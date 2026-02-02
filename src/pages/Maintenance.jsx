@@ -21,22 +21,26 @@ export const Maintenance = () => {
 
             {/* Background Effects */}
             {/* Background Effects */}
-            <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
-            {/* Darker dual overlay for contrast on gold */}
-            <div className="absolute inset-0 z-0 bg-black/60"></div>
-            <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0B1120] via-[#0B1120]/80 to-[#0B1120]"></div>
+            <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-60"></div>
+            {/* Lighter overlay to let gold show through */}
+            <div className="absolute inset-0 z-0 bg-black/40"></div>
+            <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#0B1120] via-[#0B1120]/60 to-[#0B1120]"></div>
 
             {/* Content Container */}
             <div className="relative z-10 max-w-lg w-full text-center px-6">
 
                 {/* Logo with Glow */}
-                <div className="mb-12 relative flex justify-center">
-                    <div className="absolute w-40 h-40 bg-[#C19A6B] rounded-full blur-[80px] opacity-20 animate-pulse"></div>
+                {/* Logo with Glow and Integration Fix */}
+                <div className="mb-12 relative flex justify-center items-center">
+                    {/* Dark radial backdrop to blend the logo's black background seamlessly */}
+                    <div className="absolute w-64 h-64 bg-black rounded-full blur-[40px] opacity-80 z-0"></div>
+                    {/* Gold Glow */}
+                    <div className="absolute w-40 h-40 bg-[#C19A6B] rounded-full blur-[60px] opacity-20 animate-pulse z-0"></div>
+
                     <img
                         src="/logo_new.png"
                         alt="La Boutique de la Elegancia"
-                        className="w-48 md:w-64 h-auto relative z-10 mix-blend-screen object-contain contrast-125 brightness-110"
-                        style={{ maskImage: 'radial-gradient(circle, black 40%, transparent 80%)', WebkitMaskImage: 'radial-gradient(circle, black 40%, transparent 80%)' }}
+                        className="w-56 md:w-72 h-auto relative z-10 mix-blend-screen object-contain"
                         onError={(e) => { e.target.onerror = null; e.target.src = '/logo-main.png'; }}
                     />
                 </div>
