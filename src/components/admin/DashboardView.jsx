@@ -107,7 +107,11 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                     <div className="flex items-center gap-4 bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
                         <div className="flex items-center gap-2 px-2">
                             <Calendar className="w-4 h-4 text-slate-500" />
-                            <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-transparent text-sm font-bold outline-none text-slate-700 dark:text-white cursor-pointer">
+                            <select
+                                value={dateRange}
+                                onChange={(e) => setDateRange(e.target.value)}
+                                className="bg-transparent text-sm font-bold outline-none text-slate-700 dark:text-white cursor-pointer [&>option]:bg-slate-800 [&>option]:text-white"
+                            >
                                 <option value="7">Últimos 7 días</option>
                                 <option value="30">Últimos 30 días</option>
                                 <option value="all">Todo el Histórico</option>
