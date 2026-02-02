@@ -1,0 +1,359 @@
+/* Archivo para modificaciones de estilo personalizadas */
+/* Sobrescribe aquí las clases de Tailwind o añade nuevos estilos */
+/* Fix Modal Overlay: Asegurar scroll vertical en pantallas chicas */
+.custom-modal-overlay-fix {
+    overflow-y: auto !important;
+    max-height: 100vh !important;
+    padding-bottom: 20px;
+    align-items: flex-start !important;
+    /* Evitar que se centre y corte arriba */
+    padding-top: 20px;
+}
+
+/* Fix Grid Layout: Permitir wrap en pantallas chicas */
+.custom-modal-grid-fix {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+
+/* Ajustar los hijos del grid para que ocupen ancho completo al wrappear */
+.custom-modal-grid-fix>* {
+    min-width: 300px !important;
+    /* Ancho mínimo razonable antes de wrappear */
+    flex: 1 1 400px !important;
+    /* Crecer y encoger, base 400px */
+    max-width: 100% !important;
+}
+
+/* Asegurar que el modal no sea mas ancho que la pantalla */
+.custom-modal-overlay-fix>div {
+    max-width: 95vw !important;
+    margin: 0 auto !important;
+    height: auto !important;
+    margin-bottom: 50px !important;
+    /* Espacio para scroll */
+}
+
+/* Fix Global: Evitar scroll horizontal indeseado y mejorar renderizado texto */
+body {
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Media Query para móviles y pantallas pequeñas */
+@media (max-width: 768px) {
+
+    /* Ajustar tamaño de textos en modal */
+    .custom-modal-overlay-fix * {
+        font-size: 14px !important;
+    }
+
+    .custom-modal-overlay-fix h1,
+    .custom-modal-overlay-fix h2,
+    .custom-modal-overlay-fix h3 {
+        font-size: 1.2em !important;
+    }
+
+    /* Reducir paddings en modal para ganar espacio */
+    .custom-modal-overlay-fix>div {
+        padding: 10px !important;
+        width: 100% !important;
+    }
+
+    /* Asegurar que los botones de acción tengan espacio */
+    .custom-modal-grid-fix button {
+        margin-top: 15px;
+        margin-bottom: 30px;
+        width: 100%;
+    }
+}
+
+/* ============================================ */
+/* ASISTENTE IA - ESTILOS */
+/* ============================================ */
+
+.ai-assistant-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99999;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Botón flotante */
+.ai-assistant-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+}
+
+.ai-assistant-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(102, 126, 234, 0.6);
+}
+
+.ai-icon {
+    font-size: 28px;
+    z-index: 1;
+}
+
+.ai-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: inherit;
+    animation: ai-pulse 2s infinite;
+    opacity: 0;
+}
+
+@keyframes ai-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Panel del chat */
+.ai-assistant-panel {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 380px;
+    max-width: 90vw;
+    background: rgba(30, 30, 50, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+    transition: all 0.3s ease;
+}
+
+.ai-assistant-panel.hidden {
+    display: none;
+}
+
+/* Header */
+.ai-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.ai-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-avatar {
+    font-size: 32px;
+}
+
+.ai-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.ai-status {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.ai-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ai-close-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Historial de chat */
+.ai-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 400px;
+}
+
+.ai-message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+    word-wrap: break-word;
+    /* Importante para que no se salga */
+}
+
+/* Scrollbar personalizado */
+.ai-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ai-messages::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.ai-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.ai-message.assistant {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    border-bottom-left-radius: 4px;
+}
+
+.ai-message.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+/* Typing indicator */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    width: fit-content;
+    margin-bottom: 10px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Input area */
+.ai-input-area {
+    padding: 15px;
+    background: rgba(20, 20, 35, 0.6);
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    padding: 12px 20px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.ai-input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.ai-send-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.ai-send-btn:hover {
+    transform: scale(1.05);
+}
+
+.ai-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Markdown Styles inside messages */
+.ai-message ul {
+    margin: 5px 0 5px 20px;
+    padding: 0;
+}
+
+.ai-message p {
+    margin: 5px 0;
+}
+
+.ai-message strong {
+    font-weight: 700;
+    color: #ffd700;
+    /* Dorado para resaltar */
+}

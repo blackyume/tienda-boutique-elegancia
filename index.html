@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+  <!-- SEO Meta Tags -->
+  <title>La Boutique de la Elegancia | Moda Femenina Premium Argentina</title>
+  <meta name="description"
+    content="Descubrí la moda femenina más elegante de Argentina. Vestidos, blusas, pantalones y accesorios de alta calidad. Envíos a todo el país. ✨ La Boutique de la Elegancia" />
+  <meta name="keywords"
+    content="moda femenina, ropa mujer argentina, vestidos elegantes, boutique online, ropa premium, moda argentina" />
+  <meta name="author" content="La Boutique de la Elegancia" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://la-boutique-de-la-elegancia.web.app/" />
+
+  <!-- Open Graph (Facebook, WhatsApp) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://la-boutique-de-la-elegancia.web.app/" />
+  <meta property="og:title" content="La Boutique de la Elegancia | Moda Femenina Premium" />
+  <meta property="og:description"
+    content="Descubrí la moda femenina más elegante de Argentina. Vestidos, blusas, pantalones y accesorios de alta calidad." />
+  <meta property="og:image" content="https://la-boutique-de-la-elegancia.web.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:site_name" content="La Boutique de la Elegancia" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="La Boutique de la Elegancia | Moda Femenina Premium" />
+  <meta name="twitter:description" content="Descubrí la moda femenina más elegante de Argentina." />
+  <meta name="twitter:image" content="https://la-boutique-de-la-elegancia.web.app/og-image.png" />
+
+  <!-- Theme Color (para móviles) -->
+  <meta name="theme-color" content="#020617" />
+  <meta name="msapplication-TileColor" content="#020617" />
+
+  <!-- Performance: Preconnect to external origins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.googletagmanager.com">
+  <link rel="preconnect" href="https://res.cloudinary.com">
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGLGH9DZP8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-SGLGH9DZP8');
+  </script>
+
+  <!-- Custom Assets for Modifications -->
+  <link rel="stylesheet" href="/assets/custom.css">
+  <script src="/assets/custom.js" defer></script>
+</head>
+
+<body>
+  <!-- Loading Screen -->
+  <div id="loadingScreen" class="loading-screen"
+    style="position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s;">
+    <div class="loading-content" style="text-align: center; color: white;">
+      <div class="loading-logo" style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
+        <img src="/assets/logo-main.png?v=4" alt="LBE" style="width: 120px; height: auto;">
+      </div>
+      <div class="loading-text" style="font-family: monospace;">La Boutique de la Elegancia</div>
+      <div class="loading-spinner"
+        style="width: 40px; height: 40px; border: 4px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto;">
+      </div>
+    </div>
+  </div>
+  <style>
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
+  <div id="root"></div>
+
+  <!-- Loading Logic -->
+  <script>
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loadingScreen');
+      if (loader) {
+        setTimeout(() => {
+          loader.style.opacity = '0';
+          setTimeout(() => { loader.remove(); }, 500);
+        }, 800);
+      }
+    });
+  </script>
+
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
