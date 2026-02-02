@@ -122,10 +122,7 @@ export const Footer = () => {
                     <p>
                         © 2026 La Boutique de la Elegancia. Todos los derechos reservados.
                     </p>
-                    <span className="opacity-20 hidden md:inline">|</span>
-                    <Link to="/admin" className="flex items-center gap-2 hover:text-[#C19A6B] transition-colors opacity-50 hover:opacity-100">
-                        <ShieldCheck className="w-3 h-3" /> Staff Access
-                    </Link>
+
                 </div>
             </div>
         </footer >

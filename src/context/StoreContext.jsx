@@ -3,7 +3,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from 'firebase/firestore';
 import { ref, deleteObject, listAll } from 'firebase/storage';
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { storage, auth } from '../lib/firebase';
 import imageCompression from 'browser-image-compression';
 
@@ -222,7 +222,8 @@ export const StoreProvider = ({ children }) => {
   }, [user]);
 
   const ADMIN_WHITELIST = ['laboutiquedelaeleganciaoficial@gmail.com'];
-  const isAdmin = userRole === 'admin' || (user && ADMIN_WHITELIST.includes(user.email));
+  // Admin is ONLY the specific email. Role is ignored for admin privilege to be safe.
+  const isAdmin = user && ADMIN_WHITELIST.includes(user.email);
 
   const login = async (email, password) => {
     try {
@@ -232,6 +233,31 @@ export const StoreProvider = ({ children }) => {
     } catch (error) {
       console.error(error);
       addToast("Credenciales inválidas", "error");
+      return false;
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if user exists in DB, if not create as customer
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          name: user.displayName,
+          role: 'customer',
+          createdAt: Date.now()
+        });
+      }
+      addToast("Sesión iniciada con Google", "success");
+      return true;
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      addToast("Error al iniciar con Google", "error");
       return false;
     }
   };
@@ -633,7 +659,7 @@ export const StoreProvider = ({ children }) => {
   return (
     <StoreContext.Provider value={{
       inventory, cart, setCart, addToCart, removeFromCart, cartTotal,
-      orders, wishlist, setWishlist, toasts, addToast, isAdmin, user, login, register, logout,
+      orders, wishlist, setWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout,
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isMaintenance, setIsMaintenance,
       categories, siteConfig, cloudinaryConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,

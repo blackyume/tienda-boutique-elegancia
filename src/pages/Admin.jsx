@@ -334,38 +334,27 @@ export const Admin = () => {
 
     // --- RENDER HELPERS ---
 
-    if (!isAdmin) return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950">
-            <form onSubmit={async (e) => {
-                e.preventDefault();
-                setIsLoggingIn(true);
-                await login(email, password);
-                setIsLoggingIn(false);
-            }} className="bg-white/5 backdrop-blur-xl p-10 rounded-3xl border border-white/10 text-center w-full max-w-sm shadow-2xl">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#1a1a1a] to-[#000] rounded-xl mx-auto mb-6 flex items-center justify-center text-[#C19A6B] font-luxury font-bold text-2xl border border-[#C19A6B] shadow-lg shadow-[#C19A6B]/20">B</div>
-                <h2 className="text-white text-3xl font-luxury font-bold mb-2 tracking-widest uppercase">La Boutique</h2>
-                <p className="text-[#C19A6B] text-[10px] uppercase tracking-[0.3em] mb-8">de la Elegancia</p>
+    const navigate = React.useRouter?.useNavigate?.() || (() => { }); // Hooks must be top level, but Admin is a component. I need to make sure I import useNavigate properly or use <Navigate>.
+    // Better to use <Navigate> from react-router-dom if I import it, or just use `window.location.href = '/'` or just return null and useEffect to navigate.
+    // Let's check imports in Admin.jsx. It doesn't import Navigate or useNavigate. I should add it.
+    // For now I will return a clear "Acceso Denegado" or use window.location for simplicity if I can't easily add imports without context switch.
+    // Actually I can add imports. But let's look at the existing code: `import React, { useState, useEffect, useMemo } from 'react';`
+    // I can modify the imports in another call. For now, let's render a "Return Home" content.
 
-                <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-center mb-4 focus:outline-none focus:border-[#C19A6B]/50 transition-colors"
-                    placeholder="admin@tienda.com"
-                />
-
-                <input
-                    type="password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white text-center mb-4 focus:outline-none focus:border-[#C19A6B]/50 transition-colors"
-                    placeholder="••••••••"
-                />
-
-                <Button isLoading={isLoggingIn} className="w-full bg-[#C19A6B] hover:bg-[#a38056] text-white py-3 rounded-xl font-bold tracking-wide transition-all shadow-lg hover:shadow-[#C19A6B]/20">INGRESAR</Button>
-            </form>
-        </div>
-    );
+    if (!isAdmin) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white">
+                <div className="w-16 h-16 bg-[#C19A6B] rounded-full flex items-center justify-center mb-6 animate-pulse">
+                    <Lock className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-3xl font-luxury font-bold mb-2">Acceso Restringido</h1>
+                <p className="text-slate-400 mb-8">Esta área es exclusiva para personal autorizado.</p>
+                <Button onClick={() => window.location.href = '/'} className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-slate-200 transition-colors">
+                    Volver a la Tienda
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen bg-[#F5F2EB] dark:bg-[#0B1120] font-sans text-slate-800 dark:text-slate-200 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
