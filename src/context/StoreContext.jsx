@@ -221,7 +221,7 @@ export const StoreProvider = ({ children }) => {
     }
   }, [user]);
 
-  const ADMIN_WHITELIST = ['laboutiquedelaeleganciaoficial@gmail.com'];
+  const ADMIN_WHITELIST = ['laboutiquedelaeleganciaoficial@gmail.com', 'juampi218@gmail.com'];
   // Admin is ONLY the specific email. Role is ignored for admin privilege to be safe.
   const isAdmin = user && ADMIN_WHITELIST.includes(user.email);
 
@@ -257,7 +257,8 @@ export const StoreProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error("Google Login Error:", error);
-      addToast("Error al iniciar con Google", "error");
+      // Show specific error code to help debugging
+      addToast(`Error Google: ${error.code || error.message}`, "error");
       return false;
     }
   };
@@ -499,10 +500,13 @@ export const StoreProvider = ({ children }) => {
     // --- INTEGRACIONES REALES ---
     createPreferenceMP: async (orderData) => {
       try {
-        // Llamada a tu Cloud Function (Reemplazar URL al desplegar)
-        // Local fallback o Production URL
-        // const FUNCTION_URL = "http://127.0.0.1:5001/la-boutique-de-la-elegancia/us-central1/createPreference";
-        const FUNCTION_URL = "https://us-central1-la-boutique-de-la-elegancia.cloudfunctions.net/createPreference";
+        // Llamada a tu Cloud Function o Vercel API
+        // Priorizar la URL configurada en el panel de administración
+        const FUNCTION_URL = paymentConfig.backendUrl
+          ? `${paymentConfig.backendUrl.replace(/\/$/, '')}/api/create-preference`
+          : "http://localhost:3000/api/create-preference"; // Fallback local
+
+        console.log("Connecting to Payment API:", FUNCTION_URL);
 
         const response = await fetch(FUNCTION_URL, {
           method: 'POST',

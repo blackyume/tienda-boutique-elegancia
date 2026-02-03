@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Loader } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer } from '../components/ui/ToastContainer';
 
 export const Maintenance = () => {
     const [email, setEmail] = useState('');
@@ -49,19 +50,20 @@ export const Maintenance = () => {
     }, [isAdmin, navigate]);
 
     return (
-        <div className="fixed inset-0 z-[9999] bg-black text-white flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden font-sans">
+        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 md:p-8 overflow-y-auto font-sans relative">
+            <ToastContainer />
 
             {/* ========== PREMIUM BACKGROUND ========== */}
-            <div className="absolute inset-0 z-0 bg-black"></div>
+            <div className="fixed inset-0 z-0 bg-black"></div>
             <div
-                className="absolute inset-0 z-0 opacity-20 bg-cover bg-center"
+                className="fixed inset-0 z-0 opacity-20 bg-cover bg-center"
                 style={{
                     backgroundImage: "url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2029&auto=format&fit=crop')",
                     maskImage: 'linear-gradient(to bottom, transparent 0%, transparent 35%, black 50%, black 100%)',
                     WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, transparent 35%, black 50%, black 100%)'
                 }}
             ></div>
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 z-0 bg-gradient-to-t from-[#D4AF37]/5 via-transparent to-transparent"></div>
+            <div className="fixed bottom-0 left-0 right-0 h-1/3 z-0 bg-gradient-to-t from-[#D4AF37]/5 via-transparent to-transparent"></div>
 
             {/* ========== MAIN CONTENT ========== */}
             <div className="relative z-10 max-w-xl w-full text-center flex flex-col items-center">
@@ -135,9 +137,9 @@ export const Maintenance = () => {
                     </div>
 
                     <img
-                        src="/logo_new.png"
+                        src="/logo_custom.png"
                         alt="La Boutique de la Elegancia"
-                        className="w-48 md:w-56 h-auto relative z-10 mx-auto object-contain"
+                        className="w-48 md:w-56 h-auto relative z-10 mx-auto object-contain mix-blend-screen"
                     />
                 </div>
 

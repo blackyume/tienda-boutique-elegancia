@@ -119,6 +119,24 @@ export const IntegrationsView = () => {
                                     />
                                     <p className="text-[10px] text-slate-400 mt-1">Este porcentaje se sumará al total de la compra cuando elijan Mercado Pago.</p>
                                 </div>
+                                <div>
+                                    <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">
+                                        URL del Backend (Vercel)
+                                        <span className="ml-2 bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded text-[10px] normal-case">API de Pagos</span>
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            value={mpConfig.backendUrl || ''}
+                                            onChange={e => setMpConfig({ ...mpConfig, backendUrl: e.target.value })}
+                                            className="w-full p-3 pl-10 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-[#009EE3] transition-colors text-sm font-mono text-slate-600 dark:text-slate-300"
+                                            placeholder="https://tu-proyecto.vercel.app"
+                                        />
+                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                            <Lock className="w-4 h-4" />
+                                        </div>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 mt-1">La URL donde desplegaste la carpeta /api en Vercel.</p>
+                                </div>
                             </div>
 
                             <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">

@@ -24,15 +24,7 @@ export const TrustBadges = ({ className = "" }) => {
                 </div>
             </div>
 
-            <div className="flex items-center gap-3">
-                <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300">
-                    <Lock className="w-5 h-5" />
-                </div>
-                <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Garantía</h4>
-                    <p className="text-[10px] text-slate-500">30 días de cambio</p>
-                </div>
-            </div>
+
 
             <div className="flex items-center gap-3">
                 <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300">
