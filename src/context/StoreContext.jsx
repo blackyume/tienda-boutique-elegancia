@@ -504,7 +504,7 @@ export const StoreProvider = ({ children }) => {
         // Priorizar la URL configurada en el panel de administración
         const FUNCTION_URL = paymentConfig.backendUrl
           ? `${paymentConfig.backendUrl.replace(/\/$/, '')}/api/create-preference`
-          : "http://localhost:3000/api/create-preference"; // Fallback local
+          : "https://tienda-boutique-elegancia.vercel.app/api/create-preference";
 
         console.log("Connecting to Payment API:", FUNCTION_URL);
 
