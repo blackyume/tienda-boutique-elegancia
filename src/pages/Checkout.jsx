@@ -15,6 +15,13 @@ export const Checkout = () => {
     const [loading, setLoading] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+    // Pre-fill email from user
+    useState(() => {
+        if (user?.email) {
+            setFormData(prev => ({ ...prev, email: user.email }));
+        }
+    }, [user]);
+
     // Coupon state
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -122,7 +129,7 @@ export const Checkout = () => {
                 date: new Date().toISOString(),
                 status: 'pending_payment', // Inicialmente pendiente
                 total: finalTotal,
-                customer: { ...formData, userId: user.uid, email: user.email }, // Force Auth Email
+                customer: { ...formData, userId: user.uid, email: formData.email },
                 items: cart,
                 shipping: shippingMethod,
                 shippingCost: shippingOptions[shippingMethod].cost,
@@ -137,24 +144,25 @@ export const Checkout = () => {
                 await useCoupon(appliedCoupon.id);
             }
 
-            // 2. Generar Link de Pago (Backend) - SKIPPED (User preference: WhatsApp)
-            // 3. Fallback: Redirigir a WhatsApp
-            addToast("Enviando confirmación...", "info");
-            await sendOrderEmail(newOrder); // Enviamos el mail antes de salir
-            addToast("Pedido registrado. Abriendo WhatsApp...", "success");
+            // 2. Generar Link de Pago (Backend Vercel)
+            try {
+                addToast("Generando link de pago...", "info");
+                const initPoint = await createPreferenceMP(newOrder); // Usa la URL de Vercel configurada en StoreContext
 
-            // Construir mensaje de WhatsApp
-            const itemsList = cart.map(i => `• ${i.name} (${i.size}) x${i.quantity}`).join('%0A');
-            const message = `Hola! Acabo de realizar el pedido *#${newOrder.id}*.%0A%0A*Detalle del pedido:*%0A${itemsList}%0A%0A*Total: ${formatMoney(finalTotal)}*%0A*Envío:* ${shippingOptions[shippingMethod].name}%0A%0AQuisiera coordinar el pago. Aguardo el link.`;
+                // Redirigir a Mercado Pago
+                window.location.href = initPoint;
+            } catch (mpError) {
+                console.error("Error MP, fallback WhatsApp:", mpError);
 
-            // Número de teléfono de la tienda (Dynamic from config)
-            const whatsappNumber = siteConfig?.whatsappNumber || "5491144444444";
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+                // 3. Fallback: Redirigir a WhatsApp si falla MP
+                addToast("Error conectando con Mercado Pago. Redirigiendo a WhatsApp...", "error");
 
-            window.location.href = whatsappUrl;
+                const itemsList = cart.map(i => `• ${i.name} (${i.size}) x${i.quantity}`).join('%0A');
+                const message = `Hola! Acabo de realizar el pedido *#${newOrder.id}*.%0A%0A*Detalle del pedido:*%0A${itemsList}%0A%0A*Total: ${formatMoney(finalTotal)}*%0A*Envío:* ${shippingOptions[shippingMethod].name}%0A%0AHubo un error con el pago automático. Quisiera coordinar por acá.`;
 
-            // Navegar a success en background para limpiar carro (opcional, o manejarlo al volver)
-            navigate(`/payment-status?status=pending&payment_id=whatsapp-${newOrder.id}`, { replace: true });
+                const whatsappNumber = siteConfig?.whatsappNumber || "5491144444444";
+                window.location.href = `https://wa.me/${whatsappNumber}?text=${message}`;
+            }
 
         } catch (error) {
             console.error(error);
@@ -230,9 +238,10 @@ export const Checkout = () => {
                                 <input
                                     required
                                     name="email"
-                                    value={user.email}
-                                    disabled
-                                    className="w-full bg-slate-50 dark:bg-white/5 border-none rounded-lg px-4 py-3 text-slate-500 cursor-not-allowed"
+                                    onChange={handleInputChange}
+                                    value={formData.email}
+                                    className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors placeholder-transparent"
+                                    placeholder="Email"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-6">

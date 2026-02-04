@@ -6,7 +6,7 @@ import { Button } from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
 
 export const CartDrawer = ({ isOpen, onClose }) => {
-   const { cart, removeFromCart, cartTotal, siteConfig } = useStore();
+   const { cart, removeFromCart, cartTotal, siteConfig, inventory, addToCart } = useStore();
 
    // Sales Config
    const freeShippingConfig = siteConfig.sales?.freeShipping || { enabled: false, threshold: 100000 };
@@ -100,7 +100,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                   <div className="pt-8 mt-4 border-t border-white/10">
                      <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 text-center">Completa tu Look</h4>
                      <div className="space-y-4">
-                        {useStore.getState().inventory
+                        {inventory
                            .filter(p => !cart.some(c => c.id === p.id))
                            .slice(0, 2)
                            .map(suggested => (
@@ -113,7 +113,15 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                                     <p className="text-[10px] text-slate-400">{formatMoney(suggested.price)}</p>
                                  </div>
                                  <Button
-                                    onClick={(e) => { e.stopPropagation(); useStore.getState().addToCart(suggested, suggested.sizes[0], suggested.colors[0]); }}
+                                    onClick={(e) => {
+                                       e.stopPropagation();
+                                       // Solo agregar si tiene talle/color por defecto, si no, ir al producto
+                                       if (suggested.sizes && suggested.sizes.length > 0) {
+                                          addToCart(suggested, suggested.sizes[0], suggested.colors?.[0] || 'Standard');
+                                       } else {
+                                          window.location.href = `/product/${suggested.id}`;
+                                       }
+                                    }}
                                     className="w-8 h-8 !p-0 rounded-full flex items-center justify-center bg-transparent border border-white/20 hover:bg-cielo-gold hover:text-black hover:border-cielo-gold text-white"
                                  >
                                     +

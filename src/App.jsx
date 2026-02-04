@@ -36,8 +36,7 @@ const ScrollToTop = () => {
 
 // AppContent assumes Router context exists
 const AppContent = () => {
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const { isSizeGuideOpen, setIsSizeGuideOpen, isMaintenance, isAdmin, loading, incrementVisits } = useStore();
+  const { isSizeGuideOpen, setIsSizeGuideOpen, isMaintenance, isAdmin, loading, incrementVisits, isCartOpen, setIsCartOpen } = useStore();
 
   // Use location here works because Router is now parent
   const location = useLocation();

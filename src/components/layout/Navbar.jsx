@@ -227,7 +227,7 @@ export const Navbar = ({ onOpenCart }) => {
                         <button onClick={onOpenCart} className="relative p-2 text-white hover:text-cielo-gold transition-colors magnetic-btn group">
                             <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             {cart.length > 0 && (
-                                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-cielo-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(193,154,107,0.5)] animate-bounce border border-[#0B1120]">
+                                <span className="absolute top-1 right-1 min-w-[14px] h-[14px] bg-cielo-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center shadow-md border border-[#0B1120] animate-bounce-slow leading-none pt-[1px]">
                                     {cart.reduce((a, b) => a + b.quantity, 0)}
                                 </span>
                             )}

@@ -67,6 +67,7 @@ export const Admin = () => {
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [tempColor, setTempColor] = useState("");
+    const [tempSize, setTempSize] = useState("");
     const [isSaving, setIsSaving] = useState(false);
 
     // --- FILTERS & SEARCH STATE ---
@@ -180,26 +181,33 @@ export const Admin = () => {
                     );
                     return {
                         ...curr,
-                        media: updatedMedia, // El item ya no tendrá isUploading porque recreamos el objeto sin esa prop (o la URL es string)
+                        media: updatedMedia,
                         image: updatedMedia.find(m => m.type === 'image')?.url || ''
                     };
                 });
                 addToast("Imagen subida correctamente", "success");
             } else {
-                // FALLO (uploadImage devolvió null): Eliminar item temporal
-                console.warn("Upload returned null, removing temp item");
+                // FALLO (uploadImage devolvió null): Marcar como error
+                console.warn("Upload returned null");
                 setCurrentProduct(curr => ({
                     ...curr,
-                    media: (curr.media || []).filter(item => item.tempId !== tempId)
+                    media: (curr.media || []).map(item =>
+                        item.tempId === tempId ? { ...item, isUploading: false, status: 'error', errorMessage: "Respuesta vacía del servidor" } : item
+                    )
                 }));
+                addToast("Error al subir imagen (Null)", "error");
             }
         } catch (error) {
             console.error("Error en handleImageUpload:", error);
-            addToast("Error al subir imagen", "error");
-            // Eliminar item temporal si falla
+            const msg = error.message || "Error de conexión";
+            addToast("Error al subir: " + msg, "error");
+
+            // Marcar item con error
             setCurrentProduct(curr => ({
                 ...curr,
-                media: (curr.media || []).filter(item => item.tempId !== tempId)
+                media: (curr.media || []).map(item =>
+                    item.tempId === tempId ? { ...item, isUploading: false, status: 'error', errorMessage: msg } : item
+                )
             }));
         }
     };
@@ -291,6 +299,18 @@ export const Admin = () => {
     const removeColor = (index) => {
         const newColors = currentProduct.colors.filter((_, i) => i !== index);
         setCurrentProduct({ ...currentProduct, colors: newColors });
+    };
+
+    const handleAddSize = () => {
+        if (!tempSize) return;
+        const newSizes = [...(currentProduct.sizes || []), tempSize];
+        setCurrentProduct({ ...currentProduct, sizes: newSizes });
+        setTempSize("");
+    };
+
+    const removeSize = (index) => {
+        const newSizes = currentProduct.sizes.filter((_, i) => i !== index);
+        setCurrentProduct({ ...currentProduct, sizes: newSizes });
     };
 
     const applyTargetMargin = () => {
@@ -690,10 +710,26 @@ export const Admin = () => {
                                                     <div key={index} className={`aspect-square rounded-xl overflow-hidden relative group border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm transition-all hover:shadow-md ${item.isUploading ? 'opacity-70' : ''}`}>
                                                         {item.type === 'image' ? (
                                                             <>
-                                                                <img src={item.url} className="w-full h-full object-cover" alt="Media" />
+                                                                <img src={item.url} className={`w-full h-full object-cover ${item.status === 'error' ? 'grayscale opacity-50' : ''}`} alt="Media" />
+
+                                                                {/* UPLOADING STATE */}
                                                                 {item.isUploading && (
-                                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-10">
-                                                                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-20">
+                                                                        <div className="w-8 h-8 border-2 border-[#C19A6B] border-t-transparent rounded-full animate-spin mb-2"></div>
+                                                                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">Subiendo...</span>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* ERROR STATE */}
+                                                                {item.status === 'error' && (
+                                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-900/95 z-20 p-2 text-center fade-in">
+                                                                        <div className="text-white font-bold text-[10px] mb-1">¡FALLÓ!</div>
+                                                                        <div className="text-red-200 text-[9px] leading-tight mb-2 px-1 max-h-[40px] overflow-hidden text-ellipsis" title={item.errorMessage || "Error desconocido"}>
+                                                                            {item.errorMessage || "Error desconocido"}
+                                                                        </div>
+                                                                        <button onClick={() => removeMedia(index)} className="bg-white text-red-600 px-3 py-1 rounded-lg text-[10px] font-bold uppercase hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors">
+                                                                            Eliminar
+                                                                        </button>
                                                                     </div>
                                                                 )}
                                                             </>
@@ -765,6 +801,29 @@ export const Admin = () => {
                                                     <input type="number" placeholder="0" value={currentProduct.stock} onChange={e => setCurrentProduct({ ...currentProduct, stock: e.target.value })} className="input font-bold" />
                                                 </InputGroup>
                                             </div>
+                                            <InputGroup label="Variantes de Talle">
+                                                <div className="flex gap-2 mb-2">
+                                                    <div className="relative flex-1">
+                                                        <input
+                                                            value={tempSize}
+                                                            onChange={e => setTempSize(e.target.value.toUpperCase())}
+                                                            onKeyDown={e => e.key === 'Enter' && handleAddSize()}
+                                                            className="input"
+                                                            placeholder="Ej: S, M, L, XL, 38, 40..."
+                                                        />
+                                                        <button onClick={handleAddSize} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-slate-900 text-white rounded-lg hover:bg-[#C19A6B] transition-colors"><CheckIcon className="w-3 h-3" /></button>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {(currentProduct.sizes || []).map((size, index) => (
+                                                        <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-200 dark:bg-slate-800 dark:border-slate-700 rounded-lg text-xs font-bold shadow-sm">
+                                                            {size}
+                                                            <button onClick={() => removeSize(index)} className="hover:text-red-500"><X className="w-3 h-3" /></button>
+                                                        </span>
+                                                    ))}
+                                                    {(currentProduct.sizes || []).length === 0 && <span className="text-xs text-slate-400 italic">Sin talles definidos</span>}
+                                                </div>
+                                            </InputGroup>
                                             <InputGroup label="Variantes de Color">
                                                 <div className="flex gap-2 mb-2">
                                                     <div className="relative flex-1">

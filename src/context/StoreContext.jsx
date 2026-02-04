@@ -93,6 +93,7 @@ export const StoreProvider = ({ children }) => {
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [globalFilter, setGlobalFilter] = useState({ category: "Todos", search: "" });
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
   // Auth State
@@ -664,7 +665,7 @@ export const StoreProvider = ({ children }) => {
     <StoreContext.Provider value={{
       inventory, cart, setCart, addToCart, removeFromCart, cartTotal,
       orders, wishlist, setWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout,
-      theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isMaintenance, setIsMaintenance,
+      theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
       categories, siteConfig, cloudinaryConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       ...dbActions

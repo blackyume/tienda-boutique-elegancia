@@ -6,7 +6,7 @@ import { useStore } from '../../context/StoreContext';
 import { SizeGuideModal } from './SizeGuideModal';
 
 export const QuickViewModal = ({ product, onClose }) => {
-    const { addToCart, wishlist, setWishlist, addToast, setIsSizeGuideOpen } = useStore();
+    const { addToCart, wishlist, setWishlist, addToast, setIsSizeGuideOpen, setIsCartOpen } = useStore();
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
     const [isWishlisted, setIsWishlisted] = useState(false);
@@ -37,6 +37,7 @@ export const QuickViewModal = ({ product, onClose }) => {
         if (!selectedSize || !selectedColor) return;
         addToCart(product, selectedSize, selectedColor);
         onClose();
+        setTimeout(() => setIsCartOpen(true), 300); // Wait for modal close
     };
 
     const toggleWishlist = () => {

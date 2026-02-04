@@ -109,7 +109,7 @@ export const Home = () => {
 
             {!globalFilter.search && <Features />}
 
-            {!globalFilter.search && <FeaturedCollection />}
+            {!globalFilter.search && <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />}
 
             {/* CATEGORÍAS 2026 (Masonry / Asymmetrical) */}
             {!globalFilter.search && (

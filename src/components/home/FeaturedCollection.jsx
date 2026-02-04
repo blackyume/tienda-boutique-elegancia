@@ -1,9 +1,9 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 import { ArrowRight } from 'lucide-react';
-import { formatMoney } from '../../utils/helpers';
+import { formatMoney, getColorHex } from '../../utils/helpers';
 
-export const FeaturedCollection = () => {
+export const FeaturedCollection = ({ onQuickView }) => {
     const { inventory } = useStore();
     // Get top 2 most expensive items as "Featured" or just first 2
     const featured = inventory.slice(0, 2);
@@ -36,7 +36,10 @@ export const FeaturedCollection = () => {
                                         <span className="bg-white text-black px-3 py-1 text-[10px] font-bold uppercase tracking-widest">New In</span>
                                     </div>
 
-                                    <button className="self-center bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all transform translate-y-4 group-hover:translate-y-0 duration-500">
+                                    <button
+                                        onClick={() => onQuickView && onQuickView(item)}
+                                        className="self-center bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all transform translate-y-4 group-hover:translate-y-0 duration-500"
+                                    >
                                         Ver Detalle
                                     </button>
                                 </div>
@@ -45,7 +48,26 @@ export const FeaturedCollection = () => {
                             <div className="mt-8 flex justify-between items-end border-b border-white/10 pb-4">
                                 <div>
                                     <h3 className="text-3xl font-serif text-white mb-2">{item.name}</h3>
-                                    <p className="text-sm text-slate-400 uppercase tracking-widest">{item.category}</p>
+                                    <p className="text-sm text-slate-400 uppercase tracking-widest mb-3">{item.category}</p>
+
+                                    {/* Subrle Variants Preview */}
+                                    <div className="flex items-center gap-4 opacity-70 group-hover:opacity-100 transition-opacity">
+                                        {/* Colors */}
+                                        {item.colors && item.colors.length > 0 && (
+                                            <div className="flex -space-x-2">
+                                                {item.colors.slice(0, 3).map(c => (
+                                                    <div key={c} className="w-3 h-3 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: getColorHex(c) }} />
+                                                ))}
+                                                {item.colors.length > 3 && <span className="text-[9px] text-slate-500 pl-3">+{item.colors.length - 3}</span>}
+                                            </div>
+                                        )}
+                                        {/* Sizes */}
+                                        {item.sizes && item.sizes.length > 0 && (
+                                            <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest user-select-none">
+                                                {item.sizes.slice(0, 4).join(" · ")}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-2xl font-light text-cielo-gold mb-1">{formatMoney(item.price)}</p>
