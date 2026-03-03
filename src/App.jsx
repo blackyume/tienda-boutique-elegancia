@@ -4,7 +4,6 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/shop/CartDrawer';
 import { ToastContainer } from './components/ui/ToastContainer';
-import { WhatsAppButton } from './components/ui/WhatsAppButton';
 import { SystemAlert } from './components/ui/SystemAlert';
 import { SizeGuideModal } from './components/shop/SizeGuideModal';
 import { Home } from './pages/Home';
@@ -60,12 +59,11 @@ const AppContent = () => {
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       {isSizeGuideOpen && <SizeGuideModal onClose={() => setIsSizeGuideOpen(false)} />}
       <ToastContainer />
-      <WhatsAppButton />
       <SystemAlert />
       <PromoPopup />
       <NewsletterPopup />
-      {/* ShopAssistant removed - AI only available in Admin panel */}
-
+      {/* Elegancia IA Chat Widget */}
+      <ShopAssistantWrapper />
       <div className={`flex-grow ${location.pathname !== '/' && location.pathname !== '/shop' && !location.pathname.startsWith('/admin') ? 'pt-28' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -101,6 +99,12 @@ const FooterWrapper = () => {
   const location = useLocation();
   if (location.pathname.startsWith('/admin') || location.pathname === '/checkout') return null;
   return <Footer />;
+};
+
+const ShopAssistantWrapper = () => {
+  const location = useLocation();
+  if (location.pathname.startsWith('/admin')) return null;
+  return <ShopAssistant />;
 };
 
 // Error Boundary

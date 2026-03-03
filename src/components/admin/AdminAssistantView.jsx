@@ -5,15 +5,15 @@ import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
 
 export const AdminAssistantView = ({ orders, inventory }) => {
-    const { siteConfig, addProduct, updateProduct, addCategory, toggleMaintenance, isMaintenance, uploadImage } = useStore();
+    const { siteConfig, addProduct, updateProduct, addCategory, toggleMaintenance, isMaintenance, uploadImage, aiConfig } = useStore();
     const [messages, setMessages] = useState([
-        { role: 'ai', text: '¡Hola Laura! Soy tu copiloto. ¿En qué puedo ayudarte hoy?\nPuedo analizar ventas, buscar productos o redactar contenido de marketing.' }
+        { role: 'ai', text: 'Sincronizando con la Base de Datos... \nPreparando análisis AGI inicial.', timestamp: new Date() }
     ]);
+    const [hasInitialScan, setHasInitialScan] = useState(false);
     const [input, setInput] = useState('');
     const [isAiMode, setIsAiMode] = useState(true); // Default to AI Mode
     const [showHelp, setShowHelp] = useState(false); // Help Tab State
-    const [apiKey, setApiKey] = useState('AIzaSyC_2YjBlbTdkn-Bvni-FgaNVxd9VACRci8'); // Default Key
-    const [showKey, setShowKey] = useState(false);
+    const [currentKeyIndex, setCurrentKeyIndex] = useState(0);
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -52,6 +52,80 @@ export const AdminAssistantView = ({ orders, inventory }) => {
         listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
     }, [messages]);
 
+    // Initial AGI Proactive Scan
+    useEffect(() => {
+        const performInitialScan = async () => {
+            if (hasInitialScan) return;
+
+            if (!isAiMode || !aiConfig?.adminKeys) {
+                setMessages([{ role: 'ai', text: '¡Hola Laura! El modo AGI está inactivo. ¿En qué te ayudo localmente?', timestamp: new Date() }]);
+                setHasInitialScan(true);
+                return;
+            }
+
+            if (inventory.length === 0) return;
+
+            setLoading(true);
+            const rawKeys = aiConfig?.adminKeys || '';
+            const keysArray = rawKeys.split(/[\n,]+/).map(k => k.trim()).filter(k => k);
+            let success = false;
+            let currentIdx = currentKeyIndex;
+            let lastError = null;
+
+            while (!success && currentIdx < keysArray.length) {
+                try {
+                    const genAI = new GoogleGenerativeAI(keysArray[currentIdx]);
+                    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+                    // --- GATHER LIVE STORE METRICS FOR AGI SCAN ---
+                    const salesToday = orders.filter(o => new Date(o.date).toDateString() === new Date().toDateString());
+                    const totalSalesToday = salesToday.reduce((acc, o) => acc + o.total, 0);
+                    const lowStock = inventory.filter(p => p.stock < 5).map(p => `${p.name} (${p.stock})`).join(', ');
+
+                    const prompt = `
+                        Eres Laura, el AGI (Inteligencia Artificial General) Administrador de "La Boutique de la Elegancia".
+                        Acabas de "despertar" al abrir el panel de control. 
+                        
+                        ** Tu Personalidad: **
+                        - Inteligente, profesional, ejecutiva y resolutiva. Eres la mano derecha de la dueña.
+                        - Tienes iniciativa propia. No esperes a que te pregunten, informa lo importante de inmediato.
+                        
+                        ** Datos en Tiempo Real que acabas de escanear: **
+                        - Estado Mantenimiento: ${isMaintenance ? 'ON' : 'OFF'}
+                        - Ventas Hoy: ${formatMoney(totalSalesToday)} (${salesToday.length} pedidos)
+                        - Alertas de Stock Bajo (CRÍTICO): ${lowStock || 'Todo bien por ahora'}
+                        
+                        ** Tu tarea ahora mismo: **
+                        Genera tu mensaje de bienvenida inicial. 
+                        Saluda a la dueña cordialmente, dale un rápido y elegante resumen de las ventas de hoy, y avísale SI hay stock bajo.
+                        Si hay stock bajo, sugiere usar el comando de reposición de esta manera: "\n\nNoté que [X] se está agotando. ¿Quieres que envíe un correo al proveedor para reponer [Producto]?"
+                    `;
+
+                    const result = await model.generateContent(prompt);
+                    setMessages([{ role: 'ai', text: result.response.text(), timestamp: new Date() }]);
+                    setHasInitialScan(true);
+                    setCurrentKeyIndex(currentIdx); // Save successful key
+                    success = true;
+
+                } catch (error) {
+                    console.warn(`Initial scan failed with key index ${currentIdx}:`, error);
+                    lastError = error;
+                    currentIdx++; // Try next key
+                }
+            }
+
+            if (!success) {
+                console.error("All API keys failed during initial scan:", lastError);
+                setMessages([{ role: 'ai', text: '¡Hola! Sistema AGI cargado, pero hubo un error de conexión al escanear los datos (Revisa tus API Keys). ¿En qué te ayudo localmente?' }]);
+                setHasInitialScan(true);
+            }
+
+            setLoading(false);
+        };
+
+        performInitialScan();
+    }, [isAiMode, aiConfig?.adminKeys, inventory, orders, hasInitialScan, isMaintenance, currentKeyIndex]);
+
     const handleSend = async () => {
         if (!input.trim()) return;
 
@@ -63,145 +137,161 @@ export const AdminAssistantView = ({ orders, inventory }) => {
         try {
             let responseText = '';
 
-            if (isAiMode && apiKey) {
-                // --- GEMINI AI MODE ---
-                const genAI = new GoogleGenerativeAI(apiKey);
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            if (isAiMode && aiConfig?.adminKeys) {
+                // --- GEMINI AI MODE WITH FALLBACK ---
+                const rawKeys = aiConfig.adminKeys;
+                const keysArray = rawKeys.split(/[\n,]+/).map(k => k.trim()).filter(k => k);
+                let success = false;
+                let currentIdx = currentKeyIndex;
+                let lastError = null;
 
-                // Prepare Context
-                const salesToday = orders.filter(o => new Date(o.date).toDateString() === new Date().toDateString());
-                const totalSalesToday = salesToday.reduce((acc, o) => acc + o.total, 0);
-                const lowStock = inventory.filter(p => p.stock < 5).map(p => `${p.name} (${p.stock})`).join(', ');
-                const lastOrders = orders.slice(0, 5).map(o =>
-                    `Pedido #${o.id.toString().slice(-4)}: ${o.customer?.name || 'Cliente'} (${o.customer?.email}) - $${o.total} - Dir: ${o.shipping?.address || 'Retiro'} ${o.shipping?.city || ''} CP:${o.shipping?.zip || ''}`
-                ).join('\n');
+                while (!success && currentIdx < keysArray.length) {
+                    try {
+                        const genAI = new GoogleGenerativeAI(keysArray[currentIdx]);
+                        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-                // --- ADVANCED METRICS ---
-                // 1. Mejores Clientes (VIP)
-                const customers = {};
-                orders.forEach(o => {
-                    const email = o.customer?.email || 'Anonimo';
-                    if (!customers[email]) customers[email] = { name: o.customer?.name, spent: 0, count: 0 };
-                    customers[email].spent += o.total;
-                    customers[email].count += 1;
-                });
-                const topCustomers = Object.values(customers)
-                    .sort((a, b) => b.spent - a.spent)
-                    .slice(0, 3)
-                    .map(c => `- ${c.name || c.email}: $${c.spent} (${c.count} pedidos)`)
-                    .join('\n');
+                        // Prepare Context
+                        const salesToday = orders.filter(o => new Date(o.date).toDateString() === new Date().toDateString());
+                        const totalSalesToday = salesToday.reduce((acc, o) => acc + o.total, 0);
+                        const lowStock = inventory.filter(p => p.stock < 5).map(p => `${p.name} (${p.stock})`).join(', ');
+                        const lastOrders = orders.slice(0, 5).map(o =>
+                            `Pedido #${o.id.toString().slice(-4)}: ${o.customer?.name || 'Cliente'} (${o.customer?.email}) - $${o.total} - Dir: ${o.shipping?.address || 'Retiro'} ${o.shipping?.city || ''} CP:${o.shipping?.zip || ''}`
+                        ).join('\n');
 
-                // 2. Tendencias (Colores y Categorias)
-                const trends = { colors: {}, cats: {} };
-                orders.forEach(o => o.items.forEach(item => {
-                    const product = inventory.find(p => p.id === item.id) || item;
-                    // Count Colors (if available in item or product)
-                    if (item.selectedColor) {
-                        trends.colors[item.selectedColor] = (trends.colors[item.selectedColor] || 0) + item.quantity;
-                    }
-                    // Count Categories
-                    if (product.category) {
-                        trends.cats[product.category] = (trends.cats[product.category] || 0) + item.quantity;
-                    }
-                }));
-                const topColor = Object.entries(trends.colors).sort((a, b) => b[1] - a[1])[0];
-                const topCat = Object.entries(trends.cats).sort((a, b) => b[1] - a[1])[0];
-                const trendText = `Color Top: ${topColor ? topColor[0] : 'N/A'}, Categoria Top: ${topCat ? topCat[0] : 'N/A'}`;
+                        // --- ADVANCED METRICS ---
+                        // 1. Mejores Clientes (VIP)
+                        const customers = {};
+                        orders.forEach(o => {
+                            const email = o.customer?.email || 'Anonimo';
+                            if (!customers[email]) customers[email] = { name: o.customer?.name, spent: 0, count: 0 };
+                            customers[email].spent += o.total;
+                            customers[email].count += 1;
+                        });
+                        const topCustomers = Object.values(customers)
+                            .sort((a, b) => b.spent - a.spent)
+                            .slice(0, 3)
+                            .map(c => `- ${c.name || c.email}: $${c.spent} (${c.count} pedidos)`)
+                            .join('\n');
 
-                // 3. Rentabilidad (Margen)
-                // Find product with highest margin %
-                const profitableProduct = inventory.reduce((prev, current) => {
-                    const prevCost = Number(prev.cost || 0) + Number(prev.shippingCost || 0) + Number(prev.packagingCost || 0) + Number(prev.fixedFee || 0);
-                    const currCost = Number(current.cost || 0) + Number(current.shippingCost || 0) + Number(current.packagingCost || 0) + Number(current.fixedFee || 0);
-
-                    const prevMargin = prev.price > 0 ? (prev.price - prevCost) / prev.price : 0;
-                    const currMargin = current.price > 0 ? (current.price - currCost) / current.price : 0;
-
-                    return (currMargin > prevMargin) ? current : prev;
-                }, inventory[0] || {});
-
-                const highMarginText = profitableProduct ? `${profitableProduct.name} (Margen: ${((1 - ((Number(profitableProduct.cost || 0) + Number(profitableProduct.shippingCost || 0)) / Number(profitableProduct.price))) * 100).toFixed(0)}%)` : 'N/A';
-
-                // 4. Performance & Psychology (Vistas vs Ventas)
-                // Need to aggregate sales quantity per product from orders
-                const salesByProduct = {};
-                orders.forEach(o => o.items.forEach(i => {
-                    const pid = i.id;
-                    salesByProduct[pid] = (salesByProduct[pid] || 0) + i.quantity;
-                }));
-
-                const performanceAnalysis = inventory.map(p => {
-                    const sales = salesByProduct[p.id] || 0;
-                    const views = p.views || 0;
-                    const conversion = views > 0 ? ((sales / views) * 100).toFixed(1) : 0;
-                    return { ...p, sales, views, conversion };
-                }).filter(p => p.views > 0 || p.sales > 0);
-
-                const lowConversion = performanceAnalysis
-                    .filter(p => p.views > 10 && p.sales === 0)
-                    .map(p => `- ${p.name}: ${p.views} vistas, 0 ventas (Posible precio alto o mala foto)`)
-                    .join('\n');
-
-                const highConversion = performanceAnalysis
-                    .sort((a, b) => b.conversion - a.conversion)
-                    .slice(0, 3)
-                    .map(p => `- ${p.name}: ${p.conversion}% conv. (${p.sales} vtas / ${p.views} vis)`)
-                    .join('\n');
-
-                // --- COMMAND PARSER ---
-                const handleCommands = async (text) => {
-                    const lines = text.split('\n');
-                    for (const line of lines) {
-                        if (line.includes('[ACTION:')) {
-                            const actionContent = line.substring(line.indexOf('[ACTION:') + 8, line.lastIndexOf(']'));
-                            const parts = actionContent.split(':');
-                            const type = parts[0];
-
-                            try {
-                                if (type === 'MAINTENANCE') {
-                                    const mode = parts[1]; // ON or OFF
-                                    if ((mode === 'ON' && !isMaintenance) || (mode === 'OFF' && isMaintenance)) {
-                                        await toggleMaintenance();
-                                    }
-                                } else if (type === 'CREATE_CATEGORY') {
-                                    await addCategory(parts[1]);
-                                } else if (type === 'UPDATE_PRICE') {
-                                    const id = Number(parts[1]);
-                                    const price = Number(parts[2]);
-                                    await updateProduct(id, { price });
-                                } else if (type === 'UPDATE_STOCK') {
-                                    const id = Number(parts[1]);
-                                    const stock = Number(parts[2]);
-                                    await updateProduct(id, { stock });
-                                } else if (type === 'UPDATE_PRODUCT') {
-                                    const id = Number(parts[1]);
-                                    // The rest is JSON
-                                    const jsonStr = actionContent.substring(actionContent.indexOf('{'));
-                                    const data = JSON.parse(jsonStr);
-                                    await updateProduct(id, data);
-                                } else if (type === 'CREATE_PRODUCT') {
-                                    const jsonStr = actionContent.substring(actionContent.indexOf('{'));
-                                    const data = JSON.parse(jsonStr);
-                                    await addProduct({
-                                        id: Date.now() + Math.floor(Math.random() * 1000),
-                                        name: data.name,
-                                        price: Number(data.price),
-                                        stock: Number(data.stock || 0),
-                                        category: data.category || 'General',
-                                        image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&auto=format&fit=crop', // Placeholder Default
-                                        active: true,
-                                        description: 'Creado por IA'
-                                    });
-                                }
-                            } catch (err) {
-                                console.error("Error executing AI command:", err);
+                        // 2. Tendencias (Colores y Categorias)
+                        const trends = { colors: {}, cats: {} };
+                        orders.forEach(o => o.items.forEach(item => {
+                            const product = inventory.find(p => p.id === item.id) || item;
+                            // Count Colors (if available in item or product)
+                            if (item.selectedColor) {
+                                trends.colors[item.selectedColor] = (trends.colors[item.selectedColor] || 0) + item.quantity;
                             }
-                        }
-                    }
-                };
+                            // Count Categories
+                            if (product.category) {
+                                trends.cats[product.category] = (trends.cats[product.category] || 0) + item.quantity;
+                            }
+                        }));
+                        const topColor = Object.entries(trends.colors).sort((a, b) => b[1] - a[1])[0];
+                        const topCat = Object.entries(trends.cats).sort((a, b) => b[1] - a[1])[0];
+                        const trendText = `Color Top: ${topColor ? topColor[0] : 'N/A'}, Categoria Top: ${topCat ? topCat[0] : 'N/A'}`;
 
-                // System Prompt
-                const prompt = `
+                        // 3. Rentabilidad (Margen)
+                        // Find product with highest margin %
+                        const profitableProduct = inventory.reduce((prev, current) => {
+                            const prevCost = Number(prev.cost || 0) + Number(prev.shippingCost || 0) + Number(prev.packagingCost || 0) + Number(prev.fixedFee || 0);
+                            const currCost = Number(current.cost || 0) + Number(current.shippingCost || 0) + Number(current.packagingCost || 0) + Number(current.fixedFee || 0);
+
+                            const prevMargin = prev.price > 0 ? (prev.price - prevCost) / prev.price : 0;
+                            const currMargin = current.price > 0 ? (current.price - currCost) / current.price : 0;
+
+                            return (currMargin > prevMargin) ? current : prev;
+                        }, inventory[0] || {});
+
+                        const highMarginText = profitableProduct ? `${profitableProduct.name} (Margen: ${((1 - ((Number(profitableProduct.cost || 0) + Number(profitableProduct.shippingCost || 0)) / Number(profitableProduct.price))) * 100).toFixed(0)}%)` : 'N/A';
+
+                        // 4. Performance & Psychology (Vistas vs Ventas)
+                        // Need to aggregate sales quantity per product from orders
+                        const salesByProduct = {};
+                        orders.forEach(o => o.items.forEach(i => {
+                            const pid = i.id;
+                            salesByProduct[pid] = (salesByProduct[pid] || 0) + i.quantity;
+                        }));
+
+                        const performanceAnalysis = inventory.map(p => {
+                            const sales = salesByProduct[p.id] || 0;
+                            const views = p.views || 0;
+                            const conversion = views > 0 ? ((sales / views) * 100).toFixed(1) : 0;
+                            return { ...p, sales, views, conversion };
+                        }).filter(p => p.views > 0 || p.sales > 0);
+
+                        const lowConversion = performanceAnalysis
+                            .filter(p => p.views > 10 && p.sales === 0)
+                            .map(p => `- ${p.name}: ${p.views} vistas, 0 ventas (Posible precio alto o mala foto)`)
+                            .join('\n');
+
+                        const highConversion = performanceAnalysis
+                            .sort((a, b) => b.conversion - a.conversion)
+                            .slice(0, 3)
+                            .map(p => `- ${p.name}: ${p.conversion}% conv. (${p.sales} vtas / ${p.views} vis)`)
+                            .join('\n');
+
+                        // --- COMMAND PARSER ---
+                        const handleCommands = async (text) => {
+                            const lines = text.split('\n');
+                            for (const line of lines) {
+                                if (line.includes('[ACTION:')) {
+                                    const actionContent = line.substring(line.indexOf('[ACTION:') + 8, line.lastIndexOf(']'));
+                                    const parts = actionContent.split(':');
+                                    const type = parts[0];
+
+                                    try {
+                                        if (type === 'MAINTENANCE') {
+                                            const mode = parts[1]; // ON or OFF
+                                            if ((mode === 'ON' && !isMaintenance) || (mode === 'OFF' && isMaintenance)) {
+                                                await toggleMaintenance();
+                                            }
+                                        } else if (type === 'CREATE_CATEGORY') {
+                                            await addCategory(parts[1]);
+                                        } else if (type === 'UPDATE_PRICE') {
+                                            const id = Number(parts[1]);
+                                            const price = Number(parts[2]);
+                                            await updateProduct(id, { price });
+                                        } else if (type === 'UPDATE_STOCK') {
+                                            const id = Number(parts[1]);
+                                            const stock = Number(parts[2]);
+                                            await updateProduct(id, { stock });
+                                        } else if (type === 'UPDATE_PRODUCT') {
+                                            const id = Number(parts[1]);
+                                            // The rest is JSON
+                                            const jsonStr = actionContent.substring(actionContent.indexOf('{'));
+                                            const data = JSON.parse(jsonStr);
+                                            await updateProduct(id, data);
+                                        } else if (type === 'CREATE_PRODUCT') {
+                                            const jsonStr = actionContent.substring(actionContent.indexOf('{'));
+                                            const data = JSON.parse(jsonStr);
+                                            await addProduct({
+                                                id: Date.now() + Math.floor(Math.random() * 1000),
+                                                name: data.name,
+                                                price: Number(data.price),
+                                                stock: Number(data.stock || 0),
+                                                category: data.category || 'General',
+                                                image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&auto=format&fit=crop', // Placeholder Default
+                                                active: true,
+                                                description: 'Creado por IA'
+                                            });
+                                        } else if (type === 'RESTOCK_EMAIL') {
+                                            const id = Number(parts[1]);
+                                            const product = inventory.find(p => p.id === id);
+                                            if (product) {
+                                                const subject = encodeURIComponent(`Pedido de Reposición Urgente - ${product.name}`);
+                                                const body = encodeURIComponent(`Hola equipo de proveedores,\n\nNos dirigimos a ustedes para solicitar la reposición urgente de stock del siguiente artículo:\n\n- Producto: ${product.name}\n- ID de Referencia: ${product.id}\n- Cantidad Sugerida: 20 unidades\n\nPor favor, confirmen disponibilidad y tiempos de entrega a la brevedad.\n\nAtentamente,\nLaura AGI - Administradora\nLa Boutique de la Elegancia`);
+                                                window.open(`mailto:proveedores@laboutique.com.ar?subject=${subject}&body=${body}`, '_blank');
+                                            }
+                                        }
+                                    } catch (err) {
+                                        console.error("Error executing AI command:", err);
+                                    }
+                                }
+                            }
+                        };
+
+                        // System Prompt
+                        const prompt = `
                     Eres el asistente IA y OPERADOR de la tienda "La Boutique de la Elegancia". 
                     Hablas con Laura (Dueña).
                     
@@ -215,6 +305,8 @@ export const AdminAssistantView = ({ orders, inventory }) => {
                     5. **Modificar Producto/SEO:** [ACTION:UPDATE_PRODUCT:ID_Producto:{"description":"..."}]
                     6. **Crear Producto:** [ACTION:CREATE_PRODUCT:{"name":"Nombre",...}]
                        (Solo usa este si el producto NO existe en el inventario).
+                    7. **Email a Proveedor (Auto-Stocking):** [ACTION:RESTOCK_EMAIL:ID_Producto]
+                       (Usa esto para redactar automáticamente un email al proveedor pidiendo más stock).
 
                     ** Contexto del Negocio: **
                     - Estado Mantenimiento: ${isMaintenance ? 'ON' : 'OFF'}
@@ -250,6 +342,7 @@ export const AdminAssistantView = ({ orders, inventory }) => {
                        - Descríbela detalladamente.
                        - Si parece un producto para vender, sugiere el comando [ACTION:CREATE_PRODUCT:...] completando los datos que ves (nombre, color, categoria).
                        - Usa esta URL para la imagen del producto: [URL_IMAGEN_SUBIDA]
+                    7. ** AUTO-STOCKING **: Si notas stock bajo crítico (ej: < 5) de un producto muy vendido, sugiérele a Laura redactar un email de reposición. Si ella dice "sí" o "hazlo", ejecuta de inmediato [ACTION:RESTOCK_EMAIL:ID_PRODUCTO].
                     
                     ** Inventario Real (Busca aquí IDs para actualizar): **
                     ${inventory.map(p => `- ${p.name} (ID: ${p.id}, $${p.price}, Stock: ${p.stock}, Image: ${p.image})`).join('\n')}
@@ -258,28 +351,40 @@ export const AdminAssistantView = ({ orders, inventory }) => {
                     ${userMsg.text}
                 `;
 
-                // Handle Image + Text or Text Only
-                let result;
-                if (selectedFile) {
-                    const imagePart = await fileToGenerativePart(selectedFile);
-                    const uploadedUrl = await uploadImage(selectedFile); // Upload to Cloudinary to get URL
-                    const finalPrompt = prompt.replace('[URL_IMAGEN_SUBIDA]', uploadedUrl);
-                    result = await model.generateContent([finalPrompt, imagePart]);
-                    clearFile(); // Clear after sending
-                } else {
-                    result = await model.generateContent(prompt);
+                        // Handle Image + Text or Text Only
+                        let result;
+                        if (selectedFile) {
+                            const imagePart = await fileToGenerativePart(selectedFile);
+                            const uploadedUrl = await uploadImage(selectedFile); // Upload to Cloudinary to get URL
+                            const finalPrompt = prompt.replace('[URL_IMAGEN_SUBIDA]', uploadedUrl);
+                            result = await model.generateContent([finalPrompt, imagePart]);
+                            clearFile(); // Clear after sending
+                        } else {
+                            result = await model.generateContent(prompt);
+                        }
+
+                        responseText = result.response.text();
+
+                        // Execute Generated Commands
+                        await handleCommands(responseText);
+
+                        // Add Feedback to Message if actions were taken
+                        if (responseText.includes('[ACTION:')) {
+                            responseText = responseText.replace(/\[ACTION:.*?\]/g, '✅ [Acción Ejecutada]');
+                        }
+
+                        setCurrentKeyIndex(currentIdx); // Save successful key
+                        success = true;
+
+                    } catch (err) {
+                        console.warn(`Chat failed with key index ${currentIdx}:`, err);
+                        lastError = err;
+                        currentIdx++; // Try next key
+                    }
                 }
 
-                responseText = result.response.text();
-
-                // Execute Generated Commands
-                await handleCommands(responseText);
-
-                // Add Feedback to Message if actions were taken
-                if (responseText.includes('[ACTION:')) {
-                    // Clean numeric IDs for display or just hide the raw action tag if desired
-                    // For now we keep it or replace it with a checkmark
-                    responseText = responseText.replace(/\[ACTION:.*?\]/g, '✅ [Acción Ejecutada]');
+                if (!success) {
+                    throw lastError || new Error("All API keys failed.");
                 }
 
                 setMessages(prev => [...prev, { role: 'ai', text: responseText }]);
@@ -332,9 +437,13 @@ export const AdminAssistantView = ({ orders, inventory }) => {
             {/* Header / Toolbar */}
             <div className="relative z-10 p-5 backdrop-blur-md bg-white/5 border-b border-white/10 flex justify-between items-center">
                 <div className="flex items-center gap-4">
-                    <div className={`p-2.5 rounded-xl shadow-lg border border-white/20 ${isAiMode ? 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-indigo-500/20' : 'bg-slate-700'} text-white relative overflow-hidden group`}>
+                    <div className={`w-12 h-12 rounded-xl shadow-lg border border-white/20 ${!isAiMode ? 'bg-slate-700 p-2.5' : 'bg-transparent'} text-white relative overflow-hidden group`}>
+                        {isAiMode ? (
+                            <img src={`/laura-agi.png?v=${Date.now()}`} alt="Laura AGI" className="w-full h-full object-cover mix-blend-screen" />
+                        ) : (
+                            <Sparkles className="w-6 h-6" />
+                        )}
                         <div className="absolute inset-0 bg-white/20 skew-x-12 -translate-x-10 group-hover:translate-x-20 transition-transform duration-700 ease-in-out"></div>
-                        <Sparkles className="w-6 h-6" />
                     </div>
                     <div>
                         <h2 className="font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight">
@@ -370,27 +479,8 @@ export const AdminAssistantView = ({ orders, inventory }) => {
                             {isAiMode ? 'IA Activada' : 'Solo Local'}
                         </div>
                     </button>
-
-                    {/* API Key Toggle */}
-                    <button onClick={() => setShowKey(!showKey)} className="p-2 text-slate-500 hover:text-white transition-colors">
-                        <Key className="w-4 h-4" />
-                    </button>
                 </div>
             </div>
-
-            {/* Key Input (Collapsible) */}
-            {showKey && (
-                <div className="p-4 bg-slate-100 dark:bg-black/20 border-b border-slate-200 dark:border-slate-800 animate-slideDown">
-                    <label className="text-xs font-bold text-slate-500 block mb-1">Google Gemini API Key</label>
-                    <input
-                        type="password"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 text-sm outline-none focus:border-indigo-500"
-                        placeholder="AIza..."
-                    />
-                </div>
-            )}
 
             {/* Content Area (Chat or Help) */}
             {showHelp ? (
@@ -400,57 +490,78 @@ export const AdminAssistantView = ({ orders, inventory }) => {
                         <p className="text-slate-400">Guía rápida de todo lo que Laura puede hacer por ti.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {/* Card 1: Marketing */}
-                        <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
-                            <div className="w-12 h-12 rounded-2xl bg-pink-500/20 text-pink-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <Sparkles className="w-6 h-6" />
+                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:-translate-y-1 shadow-lg">
+                            <div className="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <Sparkles className="w-5 h-5" />
                             </div>
-                            <h4 className="text-lg font-bold text-white mb-2">Marketing Guru</h4>
-                            <p className="text-sm text-slate-400 mb-4">Crea contenido para redes sociales al instante.</p>
-                            <div className="bg-black/30 p-3 rounded-lg text-xs text-slate-300 font-mono">
+                            <h4 className="text-md font-bold text-white mb-2">Marketing & Redes</h4>
+                            <p className="text-xs text-slate-400 mb-3 leading-relaxed">Crea posts irresistibles con emojis y hashtags usando info real de tus productos.</p>
+                            <div className="bg-black/40 p-2.5 rounded text-[11px] text-pink-200/70 font-mono">
                                 "Crea un post para Instagram del Vestido Rojo"
                             </div>
                         </div>
 
-                        {/* Card 2: CRM & Ventas */}
-                        <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
-                            <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <Calculator className="w-6 h-6" />
+                        {/* Card 2: CRM & Analítica */}
+                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:-translate-y-1 shadow-lg">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <Calculator className="w-5 h-5" />
                             </div>
-                            <h4 className="text-lg font-bold text-white mb-2">Analista CRM</h4>
-                            <p className="text-sm text-slate-400 mb-4">Detecta problemas de conversión y oportunidades.</p>
-                            <div className="bg-black/30 p-3 rounded-lg text-xs text-slate-300 font-mono">
+                            <h4 className="text-md font-bold text-white mb-2">Business Intelligence</h4>
+                            <p className="text-xs text-slate-400 mb-3 leading-relaxed">Dile a Laura que cruce datos de Vistas vs Ventas para detectar fugas de ganancias.</p>
+                            <div className="bg-black/40 p-2.5 rounded text-[11px] text-indigo-200/70 font-mono">
                                 "¿Por qué no se vende el Pantalón Azul?"
                             </div>
                         </div>
 
-                        {/* Card 3: Operaciones */}
-                        <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
-                            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <Key className="w-6 h-6" />
+                        {/* Card 3: Auto-Stocking (NEW) */}
+                        <div className="p-5 rounded-2xl bg-white/5 border border-amber-500/30 hover:bg-white/10 transition-all group hover:-translate-y-1 relative overflow-hidden shadow-[0_0_15px_-3px_rgba(245,158,11,0.2)]">
+                            <div className="absolute top-0 right-0 bg-amber-500 text-black text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">NUEVO AGI</div>
+                            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <Send className="w-5 h-5" />
                             </div>
-                            <h4 className="text-lg font-bold text-white mb-2">Operaciones</h4>
-                            <p className="text-sm text-slate-400 mb-4">Control total de la tienda con comandos.</p>
-                            <ul className="space-y-2 text-xs text-slate-400">
-                                <li className="flex gap-2 items-center"><Check className="w-3 h-3 text-green-400" /> "Cierra la tienda (Mantenimiento)"</li>
-                                <li className="flex gap-2 items-center"><Check className="w-3 h-3 text-green-400" /> "Sube el stock del ID 123 a 50"</li>
-                                <li className="flex gap-2 items-center"><Check className="w-3 h-3 text-green-400" /> "Cambia el precio del Vestido a $15000"</li>
+                            <h4 className="text-md font-bold text-white mb-2">Auto-Stocking</h4>
+                            <p className="text-xs text-slate-400 mb-3 leading-relaxed">Laura vigila el stock bajo y redacta emails automáticos pidiendo reposición al proveedor.</p>
+                            <div className="bg-black/40 p-2.5 rounded text-[11px] text-amber-200/70 font-mono">
+                                "Pide reposición urgente del Vestido al proveedor"
+                            </div>
+                        </div>
+
+                        {/* Card 4: Gestión de Inventario */}
+                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:-translate-y-1 shadow-lg">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <PenTool className="w-5 h-5" />
+                            </div>
+                            <h4 className="text-md font-bold text-white mb-2">Editor DDBB</h4>
+                            <p className="text-xs text-slate-400 mb-3 leading-relaxed">Ejecuta acciones reales en la Base de Datos pidiéndoselo en lenguaje natural.</p>
+                            <ul className="space-y-1.5 text-[11px] text-slate-400 font-mono bg-black/40 p-3 rounded">
+                                <li>"Sube el stock del ID 12 a 50"</li>
+                                <li>"Baja el precio del ID 15 a $5000"</li>
                             </ul>
                         </div>
 
-                        {/* Card 4: SEO & Vision */}
-                        <div className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <Search className="w-6 h-6" />
+                        {/* Card 5: Visión Artificial & SEO */}
+                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:-translate-y-1 shadow-lg">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <Search className="w-5 h-5" />
                             </div>
-                            <h4 className="text-lg font-bold text-white mb-2">SEO & Visión</h4>
-                            <p className="text-sm text-slate-400 mb-4">Optimización automática y análisis de fotos.</p>
-                            <div className="bg-black/30 p-3 rounded-lg text-xs text-slate-300 font-mono mb-2">
-                                "Mejora el SEO del producto ID 45"
+                            <h4 className="text-md font-bold text-white mb-2">Visión Artificial & SEO</h4>
+                            <p className="text-xs text-slate-400 mb-3 leading-relaxed">Sube fotos mediante el clip 📎 para sumar nuevos productos al panel inteligentemente.</p>
+                            <div className="bg-black/40 p-2.5 rounded text-[11px] text-emerald-200/70 font-mono mb-2">
+                                [📎 Foto] "Crea este nuevo vestido"
                             </div>
-                            <div className="bg-black/30 p-3 rounded-lg text-xs text-slate-300 font-mono">
-                                [Sube una foto] "¿Qué producto es este?"
+                        </div>
+
+                        {/* Card 6: Mantenimiento */}
+                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group hover:-translate-y-1 shadow-lg">
+                            <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                <Key className="w-5 h-5" />
+                            </div>
+                            <h4 className="text-md font-bold text-white mb-2">Control de Tienda</h4>
+                            <p className="text-xs text-slate-400 mb-3 leading-relaxed">Abre o cierra la tienda al mundo instantáneamente (Modo Mantenimiento).</p>
+                            <div className="bg-black/40 p-2.5 rounded text-[11px] text-red-200/70 font-mono">
+                                "Activa el modo mantenimiento"
                             </div>
                         </div>
                     </div>
@@ -461,11 +572,11 @@ export const AdminAssistantView = ({ orders, inventory }) => {
                     {messages.map((msg, idx) => (
                         <div key={idx} className={`flex gap-5 ${msg.role === 'user' ? 'flex-row-reverse' : ''} group animate-slideUp fade-in-0 duration-500`}>
                             {/* Avatar */}
-                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border border-white/10 ${msg.role === 'ai'
-                                ? 'bg-slate-900/80 text-indigo-400'
+                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border border-white/10 overflow-hidden ${msg.role === 'ai'
+                                ? 'bg-transparent text-indigo-400'
                                 : 'bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-orange-500/20'
                                 }`}>
-                                {msg.role === 'ai' ? <Sparkles className="w-5 h-5" /> : <User className="w-5 h-5" />}
+                                {msg.role === 'ai' ? <img src={`/laura-agi.png?v=${Date.now()}`} className="w-full h-full object-cover mix-blend-screen" alt="Laura AGI" /> : <User className="w-5 h-5" />}
                             </div>
 
                             {/* Bubble */}

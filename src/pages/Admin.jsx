@@ -381,7 +381,7 @@ export const Admin = () => {
             {/* SIDEBAR */}
             <aside className="w-20 lg:w-64 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 shadow-sm relative shrink-0">
                 <div className="h-20 flex items-center justify-center lg:justify-start px-6 border-b border-slate-100 dark:border-slate-800">
-                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-[#C19A6B] font-luxury font-bold border border-[#C19A6B] shadow-md shrink-0">B</div>
+                    <img src="/assets/logo-main.png" alt="La Boutique" className="h-8 w-auto object-contain drop-shadow-md shrink-0" />
                     <span className="hidden lg:block ml-3 font-luxury font-bold text-lg text-slate-800 dark:text-white tracking-widest uppercase">La Boutique</span>
                 </div>
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -507,8 +507,8 @@ export const Admin = () => {
                         </div>
 
                         {/* TABLE */}
-                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
-                            <table className="w-full text-left text-sm">
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
+                            <table className="w-full text-left text-sm min-w-[800px]">
                                 <thead className="bg-slate-50/50 dark:bg-[#111827] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
                                     <tr>
                                         <th className="p-4 pl-6 w-1/3">Producto</th>

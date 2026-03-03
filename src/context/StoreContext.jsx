@@ -86,6 +86,12 @@ export const StoreProvider = ({ children }) => {
     uploadPreset: ""
   });
 
+  // --- AI CONFIGURATION ---
+  const [aiConfig, setAiConfig] = useState({
+    adminKeys: "", // Comma-separated or array
+    customerKeys: "" // Comma-separated or array
+  });
+
   const [simulations, setSimulations] = useState([]);
   const [coupons, setCoupons] = useState([]);
 
@@ -140,6 +146,16 @@ export const StoreProvider = ({ children }) => {
       }
     });
 
+    // Config (AI config keys)
+    const unsubAiConfig = onSnapshot(doc(db, "config", "ai_settings"), (doc) => {
+      if (doc.exists()) {
+        setAiConfig({
+          adminKeys: doc.data().adminKeys || "",
+          customerKeys: doc.data().customerKeys || ""
+        });
+      }
+    });
+
     // Config (Maintenance Mode)
     const unsubMaintenance = onSnapshot(doc(db, "config", "store_settings"), (doc) => {
       if (doc.exists()) {
@@ -160,7 +176,7 @@ export const StoreProvider = ({ children }) => {
     });
 
     setLoading(false);
-    return () => { unsubAuth(); unsubProd(); unsubOrders(); unsubCats(); unsubSiteConfig(); unsubCloudinary(); unsubMaintenance(); unsubSims(); unsubCoupons(); };
+    return () => { unsubAuth(); unsubProd(); unsubOrders(); unsubCats(); unsubSiteConfig(); unsubCloudinary(); unsubAiConfig(); unsubMaintenance(); unsubSims(); unsubCoupons(); };
   }, []);
 
   // --- THEME ---
@@ -347,6 +363,11 @@ export const StoreProvider = ({ children }) => {
       if (!isAdmin) return;
       await setDoc(doc(db, "config", "cloudinary"), config);
       addToast("Credenciales Cloudinary actualizadas", "success");
+    },
+    updateAiConfig: async (config) => {
+      if (!isAdmin) return;
+      await setDoc(doc(db, "config", "ai_settings"), config);
+      addToast("Configuración de Inteligencia Artificial guardada", "success");
     },
     addProduct: async (product) => {
       if (!isAdmin) return;
@@ -666,7 +687,7 @@ export const StoreProvider = ({ children }) => {
       inventory, cart, setCart, addToCart, removeFromCart, cartTotal,
       orders, wishlist, setWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout,
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
-      categories, siteConfig, cloudinaryConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
+      categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       ...dbActions
     }}>

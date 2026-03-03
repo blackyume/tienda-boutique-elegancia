@@ -1,13 +1,55 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Lock, Settings, Mail } from 'lucide-react';
+import { Lock, Settings, Mail, Bot } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { SalesConfig } from './SalesConfig';
 
 export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig }) => {
-    const { sendOrderEmail, addToast } = useStore();
+    const { sendOrderEmail, aiConfig, updateAiConfig, addToast } = useStore();
     const [testEmail, setTestEmail] = useState("");
     const [isTestingEmail, setIsTestingEmail] = useState(false);
+    const [isTestingKey, setIsTestingKey] = useState(false);
+
+    const handleTestKey = async () => {
+        const keysText = document.getElementById('aiAdminKeys').value || aiConfig?.adminKeys || '';
+        const keysArray = keysText.split(/[,\n]+/).map(k => k.trim()).filter(k => k);
+
+        if (keysArray.length === 0) {
+            return addToast("No hay llaves para probar", "error");
+        }
+
+        setIsTestingKey(true);
+        const keyToTest = keysArray[0];
+
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${keyToTest}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+                const models = data.models.map(m => m.name.replace('models/', ''));
+                const hasGemini = models.some(m => m.includes('gemini'));
+
+                if (hasGemini) {
+                    addToast(`¡Éxito! Llave válida y activa. Modelos: ${models.slice(0, 3).join(', ')}...`, "success");
+                } else {
+                    addToast(`Llave válida, pero inusual (sin modelos Gemini detectados).`, "warning");
+                }
+            } else {
+                if (data.error?.message?.includes("API_KEY_INVALID") || data.error?.code === 400) {
+                    addToast("ERROR: La llave provista es inválida o fue eliminada en Google Cloud.", "error");
+                } else if (response.status === 404 || data.error?.message?.includes("not found")) {
+                    addToast("ERROR DE PERMISOS: La llave es válida PERO no tiene la 'Generative Language API' habilitada en Google Cloud.", "error");
+                } else {
+                    addToast(`Error al probar llave: ${data.error?.message || response.statusText}`, "error");
+                }
+            }
+        } catch (error) {
+            addToast("Error de conexión al probar la llave", "error");
+        } finally {
+            setIsTestingKey(false);
+        }
+    };
 
     const handleTestEmail = async () => {
         if (!testEmail) return addToast("Ingresa un email para probar", "error");
@@ -107,6 +149,65 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                 </Button>
                             </div>
                             <p className="text-[10px] text-slate-400 mt-1">Tu ID de medición de flujo de datos web.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* AI CONFIGURATION */}
+                <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border dark:border-slate-700 shadow-sm sm:col-span-2 md:col-span-1 lg:col-span-2 border-l-4 border-l-purple-500">
+                    <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bot className="w-5 h-5 text-purple-500" /> Inteligencia Artificial (API Keys)</h3>
+
+                    <div className="space-y-4">
+                        <div className="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-900/30 mb-4">
+                            <p className="text-sm font-medium text-purple-800 dark:text-purple-300">
+                                💡 <strong>Nota Importante:</strong> Las cuotas de mensajes <strong>no se comparten</strong> entre el panel de administrador y los clientes de la tienda, a menos que pegues las mismas llaves en ambos cuadros.
+                            </p>
+                            <p className="text-xs text-purple-600 dark:text-purple-400 mt-2">
+                                Puedes pegar múltiples llaves (separadas por comas o saltos de línea) en cada caja. Si una llave se queda sin límite de cuota, el sistema saltará automáticamente a la siguiente sin interrumpir el servicio.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Llaves de Administrador (Cerebro IA)</label>
+                                <textarea
+                                    id="aiAdminKeys"
+                                    defaultValue={aiConfig?.adminKeys || ''}
+                                    placeholder="AIzaSy...\nAIzaSy..."
+                                    className="w-full min-h-[120px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm font-mono outline-none focus:border-purple-500 resize-y"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Llaves de Clientes (Elegancia IA)</label>
+                                <textarea
+                                    id="aiCustomerKeys"
+                                    defaultValue={aiConfig?.customerKeys || ''}
+                                    placeholder="AIzaSy...\nAIzaSy..."
+                                    className="w-full min-h-[120px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm font-mono outline-none focus:border-purple-500 resize-y"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <Button
+                                onClick={() => {
+                                    updateAiConfig({
+                                        adminKeys: document.getElementById('aiAdminKeys').value,
+                                        customerKeys: document.getElementById('aiCustomerKeys').value
+                                    });
+                                    addToast("Llaves guardadas correctamente", "success");
+                                }}
+                                className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-6 py-2.5 rounded-lg shadow-lg shadow-purple-500/20"
+                            >
+                                Guardar Keys de IA
+                            </Button>
+
+                            <Button
+                                onClick={handleTestKey}
+                                isLoading={isTestingKey}
+                                className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-6 py-2.5 rounded-lg border border-slate-700"
+                            >
+                                Probar Acceso (Llave Administrador 1)
+                            </Button>
                         </div>
                     </div>
                 </div>

@@ -181,8 +181,8 @@ export const CouponsView = () => {
             </div>
 
             {/* COUPONS TABLE */}
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
-                <table className="w-full text-left text-sm">
+            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
+                <table className="w-full text-left text-sm min-w-[800px]">
                     <thead className="bg-slate-50/50 dark:bg-[#111827] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
                         <tr>
                             <th className="p-4 pl-6">Código</th>
@@ -264,8 +264,8 @@ export const CouponsView = () => {
                                             <button
                                                 onClick={() => handleToggleActive(coupon)}
                                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase transition-all border ${isActive
-                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-900/50'
-                                                        : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700'
+                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-900/50'
+                                                    : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700'
                                                     }`}
                                             >
                                                 {isActive ? (
@@ -348,8 +348,8 @@ export const CouponsView = () => {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'percentage' })}
                                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold text-sm transition-all ${formData.type === 'percentage'
-                                                    ? 'bg-[#C19A6B] text-white border-[#C19A6B]'
-                                                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#C19A6B]'
+                                                ? 'bg-[#C19A6B] text-white border-[#C19A6B]'
+                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#C19A6B]'
                                                 }`}
                                         >
                                             <Percent className="w-4 h-4" /> %
@@ -358,8 +358,8 @@ export const CouponsView = () => {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'fixed' })}
                                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold text-sm transition-all ${formData.type === 'fixed'
-                                                    ? 'bg-[#C19A6B] text-white border-[#C19A6B]'
-                                                    : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#C19A6B]'
+                                                ? 'bg-[#C19A6B] text-white border-[#C19A6B]'
+                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#C19A6B]'
                                                 }`}
                                         >
                                             <DollarSign className="w-4 h-4" /> $

@@ -280,7 +280,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
+                            <table className="w-full text-left border-collapse min-w-[900px]">
                                 <thead>
                                     <tr className="bg-slate-50 dark:bg-slate-900 text-xs uppercase text-slate-500 font-bold border-b border-slate-100 dark:border-slate-800">
                                         <th className="p-4 whitespace-nowrap">Producto</th>

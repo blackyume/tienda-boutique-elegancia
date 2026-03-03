@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, Youtube, ShieldCheck, ArrowRight, Biohazard, Scale } from 'lucide-react';
+import { Instagram, Youtube, ShieldCheck, ArrowRight, Biohazard, Scale, Mail, MessageCircle } from 'lucide-react';
 
 // TikTok SVG Icon (not in lucide-react)
 const TikTokIcon = ({ className }) => (
@@ -20,7 +20,7 @@ export const Footer = () => {
         <footer className="bg-slate-950 text-white pt-20 pb-8 border-t border-slate-900 mt-auto font-sans">
             <RegretModal isOpen={isRegretOpen} onClose={() => setIsRegretOpen(false)} />
 
-            <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 mb-16">
+            <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-5 gap-12 mb-16">
 
                 {/* Brand */}
                 <div className="col-span-1">
@@ -51,6 +51,43 @@ export const Footer = () => {
                             <a href={siteConfig.social.tiktok} target="_blank" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all"><TikTokIcon className="w-4 h-4" /></a>
                         )}
                     </div>
+                </div>
+
+                {/* Contacto */}
+                <div>
+                    <h4 className="font-bold text-xs uppercase tracking-widest mb-6 text-[#C19A6B]">Contacto</h4>
+                    <ul className="space-y-4 text-sm text-slate-400 font-light">
+                        <li>
+                            <a href="https://wa.me/5493492216487" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-3 group">
+                                <span className="w-8 h-8 rounded-full bg-[#25D366]/10 text-[#25D366] group-hover:bg-[#25D366] group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                                    <MessageCircle className="w-4 h-4" />
+                                </span>
+                                WhatsApp
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:hola@laboutique.com.ar" className="hover:text-white transition-colors flex items-center gap-3 group">
+                                <span className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                                    <Mail className="w-4 h-4" />
+                                </span>
+                                Email
+                            </a>
+                        </li>
+                        <li className="pt-2">
+                            <span className="block text-[10px] uppercase text-slate-500 font-bold mb-3 tracking-wider">Nuestras Redes</span>
+                            <div className="flex gap-2.5">
+                                {siteConfig?.social?.instagram && (
+                                    <a href={siteConfig.social.instagram} target="_blank" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><Instagram className="w-4 h-4" /></a>
+                                )}
+                                {siteConfig?.social?.youtube && (
+                                    <a href={siteConfig.social.youtube} target="_blank" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><Youtube className="w-4 h-4" /></a>
+                                )}
+                                {siteConfig?.social?.tiktok && (
+                                    <a href={siteConfig.social.tiktok} target="_blank" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><TikTokIcon className="w-4 h-4" /></a>
+                                )}
+                            </div>
+                        </li>
+                    </ul>
                 </div>
 
                 {/* Ayuda */}
