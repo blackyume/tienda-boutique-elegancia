@@ -1,11 +1,11 @@
 import { AuthModal } from '../auth/AuthModal';
-import { User, Menu, ChevronDown, Search, ShieldCheck, ShoppingBag, X, LogOut, ShoppingBasket, Truck, Lock, Star, Sun, Moon, Heart, Package } from 'lucide-react';
+import { User, Menu, ChevronDown, Search, ShieldCheck, ShoppingBag, X, LogOut, Heart, Package } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { useState, useEffect, useRef } from 'react';
 
 export const Navbar = ({ onOpenCart }) => {
-    const { cart, toggleTheme, theme, categories, setGlobalFilter, user, logout, isAdmin, siteConfig } = useStore();
+    const { cart, categories, setGlobalFilter, user, logout, isAdmin, siteConfig } = useStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Search State
@@ -172,11 +172,6 @@ export const Navbar = ({ onOpenCart }) => {
                             />
                         </div>
 
-                        {/* THEME TOGGLE */}
-                        <button onClick={toggleTheme} className="hidden md:block p-2 text-white hover:text-cielo-gold transition-colors rounded-full hover:bg-white/5">
-                            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                        </button>
-
                         {/* USER */}
                         <div className="relative group h-full flex items-center" onMouseEnter={() => setIsUserMenuOpen(true)} onMouseLeave={() => setIsUserMenuOpen(false)}>
                             <button onClick={() => !user && setIsAuthModalOpen(true)} className="p-2 text-white hover:text-cielo-gold transition-colors rounded-full hover:bg-white/5 relative z-10">
@@ -254,10 +249,6 @@ export const Navbar = ({ onOpenCart }) => {
                     <div className="w-16 h-px bg-white/20 my-4"></div>
                     <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg uppercase tracking-widest text-slate-400">La Empresa</Link>
 
-                    <button onClick={toggleTheme} className="flex items-center gap-2 text-slate-500 mt-4">
-                        {theme === 'dark' ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-                        <span className="text-sm uppercase tracking-widest">{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
-                    </button>
                 </div>
             </div>
         </>

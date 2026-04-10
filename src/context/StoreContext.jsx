@@ -25,7 +25,7 @@ export const StoreProvider = ({ children }) => {
   // --- LOCAL STATE (Cart, Theme, etc. stay in browser) ---
   const [cart, setCart] = useLocalStorage('cielo_cart', []);
   const [wishlist, setWishlist] = useLocalStorage('cielo_wishlist', []);
-  const [theme, setTheme] = useLocalStorage('cielo_theme', 'light');
+  const [theme] = useLocalStorage('cielo_theme', 'dark');
 
   // --- FIREBASE STATE (Real-time) ---
   const [inventory, setInventory] = useState([]);
@@ -228,15 +228,12 @@ export const StoreProvider = ({ children }) => {
     return () => { unsubAuth(); unsubProd(); unsubOrders(); unsubCats(); unsubSiteConfig(); unsubCloudinary(); unsubMaintenance(); unsubSims(); unsubCoupons(); unsubSuppliers(); unsubAiHistory(); unsubPromos(); unsubWishlist(); unsubShipping(); };
   }, []);
 
-  // --- THEME ---
+  // --- THEME: always dark ---
   useEffect(() => {
-    if (document.documentElement?.classList) {
-      if (theme === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
+    document.documentElement.classList.add('dark');
+  }, []);
 
-  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  const toggleTheme = () => {};
 
   const addToast = (msg, type = 'info') => {
     const id = Date.now();

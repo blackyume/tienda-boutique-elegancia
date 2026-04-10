@@ -7,7 +7,7 @@ import {
     TrendingUp, DollarSign, Calculator, Search, Users,
     Image as ImageIcon, UploadCloud, Monitor, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
-    Check as CheckIcon, Lock, Settings, Moon, Sun, Blocks, Clock, Bot, Ticket, Building2
+    Check as CheckIcon, Lock, Settings, Blocks, Clock, Bot, Ticket, Building2
 } from 'lucide-react';
 // import { CostCalculator } from '../components/admin/CostCalculator'; // REMOVE LEGACY
 import { SimulationsView } from '../components/admin/SimulationsView';
@@ -59,7 +59,7 @@ const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, theme, toggleTheme, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents } = useStore();
     // Login State
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -452,10 +452,6 @@ export const Admin = () => {
                     <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
                 </nav>
                 <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#111827] space-y-2">
-                    <button onClick={toggleTheme} className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-center lg:justify-start p-2 transition-colors">
-                        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                        <span className="hidden lg:inline">{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
-                    </button>
                     <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-center lg:justify-start p-2 transition-colors">
                         <LinkIcon className="w-4 h-4" /> <span className="hidden lg:inline">Ir a la Tienda</span>
                     </a>
