@@ -113,3 +113,39 @@ body {
 .magnetic-btn {
     @apply relative overflow-hidden transition-all duration-300 transform hover:scale-105 active:scale-95;
 }
+
+/* Mobile & Touch Utilities */
+.safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-area-top {
+    padding-top: env(safe-area-inset-top, 0);
+}
+
+.touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* Better touch targets on mobile */
+@media (max-width: 640px) {
+    button, a, [role="button"] {
+        min-height: 44px;
+    }
+    
+    input, select, textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+}
+
+/* Smooth scrolling for all devices */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Prevent text selection on interactive elements */
+.no-select {
+    -webkit-user-select: none;
+    user-select: none;
+}

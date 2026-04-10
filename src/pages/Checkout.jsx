@@ -7,11 +7,10 @@ import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, 
 import { formatMoney } from '../utils/helpers';
 
 export const Checkout = () => {
-    const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, useCoupon } = useStore();
+    const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, useCoupon } = useStore();
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '' });
-    const [shippingMethod, setShippingMethod] = useState('andreani');
+    const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '', provincia: '' });
     const [loading, setLoading] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -28,12 +27,6 @@ export const Checkout = () => {
     const [couponError, setCouponError] = useState('');
     const [applyingCoupon, setApplyingCoupon] = useState(false);
 
-    const shippingOptions = shippingRates || {
-        andreani: { name: 'Andreani', cost: 5800, time: '2-4 días' },
-        oca: { name: 'OCA', cost: 4900, time: '3-6 días' },
-        correo_argentino: { name: 'Correo Argentino', cost: 3500, time: '5-7 días' }
-    };
-
     // Calculate Surcharge based on config
     const mpFeePercentage = paymentConfig?.mpFee ? parseFloat(paymentConfig.mpFee) : 0;
     const paymentSurcharge = cartTotal * (mpFeePercentage / 100);
@@ -44,11 +37,12 @@ export const Checkout = () => {
         if (appliedCoupon.type === 'percentage') {
             return cartTotal * (appliedCoupon.value / 100);
         }
-        return Math.min(appliedCoupon.value, cartTotal); // Fixed discount can't exceed cart total
+        return Math.min(appliedCoupon.value, cartTotal);
     };
     const couponDiscount = calculateDiscount();
 
-    const finalTotal = cartTotal + shippingOptions[shippingMethod].cost + paymentSurcharge - couponDiscount;
+    // Sin envío por ahora, se coordina por WhatsApp
+    const finalTotal = cartTotal + paymentSurcharge - couponDiscount;
 
     const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -127,12 +121,12 @@ export const Checkout = () => {
             const newOrder = {
                 id: `ORD-${Math.floor(Math.random() * 900000) + 100000}`,
                 date: new Date().toISOString(),
-                status: 'pending_payment', // Inicialmente pendiente
+                status: 'pending_payment',
                 total: finalTotal,
                 customer: { ...formData, userId: user.uid, email: formData.email },
                 items: cart,
-                shipping: shippingMethod,
-                shippingCost: shippingOptions[shippingMethod].cost,
+                shipping: 'A coordinar',
+                shippingCost: 0,
                 coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null
             };
 
@@ -158,7 +152,7 @@ export const Checkout = () => {
                 addToast("Error conectando con Mercado Pago. Redirigiendo a WhatsApp...", "error");
 
                 const itemsList = cart.map(i => `• ${i.name} (${i.size}) x${i.quantity}`).join('%0A');
-                const message = `Hola! Acabo de realizar el pedido *#${newOrder.id}*.%0A%0A*Detalle del pedido:*%0A${itemsList}%0A%0A*Total: ${formatMoney(finalTotal)}*%0A*Envío:* ${shippingOptions[shippingMethod].name}%0A%0AHubo un error con el pago automático. Quisiera coordinar por acá.`;
+                const message = `Hola! Acabo de realizar el pedido *#${newOrder.id}*.%0A%0A*Detalle del pedido:*%0A${itemsList}%0A%0A*Total: ${formatMoney(finalTotal)}*%0A%0AHubo un error con el pago automático. Quisiera coordinar por acá.`;
 
                 const whatsappNumber = siteConfig?.whatsappNumber || "5491144444444";
                 window.location.href = `https://wa.me/${whatsappNumber}?text=${message}`;
@@ -273,22 +267,19 @@ export const Checkout = () => {
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
-                                {Object.entries(shippingOptions).map(([key, option]) => (
-                                    <label key={key} className={`relative flex items-center justify-between p-6 border rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${shippingMethod === key ? `bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900` : 'border-slate-200 dark:border-slate-700 hover:border-slate-400'}`}>
-                                        <div className="flex items-center gap-5">
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingMethod === key ? 'border-cielo-gold' : 'border-slate-300'}`}>
-                                                {shippingMethod === key && <div className="w-2.5 h-2.5 rounded-full bg-cielo-gold" />}
-                                            </div>
-                                            <input type="radio" checked={shippingMethod === key} onChange={() => setShippingMethod(key)} className="hidden" />
-                                            <div>
-                                                <span className="font-bold font-serif text-lg block tracking-wide">{option.name}</span>
-                                                <span className={`text-xs uppercase tracking-widest font-bold ${shippingMethod === key ? 'text-white/60 dark:text-black/60' : 'text-slate-400'}`}>Llega en {option.time}</span>
-                                            </div>
-                                        </div>
-                                        <span className="font-montserrat font-bold text-lg">{formatMoney(option.cost)}</span>
-                                    </label>
-                                ))}
+                            <div className="grid grid-cols-2 gap-6 mt-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">Ciudad</label>
+                                    <input name="ciudad" onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" placeholder="Ej: Buenos Aires" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">Provincia</label>
+                                    <input name="provincia" onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" placeholder="Ej: CABA" />
+                                </div>
+                            </div>
+
+                            <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl text-sm text-amber-700 dark:text-amber-400">
+                                <strong>Nota:</strong> El costo de envío se coordina por WhatsApp después de confirmar el pedido.
                             </div>
                         </section>
                     </form>
@@ -317,7 +308,7 @@ export const Checkout = () => {
 
                         <div className="space-y-3 pt-6 border-t border-dashed border-slate-200 dark:border-white/10">
                             <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>Subtotal</span><span>{formatMoney(cartTotal)}</span></div>
-                            <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>Envío</span><span>{formatMoney(shippingOptions[shippingMethod].cost)}</span></div>
+                            <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>Envío</span><span className="text-amber-600">A coordinar</span></div>
                             {paymentConfig?.mpFee > 0 && (
                                 <div className="flex justify-between text-slate-500 text-xs italic">
                                     <span>Recargo Gestión de Pago ({paymentConfig.mpFee}%)</span>

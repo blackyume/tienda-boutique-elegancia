@@ -168,6 +168,25 @@ export const Shop = () => {
                                         />
                                         <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+                                        {/* Product Badges */}
+                                        <div className="absolute top-2 left-2 flex flex-col gap-1">
+                                            {product.badges?.isNew && (
+                                                <span className="bg-emerald-500 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-lg">Nuevo</span>
+                                            )}
+                                            {product.badges?.isOnSale && (
+                                                <span className="bg-red-500 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-lg animate-pulse">Oferta</span>
+                                            )}
+                                            {product.badges?.isSeason && (
+                                                <span className="bg-amber-500 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-lg">Temporada</span>
+                                            )}
+                                            {product.badges?.isFeatured && (
+                                                <span className="bg-purple-500 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-lg">★ Destacado</span>
+                                            )}
+                                            {product.badges?.isExclusive && (
+                                                <span className="bg-slate-900 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-lg">Exclusivo</span>
+                                            )}
+                                        </div>
+
                                         {/* Quick Add Button */}
                                         <button className="absolute bottom-4 right-4 bg-white dark:bg-slate-900 text-black dark:text-white p-3 rounded-full shadow-lg translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-cielo-gold hover:text-black">
                                             <span className="sr-only">Ver Producto</span>

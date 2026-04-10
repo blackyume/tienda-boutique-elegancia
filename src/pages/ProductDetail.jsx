@@ -38,6 +38,16 @@ export const ProductDetail = () => {
 
     if (!product) return <div className="h-screen bg-white dark:bg-[#0B1120]" />;
 
+    // Get current variant (if exists) or fallback to base product
+    const getSelectedVariant = () => {
+        if (!product.variants || product.variants.length === 0) return null;
+        return product.variants.find(v => v.size === selectedSize && v.color === selectedColor);
+    };
+
+    const selectedVariant = getSelectedVariant();
+    const currentPrice = selectedVariant?.price ?? product.basePrice ?? product.price;
+    const currentStock = selectedVariant?.stock ?? product.stock;
+
     // Productos Relacionados
     const relatedProducts = inventory
         .filter(p => p.category === product.category && p.id !== product.id)
@@ -45,7 +55,9 @@ export const ProductDetail = () => {
 
     const handleAddToCart = () => {
         if (!selectedSize || !selectedColor) return addToast("Seleccioná talle y color", "error");
-        addToCart(product, selectedSize, selectedColor);
+        // Pass variant price to cart
+        const productWithVariantPrice = { ...product, price: currentPrice, variantStock: currentStock };
+        addToCart(productWithVariantPrice, selectedSize, selectedColor);
     };
     // Images Array (Simulado 4 imágenes)
     const productImages = [product.image, product.image, product.image, product.image];
@@ -105,7 +117,10 @@ export const ProductDetail = () => {
                             </h1>
 
                             <div className="flex items-center gap-4 mb-8">
-                                <p className="text-2xl font-montserrat font-bold text-slate-900 dark:text-white">{formatMoney(product.price)}</p>
+                                <p className="text-2xl font-montserrat font-bold text-slate-900 dark:text-white">{formatMoney(currentPrice)}</p>
+                                {selectedVariant && selectedVariant.price !== (product.basePrice ?? product.price) && (
+                                    <span className="text-sm text-slate-400 line-through">{formatMoney(product.basePrice ?? product.price)}</span>
+                                )}
                                 <div className="flex text-cielo-gold text-xs gap-1">
                                     <Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" />
                                     <span className="text-slate-400 ml-2">(24 reviews)</span>
@@ -154,22 +169,22 @@ export const ProductDetail = () => {
                         </div>
 
                         {/* Scarcity / Stock Warning */}
-                        {siteConfig?.sales?.scarcity?.enabled && product.stock > 0 && product.stock <= (parseInt(siteConfig.sales.scarcity.threshold) || 5) && (
+                        {siteConfig?.sales?.scarcity?.enabled && currentStock > 0 && currentStock <= (parseInt(siteConfig.sales.scarcity.threshold) || 5) && (
                             <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 rounded-xl flex items-center gap-3 animate-pulse">
                                 <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-full text-orange-600 dark:text-orange-400">
                                     <Star className="w-4 h-4 fill-current" />
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold uppercase tracking-wider text-orange-700 dark:text-orange-400">¡Alta Demanda!</p>
-                                    <p className="text-sm text-slate-700 dark:text-slate-300">Solo quedan <span className="font-bold">{product.stock} unidades</span> en stock.</p>
+                                    <p className="text-sm text-slate-700 dark:text-slate-300">Solo quedan <span className="font-bold">{currentStock} unidades</span> en stock.</p>
                                 </div>
                             </div>
                         )}
 
                         {/* Actions */}
                         <div className="space-y-4 mb-12 animate-slideUp delay-100">
-                            <Button onClick={handleAddToCart} className="w-full py-5 text-sm font-bold tracking-[0.2em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 h-16 hover:bg-cielo-gold dark:hover:bg-cielo-gold hover:text-black transition-colors shadow-xl" disabled={product.stock === 0}>
-                                {product.stock === 0 ? 'AGOTADO' : 'AGREGAR AL SHOPPING BAG'}
+                            <Button onClick={handleAddToCart} className="w-full py-5 text-sm font-bold tracking-[0.2em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 h-16 hover:bg-cielo-gold dark:hover:bg-cielo-gold hover:text-black transition-colors shadow-xl" disabled={currentStock === 0}>
+                                {currentStock === 0 ? 'AGOTADO' : 'AGREGAR AL SHOPPING BAG'}
                             </Button>
 
                             <button
