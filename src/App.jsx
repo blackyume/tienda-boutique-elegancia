@@ -25,6 +25,7 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsConditions } from './pages/TermsConditions';
 import { Wishlist } from './pages/Wishlist';
 import { UserProfile } from './pages/UserProfile';
+import { Success } from './pages/Success';
 import { ShopAssistant } from './components/shop/ShopAssistant';
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 
@@ -74,7 +75,7 @@ const AppContent = () => {
           <Route path="/about" element={<About />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/payment-status" element={<PaymentStatus />} />
-          {/* <Route path="/success" element={<Success />} /> Removed until valid component exists */}
+          <Route path="/success" element={<Success />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/tracking" element={<Tracking />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

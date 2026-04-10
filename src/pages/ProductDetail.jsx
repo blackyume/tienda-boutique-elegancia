@@ -59,8 +59,8 @@ export const ProductDetail = () => {
         const productWithVariantPrice = { ...product, price: currentPrice, variantStock: currentStock };
         addToCart(productWithVariantPrice, selectedSize, selectedColor);
     };
-    // Images Array (Simulado 4 imágenes)
-    const productImages = [product.image, product.image, product.image, product.image];
+    // Use product gallery if available, otherwise single image
+    const productImages = product.images?.length > 0 ? product.images : [product.image];
 
     return (
         <div className="bg-white dark:bg-[#0B1120] min-h-screen text-slate-900 dark:text-white transition-colors duration-500">

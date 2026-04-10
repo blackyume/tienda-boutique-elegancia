@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useStore } from '../../context/StoreContext';
 
 // Official WhatsApp Logo SVG Component
 const WhatsAppIcon = ({ className }) => (
@@ -11,9 +12,11 @@ const WhatsAppIcon = ({ className }) => (
 export const WhatsAppButton = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const { siteConfig } = useStore();
 
     const location = window.location;
     const isAdmin = location.pathname.includes('/admin');
+    const whatsappNumber = siteConfig?.whatsappNumber || '5491144444444';
 
     // Entrada animada
     useEffect(() => {
@@ -26,7 +29,7 @@ export const WhatsAppButton = () => {
 
     return (
         <a
-            href="https://wa.me/5493492216487"
+            href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             className={`fixed bottom-6 right-6 z-[100] group flex flex-col items-end transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
