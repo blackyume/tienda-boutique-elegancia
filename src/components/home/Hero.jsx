@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { optimizeImage } from '../../utils/helpers';
@@ -40,15 +41,24 @@ export const Hero = () => {
         document.getElementById(buttonLink)?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const heroSrc = heroImage ? optimizeImage(heroImage, 1800) : null;
+
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#020617]">
+            {heroSrc && (
+                <Helmet>
+                    <link rel="preload" as="image" href={heroSrc} fetchpriority="high" />
+                </Helmet>
+            )}
             {/* Background image with parallax */}
             <div ref={layerRef} className="absolute inset-0 z-0 will-change-transform">
-                {heroImage && (
+                {heroSrc && (
                     <img
-                        src={optimizeImage(heroImage, 1800)}
+                        src={heroSrc}
                         alt=""
                         aria-hidden="true"
+                        fetchpriority="high"
+                        decoding="async"
                         className="w-full h-full object-cover opacity-55 scale-110"
                     />
                 )}

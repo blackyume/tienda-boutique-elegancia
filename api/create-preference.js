@@ -1,5 +1,40 @@
 const mercadopago = require('mercadopago');
 
+// --- Rate limiter en memoria (sliding window por IP) ---
+// Notas: en Vercel cada instancia tiene su propia memoria. Suficiente para
+// frenar abuso básico; para producción seria sustituir por Upstash / Redis.
+const RATE_WINDOW_MS = 60_000; // 1 min
+const RATE_MAX_REQUESTS = 8;   // 8 requests por minuto por IP
+const rateBuckets = new Map();
+
+const getClientIp = (req) => {
+    const fwd = req.headers['x-forwarded-for'];
+    if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
+    return req.socket?.remoteAddress || 'unknown';
+};
+
+const checkRateLimit = (ip) => {
+    const now = Date.now();
+    const bucket = rateBuckets.get(ip) || [];
+    const recent = bucket.filter((ts) => now - ts < RATE_WINDOW_MS);
+    if (recent.length >= RATE_MAX_REQUESTS) {
+        const oldest = recent[0];
+        const retryAfterSec = Math.max(1, Math.ceil((RATE_WINDOW_MS - (now - oldest)) / 1000));
+        return { ok: false, retryAfterSec };
+    }
+    recent.push(now);
+    rateBuckets.set(ip, recent);
+    // Limpieza ocasional para no crecer indefinidamente.
+    if (rateBuckets.size > 1000) {
+        for (const [key, arr] of rateBuckets) {
+            if (!arr.length || now - arr[arr.length - 1] > RATE_WINDOW_MS) {
+                rateBuckets.delete(key);
+            }
+        }
+    }
+    return { ok: true };
+};
+
 // Dominios permitidos (producción + desarrollo local).
 // Se puede extender vía variable de entorno CORS_EXTRA_ORIGINS (separados por coma).
 const STATIC_ALLOWED_ORIGINS = [
@@ -40,6 +75,16 @@ module.exports = async (req, res) => {
 
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const ip = getClientIp(req);
+    const limit = checkRateLimit(ip);
+    if (!limit.ok) {
+        res.setHeader('Retry-After', String(limit.retryAfterSec));
+        return res.status(429).json({
+            error: 'Too many requests. Try again later.',
+            retry_after_seconds: limit.retryAfterSec
+        });
     }
 
     const ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN;
