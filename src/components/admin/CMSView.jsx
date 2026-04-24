@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
-import { Tag, Image as ImageIcon, Trash2, UploadCloud, Plus, X, Monitor, Megaphone, Layout, Share2, ToggleLeft, ToggleRight, Gift, Link as LinkIcon } from 'lucide-react';
+import { Tag, Image as ImageIcon, Trash2, UploadCloud, Plus, X, Monitor, Megaphone, Layout, Share2, ToggleLeft, ToggleRight, Gift, Link as LinkIcon, Quote, Target, Clock } from 'lucide-react';
 
 const ImageUploader = ({ currentImage, onUpload, label, className = "" }) => {
     const { uploadImage, addToast } = useStore();
@@ -115,7 +115,7 @@ const SmartImageUploader = ({ currentImage, onUpload, label, className = "" }) =
 };
 
 export const CMSView = () => {
-    const { categories, addCategory, deleteCategory, siteConfig, updateSiteConfig, addToast, cloudinaryConfig, updateCloudinaryConfig } = useStore();
+    const { categories, addCategory, deleteCategory, siteConfig, updateSiteConfig, addToast, cloudinaryConfig, updateCloudinaryConfig, inventory } = useStore();
     const [activeTab, setActiveTab] = useState('home'); // home | promo | categories | config
     const [activeSubTab, setActiveSubTab] = useState('hero');
 
@@ -181,6 +181,7 @@ export const CMSView = () => {
                     <button onClick={() => setActiveTab('home')} className={`px-4 py-2 rounded-md text-sm font-bold transition-colors whitespace-nowrap ${activeTab === 'home' ? 'bg-slate-900 text-white dark:bg-white dark:text-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>Portada & Textos</button>
                     <button onClick={() => setActiveTab('promo')} className={`px-4 py-2 rounded-md text-sm font-bold transition-colors whitespace-nowrap ${activeTab === 'promo' ? 'bg-slate-900 text-white dark:bg-white dark:text-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>Anuncios & Popups</button>
                     <button onClick={() => setActiveTab('categories')} className={`px-4 py-2 rounded-md text-sm font-bold transition-colors whitespace-nowrap ${activeTab === 'categories' ? 'bg-slate-900 text-white dark:bg-white dark:text-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>Categorías</button>
+                    <button onClick={() => setActiveTab('sections')} className={`px-4 py-2 rounded-md text-sm font-bold transition-colors whitespace-nowrap ${activeTab === 'sections' ? 'bg-slate-900 text-white dark:bg-white dark:text-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>Secciones Home</button>
                     <button onClick={() => setActiveTab('config')} className={`px-4 py-2 rounded-md text-sm font-bold transition-colors whitespace-nowrap ${activeTab === 'config' ? 'bg-slate-900 text-white dark:bg-white dark:text-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>Cloudinary</button>
                 </div>
             </div>
@@ -425,6 +426,15 @@ export const CMSView = () => {
                 </div>
             )}
 
+            {activeTab === 'sections' && (
+                <SectionsEditor
+                    siteConfig={siteConfig}
+                    updateSiteConfig={updateSiteConfig}
+                    addToast={addToast}
+                    inventory={inventory}
+                />
+            )}
+
             {activeTab === 'categories' && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* NEW CATEGORY FORM */}
@@ -495,6 +505,251 @@ export const CMSView = () => {
                     </section>
                 </div>
             )}
+        </div>
+    );
+};
+
+// --- SECTIONS EDITOR: Testimonials + ShopTheLook + Drop countdown ---
+const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) => {
+    const testimonials = Array.isArray(siteConfig?.testimonials) ? siteConfig.testimonials : [];
+    const shopTheLook = siteConfig?.shopTheLook || {};
+    const hotspots = Array.isArray(shopTheLook?.hotspots) ? shopTheLook.hotspots : [];
+    const drop = siteConfig?.drop || {};
+
+    const saveField = async (key, value) => {
+        await updateSiteConfig({ ...siteConfig, [key]: value });
+    };
+    const saveNested = async (root, payload) => {
+        await updateSiteConfig({ ...siteConfig, [root]: { ...(siteConfig?.[root] || {}), ...payload } });
+    };
+
+    const toLocalInput = (raw) => {
+        if (!raw) return '';
+        const d = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+        if (isNaN(d.getTime())) return '';
+        const off = d.getTimezoneOffset() * 60000;
+        return new Date(d.getTime() - off).toISOString().slice(0, 16);
+    };
+
+    // Testimonials handlers
+    const addTestimonial = () => {
+        const next = [...testimonials, { name: '', location: '', text: '', rating: 5 }];
+        saveField('testimonials', next);
+    };
+    const updateTestimonial = (idx, patch) => {
+        const next = testimonials.map((t, i) => (i === idx ? { ...t, ...patch } : t));
+        saveField('testimonials', next);
+    };
+    const removeTestimonial = (idx) => {
+        const next = testimonials.filter((_, i) => i !== idx);
+        saveField('testimonials', next);
+    };
+
+    // Hotspots handlers
+    const addHotspot = () => {
+        if (!inventory?.length) return addToast('No hay productos disponibles', 'error');
+        const next = [...hotspots, { productId: inventory[0].id, x: 50, y: 50 }];
+        saveNested('shopTheLook', { hotspots: next });
+    };
+    const updateHotspot = (idx, patch) => {
+        const next = hotspots.map((h, i) => (i === idx ? { ...h, ...patch } : h));
+        saveNested('shopTheLook', { hotspots: next });
+    };
+    const removeHotspot = (idx) => {
+        const next = hotspots.filter((_, i) => i !== idx);
+        saveNested('shopTheLook', { hotspots: next });
+    };
+
+    return (
+        <div className="space-y-8">
+            {/* TESTIMONIALS */}
+            <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white">
+                        <Quote className="w-5 h-5 text-[#C19A6B]" /> Testimonios ({testimonials.length})
+                    </h3>
+                    <button onClick={addTestimonial} className="inline-flex items-center gap-1 px-4 py-2 bg-[#C19A6B] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#a38056] transition-colors">
+                        <Plus className="w-4 h-4" /> Agregar
+                    </button>
+                </div>
+
+                {testimonials.length === 0 && (
+                    <div className="py-10 text-center text-slate-400 text-sm border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+                        Sin testimonios personalizados — se mostrarán los por defecto. Creá el primero para sobreescribir.
+                    </div>
+                )}
+
+                <div className="grid md:grid-cols-2 gap-4">
+                    {testimonials.map((t, idx) => (
+                        <div key={idx} className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    value={t.name || ''}
+                                    onChange={(e) => updateTestimonial(idx, { name: e.target.value })}
+                                    placeholder="Nombre (ej: Sofía G.)"
+                                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                                />
+                                <button onClick={() => removeTestimonial(idx)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg" title="Eliminar">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <input
+                                value={t.location || ''}
+                                onChange={(e) => updateTestimonial(idx, { location: e.target.value })}
+                                placeholder="Ciudad (ej: Buenos Aires)"
+                                className="w-full px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                            />
+                            <textarea
+                                value={t.text || ''}
+                                onChange={(e) => updateTestimonial(idx, { text: e.target.value })}
+                                placeholder="Comentario del cliente…"
+                                rows={3}
+                                className="w-full px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B] resize-none"
+                            />
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Estrellas</span>
+                                <select
+                                    value={t.rating || 5}
+                                    onChange={(e) => updateTestimonial(idx, { rating: Number(e.target.value) })}
+                                    className="px-2 py-1 text-sm bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+                                >
+                                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* SHOP THE LOOK */}
+            <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-6">
+                    <Target className="w-5 h-5 text-[#C19A6B]" /> Shop the Look (Hotspots)
+                </h3>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold uppercase text-slate-500 block">Imagen editorial</label>
+                        <ImageUploader
+                            currentImage={shopTheLook.image}
+                            onUpload={(url) => saveNested('shopTheLook', { image: url })}
+                            label="Subir editorial"
+                        />
+                        <input
+                            type="text"
+                            placeholder="O pega URL aquí…"
+                            defaultValue=""
+                            onBlur={(e) => e.target.value && saveNested('shopTheLook', { image: e.target.value })}
+                            className="w-full bg-transparent text-xs py-2 border-b border-slate-300 dark:border-slate-700 focus:border-[#C19A6B] outline-none dark:text-slate-300"
+                        />
+                        <p className="text-[11px] text-slate-500 leading-relaxed">
+                            Si no subís imagen, se usa la imagen del Editorial como fallback.
+                            Cada punto (x, y) usa coordenadas en porcentaje 0–100 sobre la imagen.
+                        </p>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold uppercase text-slate-500">Puntos ({hotspots.length})</span>
+                            <button onClick={addHotspot} className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#C19A6B] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg hover:bg-[#a38056]">
+                                <Plus className="w-3 h-3" /> Nuevo
+                            </button>
+                        </div>
+                        {hotspots.length === 0 && (
+                            <div className="py-6 text-center text-slate-400 text-xs border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+                                Sin hotspots — se usan los primeros 3 productos por defecto.
+                            </div>
+                        )}
+                        <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+                            {hotspots.map((h, idx) => (
+                                <div key={idx} className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700 space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <select
+                                            value={String(h.productId)}
+                                            onChange={(e) => {
+                                                const raw = e.target.value;
+                                                const asNum = Number(raw);
+                                                updateHotspot(idx, { productId: Number.isNaN(asNum) ? raw : asNum });
+                                            }}
+                                            className="flex-1 px-2 py-1.5 text-sm bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+                                        >
+                                            {inventory.map(p => (
+                                                <option key={p.id} value={String(p.id)}>{p.name}</option>
+                                            ))}
+                                        </select>
+                                        <button onClick={() => removeHotspot(idx)} className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg" title="Eliminar">
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <label className="flex flex-col gap-1">
+                                            <span className="text-[10px] uppercase font-bold text-slate-400">X ({h.x ?? 50}%)</span>
+                                            <input
+                                                type="range" min={0} max={100} step={1}
+                                                value={Number(h.x ?? 50)}
+                                                onChange={(e) => updateHotspot(idx, { x: Number(e.target.value) })}
+                                            />
+                                        </label>
+                                        <label className="flex flex-col gap-1">
+                                            <span className="text-[10px] uppercase font-bold text-slate-400">Y ({h.y ?? 50}%)</span>
+                                            <input
+                                                type="range" min={0} max={100} step={1}
+                                                value={Number(h.y ?? 50)}
+                                                onChange={(e) => updateHotspot(idx, { y: Number(e.target.value) })}
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* DROP / COUNTDOWN */}
+            <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-6">
+                    <Clock className="w-5 h-5 text-[#C19A6B]" /> Próximo Drop / Cuenta Regresiva
+                </h3>
+                <p className="text-xs text-slate-500 mb-6">
+                    Si tenés una promoción programada en Firestore (<code>scheduled_promotions</code>), se prioriza esa.
+                    Si no, se usa esta fecha como fallback. Dejala vacía para ocultar el banner.
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="text-xs font-bold uppercase text-slate-500 mb-1 block">Título</label>
+                        <input
+                            value={drop.title || ''}
+                            onChange={(e) => saveNested('drop', { title: e.target.value })}
+                            placeholder="Ej: Colección Otoño 2026"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-xs font-bold uppercase text-slate-500 mb-1 block">Fecha y hora</label>
+                        <input
+                            type="datetime-local"
+                            value={toLocalInput(drop.nextAt)}
+                            onChange={(e) => {
+                                const v = e.target.value;
+                                if (!v) return saveNested('drop', { nextAt: '' });
+                                saveNested('drop', { nextAt: new Date(v).toISOString() });
+                            }}
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                        />
+                    </div>
+                    <div className="md:col-span-2">
+                        <label className="text-xs font-bold uppercase text-slate-500 mb-1 block">Descripción</label>
+                        <textarea
+                            rows={2}
+                            value={drop.description || ''}
+                            onChange={(e) => saveNested('drop', { description: e.target.value })}
+                            placeholder="Ej: Acceso anticipado para subscriptoras. No te lo pierdas."
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B] resize-none"
+                        />
+                    </div>
+                </div>
+            </section>
         </div>
     );
 };
