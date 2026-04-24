@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /payment-status
+Disallow: /profile
+
+Sitemap: https://la-boutique-de-la-elegancia.web.app/sitemap.xml

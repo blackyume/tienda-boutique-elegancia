@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, Ticket, X, Check } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
+import { trackBeginCheckout } from '../utils/analytics';
 
 export const Checkout = () => {
     const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, useCoupon } = useStore();
@@ -135,6 +136,9 @@ export const Checkout = () => {
                 shippingCost: shippingOptions[shippingMethod].cost,
                 coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null
             };
+
+            // GA4 begin_checkout
+            trackBeginCheckout(cart, finalTotal);
 
             // 1. Crear Orden en Firebase (Persistencia)
             await createOrder(newOrder);

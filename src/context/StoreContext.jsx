@@ -6,6 +6,8 @@ import { ref, deleteObject, listAll } from 'firebase/storage';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { storage, auth } from '../lib/firebase';
 import imageCompression from 'browser-image-compression';
+import { availableAfterCart, getTotalStock, getVariantStock } from '../utils/variants';
+import { trackAddToCart, trackRemoveFromCart, trackAddToWishlist } from '../utils/analytics';
 
 // --- CONFIGURACIÓN CLOUDINARY ---
 // TODO: El usuario debe completar esto
@@ -196,38 +198,112 @@ export const StoreProvider = ({ children }) => {
   };
 
   // --- CART ---
-  const addToCart = (product, size, color) => {
-    const key = `${product.id}-${size}-${color}`;
+  const addToCart = (product, size, color, quantity = 1) => {
+    if (!product) return false;
+    const qty = Math.max(1, Number(quantity) || 1);
+
+    const needsSize = Array.isArray(product.sizes) && product.sizes.length > 0;
+    const needsColor = Array.isArray(product.colors) && product.colors.length > 0;
+    if (needsSize && !size) { addToast('Seleccioná un talle', 'error'); return false; }
+    if (needsColor && !color) { addToast('Seleccioná un color', 'error'); return false; }
+
+    const stockAvailable = availableAfterCart(product, size, color, cart);
+    if (stockAvailable <= 0) {
+      addToast('Sin stock disponible en esta combinación', 'error');
+      return false;
+    }
+    const addQty = Math.min(qty, stockAvailable);
+
+    const key = `${product.id}-${size || ''}-${color || ''}`;
     setCart(prev => {
       const existing = prev.find(i => i.key === key);
-      if (existing) return prev.map(i => i.key === key ? { ...i, quantity: i.quantity + 1 } : i);
-      const { active, stock, ...cleanProduct } = product;
-      return [...prev, { ...cleanProduct, size, color, quantity: 1, key }];
+      if (existing) return prev.map(i => i.key === key ? { ...i, quantity: i.quantity + addQty } : i);
+      // Guardamos un snapshot mínimo para el carrito (no el documento entero de Firestore).
+      const snapshot = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category
+      };
+      return [...prev, { ...snapshot, size, color, quantity: addQty, key }];
     });
-    addToast("Agregado al carrito", "success");
+    trackAddToCart(product, size, color, addQty);
+    addToast('Agregado al carrito', 'success');
+    return true;
   };
 
-  const removeFromCart = (key) => setCart(prev => prev.filter(i => i.key !== key));
+  const updateCartQty = (key, nextQty) => {
+    setCart(prev => {
+      const item = prev.find(i => i.key === key);
+      if (!item) return prev;
+      const product = inventory.find(p => String(p.id) === String(item.id));
+      const stock = product ? getVariantStock(product, item.size, item.color) : Infinity;
+      const safeQty = Math.max(1, Math.min(Number(nextQty) || 1, stock));
+      return prev.map(i => i.key === key ? { ...i, quantity: safeQty } : i);
+    });
+  };
+
+  const removeFromCart = (key) => setCart(prev => {
+    const item = prev.find(i => i.key === key);
+    if (item) trackRemoveFromCart(item);
+    return prev.filter(i => i.key !== key);
+  });
+  const clearCart = () => setCart([]);
   const cartTotal = useMemo(() => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0), [cart]);
+  const cartCount = useMemo(() => cart.reduce((acc, item) => acc + item.quantity, 0), [cart]);
+
+  // --- WISHLIST (normalizada a array de ids string, opcionalmente sync Firestore) ---
+  const toggleWishlist = (productId) => {
+    const id = String(productId);
+    setWishlist(prev => {
+      const ids = (prev || []).map(w => String(w?.id ?? w));
+      const wasAdding = !ids.includes(id);
+      const next = wasAdding
+        ? [...ids, id]
+        : (prev || []).filter(w => String(w?.id ?? w) !== id).map(w => String(w?.id ?? w));
+      if (wasAdding) {
+        const product = inventory.find(p => String(p.id) === id);
+        if (product) trackAddToWishlist(product);
+      }
+      return next;
+    });
+  };
+  const isInWishlist = (productId) => {
+    const id = String(productId);
+    return (wishlist || []).some(w => String(w?.id ?? w) === id);
+  };
 
   // --- AUTH ---
   const [userRole, setUserRole] = useState('customer');
 
+  const [wishlistSyncedForUid, setWishlistSyncedForUid] = useState(null);
   useEffect(() => {
     if (user) {
       const checkRole = async () => {
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
-            setUserRole(userDoc.data().role || 'customer');
+            const data = userDoc.data();
+            setUserRole(data.role || 'customer');
+            // Merge wishlist local con remota (unión por id).
+            const remote = Array.isArray(data.wishlist) ? data.wishlist.map(String) : [];
+            const local = (wishlist || []).map(w => String(w?.id ?? w));
+            const merged = Array.from(new Set([...remote, ...local]));
+            setWishlist(merged);
+            if (remote.length !== merged.length) {
+              await updateDoc(doc(db, "users", user.uid), { wishlist: merged });
+            }
           } else {
             await setDoc(doc(db, "users", user.uid), {
               email: user.email,
               role: 'customer',
+              wishlist: (wishlist || []).map(w => String(w?.id ?? w)),
               createdAt: Date.now()
             });
             setUserRole('customer');
           }
+          setWishlistSyncedForUid(user.uid);
         } catch (error) {
           console.error("Error fetching user role:", error);
         }
@@ -235,8 +311,18 @@ export const StoreProvider = ({ children }) => {
       checkRole();
     } else {
       setUserRole(null);
+      setWishlistSyncedForUid(null);
     }
   }, [user]);
+
+  // Push cada cambio de wishlist al doc del usuario logueado.
+  useEffect(() => {
+    if (!user || wishlistSyncedForUid !== user.uid) return;
+    const ids = (wishlist || []).map(w => String(w?.id ?? w));
+    updateDoc(doc(db, "users", user.uid), { wishlist: ids }).catch((e) =>
+      console.warn('No se pudo sincronizar wishlist:', e?.message)
+    );
+  }, [wishlist, user, wishlistSyncedForUid]);
 
   const ADMIN_WHITELIST = ['laboutiquedelaeleganciaoficial@gmail.com', 'juampi218@gmail.com'];
   // Admin is ONLY the specific email. Role is ignored for admin privilege to be safe.
@@ -684,8 +770,8 @@ export const StoreProvider = ({ children }) => {
 
   return (
     <StoreContext.Provider value={{
-      inventory, cart, setCart, addToCart, removeFromCart, cartTotal,
-      orders, wishlist, setWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout,
+      inventory, cart, setCart, addToCart, updateCartQty, removeFromCart, clearCart, cartTotal, cartCount,
+      orders, wishlist, setWishlist, toggleWishlist, isInWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout,
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
       categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,

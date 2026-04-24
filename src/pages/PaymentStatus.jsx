@@ -3,11 +3,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, Clock, ShoppingBag } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { Button } from '../components/ui/Button';
+import { trackPurchase } from '../utils/analytics';
 
 export const PaymentStatus = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { updateOrderStatus, sendOrderEmail, user } = useStore();
+    const { updateOrderStatus, sendOrderEmail, user, orders, cart, clearCart } = useStore();
     const [processed, setProcessed] = useState(false);
 
     const status = searchParams.get('status'); // success, failure, pending
@@ -26,6 +27,22 @@ export const PaymentStatus = () => {
                         paymentId: payment_id,
                         paidAt: new Date().toISOString()
                     });
+
+                    // GA4 purchase (use persisted order if available, else fallback to live cart)
+                    const persisted = (orders || []).find(o => String(o.id) === String(external_reference));
+                    const items = persisted?.items || cart || [];
+                    const total = persisted?.total || items.reduce((s, i) => s + (Number(i.price) || 0) * (i.quantity || 1), 0);
+                    if (items.length > 0) {
+                        trackPurchase({
+                            id: external_reference,
+                            total,
+                            cart: items,
+                            coupon: persisted?.coupon?.code,
+                            shipping: persisted?.shippingCost || 0,
+                        });
+                    }
+                    // Limpiar carrito tras pago exitoso
+                    if (cart && cart.length > 0) clearCart();
 
                     // Enviar Email (Solo si tenemos el objeto order, o fetch from DB done inside context? 
                     // Context sendOrderEmail takes full order object.

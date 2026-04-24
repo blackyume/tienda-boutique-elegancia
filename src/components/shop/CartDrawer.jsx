@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { X, Trash2, ShoppingBag, MapPin, ArrowRight, Truck } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight, Truck, Minus, Plus } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
 import { Button } from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
 
 export const CartDrawer = ({ isOpen, onClose }) => {
-   const { cart, removeFromCart, cartTotal, siteConfig, inventory, addToCart } = useStore();
+   const { cart, removeFromCart, updateCartQty, cartTotal, cartCount, siteConfig, inventory } = useStore();
 
    // Sales Config
    const freeShippingConfig = siteConfig.sales?.freeShipping || { enabled: false, threshold: 100000 };
@@ -34,7 +34,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
 
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-               <h2 className="text-2xl font-cinzel text-cielo-gold">Shopping Bag <span className="text-sm font-sans text-slate-400 font-normal">({cart.length})</span></h2>
+               <h2 className="text-2xl font-cinzel text-cielo-gold">Shopping Bag <span className="text-sm font-sans text-slate-400 font-normal">({cartCount})</span></h2>
                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors group">
                   <X className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
                </button>
@@ -85,9 +85,24 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                            </div>
 
                            <div className="flex justify-between items-end">
-                              <span className="font-montserrat font-bold text-lg text-white">{formatMoney(item.price)}</span>
-                              <div className="flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                                 <span className="text-xs font-bold text-cielo-gold">Cant: {item.quantity}</span>
+                              <span className="font-montserrat font-bold text-lg text-white">{formatMoney(item.price * item.quantity)}</span>
+                              <div className="flex items-center gap-1 bg-white/5 rounded-lg border border-white/10">
+                                 <button
+                                    onClick={() => updateCartQty(item.key, item.quantity - 1)}
+                                    disabled={item.quantity <= 1}
+                                    className="p-2 text-white hover:text-cielo-gold disabled:opacity-30"
+                                    aria-label="Restar"
+                                 >
+                                    <Minus className="w-3 h-3" />
+                                 </button>
+                                 <span className="text-xs font-bold text-cielo-gold w-6 text-center">{item.quantity}</span>
+                                 <button
+                                    onClick={() => updateCartQty(item.key, item.quantity + 1)}
+                                    className="p-2 text-white hover:text-cielo-gold"
+                                    aria-label="Sumar"
+                                 >
+                                    <Plus className="w-3 h-3" />
+                                 </button>
                               </div>
                            </div>
                         </div>
@@ -104,27 +119,24 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                            .filter(p => !cart.some(c => c.id === p.id))
                            .slice(0, 2)
                            .map(suggested => (
-                              <div key={suggested.id} className="flex gap-3 items-center group cursor-pointer bg-white/5 p-2 rounded-lg hover:bg-white/10 transition-colors" onClick={() => window.location.href = `/product/${suggested.id}`}>
+                              <div
+                                 key={suggested.id}
+                                 className="flex gap-3 items-center group cursor-pointer bg-white/5 p-2 rounded-lg hover:bg-white/10 transition-colors"
+                                 onClick={() => { onClose(); navigate(`/product/${suggested.id}`); }}
+                              >
                                  <div className="w-12 h-12 bg-slate-800 rounded overflow-hidden">
-                                    <img src={suggested.image} className="w-full h-full object-cover" />
+                                    <img src={suggested.image} className="w-full h-full object-cover" alt={suggested.name} loading="lazy" />
                                  </div>
                                  <div className="flex-1">
                                     <p className="text-xs font-bold text-white group-hover:text-cielo-gold transition-colors">{suggested.name}</p>
                                     <p className="text-[10px] text-slate-400">{formatMoney(suggested.price)}</p>
                                  </div>
                                  <Button
-                                    onClick={(e) => {
-                                       e.stopPropagation();
-                                       // Solo agregar si tiene talle/color por defecto, si no, ir al producto
-                                       if (suggested.sizes && suggested.sizes.length > 0) {
-                                          addToCart(suggested, suggested.sizes[0], suggested.colors?.[0] || 'Standard');
-                                       } else {
-                                          window.location.href = `/product/${suggested.id}`;
-                                       }
-                                    }}
+                                    onClick={(e) => { e.stopPropagation(); onClose(); navigate(`/product/${suggested.id}`); }}
                                     className="w-8 h-8 !p-0 rounded-full flex items-center justify-center bg-transparent border border-white/20 hover:bg-cielo-gold hover:text-black hover:border-cielo-gold text-white"
+                                    aria-label={`Ver ${suggested.name}`}
                                  >
-                                    +
+                                    <ArrowRight className="w-3.5 h-3.5" />
                                  </Button>
                               </div>
                            ))

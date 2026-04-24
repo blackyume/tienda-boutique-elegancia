@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, Heart, Check, Ruler, Share2, Copy, ChevronDown } from 'lucide-react';
+import { X, Heart, Check, Ruler, Share2, ChevronDown } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { formatMoney, getColorHex } from '../../utils/helpers';
 import { useStore } from '../../context/StoreContext';
-import { SizeGuideModal } from './SizeGuideModal';
+import { getTotalStock, isColorAvailable, isSizeAvailable } from '../../utils/variants';
 
 export const QuickViewModal = ({ product, onClose }) => {
-    const { addToCart, wishlist, setWishlist, addToast, setIsSizeGuideOpen, setIsCartOpen } = useStore();
+    const { addToCart, isInWishlist, toggleWishlist: toggleWishlistCtx, addToast, setIsSizeGuideOpen, setIsCartOpen } = useStore();
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
-    const [isWishlisted, setIsWishlisted] = useState(false);
     const [copied, setCopied] = useState(false);
 
     // Media State
@@ -17,11 +16,12 @@ export const QuickViewModal = ({ product, onClose }) => {
 
     const mediaList = product?.media && product.media.length > 0
         ? product.media
-        : [{ type: 'image', url: product?.image }];
+        : Array.isArray(product?.images) && product.images.length > 0
+            ? product.images.map(url => ({ type: 'image', url }))
+            : [{ type: 'image', url: product?.image }];
 
-    // ESC KEY & WISH LISTENER
     useEffect(() => {
-        if (product) setIsWishlisted(wishlist.includes(product.id));
+        if (!product) return;
         const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
         window.addEventListener('keydown', handleEsc);
         document.body.style.overflow = 'hidden';
@@ -29,23 +29,25 @@ export const QuickViewModal = ({ product, onClose }) => {
             window.removeEventListener('keydown', handleEsc);
             document.body.style.overflow = 'unset';
         };
-    }, [product, wishlist, onClose]);
+    }, [product, onClose]);
 
     if (!product) return null;
 
+    const isWishlisted = isInWishlist(product.id);
+    const totalStock = getTotalStock(product);
+
     const handleAddToCart = () => {
-        if (!selectedSize || !selectedColor) return;
-        addToCart(product, selectedSize, selectedColor);
-        onClose();
-        setTimeout(() => setIsCartOpen(true), 300); // Wait for modal close
+        const ok = addToCart(product, selectedSize, selectedColor);
+        if (ok) {
+            onClose();
+            setTimeout(() => setIsCartOpen(true), 300);
+        }
     };
 
     const toggleWishlist = () => {
-        setWishlist(prev => {
-            const exists = prev.includes(product.id);
-            addToast(exists ? "Eliminado de favoritos" : "Agregado a favoritos", exists ? "info" : "success");
-            return exists ? prev.filter(id => id !== product.id) : [...prev, product.id];
-        });
+        const wasIn = isInWishlist(product.id);
+        toggleWishlistCtx(product.id);
+        addToast(wasIn ? "Eliminado de favoritos" : "Agregado a favoritos", wasIn ? "info" : "success");
     };
 
     const copyLink = () => {
@@ -141,17 +143,22 @@ export const QuickViewModal = ({ product, onClose }) => {
                         <div>
                             <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest block mb-3">Color: <span className="text-slate-500 font-normal capitalize">{selectedColor || 'Elegir'}</span></span>
                             <div className="flex flex-wrap gap-3">
-                                {product.colors && product.colors.map(color => (
-                                    <button
-                                        key={color}
-                                        onClick={() => setSelectedColor(color)}
-                                        className={`w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm transition-transform hover:scale-110 flex items-center justify-center ${selectedColor === color ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-white scale-110' : ''}`}
-                                        style={{ backgroundColor: getColorHex(color) }}
-                                        title={color}
-                                    >
-                                        {selectedColor === color && <Check className={`w-4 h-4 ${color.toLowerCase() === 'blanco' ? 'text-black' : 'text-white'}`} />}
-                                    </button>
-                                ))}
+                                {product.colors && product.colors.map(color => {
+                                    const available = isColorAvailable(product, color);
+                                    return (
+                                        <button
+                                            key={color}
+                                            onClick={() => setSelectedColor(color)}
+                                            disabled={!available}
+                                            className={`w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm transition-transform hover:scale-110 flex items-center justify-center relative ${selectedColor === color ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-white scale-110' : ''} ${!available ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                            style={{ backgroundColor: getColorHex(color) }}
+                                            title={available ? color : `${color} (sin stock)`}
+                                        >
+                                            {selectedColor === color && <Check className={`w-4 h-4 ${color.toLowerCase() === 'blanco' ? 'text-black' : 'text-white'}`} />}
+                                            {!available && <span className="absolute w-full h-[2px] bg-slate-400 rotate-45 rounded-full" />}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -162,22 +169,27 @@ export const QuickViewModal = ({ product, onClose }) => {
                                 <button onClick={() => setIsSizeGuideOpen(true)} className="text-xs text-[#C19A6B] hover:underline flex items-center gap-1"><Ruler className="w-3 h-3" /> Tabla de Talles</button>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                {product.sizes && product.sizes.map(size => (
-                                    <button
-                                        key={size}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`h-12 w-12 border flex items-center justify-center text-sm font-bold uppercase transition-all rounded-lg ${selectedSize === size ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent shadow-lg' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-900 dark:hover:border-white'}`}
-                                    >
-                                        {size}
-                                    </button>
-                                ))}
+                                {product.sizes && product.sizes.map(size => {
+                                    const available = isSizeAvailable(product, size);
+                                    return (
+                                        <button
+                                            key={size}
+                                            onClick={() => setSelectedSize(size)}
+                                            disabled={!available}
+                                            className={`h-12 w-12 border flex items-center justify-center text-sm font-bold uppercase transition-all rounded-lg relative ${selectedSize === size ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent shadow-lg' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-900 dark:hover:border-white'} ${!available ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                        >
+                                            {size}
+                                            {!available && <span className="absolute inset-x-1 h-[1px] bg-slate-400 rotate-[-10deg]" />}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
 
                     <div className="mt-auto flex gap-4">
-                        <Button onClick={handleAddToCart} className="flex-1 py-4 text-sm bg-slate-900 dark:bg-white dark:text-slate-900 shadow-xl h-14" disabled={!selectedSize || !selectedColor || product.stock === 0}>
-                            {product.stock === 0 ? 'SIN STOCK' : (!selectedSize || !selectedColor) ? 'SELECCIONAR OPCIONES' : 'AGREGAR AL CARRITO'}
+                        <Button onClick={handleAddToCart} className="flex-1 py-4 text-sm bg-slate-900 dark:bg-white dark:text-slate-900 shadow-xl h-14" disabled={totalStock === 0}>
+                            {totalStock === 0 ? 'SIN STOCK' : 'AGREGAR AL CARRITO'}
                         </Button>
                         <button onClick={toggleWishlist} className="w-14 h-14 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                             <Heart className={`w-6 h-6 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-slate-400 dark:text-slate-500'}`} />

@@ -15,7 +15,7 @@ import { QuickAddCard } from '../components/shop/QuickAddCard';
 import { SEO } from '../components/seo/SEO';
 
 export const Home = () => {
-    const { inventory, wishlist, setWishlist, addToast, categories, siteConfig, globalFilter, setGlobalFilter } = useStore();
+    const { inventory, isInWishlist, toggleWishlist: toggleWishlistCtx, addToast, categories, siteConfig, globalFilter, setGlobalFilter } = useStore();
     const [quickViewProduct, setQuickViewProduct] = useState(null);
 
     // FILTRADO MAESTRO
@@ -27,11 +27,9 @@ export const Home = () => {
 
     const toggleWishlist = (e, product) => {
         e.stopPropagation();
-        setWishlist(prev => {
-            const exists = prev.includes(product.id);
-            addToast(exists ? "Eliminado de favoritos" : "Agregado a favoritos", exists ? "info" : "success");
-            return exists ? prev.filter(id => id !== product.id) : [...prev, product.id];
-        });
+        const wasIn = isInWishlist(product.id);
+        toggleWishlistCtx(product.id);
+        addToast(wasIn ? "Eliminado de favoritos" : "Agregado a favoritos", wasIn ? "info" : "success");
     };
 
     return (

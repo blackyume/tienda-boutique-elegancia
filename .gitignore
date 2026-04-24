@@ -115,3 +115,11 @@ dist
 # Firebase
 .firebase/
 firebase-debug.log
+
+# Local scripts / secrets
+test-keys*.mjs
+list-models.mjs
+*.local.js
+*.local.mjs
+.vercel
+
