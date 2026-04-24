@@ -173,7 +173,7 @@ export const ShopAssistant = () => {
     };
 
     return (
-        <div className="fixed bottom-28 sm:bottom-32 right-4 sm:right-6 z-50 flex flex-col items-end pointer-events-none">
+        <div className="fixed bottom-52 sm:bottom-56 right-4 sm:right-6 z-50 flex flex-col items-end pointer-events-none">
 
             {/* CHAT WINDOW */}
             {isOpen && (
