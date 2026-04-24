@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Lock, Settings, Mail, Bot } from 'lucide-react';
+import { Lock, Settings, Mail, Bot, AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { SalesConfig } from './SalesConfig';
 
@@ -99,6 +99,37 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isMaintenance ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
+                </div>
+
+                {/* LOW STOCK THRESHOLD */}
+                <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border dark:border-slate-700 shadow-sm">
+                    <h3 className="font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <AlertTriangle className="w-5 h-5 text-amber-500" /> Alerta de Stock Bajo
+                    </h3>
+                    <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Umbral (unidades)</label>
+                    <div className="flex gap-2">
+                        <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            defaultValue={siteConfig?.lowStockThreshold ?? 5}
+                            placeholder="5"
+                            className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-800 dark:text-gray-200 outline-none focus:border-[#C19A6B]"
+                            id="lowStockInput"
+                        />
+                        <Button
+                            onClick={() => {
+                                const v = parseInt(document.getElementById('lowStockInput').value, 10);
+                                if (Number.isNaN(v) || v < 0) return addToast("Ingresá un número válido (0 o más)", "error");
+                                updateSiteConfig({ lowStockThreshold: v });
+                                addToast("Umbral de stock actualizado", "success");
+                            }}
+                            className="bg-slate-800 text-white text-xs px-4 rounded-lg"
+                        >
+                            Guardar
+                        </Button>
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1">Productos o variantes con stock ≤ este valor dispararán alerta en el Dashboard e Inventario.</p>
                 </div>
 
                 {/* CONTACT & SOCIAL */}

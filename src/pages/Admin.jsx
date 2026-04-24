@@ -25,6 +25,8 @@ import { CouponsView } from '../components/admin/CouponsView';
 import { SalesView } from '../components/admin/SalesView';
 import { SuppliersView } from '../components/admin/SuppliersView';
 import { generateProductCopy } from '../utils/gemini';
+import { getTotalStock } from '../utils/variants';
+import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock';
 
 const COLOR_MAP = {
     'blanco': '#ffffff', 'negro': '#000000', 'gris': '#808080', 'gris claro': '#d3d3d3', 'gris oscuro': '#a9a9a9', 'plata': '#c0c0c0', 'humo': '#848884', 'carbon': '#36454f', 'blanco tiza': '#f5f5f5', 'hueso': '#e3dac9', 'marfil': '#fffff0', 'crema': '#fffdd0', 'vainilla': '#f3e5ab', 'nude': '#f5d0b5', 'piel': '#f5d0b5', 'natural': '#faebd7', 'champagne': '#fad6a5', 'vison': '#9e9e9e', 'taupe': '#483c32', 'camel': '#c19a6b', 'beige': '#f5f5dc', 'arena': '#f4a460', 'crudo': '#dbd7d2', 'tiza': '#f5f5f5',
@@ -128,12 +130,16 @@ export const Admin = () => {
         setLastOrderCount(orders.length);
     }, [orders.length]);
 
+    const lowStockThreshold = Number(siteConfig?.lowStockThreshold) > 0
+        ? Number(siteConfig.lowStockThreshold)
+        : DEFAULT_LOW_STOCK_THRESHOLD;
+
     // --- FILTER LOGIC ---
     const filteredInventory = useMemo(() => {
         let result = inventory.filter(p => {
             const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = selectedCategory === "Todos" || p.category === selectedCategory;
-            const matchesStock = filterLowStock ? p.stock < 5 : true;
+            const matchesStock = filterLowStock ? getTotalStock(p) <= lowStockThreshold : true;
             return matchesSearch && matchesCategory && matchesStock;
         });
 
@@ -141,13 +147,18 @@ export const Admin = () => {
             switch (sortOrder) {
                 case 'price-asc': return a.price - b.price;
                 case 'price-desc': return b.price - a.price;
-                case 'stock-asc': return a.stock - b.stock;
-                case 'stock-desc': return b.stock - a.stock;
+                case 'stock-asc': return getTotalStock(a) - getTotalStock(b);
+                case 'stock-desc': return getTotalStock(b) - getTotalStock(a);
                 case 'name-asc': return a.name.localeCompare(b.name);
                 case 'newest': default: return b.id - a.id;
             }
         });
-    }, [inventory, searchTerm, selectedCategory, filterLowStock, sortOrder]);
+    }, [inventory, searchTerm, selectedCategory, filterLowStock, sortOrder, lowStockThreshold]);
+
+    const lowStockItems = useMemo(
+        () => getLowStockItems(inventory, lowStockThreshold),
+        [inventory, lowStockThreshold]
+    );
 
     // --- METRICAS ---
     const metrics = useMemo(() => {
@@ -627,9 +638,26 @@ export const Admin = () => {
 
                                                         {/* STOCK */}
                                                         <td className="p-4 text-center">
-                                                            <span className={`font-bold ${p.stock < 5 ? 'text-red-500' : 'text-slate-600 dark:text-slate-300'}`}>
-                                                                {p.stock} u.
-                                                            </span>
+                                                            {(() => {
+                                                                const total = getTotalStock(p);
+                                                                const isOut = total === 0;
+                                                                const isLow = total > 0 && total <= lowStockThreshold;
+                                                                const lowVariantsCount = Array.isArray(p.variants)
+                                                                    ? p.variants.filter(v => (v.stock || 0) <= lowStockThreshold).length
+                                                                    : 0;
+                                                                return (
+                                                                    <div className="inline-flex flex-col items-center gap-1">
+                                                                        <span className={`font-bold ${isOut ? 'text-red-500' : isLow ? 'text-amber-500' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                                            {total} u.
+                                                                        </span>
+                                                                        {lowVariantsCount > 0 && (
+                                                                            <span className="text-[9px] font-bold uppercase tracking-wide text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded-full border border-amber-200 dark:border-amber-900/40">
+                                                                                {lowVariantsCount} variante{lowVariantsCount > 1 ? 's' : ''} baja{lowVariantsCount > 1 ? 's' : ''}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })()}
                                                         </td>
 
                                                         {/* PRECIO */}
@@ -700,6 +728,8 @@ export const Admin = () => {
                     toggleMaintenance={toggleMaintenance}
                     onNavigate={setAdminTab}
                     wishlistData={wishlistEvents}
+                    lowStockItems={lowStockItems}
+                    lowStockThreshold={lowStockThreshold}
                     onCreateProduct={() => {
                         setCurrentProduct({
                             id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",

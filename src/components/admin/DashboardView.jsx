@@ -2,10 +2,11 @@ import React, { useMemo, useState } from 'react';
 import { Package, Users, Wallet, TrendingUp, ShoppingCart, Plus, Search, MessageSquare, Settings, Lock, Calendar, Download, Activity, Trophy, Percent, Truck } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
 import { RealTimeClock, StatCard, ActionButton } from './AdminShared';
+import { LowStockPanel } from './LowStockPanel';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 import * as XLSX from 'xlsx';
 
-export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, wishlistData = [] }) => {
+export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, wishlistData = [], lowStockItems = [], lowStockThreshold = 5 }) => {
 
     const [dateRange, setDateRange] = useState('30'); // 7, 30, all
     const [showComparison, setShowComparison] = useState(true); // Toggle comparación temporal
@@ -370,6 +371,14 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                 </div>
                             </div>
                         </div>
+
+                        {/* LOW STOCK ALERTS */}
+                        <LowStockPanel
+                            items={lowStockItems}
+                            threshold={lowStockThreshold}
+                            onNavigateInventory={() => onNavigate('inventory')}
+                            compact
+                        />
 
                         {/* RECENT ACTIVITY LOG (EXPANDED) */}
                         <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
