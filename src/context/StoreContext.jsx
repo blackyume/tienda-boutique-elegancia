@@ -8,6 +8,7 @@ import { storage, auth } from '../lib/firebase';
 import imageCompression from 'browser-image-compression';
 import { availableAfterCart, getTotalStock, getVariantStock } from '../utils/variants';
 import { trackAddToCart, trackRemoveFromCart, trackAddToWishlist } from '../utils/analytics';
+import { buildReferralCode } from '../utils/referral';
 
 // --- CONFIGURACIÓN CLOUDINARY ---
 // TODO: El usuario debe completar esto
@@ -102,6 +103,7 @@ export const StoreProvider = ({ children }) => {
   const [wishlistEvents, setWishlistEvents] = useState([]);
   const [abandonedCarts, setAbandonedCarts] = useState([]);
   const [activeSessions, setActiveSessions] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   // Shipping Rates by Province (precargados)
   const [shippingProvinces, setShippingProvinces] = useState([
@@ -236,6 +238,12 @@ export const StoreProvider = ({ children }) => {
       setWishlistEvents(data.sort((a, b) => b.timestamp - a.timestamp).slice(0, 500));
     });
 
+    // Reviews (público, cualquiera ve todas; filtro approved=true en UI del cliente)
+    const unsubReviews = onSnapshot(collection(db, "reviews"), (snap) => {
+      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setReviews(data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
+    });
+
     // Shipping Rates by Province (overrides defaults if exists)
     const unsubShipping = onSnapshot(collection(db, "shipping_provinces"), (snap) => {
       if (snap.docs.length > 0) {
@@ -250,7 +258,7 @@ export const StoreProvider = ({ children }) => {
       unsubSiteConfig(); unsubCloudinary(); unsubAiConfig();
       unsubMaintenance(); unsubSims(); unsubCoupons();
       unsubSuppliers(); unsubAiHistory(); unsubPromos();
-      unsubWishlistEvents(); unsubShipping();
+      unsubWishlistEvents(); unsubShipping(); unsubReviews();
     };
   }, []);
 
@@ -386,14 +394,16 @@ export const StoreProvider = ({ children }) => {
             const local = (wishlist || []).map(w => String(w?.id ?? w));
             const merged = Array.from(new Set([...remote, ...local]));
             setWishlist(merged);
-            if (remote.length !== merged.length) {
-              await updateDoc(doc(db, "users", user.uid), { wishlist: merged });
-            }
+            const patch = {};
+            if (remote.length !== merged.length) patch.wishlist = merged;
+            if (!data.referralCode) patch.referralCode = buildReferralCode(user.uid);
+            if (Object.keys(patch).length > 0) await updateDoc(doc(db, "users", user.uid), patch);
           } else {
             await setDoc(doc(db, "users", user.uid), {
               email: user.email,
               role: 'customer',
               wishlist: (wishlist || []).map(w => String(w?.id ?? w)),
+              referralCode: buildReferralCode(user.uid),
               createdAt: Date.now()
             });
             setUserRole('customer');
@@ -698,6 +708,71 @@ export const StoreProvider = ({ children }) => {
         addToast(`Error Cloudinary: ${error.message}`, "error");
         return null;
       }
+    },
+
+    // --- CLOUDINARY UPLOAD (público, para reviews) ---
+    uploadReviewImage: async (file) => {
+      if (!file) return null;
+      if (!cloudinaryConfig.cloudName || !cloudinaryConfig.uploadPreset) {
+        throw new Error("Cloudinary no configurado");
+      }
+      // Tamaño más chico para reviews (1200px max, 70% calidad)
+      const options = { maxSizeMB: 0.8, maxWidthOrHeight: 1200, useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.7 };
+      let fileToUpload = file;
+      try { fileToUpload = await imageCompression(file, options); } catch { }
+
+      const formData = new FormData();
+      formData.append("file", fileToUpload);
+      formData.append("upload_preset", cloudinaryConfig.uploadPreset);
+      formData.append("folder", "reviews");
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Error al subir imagen");
+      const data = await res.json();
+      return data.secure_url;
+    },
+
+    // --- REVIEWS ---
+    addReview: async ({ productId, rating, text, photos = [] }) => {
+      if (!user) throw new Error("Tenés que iniciar sesión");
+      if (!productId || !rating || !text) throw new Error("Faltan datos");
+
+      // Validar que el user compró el producto (client-side)
+      const hasBought = orders.some(o => {
+        const orderUserId = o.customer?.userId || o.userId;
+        if (orderUserId !== user.uid) return false;
+        return (o.items || []).some(it => String(it.id) === String(productId));
+      });
+      if (!hasBought) throw new Error("Solo quienes compraron este producto pueden dejar reseña");
+
+      // Evitar reviews duplicadas del mismo user al mismo producto
+      const existing = reviews.find(r => r.userId === user.uid && String(r.productId) === String(productId));
+      if (existing) throw new Error("Ya dejaste una reseña para este producto");
+
+      const review = {
+        productId: String(productId),
+        userId: user.uid,
+        userName: user.displayName || user.email?.split('@')[0] || 'Cliente',
+        rating: Math.min(5, Math.max(1, Number(rating))),
+        text: String(text).slice(0, 1000),
+        photos: Array.isArray(photos) ? photos.slice(0, 4) : [],
+        approved: false,
+        createdAt: Date.now()
+      };
+      await addDoc(collection(db, "reviews"), review);
+      return review;
+    },
+
+    approveReview: async (id) => {
+      if (!isAdmin) return;
+      await updateDoc(doc(db, "reviews", String(id)), { approved: true });
+      addToast("Reseña aprobada", "success");
+    },
+
+    rejectReview: async (id) => {
+      if (!isAdmin) return;
+      await deleteDoc(doc(db, "reviews", String(id)));
+      addToast("Reseña eliminada", "success");
     },
 
     // --- INTEGRACIONES REALES ---
@@ -1047,7 +1122,7 @@ export const StoreProvider = ({ children }) => {
       categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
-      abandonedCarts, activeSessions,
+      abandonedCarts, activeSessions, reviews,
       shippingProvinces, setShippingProvinces,
       ...dbActions
     }}>

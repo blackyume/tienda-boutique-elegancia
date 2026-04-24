@@ -17,7 +17,8 @@ export default defineConfig({
                         'firebase/app',
                         'firebase/auth',
                         'firebase/firestore',
-                        'firebase/storage'
+                        'firebase/storage',
+                        'firebase/messaging'
                     ],
                     'mp-vendor': ['@mercadopago/sdk-react'],
                     'charts-vendor': ['recharts'],

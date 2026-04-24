@@ -5,7 +5,7 @@ import { useStore } from '../../context/StoreContext';
 import { useState, useEffect, useRef } from 'react';
 
 export const Navbar = ({ onOpenCart }) => {
-    const { cart, categories, setGlobalFilter, user, logout, isAdmin, siteConfig } = useStore();
+    const { cart, categories, setGlobalFilter, user, logout, isAdmin, siteConfig, inventory } = useStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Search State
@@ -35,13 +35,37 @@ export const Navbar = ({ onOpenCart }) => {
         }
     }, [isSearchOpen]);
 
+    // Sugerencias: top-6 productos que matchean el query
+    const suggestions = (() => {
+        const q = search.trim().toLowerCase();
+        if (q.length < 2 || !Array.isArray(inventory)) return [];
+        return inventory
+            .filter(p => p.active !== false)
+            .filter(p =>
+                p.name?.toLowerCase().includes(q) ||
+                p.category?.toLowerCase().includes(q)
+            )
+            .slice(0, 6);
+    })();
+
     const handleSearch = (e) => {
         if (e.key === 'Enter') {
-            setGlobalFilter({ category: "Todos", search: search });
-            navigate('/');
+            navigate(`/shop?q=${encodeURIComponent(search.trim())}`);
             setIsMobileMenuOpen(false);
             setIsSearchOpen(false);
+            setSearch("");
         }
+        if (e.key === 'Escape') {
+            setIsSearchOpen(false);
+            setSearch("");
+        }
+    };
+
+    const goToProduct = (id) => {
+        navigate(`/product/${id}`);
+        setIsSearchOpen(false);
+        setSearch("");
+        setIsMobileMenuOpen(false);
     };
 
     const toggleSearch = () => {
@@ -156,20 +180,61 @@ export const Navbar = ({ onOpenCart }) => {
 
                     {/* ICONS (RIGHT) */}
                     <div className="flex items-center gap-4 pr-2">
-                        {/* SEARCH (EXPANDING) */}
-                        <div className={`hidden md:flex items-center transition-all duration-300 ease-out border border-transparent ${isSearchOpen ? 'w-48 bg-white/10 px-3 py-1.5 rounded-full border-white/10' : 'w-8 bg-transparent'}`}>
-                            <button onClick={toggleSearch} className="text-white hover:text-cielo-gold cursor-pointer transition-colors">
-                                <Search className="w-4 h-4" />
-                            </button>
-                            <input
-                                ref={searchInputRef}
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                onKeyDown={handleSearch}
-                                onBlur={() => !search && setIsSearchOpen(false)}
-                                placeholder="BUSCAR..."
-                                className={`bg-transparent border-none outline-none text-[10px] uppercase font-bold tracking-wider text-white placeholder-slate-400 ml-2 w-full transition-opacity duration-200 ${isSearchOpen ? 'opacity-100' : 'opacity-0 w-0 pointer-events-none'}`}
-                            />
+                        {/* SEARCH (EXPANDING + AUTOCOMPLETE) */}
+                        <div className="hidden md:block relative">
+                            <div className={`flex items-center transition-all duration-300 ease-out border border-transparent ${isSearchOpen ? 'w-56 bg-white/10 px-3 py-1.5 rounded-full border-white/10' : 'w-8 bg-transparent'}`}>
+                                <button onClick={toggleSearch} className="text-white hover:text-cielo-gold cursor-pointer transition-colors">
+                                    <Search className="w-4 h-4" />
+                                </button>
+                                <input
+                                    ref={searchInputRef}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={handleSearch}
+                                    onBlur={() => setTimeout(() => { if (!search) setIsSearchOpen(false); }, 150)}
+                                    placeholder="BUSCAR..."
+                                    className={`bg-transparent border-none outline-none text-[10px] uppercase font-bold tracking-wider text-white placeholder-slate-400 ml-2 w-full transition-opacity duration-200 ${isSearchOpen ? 'opacity-100' : 'opacity-0 w-0 pointer-events-none'}`}
+                                />
+                            </div>
+                            {isSearchOpen && suggestions.length > 0 && (
+                                <div className="absolute top-full right-0 mt-2 w-80 bg-[#0B1120]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-40">
+                                    <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-white/5">
+                                        Sugerencias
+                                    </div>
+                                    <ul className="max-h-80 overflow-y-auto">
+                                        {suggestions.map(p => (
+                                            <li key={p.id}>
+                                                <button
+                                                    onMouseDown={(e) => { e.preventDefault(); goToProduct(p.id); }}
+                                                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 text-left transition-colors"
+                                                >
+                                                    <div className="w-10 h-10 rounded bg-slate-800 overflow-hidden shrink-0">
+                                                        {p.image && <img src={p.image} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                                                        <p className="text-[10px] text-slate-400 truncate">{p.category}</p>
+                                                    </div>
+                                                    <span className="text-xs text-cielo-gold font-bold shrink-0">
+                                                        {typeof p.price === 'number' ? `$${p.price.toLocaleString('es-AR')}` : ''}
+                                                    </span>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <button
+                                        onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            navigate(`/shop?q=${encodeURIComponent(search.trim())}`);
+                                            setIsSearchOpen(false);
+                                            setSearch("");
+                                        }}
+                                        className="w-full px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-cielo-gold hover:bg-white/5 border-t border-white/5 transition-colors"
+                                    >
+                                        Ver todos los resultados →
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {/* USER */}

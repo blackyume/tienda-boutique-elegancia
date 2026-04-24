@@ -4,12 +4,26 @@
         {
             "src": "api/*.js",
             "use": "@vercel/node"
+        },
+        {
+            "src": "api/cron/*.js",
+            "use": "@vercel/node"
         }
     ],
     "routes": [
         {
+            "src": "/api/cron/(.*)",
+            "dest": "/api/cron/$1"
+        },
+        {
             "src": "/api/(.*)",
             "dest": "/api/$1"
+        }
+    ],
+    "crons": [
+        {
+            "path": "/api/cron/abandoned-reminder",
+            "schedule": "0 */2 * * *"
         }
     ]
 }

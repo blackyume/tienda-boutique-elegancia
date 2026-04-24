@@ -7,6 +7,7 @@ import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, 
 import { formatMoney } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
+import { findReferralOwner, creditReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
 
 export const Checkout = () => {
     const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, useCoupon } = useStore();
@@ -30,6 +31,12 @@ export const Checkout = () => {
     const [couponError, setCouponError] = useState('');
     const [applyingCoupon, setApplyingCoupon] = useState(false);
 
+    // Referral state
+    const [referralCode, setReferralCode] = useState('');
+    const [appliedReferral, setAppliedReferral] = useState(null); // { code, ownerUid }
+    const [referralError, setReferralError] = useState('');
+    const [applyingReferral, setApplyingReferral] = useState(false);
+
     const shippingOptions = shippingRates || {
         andreani: { name: 'Andreani', cost: 5800, time: '2-4 días' },
         oca: { name: 'OCA', cost: 4900, time: '3-6 días' },
@@ -46,11 +53,12 @@ export const Checkout = () => {
         if (appliedCoupon.type === 'percentage') {
             return cartTotal * (appliedCoupon.value / 100);
         }
-        return Math.min(appliedCoupon.value, cartTotal); // Fixed discount can't exceed cart total
+        return Math.min(appliedCoupon.value, cartTotal);
     };
     const couponDiscount = calculateDiscount();
+    const referralDiscount = appliedReferral ? cartTotal * (REFERRAL_DISCOUNT_PERCENT / 100) : 0;
 
-    const finalTotal = cartTotal + shippingOptions[shippingMethod].cost + paymentSurcharge - couponDiscount;
+    const finalTotal = cartTotal + shippingOptions[shippingMethod].cost + paymentSurcharge - couponDiscount - referralDiscount;
 
     const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -114,6 +122,44 @@ export const Checkout = () => {
         setCouponError('');
     };
 
+    const handleApplyReferral = async () => {
+        setReferralError('');
+        const code = referralCode.trim().toUpperCase();
+        if (!code) return setReferralError('Ingresá un código');
+        setApplyingReferral(true);
+        try {
+            const owner = await findReferralOwner(code);
+            if (!owner) return setReferralError('Código no válido');
+            if (user && owner.uid === user.uid) return setReferralError('No podés usar tu propio código');
+            setAppliedReferral({ code, ownerUid: owner.uid, ownerName: owner.name || owner.email?.split('@')[0] });
+            setReferralCode('');
+            addToast(`¡Código aplicado! ${REFERRAL_DISCOUNT_PERCENT}% de descuento`, 'success');
+        } catch (err) {
+            setReferralError('No se pudo validar');
+        } finally {
+            setApplyingReferral(false);
+        }
+    };
+    const removeReferral = () => { setAppliedReferral(null); setReferralError(''); };
+
+    // Auto-aplicar si viene por URL ?ref=REF-XXXX
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const ref = params.get('ref');
+        if (ref && !appliedReferral) {
+            setReferralCode(ref.toUpperCase());
+            // Trigger validation
+            (async () => {
+                const owner = await findReferralOwner(ref);
+                if (owner && (!user || owner.uid !== user.uid)) {
+                    setAppliedReferral({ code: ref.toUpperCase(), ownerUid: owner.uid, ownerName: owner.name || owner.email?.split('@')[0] });
+                    addToast(`¡Código de referido aplicado! ${REFERRAL_DISCOUNT_PERCENT}% OFF`, 'success');
+                    setReferralCode('');
+                }
+            })();
+        }
+    }, [user]);
+
     // Abandoned cart tracking — registra carrito cuando el usuario ingresa su email
     // y deja de completar. Se debouncea para no escribir en cada keystroke.
     useEffect(() => {
@@ -175,12 +221,14 @@ export const Checkout = () => {
                 shipping: shippingMethod,
                 shippingCost: shippingOptions[shippingMethod].cost,
                 coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null,
+                referral: appliedReferral ? { code: appliedReferral.code, ownerUid: appliedReferral.ownerUid, discount: referralDiscount } : null,
                 paymentMethod: 'whatsapp'
             };
 
             trackBeginCheckout(cart, finalTotal);
             await createOrder(newOrder);
             if (appliedCoupon) await useCoupon(appliedCoupon.id);
+            if (appliedReferral) creditReferralOwner(appliedReferral.ownerUid, finalTotal, referralDiscount).catch(() => {});
             markAbandonedCartRecovered(formData.email, orderId).catch(() => {});
 
             const msg = encodeURIComponent(buildWhatsAppMessage(orderId));
@@ -214,7 +262,8 @@ export const Checkout = () => {
                 items: cart,
                 shipping: shippingMethod,
                 shippingCost: shippingOptions[shippingMethod].cost,
-                coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null
+                coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null,
+                referral: appliedReferral ? { code: appliedReferral.code, ownerUid: appliedReferral.ownerUid, discount: referralDiscount } : null
             };
 
             // GA4 begin_checkout
@@ -222,6 +271,7 @@ export const Checkout = () => {
 
             // 1. Crear Orden en Firebase (Persistencia)
             await createOrder(newOrder);
+            if (appliedReferral) creditReferralOwner(appliedReferral.ownerUid, finalTotal, referralDiscount).catch(() => {});
             markAbandonedCartRecovered(formData.email, newOrder.id).catch(() => {});
 
             // 1.5 Register coupon usage if applied
@@ -421,6 +471,18 @@ export const Checkout = () => {
                                     <span>-{formatMoney(couponDiscount)}</span>
                                 </div>
                             )}
+                            {appliedReferral && (
+                                <div className="flex justify-between text-sky-600 font-montserrat text-sm font-bold">
+                                    <span className="flex items-center gap-2">
+                                        <User className="w-4 h-4" />
+                                        Referido: {appliedReferral.code}
+                                        <button onClick={removeReferral} className="text-red-400 hover:text-red-500 p-0.5">
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                    <span>-{formatMoney(referralDiscount)}</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Coupon Input */}
@@ -452,6 +514,39 @@ export const Checkout = () => {
                                         <X className="w-3 h-3" /> {couponError}
                                     </p>
                                 )}
+                            </div>
+                        )}
+
+                        {/* Referral Input */}
+                        {!appliedReferral && (
+                            <div className="pt-3">
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            value={referralCode}
+                                            onChange={(e) => { setReferralCode(e.target.value.toUpperCase()); setReferralError(''); }}
+                                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleApplyReferral())}
+                                            placeholder="Código de referido (REF-XXXXXXXX)"
+                                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-mono font-bold tracking-wider text-sm outline-none focus:border-sky-500 transition-all"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleApplyReferral}
+                                        disabled={applyingReferral || !referralCode}
+                                        className="px-5 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors disabled:opacity-50"
+                                    >
+                                        {applyingReferral ? '...' : 'Aplicar'}
+                                    </button>
+                                </div>
+                                {referralError && (
+                                    <p className="text-red-500 text-xs font-medium mt-2 flex items-center gap-1">
+                                        <X className="w-3 h-3" /> {referralError}
+                                    </p>
+                                )}
+                                <p className="text-[10px] text-slate-400 mt-1">Ingresá el código de un amigo y obtené {REFERRAL_DISCOUNT_PERCENT}% OFF.</p>
                             </div>
                         )}
 

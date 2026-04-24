@@ -1,13 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Package, Truck, LogOut, User, MapPin } from 'lucide-react';
+import { Package, Truck, LogOut, User, MapPin, Gift, Copy, Share2 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { buildReferralCode, getReferralLink, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export const UserProfile = () => {
-    const { user, orders, logout } = useStore();
+    const { user, orders, logout, addToast } = useStore();
     const navigate = useNavigate();
+
+    const [userData, setUserData] = useState(null);
+    useEffect(() => {
+        if (!user) return;
+        const unsub = onSnapshot(doc(db, 'users', user.uid), (d) => {
+            setUserData(d.exists() ? d.data() : null);
+        });
+        return unsub;
+    }, [user]);
+
+    const referralCode = userData?.referralCode || (user ? buildReferralCode(user.uid) : '');
+    const referralLink = user ? getReferralLink(user.uid) : '';
+
+    const copy = (text) => {
+        navigator.clipboard.writeText(text);
+        addToast('Copiado al portapapeles', 'success');
+    };
+    const share = async () => {
+        const shareData = {
+            title: 'La Boutique de la Elegancia',
+            text: `Usá mi código ${referralCode} y llevate ${REFERRAL_DISCOUNT_PERCENT}% OFF en tu primera compra.`,
+            url: referralLink
+        };
+        if (navigator.share) {
+            try { await navigator.share(shareData); } catch { }
+        } else {
+            copy(referralLink);
+        }
+    };
 
     // Filter orders for current user
     const myOrders = orders.filter(o => o.userId === user?.uid || o.customer?.email === user?.email);
@@ -41,6 +73,42 @@ export const UserProfile = () => {
                     <Button onClick={() => { logout(); navigate('/'); }} variant="outline" className="text-red-500 border-red-200 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-900/20">
                         <LogOut className="w-4 h-4 mr-2" /> Cerrar Sesión
                     </Button>
+                </div>
+
+                {/* REFERRAL SECTION */}
+                <div className="bg-gradient-to-br from-[#C19A6B]/10 via-white to-sky-50 dark:from-[#C19A6B]/10 dark:via-slate-900/50 dark:to-sky-900/10 rounded-2xl border border-[#C19A6B]/30 p-6 md:p-8 mb-8 shadow-sm">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-full bg-[#C19A6B] flex items-center justify-center text-white">
+                            <Gift className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Tu código de referido</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Compartilo y tus amigos obtienen {REFERRAL_DISCOUNT_PERCENT}% OFF.</p>
+                        </div>
+                    </div>
+                    <div className="grid md:grid-cols-[auto_1fr_auto] items-center gap-3 bg-white dark:bg-slate-900/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                        <div>
+                            <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Tu código</p>
+                            <p className="font-mono font-black text-xl text-[#C19A6B] tracking-wider">{referralCode}</p>
+                        </div>
+                        <div className="md:border-l md:pl-4 md:border-slate-200 md:dark:border-slate-700">
+                            <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Link para compartir</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-300 truncate font-mono">{referralLink}</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={() => copy(referralLink)} className="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors" title="Copiar link">
+                                <Copy className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                            </button>
+                            <button onClick={share} className="p-2.5 rounded-lg bg-[#C19A6B] hover:bg-[#a87f4f] text-white transition-colors" title="Compartir">
+                                <Share2 className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+                        <Stat label="Amigos referidos" value={userData?.referralsCount || 0} />
+                        <Stat label="Ventas generadas" value={formatMoney(userData?.referralsRevenue || 0)} />
+                        <Stat label="Descuentos dados" value={formatMoney(userData?.referralsEarnings || 0)} />
+                    </div>
                 </div>
 
                 {/* ORDERS SECTION */}
@@ -134,3 +202,10 @@ const StatusBadge = ({ status }) => {
         </span>
     );
 };
+
+const Stat = ({ label, value }) => (
+    <div className="bg-white/60 dark:bg-slate-800/40 rounded-lg p-3 border border-slate-100 dark:border-slate-700">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</p>
+        <p className="text-lg font-black text-slate-900 dark:text-white mt-1">{value}</p>
+    </div>
+);

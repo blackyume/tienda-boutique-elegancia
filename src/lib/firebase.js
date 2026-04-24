@@ -3,7 +3,7 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
-const firebaseConfig = {
+export const firebaseConfig = {
     apiKey: "AIzaSyC8pSsJ7pedjQ12s77_rwWSDWyYDMJwgAk",
     authDomain: "la-boutique-de-la-elegancia.firebaseapp.com",
     projectId: "la-boutique-de-la-elegancia",
@@ -16,3 +16,4 @@ const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+export const firebaseApp = app;

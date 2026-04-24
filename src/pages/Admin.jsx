@@ -26,6 +26,7 @@ import { CouponsView } from '../components/admin/CouponsView';
 import { SalesView } from '../components/admin/SalesView';
 import { SuppliersView } from '../components/admin/SuppliersView';
 import { AbandonedCartsView } from '../components/admin/AbandonedCartsView';
+import { ReviewsView } from '../components/admin/ReviewsView';
 import { generateProductCopy } from '../utils/gemini';
 import { getTotalStock } from '../utils/variants';
 import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock';
@@ -64,7 +65,7 @@ const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews } = useStore();
     const [adminTab, setAdminTab] = useState("dashboard");
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
@@ -488,6 +489,7 @@ export const Admin = () => {
                     <SidebarItem icon={Ticket} label="Cupones" active={adminTab === 'coupons'} onClick={() => setAdminTab('coupons')} />
                     <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
                     <SidebarItem icon={ShoppingCartIcon} label="Carritos Abandonados" active={adminTab === 'abandoned'} onClick={() => setAdminTab('abandoned')} count={(abandonedCarts || []).filter(c => !c.recovered).length} />
+                    <SidebarItem icon={CheckIcon} label="Reseñas" active={adminTab === 'reviews'} onClick={() => setAdminTab('reviews')} count={(reviews || []).filter(r => !r.approved).length} />
                     <p className="hidden lg:block px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
                     <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
 
@@ -793,6 +795,7 @@ export const Admin = () => {
                 {adminTab === 'coupons' && <CouponsView />}
                 {adminTab === 'suppliers' && <SuppliersView />}
                 {adminTab === 'abandoned' && <AbandonedCartsView />}
+                {adminTab === 'reviews' && <ReviewsView />}
                 {adminTab === 'integrations' && <IntegrationsView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
             </main >

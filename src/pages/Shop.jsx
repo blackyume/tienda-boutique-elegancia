@@ -20,6 +20,7 @@ export const Shop = () => {
     const [search, setSearch] = useState(searchParams.get('q') || '');
     const [sizes, setSizes] = useState(parseSet(searchParams.get('sizes')));
     const [colors, setColors] = useState(parseSet(searchParams.get('colors')));
+    const [priceMin, setPriceMin] = useState(Number(searchParams.get('priceMin')) || 0);
     const [priceMax, setPriceMax] = useState(Number(searchParams.get('priceMax')) || 0);
     const [inStockOnly, setInStockOnly] = useState(searchParams.get('stock') === '1');
     const [sortOption, setSortOption] = useState(searchParams.get('sort') || 'relevant');
@@ -55,11 +56,12 @@ export const Shop = () => {
         if (search) params.q = search;
         if (sizes.size) params.sizes = [...sizes].join(',');
         if (colors.size) params.colors = [...colors].join(',');
+        if (priceMin > 0) params.priceMin = String(priceMin);
         if (priceMax && priceMax !== maxPrice) params.priceMax = String(priceMax);
         if (inStockOnly) params.stock = '1';
         if (sortOption !== 'relevant') params.sort = sortOption;
         setSearchParams(params, { replace: true });
-    }, [category, search, sizes, colors, priceMax, inStockOnly, sortOption, maxPrice, setSearchParams]);
+    }, [category, search, sizes, colors, priceMin, priceMax, inStockOnly, sortOption, maxPrice, setSearchParams]);
 
     const filtered = useMemo(() => {
         let list = inventory.filter((p) => p.active !== false);
@@ -75,6 +77,7 @@ export const Shop = () => {
         }
         if (sizes.size > 0) list = list.filter((p) => (p.sizes || []).some((s) => sizes.has(s)));
         if (colors.size > 0) list = list.filter((p) => (p.colors || []).some((c) => colors.has(c)));
+        if (priceMin > 0) list = list.filter((p) => Number(p.price) >= priceMin);
         if (priceMax > 0) list = list.filter((p) => Number(p.price) <= priceMax);
         if (inStockOnly) list = list.filter((p) => getTotalStock(p) > 0);
 
@@ -85,9 +88,9 @@ export const Shop = () => {
         else if (sortOption === 'popular')
             list = [...list].sort((a, b) => (b.views || 0) - (a.views || 0));
         return list;
-    }, [inventory, category, search, sizes, colors, priceMax, inStockOnly, sortOption]);
+    }, [inventory, category, search, sizes, colors, priceMin, priceMax, inStockOnly, sortOption]);
 
-    useEffect(() => { setPage(1); }, [category, search, sizes, colors, priceMax, inStockOnly, sortOption]);
+    useEffect(() => { setPage(1); }, [category, search, sizes, colors, priceMin, priceMax, inStockOnly, sortOption]);
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     const paged = filtered.slice(0, page * PAGE_SIZE);
@@ -104,6 +107,7 @@ export const Shop = () => {
         setSearch('');
         setSizes(new Set());
         setColors(new Set());
+        setPriceMin(0);
         setPriceMax(maxPrice);
         setInStockOnly(false);
         setSortOption('relevant');
@@ -114,6 +118,10 @@ export const Shop = () => {
         search && { label: `"${search}"`, onClear: () => setSearch('') },
         ...[...sizes].map((s) => ({ label: `Talle ${s}`, onClear: () => toggleIn(sizes, s, setSizes) })),
         ...[...colors].map((c) => ({ label: c, onClear: () => toggleIn(colors, c, setColors) })),
+        priceMin > 0 && {
+            label: `Desde ${formatMoney(priceMin)}`,
+            onClear: () => setPriceMin(0)
+        },
         priceMax > 0 && priceMax < maxPrice && {
             label: `Hasta ${formatMoney(priceMax)}`,
             onClear: () => setPriceMax(maxPrice)
@@ -208,16 +216,41 @@ export const Shop = () => {
                             </FilterGroup>
                         )}
 
-                        <FilterGroup title={`Precio hasta ${formatMoney(priceMax || maxPrice)}`}>
-                            <input
-                                type="range"
-                                min={0}
-                                max={maxPrice}
-                                step={Math.max(1000, Math.round(maxPrice / 50))}
-                                value={priceMax || maxPrice}
-                                onChange={(e) => setPriceMax(Number(e.target.value))}
-                                className="w-full accent-cielo-gold"
-                            />
+                        <FilterGroup title={`Precio: ${formatMoney(priceMin)} — ${formatMoney(priceMax || maxPrice)}`}>
+                            <div className="space-y-2">
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={maxPrice}
+                                    step={Math.max(1000, Math.round(maxPrice / 50))}
+                                    value={priceMin}
+                                    onChange={(e) => {
+                                        const v = Number(e.target.value);
+                                        setPriceMin(v);
+                                        if (priceMax > 0 && v > priceMax) setPriceMax(v);
+                                    }}
+                                    className="w-full accent-cielo-gold"
+                                    aria-label="Precio mínimo"
+                                />
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={maxPrice}
+                                    step={Math.max(1000, Math.round(maxPrice / 50))}
+                                    value={priceMax || maxPrice}
+                                    onChange={(e) => {
+                                        const v = Number(e.target.value);
+                                        setPriceMax(v);
+                                        if (v < priceMin) setPriceMin(v);
+                                    }}
+                                    className="w-full accent-cielo-gold"
+                                    aria-label="Precio máximo"
+                                />
+                                <div className="flex justify-between text-[10px] text-slate-400 uppercase tracking-widest">
+                                    <span>Mín</span>
+                                    <span>Máx</span>
+                                </div>
+                            </div>
                         </FilterGroup>
 
                         <label className="flex items-center gap-2 mt-2 cursor-pointer">
@@ -389,16 +422,35 @@ export const Shop = () => {
                         </FilterGroup>
                     )}
 
-                    <FilterGroup title={`Precio hasta ${formatMoney(priceMax || maxPrice)}`}>
-                        <input
-                            type="range"
-                            min={0}
-                            max={maxPrice}
-                            step={Math.max(1000, Math.round(maxPrice / 50))}
-                            value={priceMax || maxPrice}
-                            onChange={(e) => setPriceMax(Number(e.target.value))}
-                            className="w-full accent-cielo-gold"
-                        />
+                    <FilterGroup title={`Precio: ${formatMoney(priceMin)} — ${formatMoney(priceMax || maxPrice)}`}>
+                        <div className="space-y-2">
+                            <input
+                                type="range"
+                                min={0}
+                                max={maxPrice}
+                                step={Math.max(1000, Math.round(maxPrice / 50))}
+                                value={priceMin}
+                                onChange={(e) => {
+                                    const v = Number(e.target.value);
+                                    setPriceMin(v);
+                                    if (priceMax > 0 && v > priceMax) setPriceMax(v);
+                                }}
+                                className="w-full accent-cielo-gold"
+                            />
+                            <input
+                                type="range"
+                                min={0}
+                                max={maxPrice}
+                                step={Math.max(1000, Math.round(maxPrice / 50))}
+                                value={priceMax || maxPrice}
+                                onChange={(e) => {
+                                    const v = Number(e.target.value);
+                                    setPriceMax(v);
+                                    if (v < priceMin) setPriceMin(v);
+                                }}
+                                className="w-full accent-cielo-gold"
+                            />
+                        </div>
                     </FilterGroup>
 
                     <label className="flex items-center gap-2 mt-2 cursor-pointer">

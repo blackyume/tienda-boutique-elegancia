@@ -12,6 +12,7 @@ import { SizeGuideModal } from './components/shop/SizeGuideModal';
 import { Home } from './pages/Home';
 import { Maintenance } from './pages/Maintenance';
 import { PromoPopup } from './components/ui/PromoPopup';
+import { PushOptIn } from './components/ui/PushOptIn';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
 import React, { useLayoutEffect, useEffect, Suspense, lazy } from 'react';
@@ -79,6 +80,7 @@ const AppContent = () => {
       <SystemAlert />
       <PromoPopup />
       <NewsletterPopup />
+      {location.pathname !== '/admin' && <PushOptIn />}
       {/* Elegancia IA Chat Widget */}
       <ShopAssistantWrapper />
       <div className={`flex-grow ${location.pathname !== '/' && location.pathname !== '/shop' && !location.pathname.startsWith('/admin') ? 'pt-28' : ''}`}>

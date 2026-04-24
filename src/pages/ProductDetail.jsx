@@ -9,8 +9,7 @@ import { SEO } from '../components/seo/SEO';
 import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 import { TrustBadges } from '../components/ui/TrustBadges';
 import { ProductCard } from '../components/shop/ProductCard';
-import { ProductReviews, ReviewSummary } from '../components/shop/ProductReviews';
-import { useProductReviews } from '../hooks/useProductReviews';
+import { ReviewsSection } from '../components/shop/ReviewsSection';
 import {
     getTotalStock,
     getVariantStock,
@@ -65,8 +64,12 @@ export const ProductDetail = () => {
         return [product.image];
     }, [product]);
 
-    const { aggregate } = useProductReviews(product?.id);
-    const { average: reviewAverage, count: reviewCount } = aggregate();
+    const { reviews: allReviews } = useStore();
+    const { reviewAverage, reviewCount } = useMemo(() => {
+        const r = (allReviews || []).filter(x => x.approved && String(x.productId) === String(product?.id));
+        if (r.length === 0) return { reviewAverage: 0, reviewCount: 0 };
+        return { reviewAverage: r.reduce((a, x) => a + (x.rating || 0), 0) / r.length, reviewCount: r.length };
+    }, [allReviews, product?.id]);
 
     const totalStock = useMemo(() => (product ? getTotalStock(product) : 0), [product]);
     const variantStock = useMemo(
@@ -198,15 +201,24 @@ export const ProductDetail = () => {
                             </span>
                         )}
                     </div>
-                    <div className="mb-6">
-                        <ReviewSummary
-                            productId={product.id}
-                            onWriteClick={() => {
+                    {reviewCount > 0 ? (
+                        <button
+                            type="button"
+                            onClick={() => {
                                 const el = document.getElementById('product-reviews');
                                 if (el) el.scrollIntoView({ behavior: 'smooth' });
                             }}
-                        />
-                    </div>
+                            className="mb-6 inline-flex items-center gap-2 text-sm hover:opacity-80 transition-opacity"
+                        >
+                            <div className="inline-flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map(n => (
+                                    <Star key={n} className={`w-3.5 h-3.5 ${n <= Math.round(reviewAverage) ? 'fill-cielo-gold text-cielo-gold' : 'text-slate-300 dark:text-slate-700'}`} />
+                                ))}
+                            </div>
+                            <span className="font-bold text-slate-800 dark:text-white">{reviewAverage.toFixed(1)}</span>
+                            <span className="text-slate-500">· {reviewCount} reseña{reviewCount !== 1 ? 's' : ''}</span>
+                        </button>
+                    ) : null}
 
                     {product.description && (
                         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
@@ -394,8 +406,8 @@ export const ProductDetail = () => {
                 </div>
             </div>
 
-            <div id="product-reviews">
-                <ProductReviews product={product} />
+            <div id="product-reviews" className="max-w-5xl mx-auto px-4">
+                <ReviewsSection productId={product.id} />
             </div>
 
             {/* Relacionados */}

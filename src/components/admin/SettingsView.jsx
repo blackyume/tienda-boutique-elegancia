@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Lock, Settings, Mail, Bot, AlertTriangle, Send } from 'lucide-react';
+import { Lock, Settings, Mail, Bot, AlertTriangle, Send, Bell } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { SalesConfig } from './SalesConfig';
 
@@ -11,6 +11,39 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
     const [isTestingKey, setIsTestingKey] = useState(false);
     const [tgTestMsg, setTgTestMsg] = useState("");
     const [isSendingTg, setIsSendingTg] = useState(false);
+    const [pushTitle, setPushTitle] = useState("");
+    const [pushBody, setPushBody] = useState("");
+    const [pushUrl, setPushUrl] = useState("/shop");
+    const [isSendingPush, setIsSendingPush] = useState(false);
+
+    const handleSendPush = async () => {
+        if (!pushTitle.trim() || !pushBody.trim()) return addToast("Completá título y cuerpo", "error");
+        const secret = siteConfig?.push?.adminSecret || '';
+        if (!secret) return addToast("Guardá el PUSH_ADMIN_SECRET en el card de abajo", "error");
+
+        const apiBase = siteConfig?.mpApiUrl
+            ? siteConfig.mpApiUrl.replace(/\/api\/[^/]+$/, '/api')
+            : `${window.location.origin}/api`;
+        setIsSendingPush(true);
+        try {
+            const res = await fetch(`${apiBase}/send-push`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Secret': secret
+                },
+                body: JSON.stringify({ title: pushTitle, body: pushBody, url: pushUrl })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+            addToast(`Enviadas ${data.sent || 0}. Fallidas ${data.failed || 0}.`, "success");
+            setPushTitle(""); setPushBody("");
+        } catch (err) {
+            addToast(err.message || "Error al enviar push", "error");
+        } finally {
+            setIsSendingPush(false);
+        }
+    };
 
     const handleTestTelegram = async () => {
         if (!tgTestMsg.trim()) return addToast("Escribí un mensaje para probar", "error");
@@ -115,6 +148,95 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                         >
                             <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isMaintenance ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
+                    </div>
+                </div>
+
+                {/* PUSH NOTIFICATIONS */}
+                <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border dark:border-slate-700 shadow-sm md:col-span-2 border-l-4 border-l-amber-500">
+                    <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <Bell className="w-5 h-5 text-amber-500" /> Notificaciones Push (FCM)
+                    </h3>
+                    <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-900/30 mb-4 text-xs text-amber-800 dark:text-amber-300 space-y-2">
+                        <p><strong>Setup (una sola vez):</strong></p>
+                        <ol className="list-decimal ml-5 space-y-1">
+                            <li>Firebase Console → Project settings → Cloud Messaging → Web Push certificates → Generate key pair. Copiá la <strong>VAPID key</strong>.</li>
+                            <li>Pegala abajo y guardala.</li>
+                            <li>En Vercel env vars: agregá <code>FIREBASE_SERVICE_ACCOUNT</code> (JSON descargado de Firebase → Project settings → Service accounts → Generate new private key) y <code>PUSH_ADMIN_SECRET</code> (cualquier string — pegalo también abajo).</li>
+                            <li>Redeploy Vercel.</li>
+                            <li>Los visitantes verán un popup para activar notificaciones después de 10s en el sitio.</li>
+                        </ol>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">VAPID Public Key</label>
+                            <input
+                                type="text"
+                                defaultValue={siteConfig?.push?.vapidKey || ''}
+                                placeholder="B..."
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm font-mono outline-none focus:border-amber-500"
+                                id="pushVapidInput"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">PUSH_ADMIN_SECRET (debe coincidir con Vercel)</label>
+                            <input
+                                type="password"
+                                defaultValue={siteConfig?.push?.adminSecret || ''}
+                                placeholder="••••••"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm font-mono outline-none focus:border-amber-500"
+                                id="pushSecretInput"
+                            />
+                        </div>
+                    </div>
+                    <Button
+                        onClick={() => {
+                            updateSiteConfig({
+                                push: {
+                                    ...(siteConfig?.push || {}),
+                                    vapidKey: document.getElementById('pushVapidInput').value,
+                                    adminSecret: document.getElementById('pushSecretInput').value
+                                }
+                            });
+                            addToast("Configuración push guardada", "success");
+                        }}
+                        className="bg-slate-800 text-white text-xs px-6 py-2 rounded-lg"
+                    >
+                        Guardar
+                    </Button>
+
+                    <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                        <label className="text-xs font-bold uppercase text-slate-400 mb-2 block">Enviar push a todos los suscriptores</label>
+                        <div className="space-y-2">
+                            <input
+                                type="text"
+                                value={pushTitle}
+                                onChange={(e) => setPushTitle(e.target.value)}
+                                placeholder="Título (ej: 🎉 30% OFF hoy)"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-amber-500"
+                            />
+                            <textarea
+                                rows={2}
+                                value={pushBody}
+                                onChange={(e) => setPushBody(e.target.value)}
+                                placeholder="Mensaje (ej: Solo por hoy en toda la tienda. ¡Aprovechá!)"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-amber-500"
+                            />
+                            <input
+                                type="text"
+                                value={pushUrl}
+                                onChange={(e) => setPushUrl(e.target.value)}
+                                placeholder="/shop"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-amber-500"
+                            />
+                            <Button
+                                onClick={handleSendPush}
+                                isLoading={isSendingPush}
+                                className="bg-amber-600 hover:bg-amber-700 text-white text-xs px-6 py-2.5 rounded-lg w-full"
+                            >
+                                <Bell className="w-4 h-4 mr-2 inline" /> Enviar a todos
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
