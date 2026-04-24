@@ -15,6 +15,7 @@ import { PromoPopup } from './components/ui/PromoPopup';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
 import React, { useLayoutEffect, useEffect, Suspense, lazy } from 'react';
+import { startPresence } from './utils/presence';
 
 // Lazy-loaded routes (code-splitting to shrink initial bundle)
 const Shop = lazy(() => import('./pages/Shop').then(m => ({ default: m.Shop })));
@@ -42,13 +43,19 @@ const ScrollToTop = () => {
 
 // AppContent assumes Router context exists
 const AppContent = () => {
-  const { isSizeGuideOpen, setIsSizeGuideOpen, isMaintenance, isAdmin, loading, incrementVisits, isCartOpen, setIsCartOpen } = useStore();
+  const { isSizeGuideOpen, setIsSizeGuideOpen, isMaintenance, isAdmin, loading, incrementVisits, isCartOpen, setIsCartOpen, user } = useStore();
 
   // Use location here works because Router is now parent
   const location = useLocation();
 
   // Trigger visits exactly once on mount
   useEffect(() => { incrementVisits(); }, []);
+
+  // Presence tracking (visitantes live) — ignora admin
+  useEffect(() => {
+    const stop = startPresence(user);
+    return stop;
+  }, [user]);
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-[#C19A6B]">Cargando...</div>;
 

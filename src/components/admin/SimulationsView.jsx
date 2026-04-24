@@ -5,9 +5,7 @@ import { Button } from '../ui/Button';
 import { StatusSelector } from './StatusSelector';
 import { Calculator, Save, Trash2, ArrowRight, DollarSign, FileDown, Sheet, History, Plus } from 'lucide-react';
 import { formatMoney, getColorHex } from '../../utils/helpers';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+// jsPDF, jspdf-autotable y xlsx se importan dinámicamente al usarse.
 
 export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduct }) => {
     const { simulations, saveSimulation, deleteSimulation, addToast, inventory } = useStore();
@@ -54,7 +52,9 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
         setViewMode('history');
     };
 
-    const exportToPDF = () => {
+    const exportToPDF = async () => {
+        const { default: jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
         const doc = new jsPDF();
         doc.setFontSize(18);
         doc.text("Historial de Simulaciones", 14, 22);
@@ -85,7 +85,8 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
         addToast("PDF descargado correctamente", "success");
     };
 
-    const exportToExcel = () => {
+    const exportToExcel = async () => {
+        const XLSX = await import('xlsx');
         const worksheet = XLSX.utils.json_to_sheet(simulations.map(sim => ({
             Fecha: new Date(sim.createdAt).toLocaleDateString(),
             Producto: sim.name,

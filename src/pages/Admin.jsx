@@ -7,7 +7,8 @@ import {
     TrendingUp, DollarSign, Calculator, Search, Users,
     Image as ImageIcon, UploadCloud, Monitor, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
-    Check as CheckIcon, Lock, Settings, Blocks, Clock, Bot, Ticket, Building2, Sparkles
+    Check as CheckIcon, Lock, Settings, Blocks, Clock, Bot, Ticket, Building2, Sparkles,
+    ShoppingCart as ShoppingCartIcon, Send as SendIcon
 } from 'lucide-react';
 // import { CostCalculator } from '../components/admin/CostCalculator'; // REMOVE LEGACY
 import { SimulationsView } from '../components/admin/SimulationsView';
@@ -24,6 +25,7 @@ import { CouponsView } from '../components/admin/CouponsView';
 
 import { SalesView } from '../components/admin/SalesView';
 import { SuppliersView } from '../components/admin/SuppliersView';
+import { AbandonedCartsView } from '../components/admin/AbandonedCartsView';
 import { generateProductCopy } from '../utils/gemini';
 import { getTotalStock } from '../utils/variants';
 import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock';
@@ -62,7 +64,7 @@ const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions } = useStore();
     const [adminTab, setAdminTab] = useState("dashboard");
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
@@ -370,6 +372,21 @@ export const Admin = () => {
         addToast("Link copiado al portapapeles", "success");
     };
 
+    const [publishingTgId, setPublishingTgId] = useState(null);
+    const handlePublishTelegram = async (product) => {
+        if (!confirm(`¿Publicar "${product.name}" al canal de Telegram?`)) return;
+        setPublishingTgId(product.id);
+        try {
+            const { publishProductToTelegram } = await import('../utils/telegram');
+            await publishProductToTelegram(product, siteConfig);
+            addToast("Publicado en Telegram", "success");
+        } catch (err) {
+            addToast(err.message || "Error al publicar", "error");
+        } finally {
+            setPublishingTgId(null);
+        }
+    };
+
     const handleAddColor = () => {
         if (!tempColor) return;
         const newColors = [...(currentProduct.colors || []), tempColor];
@@ -470,6 +487,7 @@ export const Admin = () => {
                     <SidebarItem icon={Blocks} label="CMS / Diseño" active={adminTab === 'cms'} onClick={() => setAdminTab('cms')} />
                     <SidebarItem icon={Ticket} label="Cupones" active={adminTab === 'coupons'} onClick={() => setAdminTab('coupons')} />
                     <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
+                    <SidebarItem icon={ShoppingCartIcon} label="Carritos Abandonados" active={adminTab === 'abandoned'} onClick={() => setAdminTab('abandoned')} count={(abandonedCarts || []).filter(c => !c.recovered).length} />
                     <p className="hidden lg:block px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
                     <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
 
@@ -667,6 +685,12 @@ export const Admin = () => {
                                                         <td className="p-4 text-right pr-6">
                                                             <div className="flex justify-end gap-1">
                                                                 <ActionBtn onClick={() => copyProductLink(p.id)} icon={LinkIcon} color="text-blue-500 hover:bg-blue-50" title="Copiar Link" />
+                                                                <ActionBtn
+                                                                    onClick={() => handlePublishTelegram(p)}
+                                                                    icon={SendIcon}
+                                                                    color={`text-sky-500 hover:bg-sky-50 ${publishingTgId === p.id ? 'animate-pulse' : ''}`}
+                                                                    title="Publicar en Telegram"
+                                                                />
                                                                 <ActionBtn onClick={() => { setCurrentProduct(p); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar" />
                                                                 <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-red-500 hover:bg-red-50" title="Eliminar" />
                                                             </div>
@@ -730,6 +754,7 @@ export const Admin = () => {
                     wishlistData={wishlistEvents}
                     lowStockItems={lowStockItems}
                     lowStockThreshold={lowStockThreshold}
+                    activeSessions={activeSessions}
                     onCreateProduct={() => {
                         setCurrentProduct({
                             id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
@@ -767,6 +792,7 @@ export const Admin = () => {
                 {adminTab === 'cms' && <CMSView />}
                 {adminTab === 'coupons' && <CouponsView />}
                 {adminTab === 'suppliers' && <SuppliersView />}
+                {adminTab === 'abandoned' && <AbandonedCartsView />}
                 {adminTab === 'integrations' && <IntegrationsView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
             </main >

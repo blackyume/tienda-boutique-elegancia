@@ -1,12 +1,22 @@
-import React, { useMemo, useState } from 'react';
-import { Package, Users, Wallet, TrendingUp, ShoppingCart, Plus, Search, MessageSquare, Settings, Lock, Calendar, Download, Activity, Trophy, Percent, Truck } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Package, Users, Wallet, TrendingUp, ShoppingCart, Plus, Search, MessageSquare, Settings, Lock, Calendar, Download, Activity, Trophy, Percent, Truck, Radio } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
 import { RealTimeClock, StatCard, ActionButton } from './AdminShared';
 import { LowStockPanel } from './LowStockPanel';
+import { getLiveVisitors } from '../../utils/presence';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
-import * as XLSX from 'xlsx';
+// xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
 
-export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, wishlistData = [], lowStockItems = [], lowStockThreshold = 5 }) => {
+export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [] }) => {
+
+    // Re-render cada 15s para actualizar el corte de sesiones "vivas"
+    const [, tick] = useState(0);
+    useEffect(() => {
+        const t = setInterval(() => tick(n => n + 1), 15_000);
+        return () => clearInterval(t);
+    }, []);
+
+    const liveVisitors = useMemo(() => getLiveVisitors(activeSessions), [activeSessions]);
 
     const [dateRange, setDateRange] = useState('30'); // 7, 30, all
     const [showComparison, setShowComparison] = useState(true); // Toggle comparación temporal
@@ -144,7 +154,8 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
         return { topWished, totalWishlistAdds };
     }, [wishlistData]);
 
-    const handleExport = () => {
+    const handleExport = async () => {
+        const XLSX = await import('xlsx');
         const data = filteredOrders.map(o => ({
             ID: o.id,
             Fecha: new Date(o.date).toLocaleDateString(),
@@ -357,6 +368,25 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
 
                     {/* SIDEBAR INFO */}
                     <div className="space-y-6">
+                        {/* LIVE VISITORS */}
+                        <div className="bg-white dark:bg-[#1e293b] border border-emerald-200 dark:border-emerald-900/40 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                            <div className="absolute -top-6 -right-6 w-24 h-24 bg-emerald-100 dark:bg-emerald-900/20 rounded-full opacity-60" />
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="relative flex h-2.5 w-2.5">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                    </span>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">En vivo</span>
+                                </div>
+                                <div className="flex items-end gap-2">
+                                    <span className="text-5xl font-black text-slate-900 dark:text-white">{liveVisitors.length}</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400 mb-2">visitante{liveVisitors.length !== 1 ? 's' : ''} ahora</span>
+                                </div>
+                                <p className="text-[11px] text-slate-400 mt-1">Actualizado cada 15s · excluye admin.</p>
+                            </div>
+                        </div>
+
                         {/* STOCK LEVEL */}
                         <div className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
                             <div className="relative z-10">

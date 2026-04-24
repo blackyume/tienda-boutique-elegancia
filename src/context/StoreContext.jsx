@@ -100,6 +100,8 @@ export const StoreProvider = ({ children }) => {
   const [aiHistory, setAiHistory] = useState([]);
   const [scheduledPromotions, setScheduledPromotions] = useState([]);
   const [wishlistEvents, setWishlistEvents] = useState([]);
+  const [abandonedCarts, setAbandonedCarts] = useState([]);
+  const [activeSessions, setActiveSessions] = useState([]);
 
   // Shipping Rates by Province (precargados)
   const [shippingProvinces, setShippingProvinces] = useState([
@@ -251,6 +253,29 @@ export const StoreProvider = ({ children }) => {
       unsubWishlistEvents(); unsubShipping();
     };
   }, []);
+
+  // --- ADMIN-ONLY SUBSCRIPTIONS (abandoned carts, active sessions) ---
+  useEffect(() => {
+    const ADMIN_EMAILS = ['laboutiquedelaeleganciaoficial@gmail.com', 'juampi218@gmail.com'];
+    if (!user || !ADMIN_EMAILS.includes(user.email)) {
+      setAbandonedCarts([]);
+      setActiveSessions([]);
+      return;
+    }
+    const unsubAbandoned = onSnapshot(collection(db, 'abandoned_carts'), (snap) => {
+      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setAbandonedCarts(data.sort((a, b) => {
+        const at = a.lastUpdated?.toMillis?.() || 0;
+        const bt = b.lastUpdated?.toMillis?.() || 0;
+        return bt - at;
+      }));
+    });
+    const unsubPresence = onSnapshot(collection(db, 'active_sessions'), (snap) => {
+      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setActiveSessions(data);
+    });
+    return () => { unsubAbandoned(); unsubPresence(); };
+  }, [user]);
 
   // --- THEME (dark-only: el diseño de la web es oscuro por decisión) ---
   useEffect(() => {
@@ -760,6 +785,67 @@ export const StoreProvider = ({ children }) => {
       }
     },
 
+    // --- ABANDONED CART REMINDER ---
+    sendAbandonedCartReminder: async (abandonedCart) => {
+      const SERVICE_ID = siteConfig.emailjs?.serviceId || "";
+      const TEMPLATE_ID = siteConfig.emailjs?.abandonedTemplateId || siteConfig.emailjs?.templateId || "";
+      const PUBLIC_KEY = siteConfig.emailjs?.publicKey || "";
+
+      if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+        throw new Error("EmailJS no configurado. Completá credenciales en Admin → Configuración.");
+      }
+
+      const itemsSummary = (abandonedCart.items || [])
+        .map(i => `${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity}`)
+        .join(', ');
+
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const recoveryLink = `${baseUrl}/checkout`;
+
+      const data = {
+        service_id: SERVICE_ID,
+        template_id: TEMPLATE_ID,
+        user_id: PUBLIC_KEY,
+        template_params: {
+          to_name: abandonedCart.customer?.nombre || 'Cliente',
+          to_email: abandonedCart.email,
+          order_id: 'Recordatorio',
+          total: abandonedCart.total,
+          items_summary: itemsSummary,
+          shipping_method: `Link para completar: ${recoveryLink}`,
+          recovery_link: recoveryLink
+        }
+      };
+
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`EmailJS Error: ${errorText}`);
+      }
+
+      // Marcar que se envió el recordatorio
+      try {
+        await updateDoc(doc(db, 'abandoned_carts', abandonedCart.id), {
+          reminderSentAt: Date.now(),
+          reminderCount: (abandonedCart.reminderCount || 0) + 1
+        });
+      } catch (e) { /* noop */ }
+    },
+
+    deleteAbandonedCart: async (id) => {
+      if (!isAdmin) return;
+      try {
+        await deleteDoc(doc(db, 'abandoned_carts', String(id)));
+        addToast("Carrito eliminado", "success");
+      } catch (e) {
+        addToast("Error al eliminar", "error");
+      }
+    },
+
     // --- COUPONS ---
     addCoupon: async (coupon) => {
       if (!isAdmin) return;
@@ -961,6 +1047,7 @@ export const StoreProvider = ({ children }) => {
       categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
+      abandonedCarts, activeSessions,
       shippingProvinces, setShippingProvinces,
       ...dbActions
     }}>

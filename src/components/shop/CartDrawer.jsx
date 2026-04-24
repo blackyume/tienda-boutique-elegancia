@@ -73,7 +73,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                   cart.map(item => (
                      <div key={item.key} className="flex gap-4 group animate-fadeIn">
                         <div className="w-24 h-32 bg-slate-800 rounded-lg overflow-hidden flex-shrink-0 relative border border-white/5">
-                           <img src={item.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                           <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                         </div>
                         <div className="flex-1 flex flex-col justify-between py-1">
                            <div>

@@ -1,11 +1,12 @@
 import { AuthModal } from '../components/auth/AuthModal';
 import { useStore } from '../context/StoreContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, Ticket, X, Check, MessageCircle } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
+import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
 
 export const Checkout = () => {
     const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, useCoupon } = useStore();
@@ -113,6 +114,27 @@ export const Checkout = () => {
         setCouponError('');
     };
 
+    // Abandoned cart tracking — registra carrito cuando el usuario ingresa su email
+    // y deja de completar. Se debouncea para no escribir en cada keystroke.
+    useEffect(() => {
+        if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return;
+        if (cart.length === 0) return;
+        const timer = setTimeout(() => {
+            trackAbandonedCart({
+                email: formData.email,
+                cart,
+                customer: {
+                    nombre: formData.nombre || '',
+                    apellido: formData.apellido || '',
+                    telefono: formData.telefono || '',
+                    ciudad: formData.ciudad || ''
+                },
+                total: finalTotal
+            });
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, [formData.email, formData.nombre, formData.apellido, cart.length, finalTotal]);
+
     const buildWhatsAppMessage = (orderId) => {
         const itemsList = cart.map(i => `• ${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity} — ${formatMoney(i.price * i.quantity)}`).join('\n');
         const shippingLine = `*Envío:* ${shippingOptions[shippingMethod]?.name || shippingMethod} — ${formatMoney(shippingOptions[shippingMethod]?.cost || 0)}`;
@@ -159,6 +181,7 @@ export const Checkout = () => {
             trackBeginCheckout(cart, finalTotal);
             await createOrder(newOrder);
             if (appliedCoupon) await useCoupon(appliedCoupon.id);
+            markAbandonedCartRecovered(formData.email, orderId).catch(() => {});
 
             const msg = encodeURIComponent(buildWhatsAppMessage(orderId));
             const whatsappNumber = (siteConfig?.whatsappNumber || "5491144444444").replace(/\D/g, '');
@@ -199,6 +222,7 @@ export const Checkout = () => {
 
             // 1. Crear Orden en Firebase (Persistencia)
             await createOrder(newOrder);
+            markAbandonedCartRecovered(formData.email, newOrder.id).catch(() => {});
 
             // 1.5 Register coupon usage if applied
             if (appliedCoupon) {

@@ -1,39 +1,8 @@
 const mercadopago = require('mercadopago');
+const { checkRateLimit, getClientIp } = require('./_rateLimit');
 
-// --- Rate limiter en memoria (sliding window por IP) ---
-// Notas: en Vercel cada instancia tiene su propia memoria. Suficiente para
-// frenar abuso básico; para producción seria sustituir por Upstash / Redis.
-const RATE_WINDOW_MS = 60_000; // 1 min
-const RATE_MAX_REQUESTS = 8;   // 8 requests por minuto por IP
-const rateBuckets = new Map();
-
-const getClientIp = (req) => {
-    const fwd = req.headers['x-forwarded-for'];
-    if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
-    return req.socket?.remoteAddress || 'unknown';
-};
-
-const checkRateLimit = (ip) => {
-    const now = Date.now();
-    const bucket = rateBuckets.get(ip) || [];
-    const recent = bucket.filter((ts) => now - ts < RATE_WINDOW_MS);
-    if (recent.length >= RATE_MAX_REQUESTS) {
-        const oldest = recent[0];
-        const retryAfterSec = Math.max(1, Math.ceil((RATE_WINDOW_MS - (now - oldest)) / 1000));
-        return { ok: false, retryAfterSec };
-    }
-    recent.push(now);
-    rateBuckets.set(ip, recent);
-    // Limpieza ocasional para no crecer indefinidamente.
-    if (rateBuckets.size > 1000) {
-        for (const [key, arr] of rateBuckets) {
-            if (!arr.length || now - arr[arr.length - 1] > RATE_WINDOW_MS) {
-                rateBuckets.delete(key);
-            }
-        }
-    }
-    return { ok: true };
-};
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX_REQUESTS = 8;
 
 // Dominios permitidos (producción + desarrollo local).
 // Se puede extender vía variable de entorno CORS_EXTRA_ORIGINS (separados por coma).
@@ -78,7 +47,7 @@ module.exports = async (req, res) => {
     }
 
     const ip = getClientIp(req);
-    const limit = checkRateLimit(ip);
+    const limit = await checkRateLimit(ip, { windowMs: RATE_WINDOW_MS, max: RATE_MAX_REQUESTS });
     if (!limit.ok) {
         res.setHeader('Retry-After', String(limit.retryAfterSec));
         return res.status(429).json({

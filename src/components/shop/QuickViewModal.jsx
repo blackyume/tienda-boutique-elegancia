@@ -91,7 +91,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                                 title="Product Video"
                             ></iframe>
                         ) : (
-                            <img src={mediaList[activeMediaIndex].url} alt={product.name} className="absolute inset-0 w-full h-full object-cover" />
+                            <img src={mediaList[activeMediaIndex].url} alt={product.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                         )}
 
                         {/* Navigation Arrows (if multiple) */}
@@ -117,7 +117,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                                             <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-0.5"></div>
                                         </div>
                                     ) : (
-                                        <img src={item.url} className="w-full h-full object-cover" alt="Thumbnail" />
+                                        <img src={item.url} loading="lazy" decoding="async" className="w-full h-full object-cover" alt="Thumbnail" />
                                     )}
                                 </button>
                             ))}

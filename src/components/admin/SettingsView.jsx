@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Lock, Settings, Mail, Bot, AlertTriangle } from 'lucide-react';
+import { Lock, Settings, Mail, Bot, AlertTriangle, Send } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { SalesConfig } from './SalesConfig';
 
@@ -9,6 +9,23 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
     const [testEmail, setTestEmail] = useState("");
     const [isTestingEmail, setIsTestingEmail] = useState(false);
     const [isTestingKey, setIsTestingKey] = useState(false);
+    const [tgTestMsg, setTgTestMsg] = useState("");
+    const [isSendingTg, setIsSendingTg] = useState(false);
+
+    const handleTestTelegram = async () => {
+        if (!tgTestMsg.trim()) return addToast("Escribí un mensaje para probar", "error");
+        setIsSendingTg(true);
+        try {
+            const { publishMessageToTelegram } = await import('../../utils/telegram');
+            await publishMessageToTelegram({ message: tgTestMsg }, siteConfig);
+            addToast("Mensaje enviado al canal", "success");
+            setTgTestMsg("");
+        } catch (err) {
+            addToast(err.message || "Error al enviar", "error");
+        } finally {
+            setIsSendingTg(false);
+        }
+    };
 
     const handleTestKey = async () => {
         const keysText = document.getElementById('aiAdminKeys').value || aiConfig?.adminKeys || '';
@@ -98,6 +115,81 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                         >
                             <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isMaintenance ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
+                    </div>
+                </div>
+
+                {/* TELEGRAM BOT */}
+                <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border dark:border-slate-700 shadow-sm md:col-span-2 border-l-4 border-l-sky-500">
+                    <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <Send className="w-5 h-5 text-sky-500" /> Bot de Telegram (Publicación al Canal)
+                    </h3>
+
+                    <div className="bg-sky-50 dark:bg-sky-900/10 p-4 rounded-xl border border-sky-100 dark:border-sky-900/30 mb-4 text-xs text-sky-800 dark:text-sky-300 leading-relaxed space-y-2">
+                        <p><strong>Setup (una sola vez):</strong></p>
+                        <ol className="list-decimal ml-5 space-y-1">
+                            <li>Abrí Telegram → buscá <code className="bg-sky-100 dark:bg-sky-900/30 px-1 rounded">@BotFather</code> → <code>/newbot</code> → guardá el <strong>token</strong>.</li>
+                            <li>Creá un canal público (ej. <code>@LaBoutiqueElegancia</code>) → agregá tu bot como <strong>administrador</strong> del canal.</li>
+                            <li>En Vercel → tu proyecto → Settings → Environment Variables, agregá:
+                                <ul className="list-disc ml-5 mt-1">
+                                    <li><code>TELEGRAM_BOT_TOKEN</code> = token del bot</li>
+                                    <li><code>TELEGRAM_CHAT_ID</code> = <code>@LaBoutiqueElegancia</code> (o el -100... si es privado)</li>
+                                    <li><code>TELEGRAM_ADMIN_SECRET</code> = (opcional) cualquier string — si lo ponés acá, tenés que pegarlo también abajo</li>
+                                </ul>
+                            </li>
+                            <li>Redeployá en Vercel para que las variables queden activas.</li>
+                            <li>Desde <strong>Inventario</strong> vas a ver un botón ✉ "Publicar en Telegram" en cada producto.</li>
+                        </ol>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Admin Secret (opcional, si lo usaste)</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="password"
+                                    defaultValue={siteConfig?.telegram?.secret || ''}
+                                    placeholder="••••••"
+                                    className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-sky-500"
+                                    id="tgSecretInput"
+                                />
+                                <Button
+                                    onClick={() => {
+                                        updateSiteConfig({
+                                            telegram: {
+                                                ...(siteConfig?.telegram || {}),
+                                                secret: document.getElementById('tgSecretInput').value
+                                            }
+                                        });
+                                        addToast("Secret guardado", "success");
+                                    }}
+                                    className="bg-slate-800 text-white text-xs px-4 rounded-lg"
+                                >
+                                    Guardar
+                                </Button>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-1">Debe coincidir con <code>TELEGRAM_ADMIN_SECRET</code> del servidor.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Publicar mensaje/promo al canal</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={tgTestMsg}
+                                onChange={(e) => setTgTestMsg(e.target.value)}
+                                placeholder="Ej: 🎉 20% OFF en toda la tienda — sólo hoy!"
+                                className="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-sky-500"
+                            />
+                            <Button
+                                onClick={handleTestTelegram}
+                                isLoading={isSendingTg}
+                                className="bg-sky-600 hover:bg-sky-700 text-white text-xs px-6 py-2.5 rounded-lg"
+                            >
+                                Publicar
+                            </Button>
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-1">Test rápido: enviá un mensaje al canal para verificar que todo funciona.</p>
                     </div>
                 </div>
 
