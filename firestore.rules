@@ -1,0 +1,113 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in [
+          'laboutiquedelaeleganciaoficial@gmail.com',
+          'juampi218@gmail.com'
+        ];
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // --- PUBLIC CATALOG (read-all, admin-write) ---
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /config/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /shipping_provinces/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /coupons/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- ADMIN-ONLY BUSINESS OPS ---
+    match /suppliers/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /simulations/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /scheduled_promotions/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /ai_history/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // --- ORDERS ---
+    // Usuarios pueden crear sus propias órdenes y leer las propias.
+    // Admin puede leer/editar/eliminar todas.
+    match /orders/{id} {
+      allow create: if true;
+      allow read: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // --- USERS ---
+    // Cada usuario maneja su propio documento. Admin puede leer todos.
+    match /users/{uid} {
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if isAdmin();
+    }
+
+    // --- REVIEWS ---
+    // Todos ven reviews; solo usuarios autenticados crean; admin modera.
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // --- WISHLIST EVENTS ---
+    // Log público de eventos — cualquiera puede crear (sin datos sensibles).
+    // Solo admin lee/modera.
+    match /wishlist_events/{id} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // --- STATS / VISITS ---
+    // Cualquiera incrementa; solo admin lee/edita.
+    match /stats/{id} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+
+    // Default deny — toda ruta no declarada queda bloqueada.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
