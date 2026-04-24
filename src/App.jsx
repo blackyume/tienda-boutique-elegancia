@@ -4,12 +4,15 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/shop/CartDrawer';
 import { ToastContainer } from './components/ui/ToastContainer';
+import { WhatsAppButton } from './components/ui/WhatsAppButton';
 import { SystemAlert } from './components/ui/SystemAlert';
 import { SizeGuideModal } from './components/shop/SizeGuideModal';
 import { Home } from './pages/Home';
 import { Maintenance } from './pages/Maintenance';
 import { PromoPopup } from './components/ui/PromoPopup';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
+import { ShopAssistant } from './components/shop/ShopAssistant';
+import React, { useLayoutEffect, useEffect, Suspense, lazy } from 'react';
 
 // Lazy-loaded routes (code-splitting to shrink initial bundle)
 const Shop = lazy(() => import('./pages/Shop').then(m => ({ default: m.Shop })));
@@ -24,9 +27,7 @@ const TermsConditions = lazy(() => import('./pages/TermsConditions').then(m => (
 const Wishlist = lazy(() => import('./pages/Wishlist').then(m => ({ default: m.Wishlist })));
 const UserProfile = lazy(() => import('./pages/UserProfile').then(m => ({ default: m.UserProfile })));
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
-import { ShopAssistant } from './components/shop/ShopAssistant';
-import { WhatsAppButton } from './components/shop/WhatsAppButton';
-import React, { useState, useLayoutEffect, useEffect, Suspense, lazy } from 'react';
+const Success = lazy(() => import('./pages/Success').then(m => ({ default: m.Success })));
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
@@ -63,12 +64,12 @@ const AppContent = () => {
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       {isSizeGuideOpen && <SizeGuideModal onClose={() => setIsSizeGuideOpen(false)} />}
       <ToastContainer />
+      <WhatsAppButton />
       <SystemAlert />
       <PromoPopup />
       <NewsletterPopup />
       {/* Elegancia IA Chat Widget */}
       <ShopAssistantWrapper />
-      <WhatsAppButton />
       <div className={`flex-grow ${location.pathname !== '/' && location.pathname !== '/shop' && !location.pathname.startsWith('/admin') ? 'pt-28' : ''}`}>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
@@ -78,6 +79,7 @@ const AppContent = () => {
             <Route path="/about" element={<About />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/payment-status" element={<PaymentStatus />} />
+            <Route path="/success" element={<Success />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/tracking" element={<Tracking />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -92,8 +94,6 @@ const AppContent = () => {
     </div>
   );
 };
-
-// ... NavbarWrapper and FooterWrapper stay same ...
 
 const NavbarWrapper = ({ onOpenCart }) => {
   const location = useLocation();
@@ -123,7 +123,6 @@ const ShopAssistantWrapper = () => {
 };
 
 // Error Boundary
-
 class GlobalErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false, error: null }; }
   static getDerivedStateFromError(error) { return { hasError: true, error }; }

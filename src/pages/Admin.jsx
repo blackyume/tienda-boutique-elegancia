@@ -7,7 +7,7 @@ import {
     TrendingUp, DollarSign, Calculator, Search, Users,
     Image as ImageIcon, UploadCloud, Monitor, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
-    Check as CheckIcon, Lock, Settings, Moon, Sun, Blocks, Clock, Bot, Ticket
+    Check as CheckIcon, Lock, Settings, Blocks, Clock, Bot, Ticket, Building2
 } from 'lucide-react';
 // import { CostCalculator } from '../components/admin/CostCalculator'; // REMOVE LEGACY
 import { SimulationsView } from '../components/admin/SimulationsView';
@@ -23,6 +23,7 @@ import { AdminAssistantView } from '../components/admin/AdminAssistantView';
 import { CouponsView } from '../components/admin/CouponsView';
 
 import { SalesView } from '../components/admin/SalesView';
+import { SuppliersView } from '../components/admin/SuppliersView';
 
 const COLOR_MAP = {
     'blanco': '#ffffff', 'negro': '#000000', 'gris': '#808080', 'gris claro': '#d3d3d3', 'gris oscuro': '#a9a9a9', 'plata': '#c0c0c0', 'humo': '#848884', 'carbon': '#36454f', 'blanco tiza': '#f5f5f5', 'hueso': '#e3dac9', 'marfil': '#fffff0', 'crema': '#fffdd0', 'vainilla': '#f3e5ab', 'nude': '#f5d0b5', 'piel': '#f5d0b5', 'natural': '#faebd7', 'champagne': '#fad6a5', 'vison': '#9e9e9e', 'taupe': '#483c32', 'camel': '#c19a6b', 'beige': '#f5f5dc', 'arena': '#f4a460', 'crudo': '#dbd7d2', 'tiza': '#f5f5f5',
@@ -58,7 +59,7 @@ const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, theme, toggleTheme, cleanStorage, siteConfig, updateSiteConfig } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents } = useStore();
     // Login State
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -83,6 +84,51 @@ export const Admin = () => {
     const [calcEnvioCant, setCalcEnvioCant] = useState('');
     const [targetMargin, setTargetMargin] = useState("");
     const [targetProfit, setTargetProfit] = useState("");
+
+    // --- PUSH NOTIFICATIONS FOR NEW ORDERS ---
+    const [lastOrderCount, setLastOrderCount] = useState(orders.length);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+    // Request notification permission on mount
+    useEffect(() => {
+        if ('Notification' in window) {
+            if (Notification.permission === 'granted') {
+                setNotificationsEnabled(true);
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    setNotificationsEnabled(permission === 'granted');
+                });
+            }
+        }
+    }, []);
+
+    // Notify when new order arrives
+    useEffect(() => {
+        if (orders.length > lastOrderCount && lastOrderCount > 0) {
+            const newOrder = orders[0]; // Most recent order
+
+            // Show browser notification
+            if (notificationsEnabled && 'Notification' in window) {
+                new Notification('🛒 ¡Nuevo Pedido!', {
+                    body: `${newOrder.customer?.name || 'Cliente'} - ${formatMoney(newOrder.total)}`,
+                    icon: '/icons/icon-192x192.png',
+                    tag: 'new-order',
+                    requireInteraction: true
+                });
+            }
+
+            // Show toast
+            addToast(`¡Nuevo pedido de ${newOrder.customer?.name || 'Cliente'}!`, 'success');
+
+            // Play sound (optional)
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Dg4N/fYOHioqIhH97AAA=');
+                audio.volume = 0.5;
+                audio.play().catch(() => { });
+            } catch (e) { }
+        }
+        setLastOrderCount(orders.length);
+    }, [orders.length]);
 
     // --- FILTER LOGIC ---
     const filteredInventory = useMemo(() => {
@@ -381,8 +427,8 @@ export const Admin = () => {
             {/* SIDEBAR */}
             <aside className="w-20 lg:w-64 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 shadow-sm relative shrink-0">
                 <div className="h-20 flex items-center justify-center lg:justify-start px-6 border-b border-slate-100 dark:border-slate-800">
-                    <img src="/assets/logo-main.png" alt="La Boutique" className="h-8 w-auto object-contain drop-shadow-md shrink-0" />
-                    <span className="hidden lg:block ml-3 font-luxury font-bold text-lg text-slate-800 dark:text-white tracking-widest uppercase">La Boutique</span>
+                    <img src="/assets/logo-main.png" alt="La Boutique Logo" className="w-10 h-10 object-contain" />
+                    <span className="hidden lg:block ml-3 font-cinzel font-bold text-lg text-slate-800 dark:text-white tracking-widest uppercase">La Boutique</span>
                 </div>
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                     <SidebarItem icon={LayoutDashboard} label="Dashboard" active={adminTab === 'dashboard'} onClick={() => setAdminTab('dashboard')} />
@@ -395,6 +441,7 @@ export const Admin = () => {
                     <SidebarItem icon={Bot} label="Asistente IA" active={adminTab === 'assistant'} onClick={() => setAdminTab('assistant')} />
                     <SidebarItem icon={Blocks} label="CMS / Diseño" active={adminTab === 'cms'} onClick={() => setAdminTab('cms')} />
                     <SidebarItem icon={Ticket} label="Cupones" active={adminTab === 'coupons'} onClick={() => setAdminTab('coupons')} />
+                    <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
                     <p className="hidden lg:block px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
                     <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
                     <SidebarItem icon={Monitor} label="Imágenes de la Web" active={adminTab === 'cms'} onClick={() => setAdminTab('cms')} />
@@ -405,10 +452,6 @@ export const Admin = () => {
                     <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
                 </nav>
                 <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#111827] space-y-2">
-                    <button onClick={toggleTheme} className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-center lg:justify-start p-2 transition-colors">
-                        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                        <span className="hidden lg:inline">{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
-                    </button>
                     <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-center lg:justify-start p-2 transition-colors">
                         <LinkIcon className="w-4 h-4" /> <span className="hidden lg:inline">Ir a la Tienda</span>
                     </a>
@@ -507,8 +550,8 @@ export const Admin = () => {
                         </div>
 
                         {/* TABLE */}
-                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
-                            <table className="w-full text-left text-sm min-w-[800px]">
+                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+                            <table className="w-full text-left text-sm">
                                 <thead className="bg-slate-50/50 dark:bg-[#111827] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
                                     <tr>
                                         <th className="p-4 pl-6 w-1/3">Producto</th>
@@ -640,15 +683,16 @@ export const Admin = () => {
                     isMaintenance={isMaintenance}
                     toggleMaintenance={toggleMaintenance}
                     onNavigate={setAdminTab}
+                    wishlistData={wishlistEvents}
                     onCreateProduct={() => {
                         setCurrentProduct({
                             id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
-                            category: '', image: '', sizes: ['S', 'M'], colors: [], active: true, description: ''
+                            category: '', image: '', sizes: ['S', 'M'], colors: [], active: true, description: '', badges: {}
                         });
                         setIsProductModalOpen(true);
                     }}
                 />}
-                {adminTab === 'assistant' && <AdminAssistantView orders={orders} inventory={inventory} />}
+                {adminTab === 'assistant' && <AdminAssistantView orders={orders} inventory={inventory} onClose={() => setAdminTab('dashboard')} />}
                 {adminTab === 'orders' && <OrdersView orders={orders} updateOrderStatus={updateOrderStatus} />}
                 {adminTab === 'customers' && <CustomersView orders={orders} />}
                 {adminTab === 'sales' && <SalesView salesLog={salesLog} />}
@@ -677,6 +721,7 @@ export const Admin = () => {
                 }
                 {adminTab === 'cms' && <CMSView />}
                 {adminTab === 'coupons' && <CouponsView />}
+                {adminTab === 'suppliers' && <SuppliersView />}
                 {adminTab === 'integrations' && <IntegrationsView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
             </main >
@@ -684,17 +729,17 @@ export const Admin = () => {
             {/* PRODUCT MODAL */}
             {
                 isProductModalOpen && currentProduct && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fadeIn">
-                        <div className="bg-[#F8FAFC] dark:bg-[#0f172a] w-full max-w-[95vw] rounded-3xl overflow-hidden flex flex-col h-[95vh] border border-slate-200 dark:border-slate-800 shadow-2xl">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-fadeIn">
+                        <div className="bg-[#F8FAFC] dark:bg-[#0f172a] w-full max-w-[95vw] rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] border border-slate-200 dark:border-slate-800 shadow-2xl">
                             {/* Modal Header */}
-                            <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-[#1e293b] shrink-0">
-                                <h3 className="font-bold text-lg dark:text-white flex items-center gap-2"><Tag className="w-5 h-5 text-[#C19A6B]" /> {currentProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+                            <div className="p-3 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-[#1e293b] shrink-0">
+                                <h3 className="font-bold text-base sm:text-lg dark:text-white flex items-center gap-2"><Tag className="w-4 h-4 sm:w-5 sm:h-5 text-[#C19A6B]" /> {currentProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</h3>
                                 <button onClick={() => setIsProductModalOpen(false)} className="bg-slate-100 dark:bg-slate-800 p-2 rounded-full hover:bg-slate-200 transition-colors"><X className="w-5 h-5 text-slate-500" /></button>
                             </div>
 
                             <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
                                 {/* FORM SCROLLABLE */}
-                                <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-white dark:bg-[#1e293b]">
+                                <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 bg-white dark:bg-[#1e293b]">
                                     {/* MAIN INFO */}
                                     <section className="flex flex-col gap-6">
                                         {/* MEDIA GALLERY REPLACEMENT */}
@@ -704,7 +749,7 @@ export const Admin = () => {
                                                 <span className="text-[10px] text-slate-400">Arrastra para ordenar (Próximamente)</span>
                                             </div>
 
-                                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mb-4">
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-4">
                                                 {/* Existing Media Items */}
                                                 {(currentProduct.media || []).map((item, index) => (
                                                     <div key={index} className={`aspect-square rounded-xl overflow-hidden relative group border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm transition-all hover:shadow-md ${item.isUploading ? 'opacity-70' : ''}`}>
@@ -868,7 +913,154 @@ export const Admin = () => {
                                                     ))}
                                                 </div>
                                             </InputGroup>
+
+                                            {/* BADGES / ETIQUETAS */}
+                                            <InputGroup label="Etiquetas / Badges">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {[
+                                                        { key: 'isNew', label: 'NUEVO', color: 'bg-emerald-500' },
+                                                        { key: 'isOnSale', label: 'OFERTA', color: 'bg-red-500' },
+                                                        { key: 'isSeason', label: 'TEMPORADA', color: 'bg-amber-500' },
+                                                        { key: 'isFeatured', label: 'DESTACADO', color: 'bg-purple-500' },
+                                                        { key: 'isExclusive', label: 'EXCLUSIVO', color: 'bg-slate-900' }
+                                                    ].map(badge => (
+                                                        <button
+                                                            key={badge.key}
+                                                            type="button"
+                                                            onClick={() => setCurrentProduct({
+                                                                ...currentProduct,
+                                                                badges: {
+                                                                    ...currentProduct.badges,
+                                                                    [badge.key]: !currentProduct.badges?.[badge.key]
+                                                                }
+                                                            })}
+                                                            className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${currentProduct.badges?.[badge.key]
+                                                                ? `${badge.color} text-white shadow-lg scale-105`
+                                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200'
+                                                                }`}
+                                                        >
+                                                            {currentProduct.badges?.[badge.key] ? '✓ ' : ''}{badge.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 mt-2">Las etiquetas se muestran como badges en la tienda.</p>
+                                            </InputGroup>
                                         </div>
+                                    </section>
+
+                                    <hr className="border-slate-100 dark:border-slate-800" />
+
+                                    {/* VARIANTS - Price/Stock per Size/Color */}
+                                    <section>
+                                        <h4 className="flex items-center gap-2 font-bold text-slate-800 dark:text-white mb-4">
+                                            <SlidersHorizontal className="w-4 h-4 text-[#C19A6B]" /> Variantes (Precio por Talle/Color)
+                                        </h4>
+
+                                        <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 mb-4">
+                                            <p className="text-xs text-slate-500 mb-3">Opcional: Define precios y stock diferentes para cada combinación de talle y color.</p>
+
+                                            {/* Auto-generate button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const sizes = currentProduct.sizes || [];
+                                                    const colors = currentProduct.colors || [];
+                                                    if (sizes.length === 0 || colors.length === 0) {
+                                                        return addToast("Primero agregá talles y colores", "error");
+                                                    }
+                                                    const newVariants = [];
+                                                    sizes.forEach(size => {
+                                                        colors.forEach(color => {
+                                                            const exists = (currentProduct.variants || []).find(v => v.size === size && v.color === color);
+                                                            if (!exists) {
+                                                                newVariants.push({
+                                                                    size,
+                                                                    color,
+                                                                    price: currentProduct.price || 0,
+                                                                    stock: 0
+                                                                });
+                                                            }
+                                                        });
+                                                    });
+                                                    setCurrentProduct({
+                                                        ...currentProduct,
+                                                        variants: [...(currentProduct.variants || []), ...newVariants]
+                                                    });
+                                                    addToast(`${newVariants.length} variantes generadas`, "success");
+                                                }}
+                                                className="px-4 py-2 bg-slate-800 text-white text-xs font-bold uppercase rounded-lg hover:bg-[#C19A6B] transition-colors"
+                                            >
+                                                Generar Variantes Automáticas
+                                            </button>
+                                        </div>
+
+                                        {/* Variants Table */}
+                                        {(currentProduct.variants || []).length > 0 && (
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-sm">
+                                                    <thead>
+                                                        <tr className="border-b border-slate-200 dark:border-slate-700">
+                                                            <th className="text-left py-2 text-xs font-bold uppercase text-slate-500">Talle</th>
+                                                            <th className="text-left py-2 text-xs font-bold uppercase text-slate-500">Color</th>
+                                                            <th className="text-left py-2 text-xs font-bold uppercase text-slate-500">Precio</th>
+                                                            <th className="text-left py-2 text-xs font-bold uppercase text-slate-500">Stock</th>
+                                                            <th className="py-2"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {(currentProduct.variants || []).map((variant, idx) => (
+                                                            <tr key={idx} className="border-b border-slate-100 dark:border-slate-800">
+                                                                <td className="py-2">
+                                                                    <span className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-xs font-bold">{variant.size}</span>
+                                                                </td>
+                                                                <td className="py-2">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: getColorHex(variant.color) }}></div>
+                                                                        <span className="text-xs">{variant.color}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="py-2">
+                                                                    <input
+                                                                        type="number"
+                                                                        value={variant.price}
+                                                                        onChange={(e) => {
+                                                                            const updated = [...currentProduct.variants];
+                                                                            updated[idx].price = Number(e.target.value);
+                                                                            setCurrentProduct({ ...currentProduct, variants: updated });
+                                                                        }}
+                                                                        className="w-24 p-1 border rounded text-center font-bold dark:bg-slate-800 dark:border-slate-700"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-2">
+                                                                    <input
+                                                                        type="number"
+                                                                        value={variant.stock}
+                                                                        onChange={(e) => {
+                                                                            const updated = [...currentProduct.variants];
+                                                                            updated[idx].stock = Number(e.target.value);
+                                                                            setCurrentProduct({ ...currentProduct, variants: updated });
+                                                                        }}
+                                                                        className="w-20 p-1 border rounded text-center font-bold dark:bg-slate-800 dark:border-slate-700"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-2 text-right">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            const updated = currentProduct.variants.filter((_, i) => i !== idx);
+                                                                            setCurrentProduct({ ...currentProduct, variants: updated });
+                                                                        }}
+                                                                        className="text-red-500 hover:text-red-700 p-1"
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
                                     </section>
 
                                     <hr className="border-slate-100 dark:border-slate-800" />

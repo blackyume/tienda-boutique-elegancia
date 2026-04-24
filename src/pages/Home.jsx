@@ -10,12 +10,13 @@ import { Marquee } from '../components/home/Marquee';
 import { Editorial } from '../components/home/Editorial';
 import { FeaturedCollection } from '../components/home/FeaturedCollection';
 import { NewArrivalsCarousel } from '../components/home/NewArrivalsCarousel';
+import { HowItWorks } from '../components/home/HowItWorks';
 import { QuickAddCard } from '../components/shop/QuickAddCard';
 
 import { SEO } from '../components/seo/SEO';
 
 export const Home = () => {
-    const { inventory, isInWishlist, toggleWishlist: toggleWishlistCtx, addToast, categories, siteConfig, globalFilter, setGlobalFilter } = useStore();
+    const { inventory, wishlist, setWishlist, addToast, categories, siteConfig, globalFilter, setGlobalFilter } = useStore();
     const [quickViewProduct, setQuickViewProduct] = useState(null);
 
     // FILTRADO MAESTRO
@@ -27,9 +28,11 @@ export const Home = () => {
 
     const toggleWishlist = (e, product) => {
         e.stopPropagation();
-        const wasIn = isInWishlist(product.id);
-        toggleWishlistCtx(product.id);
-        addToast(wasIn ? "Eliminado de favoritos" : "Agregado a favoritos", wasIn ? "info" : "success");
+        setWishlist(prev => {
+            const exists = prev.includes(product.id);
+            addToast(exists ? "Eliminado de favoritos" : "Agregado a favoritos", exists ? "info" : "success");
+            return exists ? prev.filter(id => id !== product.id) : [...prev, product.id];
+        });
     };
 
     return (
@@ -54,40 +57,52 @@ export const Home = () => {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020617_100%)] opacity-80" />
                     </div>
 
-                    {/* Content Layer */}
+                    {/* Content Layer — Glassmorphism card */}
                     <div className="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center">
-                        <div className="animate-fadeIn opacity-0 [animation-delay:200ms]">
-                            <span className="inline-block px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-[10px] uppercase tracking-[0.4em] font-bold text-cielo-gold mb-6 shadow-2xl">
-                                Nueva Colección 2026
-                            </span>
-                        </div>
+                        {/* Glass panel container */}
+                        <div className="relative px-10 py-12 md:px-16 md:py-16 rounded-3xl backdrop-blur-xl bg-white/[0.04] border border-white/10 shadow-[0_8px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] animate-fadeIn">
+                            {/* Gold corner accents */}
+                            <span className="absolute top-4 left-4 w-6 h-6 border-t border-l border-cielo-gold/50" />
+                            <span className="absolute top-4 right-4 w-6 h-6 border-t border-r border-cielo-gold/50" />
+                            <span className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-cielo-gold/50" />
+                            <span className="absolute bottom-4 right-4 w-6 h-6 border-b border-r border-cielo-gold/50" />
 
-                        <h1 className="relative font-cinzel text-5xl md:text-8xl lg:text-[7rem] leading-none tracking-tighter mix-blend-overlay opacity-90 animate-slideUp">
-                            {siteConfig.hero?.title || "LA BOUTIQUE"}
-                            <span className="block italic font-serif text-3xl md:text-5xl lg:text-6xl text-white/80 mt-2 font-light tracking-normal transform -rotate-2">
-                                {siteConfig.hero?.subtitle || "de la Elegancia"}
-                            </span>
-                        </h1>
+                            <div className="animate-fadeIn opacity-0 [animation-delay:200ms]">
+                                <span className="inline-block px-5 py-2 rounded-full border border-cielo-gold/30 bg-cielo-gold/10 backdrop-blur-md text-[10px] uppercase tracking-[0.4em] font-bold text-cielo-gold mb-6 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                    Nueva Colección 2026
+                                </span>
+                            </div>
 
-                        <p className="mt-8 text-sm md:text-base text-slate-300 max-w-lg font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:600ms]">
-                            Descubre la fusión perfecta entre la moda clásica y la innovación digital. Diseños exclusivos para quienes marcan tendencia.
-                        </p>
+                            <h1 className="relative font-cinzel text-5xl md:text-7xl lg:text-[6rem] leading-none tracking-tighter text-white drop-shadow-2xl animate-slideUp">
+                                {siteConfig.hero?.title || "LA BOUTIQUE"}
+                                <span className="block italic font-serif text-2xl md:text-4xl lg:text-5xl text-cielo-gold/90 mt-3 font-light tracking-normal transform -rotate-1">
+                                    {siteConfig.hero?.subtitle || "de la Elegancia"}
+                                </span>
+                            </h1>
 
-                        <div className="mt-12 flex flex-col sm:flex-row gap-6 animate-fadeIn opacity-0 [animation-delay:800ms]">
-                            <button
-                                onClick={() => {
-                                    const target = siteConfig.hero?.buttonLink || 'shop';
-                                    if (target.startsWith('http')) window.location.href = target;
-                                    else document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' });
-                                }}
-                                className="group relative px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-[0.2em] overflow-hidden transition-all hover:scale-105"
-                            >
-                                <span className="relative z-10">{siteConfig.hero?.buttonText || "Explorar Shop"}</span>
-                                <div className="absolute inset-0 bg-cielo-gold transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500 ease-out"></div>
-                            </button>
-                            <button className="px-8 py-4 border border-white/20 hover:bg-white/5 text-white font-bold text-xs uppercase tracking-[0.2em] backdrop-blur-sm transition-all" onClick={() => document.getElementById('editorial')?.scrollIntoView({ behavior: 'smooth' })}>
-                                Ver Lookbook
-                            </button>
+                            <p className="mt-8 text-sm md:text-base text-slate-300/90 max-w-lg font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:600ms] mx-auto">
+                                Descubre la fusión perfecta entre la moda clásica y la innovación digital. Diseños exclusivos para quienes marcan tendencia.
+                            </p>
+
+                            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center animate-fadeIn opacity-0 [animation-delay:800ms]">
+                                <button
+                                    onClick={() => {
+                                        const target = siteConfig.hero?.buttonLink || 'shop';
+                                        if (target.startsWith('http')) window.location.href = target;
+                                        else document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                    className="group relative px-8 py-4 bg-cielo-gold text-black font-bold text-xs uppercase tracking-[0.2em] overflow-hidden transition-all hover:scale-105 rounded-sm shadow-[0_0_30px_rgba(212,175,55,0.4)]"
+                                >
+                                    <span className="relative z-10">{siteConfig.hero?.buttonText || "Explorar Shop"}</span>
+                                    <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500 ease-out opacity-20" />
+                                </button>
+                                <button
+                                    className="px-8 py-4 border border-white/20 hover:border-cielo-gold/40 hover:bg-white/5 text-white font-bold text-xs uppercase tracking-[0.2em] backdrop-blur-sm transition-all rounded-sm"
+                                    onClick={() => document.getElementById('editorial')?.scrollIntoView({ behavior: 'smooth' })}
+                                >
+                                    Ver Lookbook
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -101,17 +116,44 @@ export const Home = () => {
 
             {siteConfig.showMarquee && !globalFilter.search && <Marquee />}
 
+            {/* Gold separator */}
+            {!globalFilter.search && (
+                <div className="flex items-center justify-center gap-4 py-2 bg-[#020617]">
+                    <div className="h-px flex-1 max-w-xs bg-gradient-to-r from-transparent to-cielo-gold/40" />
+                    <div className="w-1.5 h-1.5 rotate-45 bg-cielo-gold/60" />
+                    <div className="h-px flex-1 max-w-xs bg-gradient-to-l from-transparent to-cielo-gold/40" />
+                </div>
+            )}
+
             <div id="editorial">
                 {siteConfig.showEditorial && !globalFilter.search && <Editorial />}
             </div>
 
             {!globalFilter.search && <Features />}
 
+            {/* Gold separator */}
+            {!globalFilter.search && (
+                <div className="flex items-center justify-center gap-4 py-2 bg-[#020617]">
+                    <div className="h-px flex-1 max-w-xs bg-gradient-to-r from-transparent to-cielo-gold/40" />
+                    <div className="w-1.5 h-1.5 rotate-45 bg-cielo-gold/60" />
+                    <div className="h-px flex-1 max-w-xs bg-gradient-to-l from-transparent to-cielo-gold/40" />
+                </div>
+            )}
+
+            {!globalFilter.search && <HowItWorks />}
+
             {!globalFilter.search && <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />}
 
             {/* CATEGORÍAS 2026 (Masonry / Asymmetrical) */}
             {!globalFilter.search && (
                 <div id="categories" className="py-24 px-4 bg-[#020617] relative">
+                    {/* Gold separator top */}
+                    <div className="flex items-center justify-center gap-4 mb-20">
+                        <div className="h-px flex-1 max-w-sm bg-gradient-to-r from-transparent to-cielo-gold/30" />
+                        <span className="text-cielo-gold/40 text-[10px] uppercase tracking-[0.3em] font-bold">Colecciones</span>
+                        <div className="h-px flex-1 max-w-sm bg-gradient-to-l from-transparent to-cielo-gold/30" />
+                    </div>
+
                     <div className="max-w-[1800px] mx-auto">
                         <div className="flex justify-between items-end mb-16 px-4">
                             <div>
@@ -128,16 +170,26 @@ export const Home = () => {
                                 <div
                                     key={cat.id}
                                     onClick={() => { setGlobalFilter({ category: cat.name, search: "" }); document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' }); }}
-                                    className={`relative group cursor-pointer overflow-hidden rounded-sm transition-all duration-700 ${index === 0 ? 'md:col-span-2' : ''}`}
+                                    className={`relative group cursor-pointer overflow-hidden rounded-sm transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,175,55,0.3)] ${index === 0 ? 'md:col-span-2' : ''}`}
                                 >
                                     <div className="absolute inset-0 bg-slate-800 animate-pulse"></div>
-                                    <img src={optimizeImage(cat.image, 600)} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                                    <img src={optimizeImage(cat.image, 600)} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[40%] group-hover:grayscale-0" />
+                                    {/* Gradient overlay — darker at rest, lighter on hover */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 opacity-70 group-hover:opacity-50 transition-opacity duration-700" />
+                                    {/* Gold shimmer on hover */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-cielo-gold/0 via-cielo-gold/5 to-cielo-gold/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                                    <div className="absolute bottom-0 left-0 p-8 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                                        <h3 className="text-3xl font-cinzel text-white mb-2">{cat.name}</h3>
-                                        <div className="w-12 h-[1px] bg-cielo-gold mb-4 group-hover:w-24 transition-all duration-500"></div>
-                                        <p className="text-xs uppercase tracking-widest text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 duration-500 delay-100">
+                                    {/* Top badge */}
+                                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                                        <span className="px-3 py-1 bg-cielo-gold/90 text-black text-[9px] font-bold uppercase tracking-widest rounded-sm">
+                                            Ver todo
+                                        </span>
+                                    </div>
+
+                                    <div className="absolute bottom-0 left-0 p-8">
+                                        <h3 className="text-3xl font-cinzel text-white mb-2 drop-shadow-lg group-hover:text-cielo-gold transition-colors duration-500">{cat.name}</h3>
+                                        <div className="w-8 h-[1px] bg-cielo-gold/60 mb-4 group-hover:w-28 transition-all duration-700 ease-out" />
+                                        <p className="text-xs uppercase tracking-widest text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center gap-2 transform translate-y-3 group-hover:translate-y-0 delay-100">
                                             Explorar <ArrowRight className="w-3 h-3 text-cielo-gold" />
                                         </p>
                                     </div>
@@ -148,8 +200,16 @@ export const Home = () => {
                 </div>
             )}
 
-            {/* SHOP SECTION REDESIGN */}
-            {/* SHOP SECTION REDESIGN */}
+            {/* Gold separator before shop */}
+            {!globalFilter.search && (
+                <div className="flex items-center justify-center gap-4 py-2 bg-[#020617]">
+                    <div className="h-px flex-1 max-w-xs bg-gradient-to-r from-transparent to-cielo-gold/40" />
+                    <div className="w-1.5 h-1.5 rotate-45 bg-cielo-gold/60" />
+                    <div className="h-px flex-1 max-w-xs bg-gradient-to-l from-transparent to-cielo-gold/40" />
+                </div>
+            )}
+
+            {/* SHOP SECTION */}
             <div id="shop" className="max-w-[1920px] mx-auto px-4 sm:px-8 py-32 min-h-screen relative z-10">
 
                 {/* 1. NEW ARRIVALS CAROUSEL (Show only if no search/filter active) */}

@@ -112,8 +112,16 @@ export const IntegrationsView = () => {
                                     </label>
                                     <input
                                         type="number"
+                                        min="0"
+                                        max="100"
+                                        step="0.1"
                                         value={mpConfig.mpFee || ''}
-                                        onChange={e => setMpConfig({ ...mpConfig, mpFee: e.target.value })}
+                                        onChange={e => {
+                                            const val = parseFloat(e.target.value);
+                                            if (e.target.value === '' || (!isNaN(val) && val >= 0 && val <= 100)) {
+                                                setMpConfig({ ...mpConfig, mpFee: e.target.value });
+                                            }
+                                        }}
                                         className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-[#009EE3] transition-colors text-sm font-mono text-slate-600 dark:text-slate-300"
                                         placeholder="Ej: 6"
                                     />

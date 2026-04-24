@@ -96,6 +96,39 @@ export const StoreProvider = ({ children }) => {
 
   const [simulations, setSimulations] = useState([]);
   const [coupons, setCoupons] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [aiHistory, setAiHistory] = useState([]);
+  const [scheduledPromotions, setScheduledPromotions] = useState([]);
+  const [wishlistEvents, setWishlistEvents] = useState([]);
+
+  // Shipping Rates by Province (precargados)
+  const [shippingProvinces, setShippingProvinces] = useState([
+    { id: 'caba', name: 'CABA', price: 2500, zone: 'AMBA' },
+    { id: 'buenos_aires', name: 'Buenos Aires (GBA)', price: 3000, zone: 'AMBA' },
+    { id: 'buenos_aires_int', name: 'Buenos Aires (Interior)', price: 4500, zone: 'Centro' },
+    { id: 'cordoba', name: 'Córdoba', price: 5500, zone: 'Centro' },
+    { id: 'santa_fe', name: 'Santa Fe', price: 5000, zone: 'Centro' },
+    { id: 'mendoza', name: 'Mendoza', price: 6500, zone: 'Cuyo' },
+    { id: 'san_luis', name: 'San Luis', price: 6000, zone: 'Cuyo' },
+    { id: 'san_juan', name: 'San Juan', price: 7000, zone: 'Cuyo' },
+    { id: 'entre_rios', name: 'Entre Ríos', price: 5000, zone: 'Litoral' },
+    { id: 'corrientes', name: 'Corrientes', price: 6500, zone: 'NEA' },
+    { id: 'misiones', name: 'Misiones', price: 7000, zone: 'NEA' },
+    { id: 'chaco', name: 'Chaco', price: 7000, zone: 'NEA' },
+    { id: 'formosa', name: 'Formosa', price: 7500, zone: 'NEA' },
+    { id: 'tucuman', name: 'Tucumán', price: 7000, zone: 'NOA' },
+    { id: 'salta', name: 'Salta', price: 8000, zone: 'NOA' },
+    { id: 'jujuy', name: 'Jujuy', price: 8500, zone: 'NOA' },
+    { id: 'santiago', name: 'Santiago del Estero', price: 7000, zone: 'NOA' },
+    { id: 'catamarca', name: 'Catamarca', price: 7500, zone: 'NOA' },
+    { id: 'la_rioja', name: 'La Rioja', price: 7000, zone: 'Cuyo' },
+    { id: 'neuquen', name: 'Neuquén', price: 8000, zone: 'Patagonia' },
+    { id: 'rio_negro', name: 'Río Negro', price: 8500, zone: 'Patagonia' },
+    { id: 'la_pampa', name: 'La Pampa', price: 6000, zone: 'Centro' },
+    { id: 'chubut', name: 'Chubut', price: 9500, zone: 'Patagonia' },
+    { id: 'santa_cruz', name: 'Santa Cruz', price: 11000, zone: 'Patagonia' },
+    { id: 'tierra_del_fuego', name: 'Tierra del Fuego', price: 13000, zone: 'Patagonia' }
+  ]);
 
   // --- UI STATE ---
   const [isMaintenance, setIsMaintenance] = useState(false);
@@ -177,19 +210,56 @@ export const StoreProvider = ({ children }) => {
       setCoupons(data.sort((a, b) => b.createdAt - a.createdAt));
     });
 
+    // Suppliers
+    const unsubSuppliers = onSnapshot(collection(db, "suppliers"), (snap) => {
+      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setSuppliers(data.sort((a, b) => b.createdAt - a.createdAt));
+    });
+
+    // AI History
+    const unsubAiHistory = onSnapshot(collection(db, "ai_history"), (snap) => {
+      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setAiHistory(data.sort((a, b) => b.timestamp - a.timestamp).slice(0, 50));
+    });
+
+    // Scheduled Promotions
+    const unsubPromos = onSnapshot(collection(db, "scheduled_promotions"), (snap) => {
+      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setScheduledPromotions(data.sort((a, b) => a.activateAt - b.activateAt));
+    });
+
+    // Wishlist Events (analytics collection)
+    const unsubWishlistEvents = onSnapshot(collection(db, "wishlist_events"), (snap) => {
+      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      setWishlistEvents(data.sort((a, b) => b.timestamp - a.timestamp).slice(0, 500));
+    });
+
+    // Shipping Rates by Province (overrides defaults if exists)
+    const unsubShipping = onSnapshot(collection(db, "shipping_provinces"), (snap) => {
+      if (snap.docs.length > 0) {
+        const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+        setShippingProvinces(data.sort((a, b) => a.name.localeCompare(b.name)));
+      }
+    });
+
     setLoading(false);
-    return () => { unsubAuth(); unsubProd(); unsubOrders(); unsubCats(); unsubSiteConfig(); unsubCloudinary(); unsubAiConfig(); unsubMaintenance(); unsubSims(); unsubCoupons(); };
+    return () => {
+      unsubAuth(); unsubProd(); unsubOrders(); unsubCats();
+      unsubSiteConfig(); unsubCloudinary(); unsubAiConfig();
+      unsubMaintenance(); unsubSims(); unsubCoupons();
+      unsubSuppliers(); unsubAiHistory(); unsubPromos();
+      unsubWishlistEvents(); unsubShipping();
+    };
   }, []);
 
-  // --- THEME ---
+  // --- THEME (dark-only: el diseño de la web es oscuro por decisión) ---
   useEffect(() => {
     if (document.documentElement?.classList) {
-      if (theme === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('dark');
     }
-  }, [theme]);
+  }, []);
 
-  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  const toggleTheme = () => { /* tema fijo: dark */ };
 
   const addToast = (msg, type = 'info') => {
     const id = Date.now();
@@ -738,6 +808,121 @@ export const StoreProvider = ({ children }) => {
       } catch (e) {
         console.error("Error using coupon:", e);
       }
+    },
+
+    // --- SUPPLIERS ---
+    addSupplier: async (supplier) => {
+      if (!isAdmin) return;
+      try {
+        await addDoc(collection(db, "suppliers"), supplier);
+        addToast("Proveedor agregado exitosamente", "success");
+      } catch (e) {
+        console.error(e);
+        addToast("Error al agregar proveedor", "error");
+      }
+    },
+    updateSupplier: async (id, updates) => {
+      if (!isAdmin) return;
+      try {
+        await updateDoc(doc(db, "suppliers", String(id)), updates);
+        addToast("Proveedor actualizado", "success");
+      } catch (e) {
+        console.error(e);
+        addToast("Error al actualizar proveedor", "error");
+      }
+    },
+    deleteSupplier: async (id) => {
+      if (!isAdmin) return;
+      try {
+        await deleteDoc(doc(db, "suppliers", String(id)));
+        addToast("Proveedor eliminado", "success");
+      } catch (e) {
+        console.error(e);
+        addToast("Error al eliminar proveedor", "error");
+      }
+    },
+
+    // --- AI HISTORY ---
+    logAiAction: async (action, details, response) => {
+      if (!isAdmin) return;
+      try {
+        await addDoc(collection(db, "ai_history"), {
+          action,
+          details,
+          response: response?.substring(0, 500) || '',
+          timestamp: Date.now(),
+          userId: user?.uid || 'system'
+        });
+      } catch (e) {
+        console.error("Error logging AI action", e);
+      }
+    },
+
+    // --- SCHEDULED PROMOTIONS ---
+    addScheduledPromotion: async (promo) => {
+      if (!isAdmin) return;
+      try {
+        await addDoc(collection(db, "scheduled_promotions"), {
+          ...promo,
+          id: Date.now(),
+          createdAt: Date.now(),
+          executed: false
+        });
+        addToast("Promoción programada", "success");
+      } catch (e) {
+        console.error(e);
+        addToast("Error al programar promoción", "error");
+      }
+    },
+    deleteScheduledPromotion: async (id) => {
+      if (!isAdmin) return;
+      try {
+        await deleteDoc(doc(db, "scheduled_promotions", String(id)));
+        addToast("Promoción eliminada", "success");
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    executeScheduledPromotion: async (promo) => {
+      if (!isAdmin) return;
+      try {
+        if (promo.type === 'activate_coupon') {
+          const coupon = coupons.find(c => c.code === promo.couponCode);
+          if (coupon) await updateDoc(doc(db, "coupons", String(coupon.id)), { active: true });
+        } else if (promo.type === 'deactivate_coupon') {
+          const coupon = coupons.find(c => c.code === promo.couponCode);
+          if (coupon) await updateDoc(doc(db, "coupons", String(coupon.id)), { active: false });
+        } else if (promo.type === 'bulk_discount') {
+          const products = inventory.filter(p => p.category === promo.category);
+          for (const p of products) {
+            const newPrice = Math.round(p.price * (1 - promo.discount / 100));
+            await updateDoc(doc(db, "products", String(p.id)), { price: newPrice });
+          }
+        }
+        await updateDoc(doc(db, "scheduled_promotions", String(promo.id)), { executed: true });
+        addToast(`Promoción ejecutada: ${promo.name}`, "success");
+      } catch (e) {
+        console.error(e);
+        addToast("Error al ejecutar promoción", "error");
+      }
+    }
+  };
+
+  // Wishlist events tracking (Firestore)
+  const trackWishlistEvent = async (product, action) => {
+    try {
+      await addDoc(collection(db, "wishlist_events"), {
+        productId: product.id,
+        productName: product.name,
+        productCategory: product.category || 'Sin categoría',
+        action, // 'add' | 'remove'
+        userId: user?.uid || null,
+        userEmail: user?.email || null,
+        sessionId: localStorage.getItem('sessionId') || `anon_${Date.now()}`,
+        timestamp: Date.now()
+      });
+    } catch (e) {
+      console.error("Error tracking wishlist:", e);
     }
   };
 
@@ -775,6 +960,8 @@ export const StoreProvider = ({ children }) => {
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
       categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
+      suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
+      shippingProvinces, setShippingProvinces,
       ...dbActions
     }}>
       {children}
@@ -783,3 +970,4 @@ export const StoreProvider = ({ children }) => {
 };
 
 export const useStore = () => useContext(StoreContext);
+
