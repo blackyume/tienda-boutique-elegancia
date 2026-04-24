@@ -1,85 +1,109 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { ArrowRight } from 'lucide-react';
-import { formatMoney, getColorHex } from '../../utils/helpers';
+import { formatMoney, getColorHex, optimizeImage } from '../../utils/helpers';
+import { Reveal } from '../ui/Reveal';
+
+const Card = ({ item, onQuickView, tall = false, small = false }) => (
+    <div className={`group relative overflow-hidden rounded-sm ${tall ? 'aspect-[3/4] md:h-full' : small ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}>
+        <img
+            src={optimizeImage(item.image, tall ? 900 : 600)}
+            alt={item.name}
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.8s] ease-out group-hover:scale-[1.08]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-cielo-gold/0 group-hover:bg-cielo-gold/5 transition-colors duration-700" />
+
+        <span className="absolute top-4 left-4 px-3 py-1 bg-cielo-gold/90 text-black text-[9px] font-bold uppercase tracking-[0.3em]">
+            Highlight
+        </span>
+
+        <div className="absolute inset-x-0 bottom-0 p-5 md:p-7 text-white">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-cielo-gold/90 mb-1">{item.category}</p>
+            <h3 className="font-serif text-xl md:text-2xl leading-tight line-clamp-2">{item.name}</h3>
+
+            <div className="mt-3 flex items-center justify-between gap-3">
+                <span className="text-lg md:text-xl text-cielo-gold font-light">{formatMoney(item.price)}</span>
+                {item.colors?.length > 0 && (
+                    <div className="flex -space-x-1.5">
+                        {item.colors.slice(0, 4).map((c) => (
+                            <span key={c} className="w-3 h-3 rounded-full border border-white/30" style={{ backgroundColor: getColorHex(c) }} />
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-4 flex items-center gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                <Link
+                    to={`/product/${item.id}`}
+                    className="inline-flex items-center gap-1.5 bg-white text-black text-[10px] font-bold uppercase tracking-widest px-4 py-2 hover:bg-cielo-gold transition-colors"
+                >
+                    Comprar <ArrowRight className="w-3 h-3" />
+                </Link>
+                <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView?.(item); }}
+                    className="inline-flex items-center px-4 py-2 border border-white/30 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors"
+                >
+                    Vista rápida
+                </button>
+            </div>
+        </div>
+    </div>
+);
 
 export const FeaturedCollection = ({ onQuickView }) => {
     const { inventory } = useStore();
-    // Get top 2 most expensive items as "Featured" or just first 2
-    const featured = inventory.slice(0, 2);
+    const featured = inventory.slice(0, 3);
+    if (featured.length === 0) return null;
+
+    const [hero, ...rest] = featured;
 
     return (
-        <div className="py-32 px-4 bg-[#020617] relative overflow-hidden">
-            {/* Background Elements */}
-            <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-cielo-gold/5 rounded-full blur-[100px] pointer-events-none" />
+        <section className="py-28 px-4 bg-[#020617] relative overflow-hidden">
+            <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-cielo-gold/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cielo-gold/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="max-w-[1800px] mx-auto">
-                <div className="text-center mb-24">
-                    <span className="text-cielo-gold text-xs uppercase tracking-[0.4em] font-bold">Selección Limitada</span>
-                    <h2 className="text-5xl md:text-7xl font-serif text-white mt-6 mb-4">Highlights</h2>
-                    <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent mx-auto"></div>
+            <Reveal className="max-w-[1600px] mx-auto relative">
+                <div className="text-center mb-16">
+                    <span className="text-cielo-gold text-[10px] uppercase tracking-[0.4em] font-bold">Selección limitada</span>
+                    <h2 className="text-5xl md:text-6xl font-serif text-white mt-4">Highlights</h2>
+                    <div className="mx-auto mt-5 flex items-center justify-center gap-3">
+                        <span className="h-px w-10 bg-cielo-gold/40" />
+                        <span className="w-1.5 h-1.5 rotate-45 bg-cielo-gold" />
+                        <span className="h-px w-10 bg-cielo-gold/40" />
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-                    {featured.map((item, index) => (
-                        <div key={item.id} className={`group relative ${index === 1 ? 'lg:mt-32' : ''}`}>
-                            <div className="aspect-[4/5] relative overflow-hidden rounded-sm">
-                                <img
-                                    src={item.image}
-                                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
-
-                                {/* Overlay Content */}
-                                <div className="absolute inset-0 p-8 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-black/40">
-                                    <div className="flex justify-between items-start">
-                                        <span className="bg-white text-black px-3 py-1 text-[10px] font-bold uppercase tracking-widest">New In</span>
-                                    </div>
-
-                                    <button
-                                        onClick={() => onQuickView && onQuickView(item)}
-                                        className="self-center bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all transform translate-y-4 group-hover:translate-y-0 duration-500"
-                                    >
-                                        Ver Detalle
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 flex justify-between items-end border-b border-white/10 pb-4">
-                                <div>
-                                    <h3 className="text-3xl font-serif text-white mb-2">{item.name}</h3>
-                                    <p className="text-sm text-slate-400 uppercase tracking-widest mb-3">{item.category}</p>
-
-                                    {/* Subrle Variants Preview */}
-                                    <div className="flex items-center gap-4 opacity-70 group-hover:opacity-100 transition-opacity">
-                                        {/* Colors */}
-                                        {item.colors && item.colors.length > 0 && (
-                                            <div className="flex -space-x-2">
-                                                {item.colors.slice(0, 3).map(c => (
-                                                    <div key={c} className="w-3 h-3 rounded-full border border-white/20 shadow-sm" style={{ backgroundColor: getColorHex(c) }} />
-                                                ))}
-                                                {item.colors.length > 3 && <span className="text-[9px] text-slate-500 pl-3">+{item.colors.length - 3}</span>}
-                                            </div>
-                                        )}
-                                        {/* Sizes */}
-                                        {item.sizes && item.sizes.length > 0 && (
-                                            <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest user-select-none">
-                                                {item.sizes.slice(0, 4).join(" · ")}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-2xl font-light text-cielo-gold mb-1">{formatMoney(item.price)}</p>
-                                    <span className="flex items-center gap-2 text-[10px] uppercase text-white/50 group-hover:text-white transition-colors cursor-pointer">
-                                        Shop Now <ArrowRight className="w-3 h-3" />
-                                    </span>
-                                </div>
-                            </div>
+                {rest.length >= 2 ? (
+                    <div className="grid md:grid-cols-12 gap-5 md:gap-6">
+                        <div className="md:col-span-7 md:row-span-2">
+                            <Card item={hero} onQuickView={onQuickView} tall />
                         </div>
-                    ))}
+                        <div className="md:col-span-5 flex flex-col gap-5 md:gap-6">
+                            {rest.map((p) => (
+                                <Card key={p.id} item={p} onQuickView={onQuickView} small />
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {featured.map((p) => (
+                            <Card key={p.id} item={p} onQuickView={onQuickView} />
+                        ))}
+                    </div>
+                )}
+
+                <div className="text-center mt-12">
+                    <Link
+                        to="/shop"
+                        className="inline-flex items-center gap-2 px-8 py-4 border border-cielo-gold/40 text-cielo-gold text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-cielo-gold hover:text-black transition-colors rounded-sm"
+                    >
+                        Ver toda la colección <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                 </div>
-            </div>
-        </div>
+            </Reveal>
+        </section>
     );
 };

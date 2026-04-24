@@ -5,6 +5,7 @@ import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/shop/CartDrawer';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { WhatsAppButton } from './components/ui/WhatsAppButton';
+import { ScrollProgress } from './components/ui/ScrollProgress';
 import { SystemAlert } from './components/ui/SystemAlert';
 import { SizeGuideModal } from './components/shop/SizeGuideModal';
 import { Home } from './pages/Home';
@@ -64,6 +65,7 @@ const AppContent = () => {
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       {isSizeGuideOpen && <SizeGuideModal onClose={() => setIsSizeGuideOpen(false)} />}
       <ToastContainer />
+      <ScrollProgress />
       <WhatsAppButton />
       <SystemAlert />
       <PromoPopup />

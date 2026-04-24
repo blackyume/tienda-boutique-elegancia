@@ -60,10 +60,6 @@ const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 export const Admin = () => {
 
     const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents } = useStore();
-    // Login State
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [isLoggingIn, setIsLoggingIn] = useState(false);
     const [adminTab, setAdminTab] = useState("dashboard");
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
@@ -332,7 +328,6 @@ export const Admin = () => {
         const url = `${window.location.origin}/product/${id}`;
         navigator.clipboard.writeText(url);
         addToast("Link copiado al portapapeles", "success");
-        addToast("Link copiado al portapapeles", "success");
     };
 
     const handleAddColor = () => {
@@ -400,13 +395,6 @@ export const Admin = () => {
 
     // --- RENDER HELPERS ---
 
-    const navigate = React.useRouter?.useNavigate?.() || (() => { }); // Hooks must be top level, but Admin is a component. I need to make sure I import useNavigate properly or use <Navigate>.
-    // Better to use <Navigate> from react-router-dom if I import it, or just use `window.location.href = '/'` or just return null and useEffect to navigate.
-    // Let's check imports in Admin.jsx. It doesn't import Navigate or useNavigate. I should add it.
-    // For now I will return a clear "Acceso Denegado" or use window.location for simplicity if I can't easily add imports without context switch.
-    // Actually I can add imports. But let's look at the existing code: `import React, { useState, useEffect, useMemo } from 'react';`
-    // I can modify the imports in another call. For now, let's render a "Return Home" content.
-
     if (!isAdmin) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white">
@@ -444,7 +432,6 @@ export const Admin = () => {
                     <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
                     <p className="hidden lg:block px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
                     <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
-                    <SidebarItem icon={Monitor} label="Imágenes de la Web" active={adminTab === 'cms'} onClick={() => setAdminTab('cms')} />
 
                     <div className="my-6 border-t border-slate-100 dark:border-slate-800"></div>
                     <p className="hidden lg:block px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Sistema</p>
@@ -564,7 +551,7 @@ export const Admin = () => {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                                     {filteredInventory.length === 0 ? (
-                                        <tr><td colSpan="5" className="p-12 text-center text-slate-400">No hay productos que coincidan con la búsqueda.</td></tr>
+                                        <tr><td colSpan="6" className="p-12 text-center text-slate-400">No hay productos que coincidan con la búsqueda.</td></tr>
                                     ) : (
                                         filteredInventory.map(p => {
                                             const totalDirectCost = (Number(p.cost) || 0) + (Number(p.shippingCost) || 0) + (Number(p.packagingCost) || 0);
@@ -633,7 +620,7 @@ export const Admin = () => {
                                                     {
                                                         isExpanded && (
                                                             <tr className="bg-slate-50 dark:bg-slate-900/30">
-                                                                <td colSpan="5" className="p-0">
+                                                                <td colSpan="6" className="p-0">
                                                                     <div className="p-6 pl-20 grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-slate-100 dark:border-slate-800 shadow-inner">
                                                                         <div className="space-y-3">
                                                                             <p className="uppercase font-bold text-[10px] tracking-wider text-slate-400">Estructura de Costos</p>
@@ -695,7 +682,6 @@ export const Admin = () => {
                 {adminTab === 'assistant' && <AdminAssistantView orders={orders} inventory={inventory} onClose={() => setAdminTab('dashboard')} />}
                 {adminTab === 'orders' && <OrdersView orders={orders} updateOrderStatus={updateOrderStatus} />}
                 {adminTab === 'customers' && <CustomersView orders={orders} />}
-                {adminTab === 'sales' && <SalesView salesLog={salesLog} />}
                 {adminTab === 'sales' && <SalesView salesLog={salesLog} />}
                 {
                     adminTab === 'calculator' && <SimulationsView
@@ -1111,7 +1097,6 @@ export const Admin = () => {
                                     <hr className="border-slate-100 dark:border-slate-800" />
 
                                     {/* PRICING STRATEGY */}
-                                    {/* PRICING STRATEGY */}
                                     <section className="bg-emerald-50/50 dark:bg-emerald-900/10 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
                                         <h4 className="font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-2 mb-4"><TrendingUp className="w-4 h-4" /> Estrategia de Precio</h4>
 
@@ -1237,10 +1222,6 @@ const Row = ({ label, value, isNegative, bold }) => (
 
 const TruckIcon = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11" /><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2" /><circle cx="7" cy="18" r="2" /><circle cx="15" cy="18" r="2" /></svg>
-);
-
-const SettingsIcon = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.78 1.35a2 2 0 0 0 .73 2.73l.15.08a2 2 0 0 1 1 1.73v.56a2 2 0 0 1-1 1.73l-.15.08a2 2 0 0 0-.73 2.73l.78 1.35a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.78-1.35a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.56a2 2 0 0 1 1-1.73l.15-.08a2 2 0 0 0 .73-2.73l-.78-1.35a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
 );
 
 

@@ -9,27 +9,49 @@
 
 export const variantKey = (size, color) => `${size || ''}::${color || ''}`;
 
-export const hasVariantMap = (product) =>
-    product && product.variants && typeof product.variants === 'object';
+export const hasVariantMap = (product) => {
+    if (!product || !product.variants) return false;
+    if (Array.isArray(product.variants)) return product.variants.length > 0;
+    return typeof product.variants === 'object';
+};
 
 export const getVariantStock = (product, size, color) => {
     if (!product) return 0;
-    if (hasVariantMap(product)) {
-        const v = product.variants[variantKey(size, color)];
-        return typeof v === 'number' ? v : 0;
+    if (!hasVariantMap(product)) {
+        return typeof product.stock === 'number' ? product.stock : 0;
     }
-    return typeof product.stock === 'number' ? product.stock : 0;
+    if (Array.isArray(product.variants)) {
+        const v = product.variants.find((x) => x.size === size && x.color === color);
+        return v && typeof v.stock === 'number' ? v.stock : 0;
+    }
+    const v = product.variants[variantKey(size, color)];
+    return typeof v === 'number' ? v : 0;
+};
+
+export const getVariantPrice = (product, size, color) => {
+    if (!product) return 0;
+    if (Array.isArray(product?.variants)) {
+        const v = product.variants.find((x) => x.size === size && x.color === color);
+        if (v && typeof v.price === 'number' && v.price > 0) return v.price;
+    }
+    return typeof product.price === 'number' ? product.price : Number(product.price) || 0;
 };
 
 export const getTotalStock = (product) => {
     if (!product) return 0;
-    if (hasVariantMap(product)) {
-        return Object.values(product.variants).reduce(
-            (acc, n) => acc + (typeof n === 'number' && n > 0 ? n : 0),
+    if (!hasVariantMap(product)) {
+        return typeof product.stock === 'number' ? product.stock : 0;
+    }
+    if (Array.isArray(product.variants)) {
+        return product.variants.reduce(
+            (acc, v) => acc + (typeof v.stock === 'number' && v.stock > 0 ? v.stock : 0),
             0
         );
     }
-    return typeof product.stock === 'number' ? product.stock : 0;
+    return Object.values(product.variants).reduce(
+        (acc, n) => acc + (typeof n === 'number' && n > 0 ? n : 0),
+        0
+    );
 };
 
 export const isVariantInStock = (product, size, color) =>
