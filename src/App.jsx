@@ -6,6 +6,7 @@ import { CartDrawer } from './components/shop/CartDrawer';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { WhatsAppButton } from './components/ui/WhatsAppButton';
 import { ScrollProgress } from './components/ui/ScrollProgress';
+import { UpdatePrompt } from './components/ui/UpdatePrompt';
 import { SystemAlert } from './components/ui/SystemAlert';
 import { SizeGuideModal } from './components/shop/SizeGuideModal';
 import { Home } from './pages/Home';
@@ -66,6 +67,7 @@ const AppContent = () => {
       {isSizeGuideOpen && <SizeGuideModal onClose={() => setIsSizeGuideOpen(false)} />}
       <ToastContainer />
       <ScrollProgress />
+      <UpdatePrompt />
       <WhatsAppButton />
       <SystemAlert />
       <PromoPopup />

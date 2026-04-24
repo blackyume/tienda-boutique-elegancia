@@ -3,7 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, Ticket, X, Check } from 'lucide-react';
+import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, Ticket, X, Check, MessageCircle } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
 
@@ -111,6 +111,63 @@ export const Checkout = () => {
     const removeCoupon = () => {
         setAppliedCoupon(null);
         setCouponError('');
+    };
+
+    const buildWhatsAppMessage = (orderId) => {
+        const itemsList = cart.map(i => `• ${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity} — ${formatMoney(i.price * i.quantity)}`).join('\n');
+        const shippingLine = `*Envío:* ${shippingOptions[shippingMethod]?.name || shippingMethod} — ${formatMoney(shippingOptions[shippingMethod]?.cost || 0)}`;
+        const couponLine = appliedCoupon ? `\n*Cupón:* ${appliedCoupon.code} (-${formatMoney(couponDiscount)})` : '';
+        const addressLine = formData.direccion ? `\n*Dirección:* ${formData.direccion}, ${formData.ciudad || ''} ${formData.cp ? '(' + formData.cp + ')' : ''}` : '';
+        return [
+            `¡Hola! Quisiera finalizar mi pedido *#${orderId}* por WhatsApp.`,
+            '',
+            '*Detalle:*',
+            itemsList,
+            '',
+            shippingLine + couponLine,
+            `*Total:* ${formatMoney(finalTotal)}`,
+            '',
+            `*Nombre:* ${formData.nombre || ''}`,
+            `*Email:* ${formData.email || ''}`,
+            `*DNI:* ${formData.dni || ''}` + addressLine,
+        ].join('\n');
+    };
+
+    const handleWhatsappCheckout = async () => {
+        if (!user) return setIsAuthModalOpen(true);
+        if (!formData.nombre || !formData.email || !formData.dni) {
+            return addToast("Completá nombre, email y DNI antes de continuar", "error");
+        }
+        if (cart.length === 0) return;
+
+        setLoading(true);
+        try {
+            const orderId = `ORD-${Math.floor(Math.random() * 900000) + 100000}`;
+            const newOrder = {
+                id: orderId,
+                date: new Date().toISOString(),
+                status: 'pending_wa',
+                total: finalTotal,
+                customer: { ...formData, userId: user.uid, email: formData.email },
+                items: cart,
+                shipping: shippingMethod,
+                shippingCost: shippingOptions[shippingMethod].cost,
+                coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null,
+                paymentMethod: 'whatsapp'
+            };
+
+            trackBeginCheckout(cart, finalTotal);
+            await createOrder(newOrder);
+            if (appliedCoupon) await useCoupon(appliedCoupon.id);
+
+            const msg = encodeURIComponent(buildWhatsAppMessage(orderId));
+            const whatsappNumber = (siteConfig?.whatsappNumber || "5491144444444").replace(/\D/g, '');
+            window.location.href = `https://wa.me/${whatsappNumber}?text=${msg}`;
+        } catch (error) {
+            console.error(error);
+            addToast(`Error: ${error.message}`, "error");
+            setLoading(false);
+        }
     };
 
     const handleCheckout = async (e) => {
@@ -384,8 +441,27 @@ export const Checkout = () => {
                             disabled={loading}
                             className="w-full bg-cielo-gold hover:bg-[#a38056] text-black hover:text-white py-5 rounded-xl font-bold text-sm uppercase tracking-[0.2em] shadow-lg shadow-cielo-gold/20 transition-all transform hover:-translate-y-1 active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                         >
-                            {loading ? <span className="animate-pulse">Procesando...</span> : <span>Confirmar Pedido</span>}
+                            {loading ? <span className="animate-pulse">Procesando...</span> : <span>Pagar con Mercado Pago</span>}
                         </button>
+
+                        <div className="flex items-center gap-3 my-4">
+                            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+                            <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">o</span>
+                            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={handleWhatsappCheckout}
+                            disabled={loading}
+                            className="w-full py-4 rounded-xl font-bold text-sm uppercase tracking-[0.2em] text-white transition-all flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110"
+                            style={{ background: 'linear-gradient(145deg, #25D366 0%, #1FA851 100%)' }}
+                            title="Enviar el pedido directamente por WhatsApp"
+                        >
+                            <MessageCircle className="w-5 h-5" />
+                            Finalizar por WhatsApp
+                        </button>
+                        <p className="text-[10px] text-center text-slate-400 mt-2">Coordiná el pago y envío por chat con una asesora.</p>
 
                         <div className="mt-6 flex justify-center items-center gap-4 text-slate-400">
                             <Lock className="w-4 h-4" />

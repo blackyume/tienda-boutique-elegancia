@@ -7,7 +7,7 @@ import {
     TrendingUp, DollarSign, Calculator, Search, Users,
     Image as ImageIcon, UploadCloud, Monitor, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
-    Check as CheckIcon, Lock, Settings, Blocks, Clock, Bot, Ticket, Building2
+    Check as CheckIcon, Lock, Settings, Blocks, Clock, Bot, Ticket, Building2, Sparkles
 } from 'lucide-react';
 // import { CostCalculator } from '../components/admin/CostCalculator'; // REMOVE LEGACY
 import { SimulationsView } from '../components/admin/SimulationsView';
@@ -24,6 +24,7 @@ import { CouponsView } from '../components/admin/CouponsView';
 
 import { SalesView } from '../components/admin/SalesView';
 import { SuppliersView } from '../components/admin/SuppliersView';
+import { generateProductCopy } from '../utils/gemini';
 
 const COLOR_MAP = {
     'blanco': '#ffffff', 'negro': '#000000', 'gris': '#808080', 'gris claro': '#d3d3d3', 'gris oscuro': '#a9a9a9', 'plata': '#c0c0c0', 'humo': '#848884', 'carbon': '#36454f', 'blanco tiza': '#f5f5f5', 'hueso': '#e3dac9', 'marfil': '#fffff0', 'crema': '#fffdd0', 'vainilla': '#f3e5ab', 'nude': '#f5d0b5', 'piel': '#f5d0b5', 'natural': '#faebd7', 'champagne': '#fad6a5', 'vison': '#9e9e9e', 'taupe': '#483c32', 'camel': '#c19a6b', 'beige': '#f5f5dc', 'arena': '#f4a460', 'crudo': '#dbd7d2', 'tiza': '#f5f5f5',
@@ -59,13 +60,14 @@ const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig } = useStore();
     const [adminTab, setAdminTab] = useState("dashboard");
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [tempColor, setTempColor] = useState("");
     const [tempSize, setTempSize] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
 
     // --- FILTERS & SEARCH STATE ---
     const [searchTerm, setSearchTerm] = useState("");
@@ -306,6 +308,33 @@ export const Admin = () => {
     };
 
     const handleDeleteProduct = async (id) => { if (confirm("¿Estás seguro de eliminar este producto?")) await deleteProduct(id); };
+
+    const handleGenerateCopy = async () => {
+        if (!currentProduct?.name) return addToast("Agregá primero el nombre del producto", "error");
+        if (!aiConfig?.adminKeys) return addToast("Configurá las API keys de Admin en Integraciones", "error");
+
+        setIsGeneratingCopy(true);
+        try {
+            const copy = await generateProductCopy(currentProduct, aiConfig);
+            setCurrentProduct(prev => {
+                const existingDesc = prev.description ? String(prev.description).trim() : '';
+                const bulletsBlock = copy.bullets.length
+                    ? '\n\n• ' + copy.bullets.join('\n• ')
+                    : '';
+                return {
+                    ...prev,
+                    description: (copy.description || existingDesc) + bulletsBlock,
+                    seoKeywords: copy.keywords.join(', ') || prev.seoKeywords || ''
+                };
+            });
+            addToast("Descripción generada", "success");
+        } catch (err) {
+            console.error("Gemini error:", err);
+            addToast(err.message || "No se pudo generar", "error");
+        } finally {
+            setIsGeneratingCopy(false);
+        }
+    };
 
     const toggleVisibility = async (p, e) => {
         e.stopPropagation();
@@ -813,14 +842,34 @@ export const Admin = () => {
                                             <InputGroup label="Nombre del Producto">
                                                 <input value={currentProduct.name} onChange={e => setCurrentProduct({ ...currentProduct, name: e.target.value })} className="input font-bold text-lg" placeholder="Ej: Remera Básica" />
                                             </InputGroup>
-                                            <InputGroup label="Descripción Detallada">
+                                            <div className="mb-1">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Descripción Detallada</label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleGenerateCopy}
+                                                        disabled={isGeneratingCopy || !currentProduct.name}
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider text-black shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-transform hover:scale-[1.02]"
+                                                        style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
+                                                        title="Generar descripción con Elegancia IA (requiere nombre y categoría)"
+                                                    >
+                                                        <Sparkles className={`w-3 h-3 ${isGeneratingCopy ? 'animate-pulse' : ''}`} />
+                                                        {isGeneratingCopy ? 'Generando…' : 'Generar con IA'}
+                                                    </button>
+                                                </div>
                                                 <textarea
                                                     value={currentProduct.description || ''}
                                                     onChange={e => setCurrentProduct({ ...currentProduct, description: e.target.value })}
                                                     className="input min-h-[80px] text-sm resize-none"
                                                     placeholder="Describe las características de la prenda (tela, corte, cuidados...)"
                                                 />
-                                            </InputGroup>
+                                                {currentProduct.seoKeywords && (
+                                                    <p className="text-[10px] text-slate-400 mt-1">
+                                                        <span className="uppercase tracking-wider font-bold">Keywords SEO: </span>
+                                                        {currentProduct.seoKeywords}
+                                                    </p>
+                                                )}
+                                            </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <InputGroup label="Categoría">
                                                     <input list="categories-list" value={currentProduct.category} onChange={e => setCurrentProduct({ ...currentProduct, category: e.target.value })} className="input" placeholder="Ej: Vestidos" />
