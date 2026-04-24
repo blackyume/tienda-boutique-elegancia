@@ -173,7 +173,7 @@ export const ShopAssistant = () => {
     };
 
     return (
-        <div className="fixed bottom-24 sm:bottom-28 right-4 sm:right-6 z-50 flex flex-col items-end pointer-events-none">
+        <div className="fixed bottom-28 sm:bottom-32 right-4 sm:right-6 z-50 flex flex-col items-end pointer-events-none">
 
             {/* CHAT WINDOW */}
             {isOpen && (
@@ -254,10 +254,11 @@ export const ShopAssistant = () => {
                 onMouseLeave={() => !isOpen && setIsHovered(false)}
             >
                 {!isOpen && (
-                    <div className={`absolute right-16 bottom-1 w-max transition-all duration-500 origin-right drop-shadow-lg pointer-events-none ${isHovered ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
+                    <div className={`absolute right-0 bottom-[calc(100%+10px)] w-[220px] transition-all duration-500 origin-bottom-right drop-shadow-lg pointer-events-none ${isHovered ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
                         <div className="bg-slate-900/95 backdrop-blur-xl border border-white/10 p-3 rounded-2xl rounded-br-none shadow-2xl">
                             <p className="text-[11px] font-bold text-white mb-0.5 flex items-center gap-1.5"><Sparkles className="w-3 h-3 text-amber-400" /> Elegancia IA</p>
-                            <p className="text-[10px] text-slate-300">¡Hola! Estoy aquí para ayudarte a elegir tu look.</p>
+                            <p className="text-[10px] text-slate-300 leading-relaxed">¡Hola! Estoy aquí para ayudarte a elegir tu look.</p>
+                            <span className="absolute -bottom-[6px] right-3 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-white/10" />
                         </div>
                     </div>
                 )}
