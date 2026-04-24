@@ -10,11 +10,14 @@
         "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "test": "vitest run",
-        "test:watch": "vitest"
+        "test:watch": "vitest",
+        "e2e": "playwright test",
+        "e2e:install": "playwright install chromium"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",
         "@mercadopago/sdk-react": "^0.0.19",
+        "@sentry/react": "^8.55.1",
         "browser-image-compression": "^2.0.2",
         "firebase": "^10.7.1",
         "firebase-admin": "^12.7.0",
@@ -31,6 +34,7 @@
         "xlsx": "^0.18.5"
     },
     "devDependencies": {
+        "@playwright/test": "^1.59.1",
         "@types/react": "^18.2.43",
         "@types/react-dom": "^18.2.17",
         "@vitejs/plugin-react": "^4.2.1",

@@ -104,6 +104,7 @@ export const StoreProvider = ({ children }) => {
   const [abandonedCarts, setAbandonedCarts] = useState([]);
   const [activeSessions, setActiveSessions] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [visitStatsHourly, setVisitStatsHourly] = useState([]);
 
   // Shipping Rates by Province (precargados)
   const [shippingProvinces, setShippingProvinces] = useState([
@@ -268,8 +269,13 @@ export const StoreProvider = ({ children }) => {
     if (!user || !ADMIN_EMAILS.includes(user.email)) {
       setAbandonedCarts([]);
       setActiveSessions([]);
+      setVisitStatsHourly([]);
       return;
     }
+    const unsubVisitStats = onSnapshot(collection(db, 'visit_stats_hourly'), (snap) => {
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setVisitStatsHourly(data.sort((a, b) => (a.id > b.id ? 1 : -1)));
+    });
     const unsubAbandoned = onSnapshot(collection(db, 'abandoned_carts'), (snap) => {
       const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
       setAbandonedCarts(data.sort((a, b) => {
@@ -282,7 +288,7 @@ export const StoreProvider = ({ children }) => {
       const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
       setActiveSessions(data);
     });
-    return () => { unsubAbandoned(); unsubPresence(); };
+    return () => { unsubAbandoned(); unsubPresence(); unsubVisitStats(); };
   }, [user]);
 
   // --- THEME (dark-only: el diseño de la web es oscuro por decisión) ---
@@ -1122,7 +1128,7 @@ export const StoreProvider = ({ children }) => {
       categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
-      abandonedCarts, activeSessions, reviews,
+      abandonedCarts, activeSessions, reviews, visitStatsHourly,
       shippingProvinces, setShippingProvinces,
       ...dbActions
     }}>

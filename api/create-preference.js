@@ -90,6 +90,9 @@ module.exports = async (req, res) => {
         const shippingCost = Math.max(0, Number(shipping_cost) || 0);
         const baseUrl = STATIC_ALLOWED_ORIGINS[0];
 
+        const webhookBase = req.headers.host?.includes('localhost')
+            ? null
+            : `https://${req.headers.host}`;
         const preference = {
             items: sanitizedItems,
             payer: {
@@ -111,6 +114,7 @@ module.exports = async (req, res) => {
                 pending: `${baseUrl}/payment-status?status=pending`
             },
             auto_return: 'approved',
+            notification_url: webhookBase ? `${webhookBase}/api/mp-webhook` : undefined,
             shipments: { cost: shippingCost, mode: 'not_specified' }
         };
 

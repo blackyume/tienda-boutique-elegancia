@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { optimizeImage } from '../utils/helpers';
@@ -32,6 +32,21 @@ export const Home = () => {
     const { inventory, categories, siteConfig, setGlobalFilter } = useStore();
     const [quickViewProduct, setQuickViewProduct] = useState(null);
 
+    // Solo productos activos, más recientes primero, máximo 8
+    const newArrivals = useMemo(
+        () => (inventory || [])
+            .filter(p => p.active !== false)
+            .sort((a, b) => (b.createdAt || b.id || 0) - (a.createdAt || a.id || 0))
+            .slice(0, 8),
+        [inventory]
+    );
+
+    // Categorías válidas (con imagen) para el grid
+    const validCategories = useMemo(
+        () => (categories || []).filter(c => c && c.name && c.image),
+        [categories]
+    );
+
     return (
         <div className="font-sans bg-[#020617] text-white overflow-x-hidden">
             <SEO
@@ -55,8 +70,8 @@ export const Home = () => {
 
             <ShopTheLook />
 
-            {/* Categorías */}
-            <section id="categories" className="py-24 px-4 bg-[#020617] relative">
+            {/* Categorías — solo renderiza si hay categorías válidas */}
+            {validCategories.length > 0 && <section id="categories" className="py-24 px-4 bg-[#020617] relative">
                 <Reveal className="max-w-[1600px] mx-auto">
                     <div className="flex items-center justify-center gap-4 mb-14">
                         <div className="h-px flex-1 max-w-sm bg-gradient-to-r from-transparent to-cielo-gold/30" />
@@ -77,8 +92,8 @@ export const Home = () => {
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-[600px] md:h-[500px]">
-                        {categories.map((cat, index) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[280px] md:auto-rows-[500px]">
+                        {validCategories.map((cat, index) => (
                             <Link
                                 key={cat.id}
                                 to="/shop"
@@ -111,7 +126,7 @@ export const Home = () => {
                         ))}
                     </div>
                 </Reveal>
-            </section>
+            </section>}
 
             <GoldDivider />
 
@@ -119,7 +134,7 @@ export const Home = () => {
             <section className="py-20 px-4 sm:px-8 bg-[#020617]">
                 <div className="max-w-[1800px] mx-auto">
                     <NewArrivalsCarousel
-                        products={inventory.slice(0, 8)}
+                        products={newArrivals}
                         onQuickView={(p) => setQuickViewProduct(p)}
                     />
                 </div>

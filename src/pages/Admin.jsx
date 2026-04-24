@@ -65,7 +65,7 @@ const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly } = useStore();
     const [adminTab, setAdminTab] = useState("dashboard");
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
@@ -757,6 +757,7 @@ export const Admin = () => {
                     lowStockItems={lowStockItems}
                     lowStockThreshold={lowStockThreshold}
                     activeSessions={activeSessions}
+                    visitStatsHourly={visitStatsHourly}
                     onCreateProduct={() => {
                         setCurrentProduct({
                             id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",

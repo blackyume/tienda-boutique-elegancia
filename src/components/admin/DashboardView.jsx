@@ -7,7 +7,7 @@ import { getLiveVisitors } from '../../utils/presence';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 // xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
 
-export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [] }) => {
+export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [] }) => {
 
     // Re-render cada 15s para actualizar el corte de sesiones "vivas"
     const [, tick] = useState(0);
@@ -17,6 +17,24 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
     }, []);
 
     const liveVisitors = useMemo(() => getLiveVisitors(activeSessions), [activeSessions]);
+
+    // Últimas 48 horas de tráfico, rellenando buckets vacíos en 0.
+    const visitChartData = useMemo(() => {
+        const map = new Map(visitStatsHourly.map(v => [v.id, v.count || 0]));
+        const now = new Date();
+        const points = [];
+        for (let i = 47; i >= 0; i--) {
+            const d = new Date(now.getTime() - i * 3600_000);
+            const bucket = `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}${String(d.getUTCHours()).padStart(2, '0')}`;
+            points.push({
+                hour: d.toLocaleString('es-AR', { hour: '2-digit', day: '2-digit', month: '2-digit' }),
+                visitors: map.get(bucket) || 0
+            });
+        }
+        return points;
+    }, [visitStatsHourly]);
+
+    const totalVisitorsLast48h = visitChartData.reduce((acc, p) => acc + p.visitors, 0);
 
     const [dateRange, setDateRange] = useState('30'); // 7, 30, all
     const [showComparison, setShowComparison] = useState(true); // Toggle comparación temporal
@@ -289,6 +307,33 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                 />
                             </div>
                             <ActionButton icon={Settings} label="Configuración" onClick={() => onNavigate('settings')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
+                        </div>
+
+                        {/* CHART: VISITANTES ÚLTIMAS 48H */}
+                        <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                    <Radio className="w-4 h-4 text-emerald-500" /> Tráfico (últimas 48h)
+                                </h3>
+                                <span className="text-xs text-slate-400">{totalVisitorsLast48h} sesiones únicas</span>
+                            </div>
+                            <div className="h-[200px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={visitChartData}>
+                                        <defs>
+                                            <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.6} />
+                                                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.4} />
+                                        <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} interval={Math.floor(visitChartData.length / 8)} />
+                                        <YAxis hide={true} />
+                                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} formatter={(v) => [`${v} visitantes`, '']} />
+                                        <Area type="monotone" dataKey="visitors" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorVisitors)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
 
                         {/* CHART: VENTAS SEMANALES */}
