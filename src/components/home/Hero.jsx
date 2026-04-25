@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight } from 'lucide-react';
@@ -9,11 +9,18 @@ export const Hero = () => {
     const { siteConfig } = useStore();
     const layerRef = useRef(null);
     const contentRef = useRef(null);
+    // Efectos no críticos (noise, parallax) se montan post-LCP para no bloquear render
+    const [effectsReady, setEffectsReady] = useState(false);
 
     useEffect(() => {
         const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-        if (reduced) return;
+        const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
+        const handle = schedule(() => setEffectsReady(true), { timeout: 2000 });
+
+        if (reduced) return () => {};
+
         let raf = 0;
+        let bound = false;
         const onScroll = () => {
             if (raf) return;
             raf = requestAnimationFrame(() => {
@@ -23,8 +30,18 @@ export const Hero = () => {
                 raf = 0;
             });
         };
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => { window.removeEventListener('scroll', onScroll); if (raf) cancelAnimationFrame(raf); };
+        // Atar el listener después del primer paint
+        const bindTimeout = setTimeout(() => {
+            window.addEventListener('scroll', onScroll, { passive: true });
+            bound = true;
+        }, 800);
+
+        return () => {
+            clearTimeout(bindTimeout);
+            if (bound) window.removeEventListener('scroll', onScroll);
+            if (raf) cancelAnimationFrame(raf);
+            if (window.cancelIdleCallback && handle) window.cancelIdleCallback(handle);
+        };
     }, []);
 
     const heroImage = typeof siteConfig?.hero === 'string' ? siteConfig.hero : siteConfig?.hero?.image;
@@ -77,12 +94,14 @@ export const Hero = () => {
                 }}
             />
 
-            {/* Shimmer grain */}
-            <div className="absolute inset-0 z-[2] opacity-[0.06] mix-blend-overlay pointer-events-none"
-                style={{
-                    backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-                }}
-            />
+            {/* Shimmer grain (diferido hasta post-LCP para no bloquear render) */}
+            {effectsReady && (
+                <div className="absolute inset-0 z-[2] opacity-[0.06] mix-blend-overlay pointer-events-none"
+                    style={{
+                        backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+                    }}
+                />
+            )}
 
             {/* Gold thin edges */}
             <span className="absolute top-8 left-8 w-10 h-px bg-cielo-gold/50 z-[3]" />

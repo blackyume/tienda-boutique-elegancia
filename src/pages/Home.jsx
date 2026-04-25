@@ -1,20 +1,23 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { optimizeImage } from '../utils/helpers';
 import { ArrowRight } from 'lucide-react';
 
+// Above-the-fold: import directo
 import { Hero } from '../components/home/Hero';
 import { TrustBar } from '../components/home/TrustBar';
-import { Editorial } from '../components/home/Editorial';
-import { FeaturedCollection } from '../components/home/FeaturedCollection';
-import { ShopTheLook } from '../components/home/ShopTheLook';
-import { NewArrivalsCarousel } from '../components/home/NewArrivalsCarousel';
-import { Testimonials } from '../components/home/Testimonials';
-import { HowItWorks } from '../components/home/HowItWorks';
-import { CountdownBanner } from '../components/home/CountdownBanner';
-import { NewsletterInline } from '../components/home/NewsletterInline';
-import { InstagramFeed } from '../components/home/InstagramFeed';
+
+// Below-the-fold: lazy loading para mejor LCP
+const Editorial = lazy(() => import('../components/home/Editorial').then(m => ({ default: m.Editorial })));
+const FeaturedCollection = lazy(() => import('../components/home/FeaturedCollection').then(m => ({ default: m.FeaturedCollection })));
+const ShopTheLook = lazy(() => import('../components/home/ShopTheLook').then(m => ({ default: m.ShopTheLook })));
+const NewArrivalsCarousel = lazy(() => import('../components/home/NewArrivalsCarousel').then(m => ({ default: m.NewArrivalsCarousel })));
+const Testimonials = lazy(() => import('../components/home/Testimonials').then(m => ({ default: m.Testimonials })));
+const HowItWorks = lazy(() => import('../components/home/HowItWorks').then(m => ({ default: m.HowItWorks })));
+const CountdownBanner = lazy(() => import('../components/home/CountdownBanner').then(m => ({ default: m.CountdownBanner })));
+const NewsletterInline = lazy(() => import('../components/home/NewsletterInline').then(m => ({ default: m.NewsletterInline })));
+const InstagramFeed = lazy(() => import('../components/home/InstagramFeed').then(m => ({ default: m.InstagramFeed })));
 
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { Reveal } from '../components/ui/Reveal';
@@ -60,15 +63,21 @@ export const Home = () => {
 
             <TrustBar />
 
-            <div id="editorial">
-                {siteConfig?.showEditorial !== false && <Editorial />}
-            </div>
+            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+                <div id="editorial">
+                    {siteConfig?.showEditorial !== false && <Editorial />}
+                </div>
+            </Suspense>
 
             <GoldDivider />
 
-            <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
+            <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
+                <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
+            </Suspense>
 
-            <ShopTheLook />
+            <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
+                <ShopTheLook />
+            </Suspense>
 
             {/* Categorías — solo renderiza si hay categorías válidas */}
             {validCategories.length > 0 && <section id="categories" className="py-24 px-4 bg-[#020617] relative">
@@ -133,18 +142,26 @@ export const Home = () => {
             {/* New Arrivals */}
             <section className="py-20 px-4 sm:px-8 bg-[#020617]">
                 <div className="max-w-[1800px] mx-auto">
-                    <NewArrivalsCarousel
-                        products={newArrivals}
-                        onQuickView={(p) => setQuickViewProduct(p)}
-                    />
+                    <Suspense fallback={<div className="h-[400px]" />}>
+                        <NewArrivalsCarousel
+                            products={newArrivals}
+                            onQuickView={(p) => setQuickViewProduct(p)}
+                        />
+                    </Suspense>
                 </div>
             </section>
 
-            <CountdownBanner />
+            <Suspense fallback={<div className="h-[200px] bg-[#020617]" />}>
+                <CountdownBanner />
+            </Suspense>
 
-            <Testimonials />
+            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+                <Testimonials />
+            </Suspense>
 
-            <HowItWorks />
+            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+                <HowItWorks />
+            </Suspense>
 
             {/* Bridge to /shop */}
             <section className="py-20 px-4 bg-[#020617] relative overflow-hidden border-y border-white/5">
@@ -163,9 +180,13 @@ export const Home = () => {
                 </Reveal>
             </section>
 
-            <NewsletterInline />
+            <Suspense fallback={<div className="h-[200px] bg-[#020617]" />}>
+                <NewsletterInline />
+            </Suspense>
 
-            <InstagramFeed />
+            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+                <InstagramFeed />
+            </Suspense>
         </div>
     );
 };

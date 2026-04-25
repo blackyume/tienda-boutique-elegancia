@@ -426,6 +426,26 @@ export const ProductDetail = () => {
                     </div>
                 </div>
             )}
+
+            {/* MOBILE STICKY CART BAR */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] backdrop-blur-xl">
+                <div className="flex items-center gap-3 px-4 py-3 safe-bottom">
+                    <div className="flex-shrink-0">
+                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Total</p>
+                        <p className="text-lg font-black text-slate-900 dark:text-white leading-none">{formatMoney(product.price * quantity)}</p>
+                    </div>
+                    <button
+                        onClick={handleAddToCart}
+                        disabled={totalStock === 0}
+                        className="flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] text-black transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ background: totalStock === 0 ? '#94a3b8' : 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
+                    >
+                        {totalStock === 0 ? 'Agotado' : 'Agregar al carrito'}
+                    </button>
+                </div>
+            </div>
+            {/* padding para que el sticky no tape contenido */}
+            <div className="md:hidden h-20" />
         </div>
     );
 };
