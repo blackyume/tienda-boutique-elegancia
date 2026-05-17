@@ -21,16 +21,12 @@ const Card = ({ item, onQuickView, tall = false, small = false }) => (
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute inset-0 bg-cielo-gold/0 group-hover:bg-cielo-gold/5 transition-colors duration-700" />
 
-        <span className="absolute top-4 left-4 px-3 py-1 bg-cielo-gold/90 text-black text-[9px] font-bold uppercase tracking-[0.3em]">
-            Highlight
-        </span>
-
         <div className="absolute inset-x-0 bottom-0 p-5 md:p-7 text-white">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-cielo-gold/90 mb-1">{item.category}</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-1">{item.category}</p>
             <h3 className="font-serif text-xl md:text-2xl leading-tight line-clamp-2">{item.name}</h3>
 
             <div className="mt-3 flex items-center justify-between gap-3">
-                <span className="text-lg md:text-xl text-cielo-gold font-light">{formatMoney(item.price)}</span>
+                <span className="text-lg md:text-xl text-white/90 font-light">{formatMoney(item.price)}</span>
                 {item.colors?.length > 0 && (
                     <div className="flex -space-x-1.5">
                         {item.colors.slice(0, 4).map((c) => (

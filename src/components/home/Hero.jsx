@@ -61,7 +61,7 @@ export const Hero = () => {
     const heroSrc = heroImage ? optimizeImage(heroImage, 1800) : null;
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#020617]">
+        <section className="relative min-h-screen flex items-end overflow-hidden bg-[#020617] px-6 md:px-16 lg:px-24 pb-20 md:pb-28">
             {heroSrc && (
                 <Helmet>
                     <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />
@@ -104,38 +104,31 @@ export const Hero = () => {
                 />
             )}
 
-            {/* Content */}
-            <div ref={contentRef} className="relative z-10 text-center px-4 max-w-5xl mx-auto will-change-transform">
-                <div className="animate-fadeIn">
-                    <span className="inline-block px-5 py-2 rounded-full border border-cielo-gold/30 bg-cielo-gold/10 backdrop-blur-md text-[10px] uppercase tracking-[0.4em] font-bold text-cielo-gold mb-8 shadow-[0_0_30px_rgba(212,175,55,0.15)]">
+            {/* Content — editorial, alineado abajo-izquierda */}
+            <div ref={contentRef} className="relative z-10 text-left max-w-4xl will-change-transform">
+                <div className="animate-fadeIn flex items-center gap-4 mb-6">
+                    <span className="h-px w-12 bg-cielo-gold/60" />
+                    <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-white/70">
                         Colección 2026 · Edición de autor
                     </span>
                 </div>
 
-                <h1 className="relative font-cinzel text-5xl md:text-7xl lg:text-[7rem] leading-[0.95] tracking-tight text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.7)] animate-slideUp">
+                <h1 className="font-cinzel text-6xl md:text-8xl lg:text-[8.5rem] leading-[0.9] tracking-tight text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.6)] animate-slideUp">
                     {title}
-                    <span
-                        className="block italic font-serif text-2xl md:text-4xl lg:text-5xl mt-4 font-light tracking-normal"
-                        style={{
-                            backgroundImage: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
-                        }}
-                    >
+                    <span className="block italic font-serif text-3xl md:text-5xl lg:text-6xl mt-3 font-light tracking-normal text-white/90">
                         {subtitle}
                     </span>
                 </h1>
 
-                <p className="mt-10 text-sm md:text-base text-slate-300/90 max-w-xl font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:500ms] mx-auto">
+                <p className="mt-8 text-sm md:text-base text-slate-300/80 max-w-md font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:500ms]">
                     Moda femenina curada a mano. Donde la tradición del oficio encuentra el lenguaje estético del presente.
                 </p>
 
-                <div className="mt-12 flex flex-col items-center gap-6 animate-fadeIn opacity-0 [animation-delay:800ms]">
+                <div className="mt-10 flex flex-wrap items-center gap-8 animate-fadeIn opacity-0 [animation-delay:800ms]">
                     <Link
                         to="/shop"
                         onClick={primaryAction}
-                        className="group relative inline-flex items-center justify-center gap-3 px-14 py-5 text-black font-bold text-[11px] uppercase tracking-[0.35em] overflow-hidden rounded-sm shadow-[0_10px_50px_-10px_rgba(212,175,55,0.75)] transition-transform hover:scale-[1.03]"
+                        className="group relative inline-flex items-center justify-center gap-3 px-12 py-4 text-black font-bold text-[11px] uppercase tracking-[0.35em] overflow-hidden rounded-sm shadow-[0_10px_50px_-12px_rgba(212,175,55,0.6)] transition-transform hover:scale-[1.03]"
                         style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                     >
                         <span className="relative z-10">{buttonText}</span>
@@ -144,7 +137,7 @@ export const Hero = () => {
                     </Link>
                     <button
                         onClick={() => document.getElementById('editorial')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="group inline-flex items-center gap-2 text-white/70 hover:text-white text-[10px] uppercase tracking-[0.35em] font-bold transition-colors"
+                        className="group inline-flex items-center gap-2 text-white/60 hover:text-white text-[10px] uppercase tracking-[0.35em] font-bold transition-colors"
                     >
                         <span className="relative">
                             Descubrir la colección
@@ -154,10 +147,10 @@ export const Hero = () => {
                 </div>
             </div>
 
-            {/* Scroll hint */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center animate-bounce opacity-60">
-                <div className="w-[1px] h-12 bg-gradient-to-b from-cielo-gold to-transparent" />
-                <span className="text-[9px] uppercase tracking-[0.3em] text-white/60 mt-2">Scroll</span>
+            {/* Scroll hint — discreto, a la derecha */}
+            <div className="absolute bottom-10 right-8 md:right-16 z-10 hidden sm:flex flex-col items-center opacity-50">
+                <span className="text-[9px] uppercase tracking-[0.3em] text-white/60 mb-2 [writing-mode:vertical-rl] rotate-180">Scroll</span>
+                <div className="w-[1px] h-14 bg-gradient-to-b from-cielo-gold/70 to-transparent" />
             </div>
         </section>
     );

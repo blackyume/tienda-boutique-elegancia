@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, Youtube, ShieldCheck, ArrowRight, Biohazard, Scale, Mail, MessageCircle } from 'lucide-react';
+import { Instagram, Youtube, ArrowRight, Scale, Mail, MessageCircle } from 'lucide-react';
 
 // TikTok SVG Icon (not in lucide-react)
 const TikTokIcon = ({ className }) => (
@@ -130,36 +130,17 @@ export const Footer = () => {
 
             <div className="max-w-7xl mx-auto px-4 pt-8 border-t border-white/10 flex flex-col items-center text-center">
 
-                <div className="mb-6 flex flex-col items-center">
-                    <p className="text-[10px] text-slate-600 mb-3 tracking-widest uppercase">Diseñado y creado por</p>
-
-                    <div className="relative group cursor-default px-6 py-2">
-                        {/* Subtle Cyan Glow Blob */}
-                        <div className="absolute inset-0 bg-cyan-900/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-
-                        <div className="relative z-10 flex flex-col items-center gap-1">
-                            {/* Main Line: Icon + Name */}
-                            <div className="flex items-center gap-3 text-cyan-500 drop-shadow-[0_0_5px_rgba(34,211,238,0.2)]">
-                                <Biohazard className="w-5 h-5 animate-[spin_10s_linear_infinite]" />
-                                <span className="text-sm font-bold tracking-[0.25em] font-sans whitespace-nowrap">
-                                    BLACKYUME AI NEURONAL CORP
-                                </span>
-                            </div>
-
-                            {/* Subtitle: Centered below */}
-                            <div className="h-[1px] w-full bg-cyan-500/10 my-0.5" />
-                            <span className="text-[10px] text-cyan-400/60 tracking-[0.15em] font-light uppercase">
-                                Neural Network Division <span className="text-cyan-600/40 mx-1">{'//'}</span> [神経回路網]
-                            </span>
-                        </div>
-                    </div>
+                <div className="mb-6 flex flex-col items-center gap-3">
+                    <span className="font-cinzel text-xl tracking-[0.25em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] bg-clip-text text-transparent">
+                        LBE
+                    </span>
+                    <span className="text-[10px] text-slate-500 tracking-[0.3em] uppercase">
+                        Moda femenina · Hecho en Argentina
+                    </span>
                 </div>
 
-                <div className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose flex flex-col md:flex-row items-center gap-4 md:gap-8">
-                    <p>
-                        © 2026 La Boutique de la Elegancia. Todos los derechos reservados.
-                    </p>
-
+                <div className="text-[10px] text-slate-500 uppercase tracking-widest leading-loose">
+                    <p>© 2026 La Boutique de la Elegancia · Todos los derechos reservados</p>
                 </div>
             </div>
         </footer >
