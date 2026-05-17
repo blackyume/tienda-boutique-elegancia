@@ -43,6 +43,23 @@ const ScrollToTop = () => {
   return null;
 }
 
+// Bypass QA: ?qa=CLAVE saltea el gate de mantenimiento (para revisión
+// visual/screenshots sin abrir la tienda al público). Se persiste en
+// localStorage para sobrevivir la navegación SPA. Override por env.
+const QA_BYPASS_KEY = import.meta.env.VITE_QA_BYPASS || 'lbde-qa-7f3a2c';
+
+const hasQaBypass = () => {
+  try {
+    const fromUrl = new URLSearchParams(window.location.search).get('qa');
+    if (fromUrl && fromUrl === QA_BYPASS_KEY) {
+      localStorage.setItem('qa_bypass', QA_BYPASS_KEY);
+    }
+    return localStorage.getItem('qa_bypass') === QA_BYPASS_KEY;
+  } catch {
+    return false;
+  }
+};
+
 // AppContent assumes Router context exists
 const AppContent = () => {
   const { isSizeGuideOpen, setIsSizeGuideOpen, isMaintenance, isAdmin, loading, incrementVisits, isCartOpen, setIsCartOpen, user } = useStore();
@@ -62,7 +79,7 @@ const AppContent = () => {
   if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-[#C19A6B]">Cargando...</div>;
 
   // Si está en mantenimiento y NO es admin, muestra pantalla de bloqueo
-  if (isMaintenance && !isAdmin) {
+  if (isMaintenance && !isAdmin && !hasQaBypass()) {
     // Excepción: Permitir login de admin (ruta /admin) para que pueda entrar a apagarlo
     const isTryingToLogin = location.pathname.startsWith('/admin');
     if (!isTryingToLogin) return <Maintenance />;

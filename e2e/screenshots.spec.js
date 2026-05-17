@@ -7,6 +7,17 @@ import { test } from '@playwright/test';
 
 const OUT = 'screenshots';
 
+// Debe coincidir con QA_BYPASS_KEY de src/App.jsx (saltea mantenimiento).
+const QA_KEY = process.env.QA_BYPASS || 'lbde-qa-7f3a2c';
+
+// Inyecta el flag en localStorage antes de que arranque la app, en cada
+// navegación, para que el gate de mantenimiento no lo bloquee.
+test.beforeEach(async ({ page }) => {
+    await page.addInitScript((k) => {
+        try { localStorage.setItem('qa_bypass', k); } catch { /* noop */ }
+    }, QA_KEY);
+});
+
 // La app mantiene sockets de Firestore abiertos → nunca llega a
 // 'networkidle'. Hay 2 capas de loader: el splash estático
 // (#loadingScreen en index.html, se va ~1.3s post-load) y el gate
