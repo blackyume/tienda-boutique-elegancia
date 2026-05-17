@@ -419,40 +419,41 @@ export const Admin = () => {
     };
 
     const applyTargetMargin = () => {
-        if (!targetMargin) return;
+        const margin = Number(targetMargin);
+        if (!targetMargin || isNaN(margin) || margin <= 0) return addToast("Ingresá un margen % válido", "error");
+
         const t = Number(currentProduct.cost || 0) + Number(currentProduct.shippingCost || 0) + Number(currentProduct.packagingCost || 0) + Number(currentProduct.fixedFee || 0);
-        if (t === 0) return;
+        if (t <= 0) return addToast("Cargá primero el costo de la prenda para usar el margen %", "error");
 
         const feeDecimal = (Number(currentProduct.feePercent || 0) / 100);
-        const markupDecimal = (Number(targetMargin) / 100);
+        if (feeDecimal >= 1) return addToast("La comisión no puede ser 100% o más", "error");
 
-        if (feeDecimal >= 1) {
-            addToast("La comisión no puede ser 100% o más", "error");
-            return;
-        }
-
-        // Formula: Markup sobre Costo (Rentabilidad)
-        // Precio = (Costo * (1 + Markup)) / (1 - Comisión)
-        let p = (t * (1 + markupDecimal)) / (1 - feeDecimal);
+        // Markup sobre Costo: Precio = (Costo * (1 + Markup)) / (1 - Comisión)
+        let p = (t * (1 + margin / 100)) / (1 - feeDecimal);
+        if (!isFinite(p) || p <= 0) return addToast("No se pudo calcular el precio", "error");
 
         p = Math.ceil(p / 100) * 100; // Redondeo a centena
         setCurrentProduct(prev => ({ ...prev, price: p }));
-        setTargetProfit(""); // Clear the other input
+        setTargetProfit("");
+        addToast(`Precio fijado en ${formatMoney(p)}`, "success");
     };
 
     const applyTargetProfit = () => {
-        if (!targetProfit) return;
+        const profit = Number(targetProfit);
+        if (!targetProfit || isNaN(profit) || profit <= 0) return addToast("Ingresá un monto de ganancia válido", "error");
+
         const t = Number(currentProduct.cost || 0) + Number(currentProduct.shippingCost || 0) + Number(currentProduct.packagingCost || 0) + Number(currentProduct.fixedFee || 0);
-        const feeDecimal = (Number(currentProduct.feePercent || 0) / 100); // e.g. 0.06
+        const feeDecimal = (Number(currentProduct.feePercent || 0) / 100);
+        if (feeDecimal >= 1) return addToast("La comisión no puede ser 100% o más", "error");
 
-        if (feeDecimal >= 1) return;
+        // Precio = (Costo + Ganancia) / (1 - Comisión)
+        let p = (t + profit) / (1 - feeDecimal);
+        if (!isFinite(p) || p <= 0) return addToast("No se pudo calcular el precio", "error");
 
-        // Price = (Cost + Profit) / (1 - Fee)
-        // Check: Price - (Price*Fee) - Cost = Profit
-        let p = (t + Number(targetProfit)) / (1 - feeDecimal);
         p = Math.ceil(p / 100) * 100;
         setCurrentProduct(prev => ({ ...prev, price: p }));
-        setTargetMargin(""); // Clear the other input
+        setTargetMargin("");
+        addToast(`Precio fijado en ${formatMoney(p)}`, "success");
     };
 
     const toggleRow = (id) => { setExpandedRow(expandedRow === id ? null : id); };

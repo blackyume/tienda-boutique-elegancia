@@ -10,6 +10,8 @@ import { useAuth } from '../hooks/useAuth';
 
 const StoreContext = createContext();
 
+let toastSeq = 0;
+
 const INITIAL_CATEGORIES = [];
 
 const INITIAL_IMAGES = {
@@ -159,7 +161,9 @@ export const StoreProvider = ({ children }) => {
   const toggleTheme = () => { /* tema fijo: dark */ };
 
   const addToast = (msg, type = 'info') => {
-    const id = Date.now();
+    // ID único: Date.now() colisiona si se crean varios toasts en el mismo
+    // ms (ej. al subir imagen) → keys duplicadas en React → toast pegado.
+    const id = `${Date.now()}-${++toastSeq}`;
     setToasts(prev => [...prev, { id, msg, type }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
   };
