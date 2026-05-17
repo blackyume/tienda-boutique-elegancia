@@ -1,5 +1,4 @@
 import React, { memo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Heart, Eye } from 'lucide-react';
 import { formatMoney, getColorHex } from '../../utils/helpers';
 import { getTotalStock } from '../../utils/variants';
@@ -19,7 +18,6 @@ const discountPct = (product) => {
 };
 
 export const ProductCard = memo(function ProductCard({ product, priority = false, onQuickView }) {
-    const navigate = useNavigate();
     const { wishlist, setWishlist, addToast } = useStore();
     const [quickOpen, setQuickOpen] = useState(false);
 
@@ -37,10 +35,6 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
     const mainImage = product.image || (Array.isArray(product.images) && product.images[0]);
 
     const openQuick = () => setQuickOpen(true);
-    const goToDetail = () => {
-        navigate(`/product/${product.id}`);
-        window.scrollTo(0, 0);
-    };
 
     const toggleWishlist = (e) => {
         e.stopPropagation();

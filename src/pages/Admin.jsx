@@ -867,20 +867,6 @@ export const Admin = () => {
                                                 <span className="text-[10px] text-slate-400">Arrastra para ordenar (Próximamente)</span>
                                             </div>
 
-                                            <div className="mb-4 flex items-start gap-3 p-3 rounded-xl bg-[#C19A6B]/5 border border-[#C19A6B]/20">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setCurrentProduct(p => ({ ...p, spin360: !p.spin360 }))}
-                                                    className={`shrink-0 relative w-11 h-6 rounded-full transition-colors ${currentProduct.spin360 ? 'bg-[#C19A6B]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                                                    aria-pressed={!!currentProduct.spin360}
-                                                >
-                                                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${currentProduct.spin360 ? 'translate-x-5' : ''}`} />
-                                                </button>
-                                                <div className="text-[11px] leading-snug text-slate-500 dark:text-slate-400">
-                                                    <span className="font-bold text-slate-700 dark:text-slate-200">Vista 360° (arrastrar para girar)</span> — activá solo si subís un set de <b>8+ fotos en orden</b> girando la prenda.
-                                                    <br />Si la dejás <b>apagada</b> y hay 2+ fotos, el modal hace <b>flip frente/dorso</b> (1ª foto = frente, 2ª = dorso).
-                                                </div>
-                                            </div>
 
                                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-4">
                                                 {/* Existing Media Items */}
