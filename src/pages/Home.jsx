@@ -18,6 +18,7 @@ const HowItWorks = lazy(() => import('../components/home/HowItWorks').then(m => 
 const CountdownBanner = lazy(() => import('../components/home/CountdownBanner').then(m => ({ default: m.CountdownBanner })));
 const NewsletterInline = lazy(() => import('../components/home/NewsletterInline').then(m => ({ default: m.NewsletterInline })));
 const InstagramFeed = lazy(() => import('../components/home/InstagramFeed').then(m => ({ default: m.InstagramFeed })));
+const Atelier = lazy(() => import('../components/home/Atelier').then(m => ({ default: m.Atelier })));
 
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { Reveal } from '../components/ui/Reveal';
@@ -75,6 +76,10 @@ export const Home = () => {
                 <div id="editorial">
                     {siteConfig?.showEditorial !== false && <Editorial />}
                 </div>
+            </Suspense>
+
+            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+                <Atelier />
             </Suspense>
 
             <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
