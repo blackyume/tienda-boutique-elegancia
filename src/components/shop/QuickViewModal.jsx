@@ -76,7 +76,12 @@ export const QuickViewModal = ({ product, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+        <div
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Vista rápida: ${product.name}`}
+        >
             <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" onClick={onClose} />
 
             {/* Halo dorado que respira detrás del modal */}

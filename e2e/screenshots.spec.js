@@ -99,5 +99,17 @@ for (const [device, viewport] of [['desktop', DESKTOP], ['mobile', MOBILE]]) {
             await page.screenshot({ path: `${OUT}/product-${device}-fold.png` });
             await page.screenshot({ path: `${OUT}/product-${device}.png`, fullPage: true });
         });
+
+        test(`quick view modal (${device})`, async ({ page }) => {
+            await page.goto('/shop', { waitUntil: 'domcontentloaded' });
+            await settle(page);
+            const card = page.locator('article[role="button"]').first();
+            await card.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {});
+            if (await card.count() === 0) { test.skip(true, 'Sin productos'); return; }
+            await card.click();
+            await page.locator('[role="dialog"]').first().waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {});
+            await page.waitForTimeout(1500);
+            await page.screenshot({ path: `${OUT}/quickview-${device}.png` });
+        });
     });
 }
