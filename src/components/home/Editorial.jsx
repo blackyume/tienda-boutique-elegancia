@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 
 export const Editorial = () => {
     const { siteConfig } = useStore();
+    const [imgOk, setImgOk] = useState(true);
+    const editorialImg = siteConfig.editorial?.image;
 
     return (
         <div className="relative w-full min-h-[600px] md:h-[80vh] flex flex-col md:flex-row bg-[#020617] text-white">
@@ -39,17 +41,23 @@ export const Editorial = () => {
                 {/* Scrim sólo del lado del texto + base inferior para la cita */}
                 <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-[#020617] via-[#020617]/30 to-transparent z-10" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-transparent to-transparent z-10" />
-                {siteConfig.editorial?.image ? (
+                {editorialImg && imgOk ? (
                     <img
-                        src={siteConfig.editorial.image}
+                        src={editorialImg}
                         className="w-full h-full object-cover grayscale-[15%] hover:grayscale-0 hover:scale-105 transition-all duration-[2s] ease-out"
                         alt="Editorial Fashion"
                         loading="lazy"
                         decoding="async"
+                        onError={() => setImgOk(false)}
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-cielo-gold/30 font-cinzel text-2xl tracking-widest">
-                        LBE
+                    // Fallback premium si la imagen falla/falta (no <img> roto)
+                    <div
+                        className="w-full h-full flex flex-col items-center justify-center gap-5"
+                        style={{ background: 'radial-gradient(circle at 60% 40%, rgba(193,154,107,0.18), transparent 60%), linear-gradient(135deg, #0a0f1e 0%, #020617 60%, #0a0f1e 100%)' }}
+                    >
+                        <span className="font-cinzel text-6xl tracking-[0.2em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] bg-clip-text text-transparent">LBE</span>
+                        <span className="text-[10px] uppercase tracking-[0.5em] text-cielo-gold/60">La Boutique de la Elegancia</span>
                     </div>
                 )}
 

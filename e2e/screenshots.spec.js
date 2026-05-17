@@ -69,6 +69,17 @@ for (const [device, viewport] of [['desktop', DESKTOP], ['mobile', MOBILE]]) {
             await page.screenshot({ path: `${OUT}/home-${device}.png`, fullPage: true });
         });
 
+        test(`home editorial (${device})`, async ({ page }) => {
+            await page.goto('/', { waitUntil: 'domcontentloaded' });
+            await settle(page);
+            const ed = page.locator('#editorial');
+            await ed.scrollIntoViewIfNeeded().catch(() => {});
+            await page.waitForTimeout(1500);
+            await ed.screenshot({ path: `${OUT}/editorial-${device}.png` }).catch(async () => {
+                await page.screenshot({ path: `${OUT}/editorial-${device}.png` });
+            });
+        });
+
         test(`shop (${device})`, async ({ page }) => {
             await page.goto('/shop', { waitUntil: 'domcontentloaded' });
             await settle(page);
