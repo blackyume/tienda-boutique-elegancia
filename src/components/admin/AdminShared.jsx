@@ -20,7 +20,35 @@ export const RealTimeClock = () => {
     );
 };
 
-export const StatCard = ({ label, value, sub, icon: Icon, theme }) => {
+const SPARK_STROKE = {
+    emerald: '#10b981', blue: '#3b82f6', purple: '#a855f7', orange: '#C19A6B'
+};
+
+export const Sparkline = ({ data = [], theme = 'orange' }) => {
+    if (!data || data.length < 2) return null;
+    const w = 100, h = 28;
+    const max = Math.max(...data, 1);
+    const min = Math.min(...data, 0);
+    const span = max - min || 1;
+    const step = w / (data.length - 1);
+    const points = data.map((v, i) => `${(i * step).toFixed(1)},${(h - ((v - min) / span) * h).toFixed(1)}`);
+    const stroke = SPARK_STROKE[theme] || SPARK_STROKE.orange;
+    return (
+        <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="w-full h-7 overflow-visible" aria-hidden="true">
+            <polyline
+                points={`0,${h} ${points.join(' ')} ${w},${h}`}
+                fill={stroke} fillOpacity="0.08" stroke="none"
+            />
+            <polyline
+                points={points.join(' ')}
+                fill="none" stroke={stroke} strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke"
+            />
+        </svg>
+    );
+};
+
+export const StatCard = ({ label, value, sub, icon: Icon, theme, spark }) => {
     // Premium Fashion Palette
     const themeStyles = {
         emerald: "text-emerald-600 dark:text-emerald-400 after:bg-emerald-500",
@@ -46,6 +74,10 @@ export const StatCard = ({ label, value, sub, icon: Icon, theme }) => {
                     <Icon className="w-5 h-5" />
                 </div>
             </div>
+
+            {spark && spark.length > 1 && (
+                <div className="-mx-1 mb-1"><Sparkline data={spark} theme={theme} /></div>
+            )}
 
             {sub && (
                 <div className="pt-4 border-t border-slate-50 dark:border-slate-800/50">

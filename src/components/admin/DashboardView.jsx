@@ -140,7 +140,21 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
         const avgTicketPrev = prevCount > 0 ? prevRevenue / prevCount : 0;
         const ticketChange = avgTicketPrev > 0 ? ((avgTicketCurrent - avgTicketPrev) / avgTicketPrev * 100).toFixed(1) : 0;
 
+        // Series diarias para sparklines (máx 30 días)
+        const seriesDays = Math.min(days, 30);
+        const revenueSeries = Array(seriesDays).fill(0);
+        const ordersSeries = Array(seriesDays).fill(0);
+        currentOrders.forEach(o => {
+            const idx = seriesDays - 1 - Math.floor((now - new Date(o.date)) / 86400000);
+            if (idx >= 0 && idx < seriesDays) {
+                revenueSeries[idx] += o.total;
+                ordersSeries[idx] += 1;
+            }
+        });
+
         return {
+            revenueSeries,
+            ordersSeries,
             currentRevenue,
             currentCount,
             prevRevenue,
@@ -246,6 +260,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         </span>}
                         icon={Wallet}
                         theme="emerald"
+                        spark={periodComparison.revenueSeries}
                     />
                     <StatCard
                         label="Pedidos"
@@ -260,6 +275,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         </span>}
                         icon={ShoppingCart}
                         theme="blue"
+                        spark={periodComparison.ordersSeries}
                     />
                     <StatCard
                         label="Ticket Promedio"
