@@ -28,6 +28,9 @@ async function settle(page) {
     await page.waitForLoadState('load').catch(() => {});
     await page.locator('#loadingScreen').waitFor({ state: 'detached', timeout: 25_000 }).catch(() => {});
     await page.getByText('Cargando...', { exact: true }).waitFor({ state: 'detached', timeout: 25_000 }).catch(() => {});
+    // Ancla positiva: el footer sólo existe cuando la app real montó
+    // (no está ni en el splash ni en el gate "Cargando..." ni en Maintenance).
+    await page.locator('footer').first().waitFor({ state: 'visible', timeout: 25_000 }).catch(() => {});
     await page.waitForTimeout(1500);
     await page.evaluate(async () => {
         await new Promise((res) => {
@@ -57,12 +60,18 @@ for (const [device, viewport] of [['desktop', DESKTOP], ['mobile', MOBILE]]) {
         test(`home (${device})`, async ({ page }) => {
             await page.goto('/', { waitUntil: 'domcontentloaded' });
             await settle(page);
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await page.waitForTimeout(500);
+            await page.screenshot({ path: `${OUT}/home-${device}-fold.png` });
             await page.screenshot({ path: `${OUT}/home-${device}.png`, fullPage: true });
         });
 
         test(`shop (${device})`, async ({ page }) => {
             await page.goto('/shop', { waitUntil: 'domcontentloaded' });
             await settle(page);
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await page.waitForTimeout(500);
+            await page.screenshot({ path: `${OUT}/shop-${device}-fold.png` });
             await page.screenshot({ path: `${OUT}/shop-${device}.png`, fullPage: true });
         });
 
@@ -79,6 +88,9 @@ for (const [device, viewport] of [['desktop', DESKTOP], ['mobile', MOBILE]]) {
             await card.click();
             await page.waitForURL('**/product/**', { timeout: 15_000 }).catch(() => {});
             await settle(page);
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await page.waitForTimeout(500);
+            await page.screenshot({ path: `${OUT}/product-${device}-fold.png` });
             await page.screenshot({ path: `${OUT}/product-${device}.png`, fullPage: true });
         });
     });
