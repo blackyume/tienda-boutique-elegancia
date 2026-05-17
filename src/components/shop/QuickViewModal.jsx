@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { X, Heart, Check, Ruler, Share2, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Heart, Check, Ruler, Share2, ChevronDown, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { formatMoney, getColorHex } from '../../utils/helpers';
 import { useStore } from '../../context/StoreContext';
 import { getTotalStock, isColorAvailable, isSizeAvailable } from '../../utils/variants';
 
 export const QuickViewModal = ({ product, onClose }) => {
+    const navigate = useNavigate();
     const { addToCart, isInWishlist, toggleWishlist: toggleWishlistCtx, addToast, setIsSizeGuideOpen, setIsCartOpen } = useStore();
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
@@ -58,6 +60,12 @@ export const QuickViewModal = ({ product, onClose }) => {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const goToDetail = () => {
+        onClose();
+        navigate(`/product/${product.id}`);
+        window.scrollTo(0, 0);
+    };
+
     const getEmbedUrl = (url) => {
         if (!url) return '';
         if (url.includes('youtube.com') || url.includes('youtu.be')) {
@@ -68,10 +76,29 @@ export const QuickViewModal = ({ product, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
-            <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" onClick={onClose} />
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" onClick={onClose} />
 
-            <div className="bg-white dark:bg-slate-950 w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl relative flex flex-col md:flex-row animate-slideUp ring-1 ring-white/10" onClick={(e) => e.stopPropagation()}>
+            {/* Halo dorado que respira detrás del modal */}
+            <div aria-hidden className="pointer-events-none absolute w-[min(1080px,92vw)] h-[78vh] rounded-full bg-[#C19A6B]/15 blur-[130px] animate-pulse" />
+
+            {/* Marco con borde dorado animado (cometa que gira y destaca) */}
+            <div
+                className="relative w-full max-w-5xl max-h-[92vh] rounded-[26px] p-[2px] overflow-hidden shadow-[0_0_80px_-14px_rgba(193,154,107,0.6)] animate-slideUp"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <span
+                    aria-hidden
+                    className="pointer-events-none absolute -inset-[60%] animate-[spin_5s_linear_infinite]"
+                    style={{
+                        background:
+                            'conic-gradient(from 0deg, rgba(193,154,107,0) 0deg, rgba(193,154,107,0) 225deg, #BF953F 280deg, #FCF6BA 312deg, #B38728 344deg, rgba(193,154,107,0) 360deg)'
+                    }}
+                />
+                {/* Borde estático tenue para que el marco siempre se lea */}
+                <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[26px] ring-1 ring-[#C19A6B]/20" />
+
+                <div className="relative bg-white dark:bg-slate-950 w-full max-h-[92vh] overflow-y-auto rounded-[24px] flex flex-col md:flex-row" onClick={(e) => e.stopPropagation()}>
 
                 <button onClick={onClose} className="absolute top-4 right-4 z-20 p-2 bg-white/80 dark:bg-black/50 hover:bg-white dark:hover:bg-black rounded-full transition-colors backdrop-blur-md shadow-sm">
                     <X className="w-5 h-5 text-slate-900 dark:text-white" />
@@ -195,6 +222,14 @@ export const QuickViewModal = ({ product, onClose }) => {
                             <Heart className={`w-6 h-6 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-slate-400 dark:text-slate-500'}`} />
                         </button>
                     </div>
+
+                    <button
+                        onClick={goToDetail}
+                        className="mt-4 w-full text-xs font-bold uppercase tracking-[0.2em] text-[#C19A6B] hover:text-[#FCF6BA] transition-colors flex items-center justify-center gap-2"
+                    >
+                        Ver ficha completa <ArrowRight className="w-4 h-4" />
+                    </button>
+                </div>
                 </div>
             </div>
         </div>

@@ -31,6 +31,9 @@ async function settle(page) {
     // Ancla positiva: el footer sólo existe cuando la app real montó
     // (no está ni en el splash ni en el gate "Cargando..." ni en Maintenance).
     await page.locator('footer').first().waitFor({ state: 'visible', timeout: 25_000 }).catch(() => {});
+    // El splash de index.html se quita sólo en window 'load'; si una
+    // imagen cuelga, queda pegado. Para la captura lo forzamos a irse.
+    await page.evaluate(() => document.getElementById('loadingScreen')?.remove());
     await page.waitForTimeout(1500);
     await page.evaluate(async () => {
         await new Promise((res) => {
@@ -78,7 +81,10 @@ for (const [device, viewport] of [['desktop', DESKTOP], ['mobile', MOBILE]]) {
         test(`product detail (${device})`, async ({ page }) => {
             await page.goto('/shop', { waitUntil: 'domcontentloaded' });
             await settle(page);
-            const card = page.locator('a[href*="/product/"]').first();
+            // ProductCard es <article role="link" aria-label="Ver ...">,
+            // no un <a href>. Navega por onClick.
+            const card = page.locator('article[role="link"]').first();
+            await card.waitFor({ state: 'visible', timeout: 15_000 }).catch(() => {});
             const hasProduct = await card.count().then(c => c > 0);
             if (!hasProduct) {
                 test.info().annotations.push({ type: 'note', description: 'Sin productos cargados — se omite product detail' });

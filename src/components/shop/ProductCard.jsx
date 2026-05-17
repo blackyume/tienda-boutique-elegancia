@@ -1,9 +1,10 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Eye } from 'lucide-react';
 import { formatMoney, getColorHex } from '../../utils/helpers';
 import { getTotalStock } from '../../utils/variants';
 import { LazyImage } from '../ui/LazyImage';
+import { QuickViewModal } from './QuickViewModal';
 import { useStore } from '../../context/StoreContext';
 
 const isNew = (product) => {
@@ -20,6 +21,7 @@ const discountPct = (product) => {
 export const ProductCard = memo(function ProductCard({ product, priority = false, onQuickView }) {
     const navigate = useNavigate();
     const { wishlist, setWishlist, addToast } = useStore();
+    const [quickOpen, setQuickOpen] = useState(false);
 
     const totalStock = getTotalStock(product);
     const outOfStock = totalStock <= 0;
@@ -34,6 +36,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
         product.hoverImage || (Array.isArray(product.images) && product.images[1]) || null;
     const mainImage = product.image || (Array.isArray(product.images) && product.images[0]);
 
+    const openQuick = () => setQuickOpen(true);
     const goToDetail = () => {
         navigate(`/product/${product.id}`);
         window.scrollTo(0, 0);
@@ -54,13 +57,16 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
     const colors = (product.colors || []).slice(0, 4);
 
     return (
+        <>
+        {quickOpen && <QuickViewModal product={product} onClose={() => setQuickOpen(false)} />}
         <article
             className="group relative flex flex-col cursor-pointer"
-            onClick={goToDetail}
-            onKeyDown={(e) => (e.key === 'Enter' ? goToDetail() : null)}
+            onClick={openQuick}
+            onKeyDown={(e) => (e.key === 'Enter' ? openQuick() : null)}
             tabIndex={0}
-            role="link"
-            aria-label={`Ver ${product.name}`}
+            role="button"
+            aria-haspopup="dialog"
+            aria-label={`Vista rápida de ${product.name}`}
         >
             {/* Imagen */}
             <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -168,5 +174,6 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 )}
             </div>
         </article>
+        </>
     );
 });

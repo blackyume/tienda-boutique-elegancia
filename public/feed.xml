@@ -4,5 +4,41 @@
     <title>La Boutique de la Elegancia</title>
     <link>https://la-boutique-de-la-elegancia.web.app</link>
     <description>Moda femenina premium — Argentina</description>
+    <item>
+      <g:id>3cKqpkFH5deOn8TnT2a0</g:id>
+      <g:title>pantalon corto diario</g:title>
+      <g:description>Este pantalón corto redefine la elegancia casual con un corte impecable que estiliza la figura. Ideal para los días activos en la ciudad o una tarde relajada, ofrece una comodidad excepcional sin sacrificar el estilo. Su diseño versátil lo convierte en un básico indispensable para un guardarropa premium.
+
+• Corte sastre que realza la silueta.
+• Comodidad ideal para el ritmo diario.
+• Versátil, combina con prendas casuales o formales.
+• Mantenimiento sencillo para su cuidado habitual.</g:description>
+      <g:link>https://la-boutique-de-la-elegancia.web.app/product/3cKqpkFH5deOn8TnT2a0</g:link>
+      <g:image_link>https://res.cloudinary.com/dhfjszhjl/image/upload/v1779036068/tienda-cielo/slialbgw0gjibboksbdv.jpg</g:image_link>
+      <g:availability>in stock</g:availability>
+      <g:price>7.96 ARS</g:price>
+      <g:brand>La Boutique de la Elegancia</g:brand>
+      <g:condition>new</g:condition>
+      <g:product_type>pantalon</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+    <item>
+      <g:id>jHtf0gaLGAkmXJ3r8Kow</g:id>
+      <g:title>Remera</g:title>
+      <g:description>Esta remera, de corte impecable, ofrece una silueta moderna y favorecedora que se adapta con gracia al cuerpo. Confeccionada en un tejido de tacto sedoso, garantiza confort y una caída fluida. Ideal para realzar cualquier conjunto, llevándote del día a la noche con sofisticación.
+
+• Tejido suave de alta calidad para un confort excepcional.
+• Diseño versátil, ideal para realzar tu estilo diario.
+• Corte que se adapta con elegancia a tu figura.
+• Fácil cuidado; lavar a máquina en ciclo delicado y frío.</g:description>
+      <g:link>https://la-boutique-de-la-elegancia.web.app/product/jHtf0gaLGAkmXJ3r8Kow</g:link>
+      <g:image_link>https://res.cloudinary.com/dhfjszhjl/image/upload/v1779036890/tienda-cielo/ktaj7vrqw1xrmegytvtv.jpg</g:image_link>
+      <g:availability>in stock</g:availability>
+      <g:price>5000.00 ARS</g:price>
+      <g:brand>La Boutique de la Elegancia</g:brand>
+      <g:condition>new</g:condition>
+      <g:product_type>Remera</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
   </channel>
 </rss>
