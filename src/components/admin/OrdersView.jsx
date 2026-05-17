@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { formatMoney } from '../../utils/helpers';
 import { KanbanBoard } from './KanbanBoard';
 import { EmptyState } from '../ui/EmptyState';
+import { usePrompt } from '../ui/ConfirmDialog';
 import { LayoutList, KanbanSquare, PackageOpen } from 'lucide-react';
 
 export const OrdersView = ({ orders, updateOrderStatus }) => {
+    const askPrompt = usePrompt();
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'board'
     const [filter, setFilter] = useState('all');
 
@@ -17,9 +19,15 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
         return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
     };
 
-    const handleUpdate = (id, newStatus) => {
+    const handleUpdate = async (id, newStatus) => {
         if (newStatus === 'shipped') {
-            const tracking = prompt("Ingresa el código de seguimiento (opcional):");
+            const tracking = await askPrompt({
+                title: 'Marcar como enviado',
+                message: 'Código de seguimiento (opcional).',
+                placeholder: 'Ej: AR123456789',
+                confirmText: 'Marcar enviado'
+            });
+            if (tracking === null) return; // cancelado
             updateOrderStatus(id, newStatus, { trackingNumber: tracking || '' });
         } else {
             updateOrderStatus(id, newStatus);

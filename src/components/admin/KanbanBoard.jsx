@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { useConfirm } from '../ui/ConfirmDialog';
+import { useConfirm, usePrompt } from '../ui/ConfirmDialog';
 import { formatMoney } from '../../utils/helpers';
 import { Clock, CheckCircle, Truck, Package, AlertCircle } from 'lucide-react';
 
 export const KanbanBoard = ({ orders, updateOrderStatus }) => {
     const [draggedOrder, setDraggedOrder] = useState(null);
     const confirm = useConfirm();
+    const askPrompt = usePrompt();
 
     // Columns Configuration
     const columns = [
@@ -33,7 +34,13 @@ export const KanbanBoard = ({ orders, updateOrderStatus }) => {
         if (draggedOrder && draggedOrder.id === orderId && draggedOrder.status !== status) {
 
             if (status === 'shipped') {
-                const tracking = prompt("Ingresa el código de seguimiento (opcional):");
+                const tracking = await askPrompt({
+                    title: 'Marcar como enviado',
+                    message: 'Código de seguimiento (opcional).',
+                    placeholder: 'Ej: AR123456789',
+                    confirmText: 'Marcar enviado'
+                });
+                if (tracking === null) { setDraggedOrder(null); return; }
                 updateOrderStatus(orderId, status, { trackingNumber: tracking || '' });
             } else {
                 if (await confirm({ title: 'Mover pedido', message: `Se moverá el pedido #${orderId.slice(-4)} al estado ${status.toUpperCase()}.`, confirmText: 'Mover' })) {
