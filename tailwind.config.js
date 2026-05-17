@@ -46,6 +46,10 @@ export default {
                     '0%': { opacity: '0', transform: 'scale(.95)' },
                     '100%': { opacity: '1', transform: 'scale(1)' },
                 },
+                kenburns: {
+                    '0%': { transform: 'scale(1.08) translate3d(0,0,0)' },
+                    '100%': { transform: 'scale(1.18) translate3d(-1.5%, -1.5%, 0)' },
+                },
             },
             animation: {
                 fadeIn: 'fadeIn 0.8s ease-out forwards',
@@ -53,6 +57,7 @@ export default {
                 float: 'float 10s ease-in-out infinite',
                 marquee: 'marquee 25s linear infinite',
                 marquee2: 'marquee2 25s linear infinite',
+                kenburns: 'kenburns 24s ease-in-out infinite alternate',
             },
         },
     },

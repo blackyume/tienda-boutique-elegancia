@@ -76,7 +76,7 @@ export const Hero = () => {
                         aria-hidden="true"
                         fetchPriority="high"
                         decoding="async"
-                        className="w-full h-full object-cover opacity-[0.78] scale-110"
+                        className="w-full h-full object-cover opacity-[0.78] animate-kenburns motion-reduce:animate-none motion-reduce:scale-110"
                     />
                 )}
             </div>
@@ -103,16 +103,6 @@ export const Hero = () => {
                     }}
                 />
             )}
-
-            {/* Gold thin edges */}
-            <span className="absolute top-8 left-8 w-10 h-px bg-cielo-gold/50 z-[3]" />
-            <span className="absolute top-8 left-8 w-px h-10 bg-cielo-gold/50 z-[3]" />
-            <span className="absolute top-8 right-8 w-10 h-px bg-cielo-gold/50 z-[3]" />
-            <span className="absolute top-8 right-8 w-px h-10 bg-cielo-gold/50 z-[3]" />
-            <span className="absolute bottom-8 left-8 w-10 h-px bg-cielo-gold/50 z-[3]" />
-            <span className="absolute bottom-8 left-8 w-px h-10 bg-cielo-gold/50 z-[3]" />
-            <span className="absolute bottom-8 right-8 w-10 h-px bg-cielo-gold/50 z-[3]" />
-            <span className="absolute bottom-8 right-8 w-px h-10 bg-cielo-gold/50 z-[3]" />
 
             {/* Content */}
             <div ref={contentRef} className="relative z-10 text-center px-4 max-w-5xl mx-auto will-change-transform">
@@ -141,22 +131,25 @@ export const Hero = () => {
                     Moda femenina curada a mano. Donde la tradición del oficio encuentra el lenguaje estético del presente.
                 </p>
 
-                <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center animate-fadeIn opacity-0 [animation-delay:800ms]">
+                <div className="mt-12 flex flex-col items-center gap-6 animate-fadeIn opacity-0 [animation-delay:800ms]">
                     <Link
                         to="/shop"
                         onClick={primaryAction}
-                        className="group relative inline-flex items-center justify-center gap-2 px-10 py-4 text-black font-bold text-[11px] uppercase tracking-[0.3em] overflow-hidden rounded-sm shadow-[0_10px_40px_-10px_rgba(212,175,55,0.7)] transition-transform hover:scale-[1.03]"
+                        className="group relative inline-flex items-center justify-center gap-3 px-14 py-5 text-black font-bold text-[11px] uppercase tracking-[0.35em] overflow-hidden rounded-sm shadow-[0_10px_50px_-10px_rgba(212,175,55,0.75)] transition-transform hover:scale-[1.03]"
                         style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                     >
                         <span className="relative z-10">{buttonText}</span>
-                        <ArrowRight className="relative z-10 w-4 h-4" />
+                        <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-1" />
                         <span className="absolute inset-0 bg-white/60 translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700" />
                     </Link>
                     <button
                         onClick={() => document.getElementById('editorial')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="inline-flex items-center justify-center gap-2 px-10 py-4 border border-white/20 hover:border-cielo-gold/60 hover:bg-white/5 text-white font-bold text-[11px] uppercase tracking-[0.3em] backdrop-blur-sm transition-colors rounded-sm"
+                        className="group inline-flex items-center gap-2 text-white/70 hover:text-white text-[10px] uppercase tracking-[0.35em] font-bold transition-colors"
                     >
-                        Ver editorial
+                        <span className="relative">
+                            Descubrir la colección
+                            <span className="absolute -bottom-1 left-0 w-0 group-hover:w-full h-px bg-cielo-gold transition-all duration-500" />
+                        </span>
                     </button>
                 </div>
             </div>

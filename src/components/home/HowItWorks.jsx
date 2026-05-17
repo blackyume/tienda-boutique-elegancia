@@ -5,20 +5,20 @@ const steps = [
     {
         number: '01',
         icon: Search,
-        title: 'Elegís',
-        desc: 'Explorá nuestra colección y seleccioná las prendas que más te gusten. Podés filtrar por categoría, talla y color.',
+        title: 'Curaduría',
+        desc: 'Cada pieza está elegida a mano, no por catálogo. Filtrá por categoría, talle y color y encontrá lo tuyo.',
     },
     {
         number: '02',
         icon: CreditCard,
-        title: 'Pagás',
-        desc: 'Completá tu compra de forma segura con tarjeta, débito o Mercado Pago. Cuotas sin interés disponibles.',
+        title: 'Pago protegido',
+        desc: 'Tarjeta, débito o Mercado Pago con cuotas. Datos siempre cifrados, compra sin sobresaltos.',
     },
     {
         number: '03',
         icon: Package,
-        title: 'Lo recibís',
-        desc: 'Tu pedido llega a tu puerta en todo el país. Seguí el estado de tu envío en tiempo real desde la tienda.',
+        title: 'En tu puerta',
+        desc: 'Envíos a todo el país con seguimiento en tiempo real desde tu cuenta. Empaque cuidado, como un regalo.',
     },
 ];
 
@@ -35,13 +35,13 @@ export const HowItWorks = () => {
                 {/* Header */}
                 <div className="text-center mb-20">
                     <span className="inline-block text-cielo-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4">
-                        Simple y rápido
+                        La experiencia LBE
                     </span>
                     <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight">
-                        Cómo funciona
+                        Comprar, sin fricción
                     </h2>
                     <p className="mt-4 text-slate-400 text-sm font-light max-w-md mx-auto leading-relaxed">
-                        Comprar en La Boutique es fácil, seguro y elegante — en tres pasos.
+                        Curaduría, pago protegido y entrega en todo el país. Vos elegís — del resto nos ocupamos nosotros.
                     </p>
                 </div>
 

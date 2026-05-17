@@ -24,10 +24,10 @@ import { Reveal } from '../components/ui/Reveal';
 import { SEO } from '../components/seo/SEO';
 
 const GoldDivider = () => (
-    <div className="flex items-center justify-center gap-4 py-4 bg-[#020617]">
-        <div className="h-px flex-1 max-w-xs bg-gradient-to-r from-transparent to-cielo-gold/40" />
-        <div className="w-1.5 h-1.5 rotate-45 bg-cielo-gold/60" />
-        <div className="h-px flex-1 max-w-xs bg-gradient-to-l from-transparent to-cielo-gold/40" />
+    <div className="flex items-center justify-center gap-5 py-10 bg-[#020617]">
+        <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-cielo-gold/25" />
+        <div className="w-1 h-1 rotate-45 bg-cielo-gold/50" />
+        <div className="h-px flex-1 max-w-[200px] bg-gradient-to-l from-transparent to-cielo-gold/25" />
     </div>
 );
 
@@ -63,16 +63,18 @@ export const Home = () => {
 
             <TrustBar />
 
-            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
-                <div id="editorial">
-                    {siteConfig?.showEditorial !== false && <Editorial />}
-                </div>
+            {/* Producto primero: el visitante ve mercadería apenas baja */}
+            <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
+                <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
             </Suspense>
 
             <GoldDivider />
 
-            <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
-                <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
+            {/* Editorial como pausa de marca */}
+            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+                <div id="editorial">
+                    {siteConfig?.showEditorial !== false && <Editorial />}
+                </div>
             </Suspense>
 
             <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>

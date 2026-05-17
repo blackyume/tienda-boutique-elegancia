@@ -6,7 +6,12 @@ import { formatMoney, getColorHex, optimizeImage } from '../../utils/helpers';
 import { Reveal } from '../ui/Reveal';
 
 const Card = ({ item, onQuickView, tall = false, small = false }) => (
-    <div className={`group relative overflow-hidden rounded-sm ${tall ? 'aspect-[3/4] md:h-full' : small ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}>
+    <div
+        onClick={() => onQuickView?.(item)}
+        role="button"
+        aria-label={`Vista rápida de ${item.name}`}
+        className={`group relative overflow-hidden rounded-sm cursor-pointer ${tall ? 'aspect-[3/4] md:h-full' : small ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}
+    >
         <img
             src={optimizeImage(item.image, tall ? 900 : 600)}
             alt={item.name}
@@ -35,9 +40,11 @@ const Card = ({ item, onQuickView, tall = false, small = false }) => (
                 )}
             </div>
 
-            <div className="mt-4 flex items-center gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+            {/* Visible siempre en mobile (sin hover); hover-reveal en desktop */}
+            <div className="mt-4 flex items-center gap-2 transition-all duration-500 md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0">
                 <Link
                     to={`/product/${item.id}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="inline-flex items-center gap-1.5 bg-white text-black text-[10px] font-bold uppercase tracking-widest px-4 py-2 hover:bg-cielo-gold transition-colors"
                 >
                     Comprar <ArrowRight className="w-3 h-3" />
