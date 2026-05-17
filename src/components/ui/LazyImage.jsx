@@ -43,7 +43,7 @@ export const LazyImage = ({
                 alt={alt}
                 loading={fetchPriority === 'high' ? 'eager' : 'lazy'}
                 decoding="async"
-                fetchpriority={fetchPriority}
+                fetchPriority={fetchPriority}
                 onLoad={() => setLoaded(true)}
                 className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} ${imgClassName}`}
             />

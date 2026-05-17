@@ -64,7 +64,7 @@ export const Hero = () => {
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#020617]">
             {heroSrc && (
                 <Helmet>
-                    <link rel="preload" as="image" href={heroSrc} fetchpriority="high" />
+                    <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />
                 </Helmet>
             )}
             {/* Background image with parallax */}
@@ -74,7 +74,7 @@ export const Hero = () => {
                         src={heroSrc}
                         alt=""
                         aria-hidden="true"
-                        fetchpriority="high"
+                        fetchPriority="high"
                         decoding="async"
                         className="w-full h-full object-cover opacity-[0.78] scale-110"
                     />

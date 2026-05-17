@@ -42,13 +42,13 @@ export const Footer = () => {
                     </p>
                     <div className="flex gap-4">
                         {siteConfig?.social?.instagram && (
-                            <a href={siteConfig.social.instagram} target="_blank" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all"><Instagram className="w-4 h-4" /></a>
+                            <a href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all"><Instagram className="w-4 h-4" /></a>
                         )}
                         {siteConfig?.social?.youtube && (
-                            <a href={siteConfig.social.youtube} target="_blank" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all"><Youtube className="w-4 h-4" /></a>
+                            <a href={siteConfig.social.youtube} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all"><Youtube className="w-4 h-4" /></a>
                         )}
                         {siteConfig?.social?.tiktok && (
-                            <a href={siteConfig.social.tiktok} target="_blank" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all"><TikTokIcon className="w-4 h-4" /></a>
+                            <a href={siteConfig.social.tiktok} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all"><TikTokIcon className="w-4 h-4" /></a>
                         )}
                     </div>
                 </div>
@@ -77,13 +77,13 @@ export const Footer = () => {
                             <span className="block text-[10px] uppercase text-slate-500 font-bold mb-3 tracking-wider">Nuestras Redes</span>
                             <div className="flex gap-2.5">
                                 {siteConfig?.social?.instagram && (
-                                    <a href={siteConfig.social.instagram} target="_blank" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><Instagram className="w-4 h-4" /></a>
+                                    <a href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><Instagram className="w-4 h-4" /></a>
                                 )}
                                 {siteConfig?.social?.youtube && (
-                                    <a href={siteConfig.social.youtube} target="_blank" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><Youtube className="w-4 h-4" /></a>
+                                    <a href={siteConfig.social.youtube} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><Youtube className="w-4 h-4" /></a>
                                 )}
                                 {siteConfig?.social?.tiktok && (
-                                    <a href={siteConfig.social.tiktok} target="_blank" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><TikTokIcon className="w-4 h-4" /></a>
+                                    <a href={siteConfig.social.tiktok} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#C19A6B] hover:text-white hover:border-[#C19A6B] transition-all"><TikTokIcon className="w-4 h-4" /></a>
                                 )}
                             </div>
                         </li>
@@ -149,7 +149,7 @@ export const Footer = () => {
                             {/* Subtitle: Centered below */}
                             <div className="h-[1px] w-full bg-cyan-500/10 my-0.5" />
                             <span className="text-[10px] text-cyan-400/60 tracking-[0.15em] font-light uppercase">
-                                Neural Network Division <span className="text-cyan-600/40 mx-1">//</span> [神経回路網]
+                                Neural Network Division <span className="text-cyan-600/40 mx-1">{'//'}</span> [神経回路網]
                             </span>
                         </div>
                     </div>

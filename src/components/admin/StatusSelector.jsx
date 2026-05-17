@@ -36,7 +36,7 @@ export const StatusSelector = ({ product }) => {
             window.removeEventListener('resize', close);
             document.removeEventListener('mousedown', onDocClick);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [open]);
 
     const onDocClick = (e) => {

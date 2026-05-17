@@ -418,7 +418,7 @@ export const useDbActions = ({
         addToast("Error al eliminar cupón", "error");
       }
     },
-    useCoupon: async (id) => {
+    redeemCoupon: async (id) => {
       try {
         const couponRef = doc(db, "coupons", String(id));
         const snap = await getDoc(couponRef);

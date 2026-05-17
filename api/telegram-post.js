@@ -34,7 +34,7 @@ const applyCors = (req, res) => {
 };
 
 const escapeMarkdown = (s) =>
-    String(s || '').replace(/([_*\[\]()~`>#+=|{}.!-])/g, '\\$1');
+    String(s || '').replace(/([_*[\]()~`>#+=|{}.!-])/g, '\\$1');
 
 const buildProductCaption = ({ name, price, description, category, url }) => {
     const safePrice = typeof price === 'number'

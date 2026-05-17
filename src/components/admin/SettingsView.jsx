@@ -466,7 +466,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-4">
                             <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
-                                Configura tus credenciales de <a href="https://dashboard.emailjs.com" target="_blank" className="text-blue-500 underline">EmailJS</a> para enviar correos.
+                                Configura tus credenciales de <a href="https://dashboard.emailjs.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">EmailJS</a> para enviar correos.
                             </p>
                             <div>
                                 <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Service ID</label>

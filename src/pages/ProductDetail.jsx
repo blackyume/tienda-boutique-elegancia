@@ -149,7 +149,7 @@ export const ProductDetail = () => {
                             alt={product.name}
                             className="w-full h-full object-cover animate-fadeIn"
                             loading="eager"
-                            fetchpriority="high"
+                            fetchPriority="high"
                             decoding="async"
                         />
                         {images.length > 1 && (

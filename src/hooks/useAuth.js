@@ -49,7 +49,7 @@ export const useAuth = ({ user, wishlist, setWishlist, addToast }) => {
       setUserRole(null);
       setWishlistSyncedForUid(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user]);
 
   // Push cada cambio de wishlist al doc del usuario logueado.

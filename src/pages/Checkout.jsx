@@ -10,7 +10,7 @@ import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandon
 import { findReferralOwner, creditReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
 
 export const Checkout = () => {
-    const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, useCoupon } = useStore();
+    const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, redeemCoupon } = useStore();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '' });
@@ -227,7 +227,7 @@ export const Checkout = () => {
 
             trackBeginCheckout(cart, finalTotal);
             await createOrder(newOrder);
-            if (appliedCoupon) await useCoupon(appliedCoupon.id);
+            if (appliedCoupon) await redeemCoupon(appliedCoupon.id);
             if (appliedReferral) creditReferralOwner(appliedReferral.ownerUid, finalTotal, referralDiscount).catch(() => {});
             markAbandonedCartRecovered(formData.email, orderId).catch(() => {});
 
@@ -276,7 +276,7 @@ export const Checkout = () => {
 
             // 1.5 Register coupon usage if applied
             if (appliedCoupon) {
-                await useCoupon(appliedCoupon.id);
+                await redeemCoupon(appliedCoupon.id);
             }
 
             // 2. Generar Link de Pago (Backend Vercel)

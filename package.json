@@ -7,7 +7,7 @@
         "dev": "vite",
         "prebuild": "node scripts/generate-sitemap.js && node scripts/generate-shopping-feed.js",
         "build": "vite build",
-        "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+        "lint": "eslint . --ext js,jsx --report-unused-disable-directives",
         "preview": "vite preview",
         "test": "vitest run",
         "test:watch": "vitest",

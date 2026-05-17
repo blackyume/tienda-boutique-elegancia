@@ -98,7 +98,7 @@ export const useFirestoreSubscriptions = ({
             unsubMaintenance(); unsubCoupons();
             unsubShipping(); unsubReviews();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, []);
 
     // --- Suscripciones según rol ---
@@ -168,6 +168,6 @@ export const useFirestoreSubscriptions = ({
         }
 
         return () => subs.forEach(u => u());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [user]);
 };
