@@ -3,6 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { Button } from '../components/ui/Button';
 import { useConfirm } from '../components/ui/ConfirmDialog';
 import { EmptyState } from '../components/ui/EmptyState';
+import { CommandPalette } from '../components/admin/CommandPalette';
 import { formatMoney } from '../utils/helpers';
 import {
     LayoutDashboard, Package, Tag, LogOut, Edit2, Trash2, X,
@@ -465,6 +466,20 @@ export const Admin = () => {
 
     const toggleRow = (id) => { setExpandedRow(expandedRow === id ? null : id); };
 
+    const openNewProduct = () => {
+        setCurrentProduct({
+            id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
+            category: '', image: '', sizes: ['S', 'M'], colors: [], active: true, description: ''
+        });
+        setIsProductModalOpen(true);
+    };
+
+    const paletteCommands = [
+        { id: 'act-new-product', label: 'Nuevo producto', group: 'Acción', icon: Tag, action: () => { setAdminTab('inventory'); openNewProduct(); } },
+        { id: 'act-store', label: 'Ir a la tienda', group: 'Acción', icon: LinkIcon, action: () => { window.location.href = '/'; } },
+        ...Object.entries(TAB_LABELS).map(([k, label]) => ({ id: `nav-${k}`, label, group: 'Sección', action: () => setAdminTab(k) }))
+    ];
+
     // --- RENDER HELPERS ---
 
     if (!isAdmin) {
@@ -484,6 +499,7 @@ export const Admin = () => {
 
     return (
         <div className="flex h-screen bg-[#F5F2EB] dark:bg-[#0B1120] font-sans text-slate-800 dark:text-slate-200 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+            <CommandPalette commands={paletteCommands} />
             {/* BACKDROP MOBILE */}
             {sidebarOpen && (
                 <div
@@ -526,6 +542,14 @@ export const Admin = () => {
                     <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
                 </nav>
                 <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#111827] space-y-2">
+                    <button
+                        onClick={() => window.dispatchEvent(new Event('admin:open-command-palette'))}
+                        className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-start p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-[#C19A6B]/40 transition-colors"
+                    >
+                        <Search className="w-4 h-4" />
+                        <span className="inline flex-1 text-left">Buscar</span>
+                        <kbd className="text-[9px] font-bold text-slate-400 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5">⌘K</kbd>
+                    </button>
                     <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-start p-2 transition-colors">
                         <LinkIcon className="w-4 h-4" /> <span className="inline">Ir a la Tienda</span>
                     </a>
@@ -552,13 +576,7 @@ export const Admin = () => {
                                 <h1 className="text-3xl font-luxury font-bold dark:text-white text-slate-900 tracking-wider">Inventario Exclusivo</h1>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Gestiona tu colección premium.</p>
                             </div>
-                            <Button onClick={() => {
-                                setCurrentProduct({
-                                    id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
-                                    category: '', image: '', sizes: ['S', 'M'], colors: [], active: true, description: ''
-                                });
-                                setIsProductModalOpen(true);
-                            }} className="bg-black hover:bg-[#C19A6B] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#C19A6B] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
+                            <Button onClick={openNewProduct} className="bg-black hover:bg-[#C19A6B] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#C19A6B] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
                                 + Nuevo Diseño
                             </Button>
                         </div>
