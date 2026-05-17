@@ -37,38 +37,28 @@ export const Garment360Viewer = ({ images = [], mode = 'static', alt = '', class
     return <FlipViewer front={frames[0]} back={frames[1]} alt={alt} className={className} />;
 };
 
-// ---------- FLIP frente / dorso ----------
+// ---------- FLIP frente / dorso con AUTO-GIRO en el eje Y ----------
 const FlipViewer = ({ front, back, alt, className }) => {
-    const [flipped, setFlipped] = useState(false);
-    const downX = useRef(null);
-
-    const onDown = (e) => { downX.current = (e.touches?.[0]?.clientX ?? e.clientX); };
-    const onUp = (e) => {
-        if (downX.current == null) return;
-        const x = (e.changedTouches?.[0]?.clientX ?? e.clientX);
-        if (Math.abs(x - downX.current) > 40) setFlipped((f) => !f);
-        downX.current = null;
-    };
+    // Gira solo en loop; el usuario puede pausar (tocar) para mirar.
+    const [paused, setPaused] = useState(false);
 
     return (
         <div
-            className={`relative group select-none cursor-grab active:cursor-grabbing ${className}`}
-            style={{ perspective: '1400px' }}
-            onMouseDown={onDown}
-            onMouseUp={onUp}
-            onTouchStart={onDown}
-            onTouchEnd={onUp}
-            onDoubleClick={() => setFlipped((f) => !f)}
+            className={`relative group select-none cursor-pointer ${className}`}
+            style={{ perspective: '1500px' }}
+            onClick={() => setPaused((p) => !p)}
+            title={paused ? 'Tocar para reanudar el giro' : 'Tocar para pausar'}
         >
             <div
-                className="relative w-full h-full transition-transform duration-700 ease-out"
-                style={{ transformStyle: 'preserve-3d', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+                className="relative w-full h-full animate-spin-y motion-reduce:animate-none group-hover:[animation-play-state:paused]"
+                style={{ transformStyle: 'preserve-3d', animationPlayState: paused ? 'paused' : 'running' }}
             >
                 <img
                     src={front}
                     alt={alt}
                     loading="lazy"
                     decoding="async"
+                    draggable={false}
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ backfaceVisibility: 'hidden' }}
                 />
@@ -77,19 +67,16 @@ const FlipViewer = ({ front, back, alt, className }) => {
                     alt={`${alt} (dorso)`}
                     loading="lazy"
                     decoding="async"
+                    draggable={false}
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
                 />
             </div>
 
-            <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setFlipped((f) => !f); }}
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-4 py-2 rounded-full bg-black/55 hover:bg-black/75 text-white text-[11px] font-bold uppercase tracking-widest backdrop-blur transition-colors"
-            >
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-4 py-2 rounded-full bg-black/55 text-white text-[11px] font-bold uppercase tracking-widest backdrop-blur pointer-events-none">
                 <RotateCcw className="w-3.5 h-3.5" />
-                {flipped ? 'Ver frente' : 'Ver dorso'}
-            </button>
+                {paused ? 'Giro en pausa' : 'Girando — tocá para pausar'}
+            </div>
         </div>
     );
 };
