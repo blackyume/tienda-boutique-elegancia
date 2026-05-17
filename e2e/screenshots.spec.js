@@ -1,0 +1,74 @@
+import { test } from '@playwright/test';
+
+// Screenshots automáticos para revisión visual (no son asserts).
+// Corré:  npm run shots          → apunta a producción (web.app)
+//         BASE_URL=http://localhost:4173 npm run shots  → local (preview)
+// Los PNG quedan en ./screenshots/ y se revisan a mano.
+
+const OUT = 'screenshots';
+
+// La app mantiene sockets de Firestore abiertos → nunca llega a
+// 'networkidle'. Hay 2 capas de loader: el splash estático
+// (#loadingScreen en index.html, se va ~1.3s post-load) y el gate
+// React (texto "Cargando..." mientras resuelve Firestore). Esperamos
+// a que ambos desaparezcan antes de capturar, + scroll acotado para
+// las secciones lazy/IntersectionObserver + parallax (difiere ~800ms).
+async function settle(page) {
+    await page.waitForLoadState('load').catch(() => {});
+    await page.locator('#loadingScreen').waitFor({ state: 'detached', timeout: 25_000 }).catch(() => {});
+    await page.getByText('Cargando...', { exact: true }).waitFor({ state: 'detached', timeout: 25_000 }).catch(() => {});
+    await page.waitForTimeout(1500);
+    await page.evaluate(async () => {
+        await new Promise((res) => {
+            let y = 0;
+            let guard = 0;
+            const step = () => {
+                window.scrollTo(0, y);
+                y += window.innerHeight;
+                guard += 1;
+                if (y < document.body.scrollHeight && guard < 40) setTimeout(step, 80);
+                else { window.scrollTo(0, 0); setTimeout(res, 300); }
+            };
+            step();
+        });
+    }).catch(() => {});
+    await page.waitForTimeout(1800);
+}
+
+const DESKTOP = { width: 1440, height: 900 };
+const MOBILE = { width: 390, height: 844 };
+
+for (const [device, viewport] of [['desktop', DESKTOP], ['mobile', MOBILE]]) {
+    test.describe(`Screenshots — ${device}`, () => {
+        test.use({ viewport });
+        test.describe.configure({ timeout: 90_000 });
+
+        test(`home (${device})`, async ({ page }) => {
+            await page.goto('/', { waitUntil: 'domcontentloaded' });
+            await settle(page);
+            await page.screenshot({ path: `${OUT}/home-${device}.png`, fullPage: true });
+        });
+
+        test(`shop (${device})`, async ({ page }) => {
+            await page.goto('/shop', { waitUntil: 'domcontentloaded' });
+            await settle(page);
+            await page.screenshot({ path: `${OUT}/shop-${device}.png`, fullPage: true });
+        });
+
+        test(`product detail (${device})`, async ({ page }) => {
+            await page.goto('/shop', { waitUntil: 'domcontentloaded' });
+            await settle(page);
+            const card = page.locator('a[href*="/product/"]').first();
+            const hasProduct = await card.count().then(c => c > 0);
+            if (!hasProduct) {
+                test.info().annotations.push({ type: 'note', description: 'Sin productos cargados — se omite product detail' });
+                test.skip(true, 'No hay productos publicados todavía');
+                return;
+            }
+            await card.click();
+            await page.waitForURL('**/product/**', { timeout: 15_000 }).catch(() => {});
+            await settle(page);
+            await page.screenshot({ path: `${OUT}/product-${device}.png`, fullPage: true });
+        });
+    });
+}

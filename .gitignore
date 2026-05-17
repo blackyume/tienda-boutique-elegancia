@@ -129,4 +129,5 @@ list-models.mjs
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/screenshots/
 
