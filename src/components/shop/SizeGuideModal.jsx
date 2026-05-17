@@ -1,74 +1,109 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Ruler } from 'lucide-react';
 
+const TOPS = [
+    ['S', '85 - 90', '50'],
+    ['M', '90 - 95', '52'],
+    ['L', '95 - 100', '54'],
+    ['XL', '100 - 105', '56'],
+];
+const BOTTOMS = [
+    ['36 (S)', '60 - 64', '88 - 92'],
+    ['38 (M)', '64 - 68', '92 - 96'],
+    ['40 (L)', '68 - 72', '96 - 100'],
+    ['42 (XL)', '72 - 76', '100 - 104'],
+];
+
 export const SizeGuideModal = ({ onClose }) => {
-    const [tab, setTab] = useState('tops'); // 'tops' or 'bottoms'
+    const [tab, setTab] = useState('tops');
+    const isTops = tab === 'tops';
+    const rows = isTops ? TOPS : BOTTOMS;
+
+    useEffect(() => {
+        const prev = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        const onKey = (e) => e.key === 'Escape' && onClose();
+        window.addEventListener('keydown', onKey);
+        return () => {
+            document.body.style.overflow = prev;
+            window.removeEventListener('keydown', onKey);
+        };
+    }, [onClose]);
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-slideUp border border-slate-200 dark:border-slate-700">
-                
-                {/* Header */}
-                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900">
-                    <h3 className="font-serif text-xl text-slate-900 dark:text-white flex items-center gap-2">
-                        <Ruler className="w-5 h-5 text-[#C19A6B]" /> Guía de Talles
-                    </h3>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
-                        <X className="w-5 h-5 dark:text-white" />
-                    </button>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex border-b border-slate-100 dark:border-slate-800">
-                    <button 
-                        onClick={() => setTab('tops')} 
-                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-colors ${tab === 'tops' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-b-2 border-[#C19A6B]' : 'bg-slate-50 dark:bg-slate-950 text-slate-400'}`}
-                    >
-                        Partes de Arriba
-                    </button>
-                    <button 
-                        onClick={() => setTab('bottoms')} 
-                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-colors ${tab === 'bottoms' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-b-2 border-[#C19A6B]' : 'bg-slate-50 dark:bg-slate-950 text-slate-400'}`}
-                    >
-                        Partes de Abajo
-                    </button>
-                </div>
-
-                {/* Content */}
-                <div className="p-8">
-                    <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 mb-6">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase text-xs">
-                                <tr>
-                                    <th className="p-3 pl-4">Talle</th>
-                                    <th className="p-3">{tab === 'tops' ? 'Busto (cm)' : 'Cintura (cm)'}</th>
-                                    <th className="p-3">{tab === 'tops' ? 'Largo (cm)' : 'Cadera (cm)'}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
-                                {tab === 'tops' ? (
-                                    <>
-                                        <tr><td className="p-3 pl-4 font-bold">S</td><td>85 - 90</td><td>50</td></tr>
-                                        <tr><td className="p-3 pl-4 font-bold">M</td><td>90 - 95</td><td>52</td></tr>
-                                        <tr><td className="p-3 pl-4 font-bold">L</td><td>95 - 100</td><td>54</td></tr>
-                                        <tr><td className="p-3 pl-4 font-bold">XL</td><td>100 - 105</td><td>56</td></tr>
-                                    </>
-                                ) : (
-                                    <>
-                                        <tr><td className="p-3 pl-4 font-bold">36 (S)</td><td>60 - 64</td><td>88 - 92</td></tr>
-                                        <tr><td className="p-3 pl-4 font-bold">38 (M)</td><td>64 - 68</td><td>92 - 96</td></tr>
-                                        <tr><td className="p-3 pl-4 font-bold">40 (L)</td><td>68 - 72</td><td>96 - 100</td></tr>
-                                        <tr><td className="p-3 pl-4 font-bold">42 (XL)</td><td>72 - 76</td><td>100 - 104</td></tr>
-                                    </>
-                                )}
-                            </tbody>
-                        </table>
+        <div
+            className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
+            onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Guía de talles"
+        >
+            <div
+                className="relative w-full max-w-lg rounded-[22px] p-[1.5px] overflow-hidden shadow-[0_0_60px_-14px_rgba(193,154,107,0.5)] animate-slideUp"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[22px] ring-1 ring-[#C19A6B]/25" />
+                <div className="relative bg-[#0B1120] rounded-[20px] overflow-hidden">
+                    {/* Header */}
+                    <div className="px-7 py-5 border-b border-white/10 flex justify-between items-center">
+                        <h3 className="font-serif text-xl text-white flex items-center gap-2.5">
+                            <Ruler className="w-5 h-5 text-[#C19A6B]" /> Guía de Talles
+                        </h3>
+                        <button
+                            onClick={onClose}
+                            aria-label="Cerrar"
+                            className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
                     </div>
 
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-                        <strong>Tip de medición:</strong> {tab === 'tops' ? 'Mide el contorno de tu busto por la parte más saliente y el largo desde el hombro hasta la cadera.' : 'Mide tu cintura por la parte más estrecha y tu cadera por la parte más ancha de los glúteos.'}
-                        <br/>
-                        <span className="opacity-70 mt-1 block">Si estás entre dos talles, te recomendamos elegir el más grande para mayor comodidad.</span>
+                    {/* Tabs */}
+                    <div className="flex">
+                        {[['tops', 'Partes de arriba'], ['bottoms', 'Partes de abajo']].map(([key, label]) => (
+                            <button
+                                key={key}
+                                onClick={() => setTab(key)}
+                                className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors relative ${tab === key ? 'text-[#C19A6B]' : 'text-white/40 hover:text-white/70'}`}
+                            >
+                                {label}
+                                {tab === key && <span className="absolute bottom-0 inset-x-6 h-px bg-gradient-to-r from-transparent via-[#C19A6B] to-transparent" />}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-7">
+                        <div className="overflow-hidden rounded-xl border border-white/10">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-white/[0.03] text-[#C19A6B]/80 uppercase text-[10px] tracking-[0.15em]">
+                                    <tr>
+                                        <th className="p-3 pl-5 font-bold">Talle</th>
+                                        <th className="p-3 font-bold">{isTops ? 'Busto (cm)' : 'Cintura (cm)'}</th>
+                                        <th className="p-3 font-bold">{isTops ? 'Largo (cm)' : 'Cadera (cm)'}</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-slate-300">
+                                    {rows.map(([t, a, b], i) => (
+                                        <tr key={t} className={i % 2 ? 'bg-white/[0.02]' : ''}>
+                                            <td className="p-3 pl-5 font-bold text-white">{t}</td>
+                                            <td className="p-3">{a}</td>
+                                            <td className="p-3">{b}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="mt-5 rounded-xl border border-[#C19A6B]/20 bg-[#C19A6B]/[0.06] p-4 text-xs text-slate-300 leading-relaxed">
+                            <strong className="text-[#C19A6B]">Cómo medir:</strong>{' '}
+                            {isTops
+                                ? 'Tomá el contorno del busto por la parte más saliente y el largo desde el hombro hasta la cadera.'
+                                : 'Tomá la cintura por la parte más estrecha y la cadera por la parte más ancha.'}
+                            <span className="block mt-1.5 text-slate-500">
+                                Si estás entre dos talles, elegí el más grande para mayor comodidad.
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
