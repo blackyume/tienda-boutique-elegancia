@@ -10,12 +10,11 @@ const items = [
 
 export const TrustBar = () => (
     <div className="relative bg-[#020617] border-y border-white/5">
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(212,175,55,0.05),transparent)] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 py-6">
             <ul className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
                 {items.map(({ Icon, title, desc }, i) => (
                     <li key={i} className="flex items-center gap-3 justify-center md:justify-start">
-                        <span className="shrink-0 w-10 h-10 rounded-full border border-cielo-gold/30 flex items-center justify-center text-cielo-gold bg-white/[0.02]">
+                        <span className="shrink-0 w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-white/70 bg-white/[0.02]">
                             <Icon className="w-4 h-4" strokeWidth={1.5} />
                         </span>
                         <div className="leading-tight">

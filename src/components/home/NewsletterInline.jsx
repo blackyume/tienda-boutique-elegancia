@@ -18,9 +18,9 @@ export const NewsletterInline = () => {
 
     return (
         <section className="relative py-24 px-4 bg-[#020617] overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(212,175,55,0.08),transparent_50%),radial-gradient(circle_at_70%_50%,rgba(212,175,55,0.06),transparent_50%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.05),transparent_60%)] pointer-events-none" />
             <Reveal className="relative max-w-3xl mx-auto text-center">
-                <span className="inline-block text-cielo-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-3">Lista de espera</span>
+                <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-3">Lista de espera</span>
                 <h2 className="text-3xl md:text-5xl font-serif text-white leading-tight">
                     Acceso a drops <span className="italic text-cielo-gold">48 horas antes</span>
                 </h2>

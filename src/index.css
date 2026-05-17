@@ -101,6 +101,25 @@ body {
     background: #D4AF37;
 }
 
+/* Scrollbar dorada — igual al borde del modal premium */
+.scrollbar-gold {
+    scrollbar-width: thin;
+    scrollbar-color: #BF953F transparent;
+}
+.scrollbar-gold::-webkit-scrollbar {
+    width: 6px;
+}
+.scrollbar-gold::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollbar-gold::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #BF953F, #FCF6BA 50%, #B38728);
+    border-radius: 99px;
+}
+.scrollbar-gold::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #FCF6BA, #BF953F);
+}
+
 /* Utilities */
 .text-gold-gradient {
     @apply bg-clip-text text-transparent bg-gold-metallic;

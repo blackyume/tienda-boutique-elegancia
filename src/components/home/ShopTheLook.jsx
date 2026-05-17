@@ -37,7 +37,7 @@ export const ShopTheLook = () => {
         <section className="relative py-24 px-4 bg-[#020617] overflow-hidden">
             <Reveal className="max-w-[1600px] mx-auto">
                 <div className="text-center mb-14">
-                    <span className="inline-block text-cielo-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-3">Shop The Look</span>
+                    <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-3">Shop The Look</span>
                     <h2 className="text-4xl md:text-5xl font-serif text-white">Vestí el editorial</h2>
                     <p className="mt-3 text-slate-400 text-sm font-light max-w-md mx-auto">Tocá los puntos dorados y descubrí cada prenda.</p>
                 </div>

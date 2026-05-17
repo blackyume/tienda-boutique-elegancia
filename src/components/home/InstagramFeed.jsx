@@ -31,7 +31,7 @@ export const InstagramFeed = () => {
             <div className="max-w-7xl mx-auto px-4">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <div className="flex items-center justify-center gap-2 mb-4 text-cielo-gold font-bold uppercase tracking-widest text-xs">
+                    <div className="flex items-center justify-center gap-2 mb-4 text-white/40 font-bold uppercase tracking-widest text-xs">
                         <Instagram className="w-4 h-4" /> Seguinos en Instagram
                     </div>
                     <h2 className="text-4xl font-cinzel text-white mb-3">{handle}</h2>

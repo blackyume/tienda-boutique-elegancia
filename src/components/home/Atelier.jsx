@@ -12,7 +12,7 @@ export const Atelier = () => (
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(193,154,107,0.05),transparent_60%)] pointer-events-none" />
 
         <Reveal className="relative max-w-5xl mx-auto text-center">
-            <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-cielo-gold/70">El Atelier</span>
+            <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-white/40">El Atelier</span>
             <h2 className="mt-6 font-serif text-3xl md:text-5xl lg:text-6xl text-white leading-[1.15] max-w-3xl mx-auto">
                 No hacemos temporada tras temporada.
                 <span className="block text-white/50 italic mt-2">Hacemos prendas que se quedan.</span>

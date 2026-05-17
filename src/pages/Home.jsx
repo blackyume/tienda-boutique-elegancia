@@ -24,14 +24,6 @@ import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { Reveal } from '../components/ui/Reveal';
 import { SEO } from '../components/seo/SEO';
 
-const GoldDivider = () => (
-    <div className="flex items-center justify-center gap-5 py-10 bg-[#020617]">
-        <div className="h-px flex-1 max-w-[200px] bg-gradient-to-r from-transparent to-cielo-gold/25" />
-        <div className="w-1 h-1 rotate-45 bg-cielo-gold/50" />
-        <div className="h-px flex-1 max-w-[200px] bg-gradient-to-l from-transparent to-cielo-gold/25" />
-    </div>
-);
-
 export const Home = () => {
     const { inventory, categories, siteConfig, setGlobalFilter } = useStore();
     const [quickViewProduct, setQuickViewProduct] = useState(null);
@@ -69,17 +61,11 @@ export const Home = () => {
                 <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
             </Suspense>
 
-            <GoldDivider />
-
             {/* Editorial como pausa de marca */}
             <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
                 <div id="editorial">
                     {siteConfig?.showEditorial !== false && <Editorial />}
                 </div>
-            </Suspense>
-
-            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
-                <Atelier />
             </Suspense>
 
             <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
@@ -88,16 +74,10 @@ export const Home = () => {
 
             {/* Categorías — solo renderiza si hay categorías válidas */}
             {validCategories.length > 0 && <section id="categories" className="py-24 px-4 bg-[#020617] relative">
-                <Reveal className="max-w-[1600px] mx-auto">
-                    <div className="flex items-center justify-center gap-4 mb-14">
-                        <div className="h-px flex-1 max-w-sm bg-gradient-to-r from-transparent to-cielo-gold/30" />
-                        <span className="text-cielo-gold/70 text-[10px] uppercase tracking-[0.4em] font-bold">Colecciones</span>
-                        <div className="h-px flex-1 max-w-sm bg-gradient-to-l from-transparent to-cielo-gold/30" />
-                    </div>
-
+                <Reveal className="max-w-[1700px] mx-auto">
                     <div className="flex justify-between items-end mb-12 px-2">
                         <div>
-                            <span className="text-cielo-gold text-[10px] uppercase tracking-[0.4em] font-bold">Categorías</span>
+                            <span className="text-white/40 text-[10px] uppercase tracking-[0.4em] font-bold">Categorías</span>
                             <h2 className="text-4xl md:text-5xl font-serif text-white mt-3">Curaduría exclusiva</h2>
                         </div>
                         <Link
@@ -144,8 +124,6 @@ export const Home = () => {
                 </Reveal>
             </section>}
 
-            <GoldDivider />
-
             {/* New Arrivals */}
             <section className="py-20 px-4 sm:px-8 bg-[#020617]">
                 <div className="max-w-[1800px] mx-auto">
@@ -166,26 +144,14 @@ export const Home = () => {
                 <Testimonials />
             </Suspense>
 
+            {/* Pausa de marca, distribuida lejos de la Editorial */}
+            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+                <Atelier />
+            </Suspense>
+
             <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
                 <HowItWorks />
             </Suspense>
-
-            {/* Bridge to /shop */}
-            <section className="py-20 px-4 bg-[#020617] relative overflow-hidden border-y border-white/5">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.06),transparent_60%)] pointer-events-none" />
-                <Reveal className="relative max-w-3xl mx-auto text-center">
-                    <span className="text-cielo-gold text-[10px] uppercase tracking-[0.4em] font-bold">Tienda Online</span>
-                    <h2 className="mt-3 text-4xl md:text-5xl font-serif text-white">Explorá el catálogo completo</h2>
-                    <p className="mt-4 text-slate-400 text-sm font-light max-w-lg mx-auto">Todas las piezas de la temporada — con filtros por talla, color y categoría.</p>
-                    <Link
-                        to="/shop"
-                        className="mt-8 inline-flex items-center gap-2 px-10 py-4 text-black font-bold text-[11px] uppercase tracking-[0.3em] rounded-sm transition-transform hover:scale-[1.03]"
-                        style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
-                    >
-                        Ir a la tienda <ArrowRight className="w-4 h-4" />
-                    </Link>
-                </Reveal>
-            </section>
 
             <Suspense fallback={<div className="h-[200px] bg-[#020617]" />}>
                 <NewsletterInline />

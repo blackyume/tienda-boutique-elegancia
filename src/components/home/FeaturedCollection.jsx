@@ -18,8 +18,7 @@ const Card = ({ item, onQuickView, tall = false, small = false }) => (
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.8s] ease-out group-hover:scale-[1.08]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-        <div className="absolute inset-0 bg-cielo-gold/0 group-hover:bg-cielo-gold/5 transition-colors duration-700" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 p-5 md:p-7 text-white">
             <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-1">{item.category}</p>
@@ -65,18 +64,10 @@ export const FeaturedCollection = ({ onQuickView }) => {
 
     return (
         <section className="py-28 px-4 bg-[#020617] relative overflow-hidden">
-            <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-cielo-gold/5 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cielo-gold/[0.03] rounded-full blur-[120px] pointer-events-none" />
-
-            <Reveal className="max-w-[1600px] mx-auto relative">
+            <Reveal className="max-w-[1700px] mx-auto relative">
                 <div className="text-center mb-16">
-                    <span className="text-cielo-gold text-[10px] uppercase tracking-[0.4em] font-bold">Selección limitada</span>
+                    <span className="text-white/40 text-[10px] uppercase tracking-[0.4em] font-bold">Selección limitada</span>
                     <h2 className="text-5xl md:text-6xl font-serif text-white mt-4">Highlights</h2>
-                    <div className="mx-auto mt-5 flex items-center justify-center gap-3">
-                        <span className="h-px w-10 bg-cielo-gold/40" />
-                        <span className="w-1.5 h-1.5 rotate-45 bg-cielo-gold" />
-                        <span className="h-px w-10 bg-cielo-gold/40" />
-                    </div>
                 </div>
 
                 {rest.length >= 2 ? (

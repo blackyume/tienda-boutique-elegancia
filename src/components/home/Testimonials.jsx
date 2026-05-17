@@ -40,10 +40,9 @@ export const Testimonials = () => {
 
     return (
         <section className="relative py-28 px-4 bg-[#020617] overflow-hidden">
-            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cielo-gold/[0.04] rounded-full blur-[120px] pointer-events-none" />
             <Reveal className="max-w-5xl mx-auto relative z-10">
                 <div className="text-center mb-14">
-                    <span className="inline-block text-cielo-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-3">La voz de nuestras clientas</span>
+                    <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-3">La voz de nuestras clientas</span>
                     <h2 className="text-4xl md:text-5xl font-serif text-white">Experiencias reales</h2>
                 </div>
 

@@ -86,11 +86,10 @@ export const Hero = () => {
                 className="absolute inset-0 z-[1] pointer-events-none"
                 style={{
                     background: `
-                        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(212,175,55,0.18), transparent 60%),
-                        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(191,149,63,0.15), transparent 65%),
-                        radial-gradient(ellipse 55% 45% at 50% 45%, rgba(2,6,23,0.6), transparent 70%),
+                        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(212,175,55,0.07), transparent 60%),
+                        radial-gradient(ellipse 55% 45% at 50% 45%, rgba(2,6,23,0.55), transparent 70%),
                         radial-gradient(ellipse 70% 40% at 50% 100%, rgba(2,6,23,1) 0%, transparent 70%),
-                        linear-gradient(180deg, rgba(2,6,23,0.35) 0%, rgba(2,6,23,0.55) 60%, #020617 100%)
+                        linear-gradient(180deg, rgba(2,6,23,0.30) 0%, rgba(2,6,23,0.55) 60%, #020617 100%)
                     `
                 }}
             />
@@ -113,14 +112,14 @@ export const Hero = () => {
                     </span>
                 </div>
 
-                <h1 className="font-cinzel text-6xl md:text-8xl lg:text-[8.5rem] leading-[0.9] tracking-tight text-white drop-shadow-[0_10px_40px_rgba(0,0,0,0.6)] animate-slideUp">
+                <h1 className="font-cinzel text-5xl md:text-7xl lg:text-[6.5rem] leading-[0.95] tracking-tight text-white drop-shadow-[0_6px_28px_rgba(0,0,0,0.5)] animate-slideUp">
                     {title}
-                    <span className="block italic font-serif text-3xl md:text-5xl lg:text-6xl mt-3 font-light tracking-normal text-white/90">
+                    <span className="block italic font-serif text-2xl md:text-4xl lg:text-5xl mt-4 font-light tracking-normal text-white/85">
                         {subtitle}
                     </span>
                 </h1>
 
-                <p className="mt-8 text-sm md:text-base text-slate-300/80 max-w-md font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:500ms]">
+                <p className="mt-10 text-sm md:text-base text-slate-300/75 max-w-md font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:500ms]">
                     Moda femenina curada a mano. Donde la tradición del oficio encuentra el lenguaje estético del presente.
                 </p>
 

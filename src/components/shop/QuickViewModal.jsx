@@ -104,7 +104,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                 {/* Borde estático tenue para que el marco siempre se lea */}
                 <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[26px] ring-1 ring-[#C19A6B]/20" />
 
-                <div className="relative bg-white dark:bg-slate-950 w-full max-h-[92vh] rounded-[24px] flex flex-col md:flex-row overflow-y-auto md:overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                <div className="scrollbar-gold relative bg-white dark:bg-slate-950 w-full max-h-[92vh] rounded-[24px] flex flex-col md:flex-row overflow-y-auto md:overflow-hidden" onClick={(e) => e.stopPropagation()}>
 
                 <button onClick={onClose} className="absolute top-4 right-4 z-20 p-2 bg-white/80 dark:bg-black/50 hover:bg-white dark:hover:bg-black rounded-full transition-colors backdrop-blur-md shadow-sm">
                     <X className="w-5 h-5 text-slate-900 dark:text-white" />
@@ -159,7 +159,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                 </div>
 
                 {/* INFO — sólo esta columna scrollea en desktop */}
-                <div className="w-full md:w-[45%] p-8 md:p-10 flex flex-col bg-white dark:bg-slate-950 md:overflow-y-auto md:max-h-[92vh]">
+                <div className="scrollbar-gold w-full md:w-[45%] p-8 md:p-10 flex flex-col bg-white dark:bg-slate-950 md:overflow-y-auto md:max-h-[92vh]">
                     <div className="flex justify-between items-start mb-2 pr-8">
                         <span className="text-xs font-bold text-[#C19A6B] uppercase tracking-[0.2em]">{product.category}</span>
                         <button onClick={copyLink} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cielo-gold transition-colors" title="Copiar enlace">

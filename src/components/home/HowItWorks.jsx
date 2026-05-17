@@ -25,16 +25,10 @@ const steps = [
 export const HowItWorks = () => {
     return (
         <section className="relative py-28 px-4 bg-[#020617] overflow-hidden">
-            {/* Gold top separator line */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-cielo-gold/60" />
-
-            {/* Background subtle texture */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.04)_0%,transparent_70%)] pointer-events-none" />
-
             <div className="max-w-6xl mx-auto relative z-10">
                 {/* Header */}
                 <div className="text-center mb-20">
-                    <span className="inline-block text-cielo-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4">
+                    <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-4">
                         La experiencia LBE
                     </span>
                     <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight">
@@ -81,9 +75,6 @@ export const HowItWorks = () => {
                     })}
                 </div>
             </div>
-
-            {/* Gold bottom separator */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-t from-transparent to-cielo-gold/60" />
         </section>
     );
 };
