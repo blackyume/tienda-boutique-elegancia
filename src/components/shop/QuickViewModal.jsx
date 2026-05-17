@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Heart, Check, Ruler, Share2, ChevronDown, ArrowRight } from 'lucide-react';
+import { X, Heart, Check, Ruler, Share2, ChevronDown, ArrowRight, RotateCw } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { formatMoney, getColorHex } from '../../utils/helpers';
 import { useStore } from '../../context/StoreContext';
 import { getTotalStock, isColorAvailable, isSizeAvailable } from '../../utils/variants';
+import { Garment360Viewer, getViewerMode } from './Garment360Viewer';
 
 export const QuickViewModal = ({ product, onClose }) => {
     const navigate = useNavigate();
@@ -21,6 +22,11 @@ export const QuickViewModal = ({ product, onClose }) => {
         : Array.isArray(product?.images) && product.images.length > 0
             ? product.images.map(url => ({ type: 'image', url }))
             : [{ type: 'image', url: product?.image }];
+
+    // Visor giratorio (convive con la galería estática vía toggle)
+    const imageUrls = mediaList.filter(m => m.type === 'image' && m.url).map(m => m.url);
+    const viewerMode = getViewerMode(product, imageUrls);
+    const [spinOn, setSpinOn] = useState(false);
 
     useEffect(() => {
         if (!product) return;
@@ -122,12 +128,31 @@ export const QuickViewModal = ({ product, onClose }) => {
                                 allowFullScreen
                                 title="Product Video"
                             ></iframe>
+                        ) : spinOn && viewerMode !== 'static' ? (
+                            <Garment360Viewer
+                                images={imageUrls}
+                                mode={viewerMode}
+                                alt={product.name}
+                                className="absolute inset-0 w-full h-full"
+                            />
                         ) : (
                             <img src={mediaList[activeMediaIndex].url} alt={product.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                         )}
 
-                        {/* Navigation Arrows (if multiple) */}
-                        {mediaList.length > 1 && (
+                        {/* Toggle: galería estática ⇄ visor giratorio (conviven) */}
+                        {viewerMode !== 'static' && mediaList[activeMediaIndex].type !== 'video' && (
+                            <button
+                                type="button"
+                                onClick={() => setSpinOn(s => !s)}
+                                className={`absolute top-4 left-4 z-10 flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest backdrop-blur transition-colors ${spinOn ? 'bg-[#C19A6B] text-black' : 'bg-black/55 hover:bg-black/75 text-white'}`}
+                            >
+                                <RotateCw className="w-3.5 h-3.5" />
+                                {spinOn ? 'Ver galería' : (viewerMode === 'spin' ? 'Girar 360°' : 'Girar prenda')}
+                            </button>
+                        )}
+
+                        {/* Navigation Arrows (if multiple, sólo en galería estática) */}
+                        {!spinOn && mediaList.length > 1 && (
                             <>
                                 <button onClick={() => setActiveMediaIndex(prev => prev === 0 ? mediaList.length - 1 : prev - 1)} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white p-2 rounded-full backdrop-blur-sm transition-all"><ChevronDown className="w-5 h-5 rotate-90" /></button>
                                 <button onClick={() => setActiveMediaIndex(prev => prev === mediaList.length - 1 ? 0 : prev + 1)} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white p-2 rounded-full backdrop-blur-sm transition-all"><ChevronDown className="w-5 h-5 -rotate-90" /></button>
@@ -141,8 +166,8 @@ export const QuickViewModal = ({ product, onClose }) => {
                             {mediaList.map((item, idx) => (
                                 <button
                                     key={idx}
-                                    onClick={() => setActiveMediaIndex(idx)}
-                                    className={`relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activeMediaIndex === idx ? 'border-[#C19A6B] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                    onClick={() => { setActiveMediaIndex(idx); setSpinOn(false); }}
+                                    className={`relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${!spinOn && activeMediaIndex === idx ? 'border-[#C19A6B] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                 >
                                     {item.type === 'video' ? (
                                         <div className="w-full h-full bg-slate-800 flex items-center justify-center text-white">
