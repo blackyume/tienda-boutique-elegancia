@@ -76,7 +76,7 @@ export const Hero = () => {
                         aria-hidden="true"
                         fetchpriority="high"
                         decoding="async"
-                        className="w-full h-full object-cover opacity-55 scale-110"
+                        className="w-full h-full object-cover opacity-[0.78] scale-110"
                     />
                 )}
             </div>
@@ -88,8 +88,9 @@ export const Hero = () => {
                     background: `
                         radial-gradient(ellipse 60% 50% at 20% 30%, rgba(212,175,55,0.18), transparent 60%),
                         radial-gradient(ellipse 50% 60% at 80% 70%, rgba(191,149,63,0.15), transparent 65%),
+                        radial-gradient(ellipse 55% 45% at 50% 45%, rgba(2,6,23,0.6), transparent 70%),
                         radial-gradient(ellipse 70% 40% at 50% 100%, rgba(2,6,23,1) 0%, transparent 70%),
-                        linear-gradient(180deg, rgba(2,6,23,0.3) 0%, rgba(2,6,23,0.6) 60%, #020617 100%)
+                        linear-gradient(180deg, rgba(2,6,23,0.35) 0%, rgba(2,6,23,0.55) 60%, #020617 100%)
                     `
                 }}
             />
@@ -155,7 +156,7 @@ export const Hero = () => {
                         onClick={() => document.getElementById('editorial')?.scrollIntoView({ behavior: 'smooth' })}
                         className="inline-flex items-center justify-center gap-2 px-10 py-4 border border-white/20 hover:border-cielo-gold/60 hover:bg-white/5 text-white font-bold text-[11px] uppercase tracking-[0.3em] backdrop-blur-sm transition-colors rounded-sm"
                     >
-                        Ver lookbook
+                        Ver editorial
                     </button>
                 </div>
             </div>

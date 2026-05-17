@@ -2,18 +2,15 @@ import React from 'react';
 import { Instagram, ExternalLink } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
-const PLACEHOLDER_IMAGES = [
-    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400",
-    "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=400",
-    "https://images.unsplash.com/photo-1529139574466-a302c2d56dc6?auto=format&fit=crop&q=80&w=400",
-    "https://images.unsplash.com/photo-1550614000-4b9519e007d3?auto=format&fit=crop&q=80&w=400",
-    "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=400",
-    "https://images.unsplash.com/photo-1485230946287-65775ce5ad96?auto=format&fit=crop&q=80&w=400",
-];
-
 export const InstagramFeed = () => {
-    const { siteConfig } = useStore();
+    const { siteConfig, inventory } = useStore();
     const instagramUrl = siteConfig?.social?.instagram || 'https://instagram.com';
+
+    // Fotos reales del catálogo (no stock genérico) — honesto y premium.
+    const feedImages = (inventory || [])
+        .filter(p => p?.active !== false && p?.image)
+        .slice(0, 6)
+        .map(p => ({ url: p.image, name: p.name }));
 
     // Extract handle from URL if it's a full URL
     const getHandle = (url) => {
@@ -41,28 +38,30 @@ export const InstagramFeed = () => {
                     <p className="text-slate-500 text-sm">Mirá nuestros últimos looks y novedades</p>
                 </div>
 
-                {/* Grid */}
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-10">
-                    {PLACEHOLDER_IMAGES.map((img, idx) => (
-                        <a
-                            href={instagramUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            key={idx}
-                            className="group relative aspect-square overflow-hidden cursor-pointer"
-                        >
-                            <img
-                                src={img}
-                                alt={`Instagram Post ${idx + 1}`}
-                                loading="lazy"
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <Instagram className="w-6 h-6 text-white" />
-                            </div>
-                        </a>
-                    ))}
-                </div>
+                {/* Grid — fotos reales del catálogo; si no hay, no se muestra */}
+                {feedImages.length > 0 && (
+                    <div className={`grid gap-2 mb-10 ${feedImages.length >= 6 ? 'grid-cols-3 md:grid-cols-6' : 'grid-cols-2 md:grid-cols-4 max-w-4xl mx-auto'}`}>
+                        {feedImages.map((item, idx) => (
+                            <a
+                                href={instagramUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                key={idx}
+                                className="group relative aspect-square overflow-hidden cursor-pointer"
+                            >
+                                <img
+                                    src={item.url}
+                                    alt={item.name || `Look ${idx + 1}`}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <Instagram className="w-6 h-6 text-white" />
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                )}
 
                 {/* CTA */}
                 <div className="text-center">
