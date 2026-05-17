@@ -273,9 +273,20 @@ export const Admin = () => {
         if (!currentProduct.name) return addToast("Falta el nombre del producto", "error");
         if (!currentProduct.price || Number(currentProduct.price) <= 0) return addToast("El precio debe ser mayor a 0", "error");
 
-        setIsSaving(true);
+        // No persistir imágenes a medio subir / con error / blobs locales:
+        // se romperían al recargar la web.
+        const media = currentProduct.media || [];
+        if (media.some(m => m.isUploading)) return addToast("Esperá a que terminen de subir las imágenes", "error");
+        const cleanMedia = media.filter(m =>
+            !m.isUploading && m.status !== 'error' && !String(m.url || '').startsWith('blob:')
+        );
+        const firstImg = cleanMedia.find(m => m.type === 'image')?.url || '';
+        const cleanImage = firstImg || (String(currentProduct.image || '').startsWith('blob:') ? '' : (currentProduct.image || ''));
+
         const productToSave = {
             ...currentProduct,
+            media: cleanMedia,
+            image: cleanImage,
             price: Number(currentProduct.price),
             stock: Number(currentProduct.stock),
             cost: Number(currentProduct.cost || 0),
@@ -286,14 +297,24 @@ export const Admin = () => {
             active: currentProduct.active !== undefined ? currentProduct.active : true
         };
 
+        if (productToSave.active && getTotalStock(productToSave) <= 0) {
+            const ok = await confirm({
+                title: 'Sin stock comprable',
+                message: 'Se va a publicar pero no tiene stock (ni variantes con stock). Aparecerá como "Sin stock" y no se podrá comprar. ¿Publicar igual?',
+                confirmText: 'Publicar igual'
+            });
+            if (!ok) return;
+        }
+
+        setIsSaving(true);
         try {
             if (productToSave.id && inventory.find(p => p.id === productToSave.id)) {
                 await updateProduct(productToSave.id, productToSave);
             } else {
-                await addProduct({ ...productToSave, id: Date.now() }); // Ensure numeric ID for sort if new
+                await addProduct(productToSave);
             }
             setIsProductModalOpen(false);
-            addToast("Producto guardado correctamente", "success");
+            addToast(productToSave.active ? "Producto publicado" : "Borrador guardado", "success");
         } catch (error) {
             console.error(error);
             addToast("Error al guardar: " + error.message, "error");
@@ -438,8 +459,8 @@ export const Admin = () => {
 
     const openNewProduct = () => {
         setCurrentProduct({
-            id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
-            category: '', image: '', sizes: ['S', 'M'], colors: [], active: true, description: ''
+            name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
+            category: '', image: '', media: [], sizes: ['S', 'M'], colors: [], active: false, description: ''
         });
         setIsProductModalOpen(true);
     };
@@ -715,7 +736,7 @@ export const Admin = () => {
                                                                     color={`text-sky-500 hover:bg-sky-50 ${publishingTgId === p.id ? 'animate-pulse' : ''}`}
                                                                     title="Publicar en Telegram"
                                                                 />
-                                                                <ActionBtn onClick={() => { setCurrentProduct(p); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar" />
+                                                                <ActionBtn onClick={() => { setCurrentProduct({ ...p, active: p.active !== false }); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar" />
                                                                 <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-red-500 hover:bg-red-50" title="Eliminar" />
                                                             </div>
                                                         </td>
@@ -782,8 +803,8 @@ export const Admin = () => {
                     visitStatsHourly={visitStatsHourly}
                     onCreateProduct={() => {
                         setCurrentProduct({
-                            id: Date.now(), name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
-                            category: '', image: '', sizes: ['S', 'M'], colors: [], active: true, description: '', badges: {}
+                            name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
+                            category: '', image: '', media: [], sizes: ['S', 'M'], colors: [], active: false, description: '', badges: {}
                         });
                         setIsProductModalOpen(true);
                     }}
@@ -797,18 +818,17 @@ export const Admin = () => {
                         onSaveToProduct={(data) => {
                             setCurrentProduct({
                                 ...currentProduct,
-                                id: Date.now(),
                                 name: data.name,
                                 price: data.price,
                                 cost: data.cost,
                                 category: '',
-                                image: '', sizes: ['S', 'M'], colors: [], active: true, description: ''
+                                image: '', media: [], sizes: ['S', 'M'], colors: [], active: false, description: ''
                             });
                             setAdminTab('inventory');
                             setIsProductModalOpen(true);
                         }}
                         onEditProduct={(p) => {
-                            setCurrentProduct(p);
+                            setCurrentProduct({ ...p, active: p.active !== false });
                             setIsProductModalOpen(true);
                         }}
                         onDeleteProduct={handleDeleteProduct}
@@ -1288,13 +1308,31 @@ export const Admin = () => {
                             </div>
 
                             {/* Barra de acción fija (siempre visible, mobile + desktop) */}
-                            <div className="shrink-0 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1e293b] p-3 sm:p-4 flex items-center justify-end gap-3">
-                                <button onClick={() => setIsProductModalOpen(false)} className="px-5 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                    Cancelar
+                            <div className="shrink-0 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1e293b] p-3 sm:p-4 flex items-center justify-between gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setCurrentProduct(p => ({ ...p, active: !p.active }))}
+                                    className="flex items-center gap-2.5 group select-none"
+                                    title="Si está apagado, se guarda como borrador y NO se ve en la tienda"
+                                >
+                                    <span className={`relative w-11 h-6 rounded-full transition-colors ${currentProduct.active ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}>
+                                        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${currentProduct.active ? 'translate-x-5' : ''}`} />
+                                    </span>
+                                    <span className="text-left leading-tight">
+                                        <span className={`block text-xs sm:text-sm font-bold ${currentProduct.active ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>
+                                            {currentProduct.active ? 'Visible en la tienda' : 'Borrador (oculto)'}
+                                        </span>
+                                        <span className="block text-[10px] text-slate-400">{currentProduct.active ? 'Se publica al guardar' : 'No aparece en la web'}</span>
+                                    </span>
                                 </button>
-                                <Button onClick={handleSaveProduct} isLoading={isSaving} className="bg-[#C19A6B] hover:bg-[#a38056] text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#C19A6B]/20 text-base sm:text-lg transition-transform active:scale-95">
-                                    GUARDAR CAMBIOS
-                                </Button>
+                                <div className="flex items-center gap-3">
+                                    <button onClick={() => setIsProductModalOpen(false)} className="px-5 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                        Cancelar
+                                    </button>
+                                    <Button onClick={handleSaveProduct} isLoading={isSaving} className="bg-[#C19A6B] hover:bg-[#a38056] text-white px-6 sm:px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#C19A6B]/20 text-base sm:text-lg transition-transform active:scale-95">
+                                        {currentProduct.active ? 'PUBLICAR' : 'GUARDAR BORRADOR'}
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
