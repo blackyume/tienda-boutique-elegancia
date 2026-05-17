@@ -1284,10 +1284,17 @@ export const Admin = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <Button onClick={handleSaveProduct} isLoading={isSaving} className="w-full bg-[#C19A6B] hover:bg-[#a38056] text-white py-4 rounded-xl font-bold shadow-lg shadow-[#C19A6B]/20 text-lg mt-6 transition-transform active:scale-95">
-                                        GUARDAR CAMBIOS
-                                    </Button>
                                 </div>
+                            </div>
+
+                            {/* Barra de acción fija (siempre visible, mobile + desktop) */}
+                            <div className="shrink-0 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1e293b] p-3 sm:p-4 flex items-center justify-end gap-3">
+                                <button onClick={() => setIsProductModalOpen(false)} className="px-5 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                    Cancelar
+                                </button>
+                                <Button onClick={handleSaveProduct} isLoading={isSaving} className="bg-[#C19A6B] hover:bg-[#a38056] text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#C19A6B]/20 text-base sm:text-lg transition-transform active:scale-95">
+                                    GUARDAR CAMBIOS
+                                </Button>
                             </div>
                         </div>
                     </div>
