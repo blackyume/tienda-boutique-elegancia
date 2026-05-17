@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Button } from '../components/ui/Button';
+import { useConfirm } from '../components/ui/ConfirmDialog';
+import { EmptyState } from '../components/ui/EmptyState';
 import { formatMoney } from '../utils/helpers';
 import {
     LayoutDashboard, Package, Tag, LogOut, Edit2, Trash2, X,
@@ -8,9 +10,8 @@ import {
     Image as ImageIcon, UploadCloud, Monitor, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
     Check as CheckIcon, Lock, Settings, Blocks, Clock, Bot, Ticket, Building2, Sparkles,
-    ShoppingCart as ShoppingCartIcon, Send as SendIcon
+    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen
 } from 'lucide-react';
-// import { CostCalculator } from '../components/admin/CostCalculator'; // REMOVE LEGACY
 import { SimulationsView } from '../components/admin/SimulationsView';
 import { IntegrationsView } from '../components/admin/IntegrationsView';
 import { CMSView } from '../components/admin/CMSView';
@@ -63,10 +64,19 @@ const COLOR_MAP = {
 };
 const getColorHex = (name) => COLOR_MAP[name.toLowerCase()] || '#cbd5e1';
 
+const TAB_LABELS = {
+    dashboard: 'Dashboard', inventory: 'Inventario', orders: 'Pedidos', customers: 'Clientes',
+    sales: 'Ventas', assistant: 'Asistente IA', cms: 'CMS / Diseño', coupons: 'Cupones',
+    suppliers: 'Proveedores', abandoned: 'Carritos Abandonados', reviews: 'Reseñas',
+    calculator: 'Historial de Costos', integrations: 'Integraciones', settings: 'Configuración'
+};
+
 export const Admin = () => {
 
     const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly } = useStore();
+    const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [tempColor, setTempColor] = useState("");
@@ -321,7 +331,11 @@ export const Admin = () => {
         }
     };
 
-    const handleDeleteProduct = async (id) => { if (confirm("¿Estás seguro de eliminar este producto?")) await deleteProduct(id); };
+    const handleDeleteProduct = async (id) => {
+        if (await confirm({ title: 'Eliminar producto', message: 'Esta acción no se puede deshacer. ¿Eliminar este producto del catálogo?', confirmText: 'Eliminar', danger: true })) {
+            await deleteProduct(id);
+        }
+    };
 
     const handleGenerateCopy = async () => {
         if (!currentProduct?.name) return addToast("Agregá primero el nombre del producto", "error");
@@ -375,7 +389,7 @@ export const Admin = () => {
 
     const [publishingTgId, setPublishingTgId] = useState(null);
     const handlePublishTelegram = async (product) => {
-        if (!confirm(`¿Publicar "${product.name}" al canal de Telegram?`)) return;
+        if (!(await confirm({ title: 'Publicar en Telegram', message: `Se publicará "${product.name}" en el canal de Telegram.`, confirmText: 'Publicar' }))) return;
         setPublishingTgId(product.id);
         try {
             const { publishProductToTelegram } = await import('../utils/telegram');
@@ -470,13 +484,26 @@ export const Admin = () => {
 
     return (
         <div className="flex h-screen bg-[#F5F2EB] dark:bg-[#0B1120] font-sans text-slate-800 dark:text-slate-200 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-            {/* SIDEBAR */}
-            <aside className="w-20 lg:w-64 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 flex flex-col z-20 shadow-sm relative shrink-0">
-                <div className="h-20 flex items-center justify-center lg:justify-start px-6 border-b border-slate-100 dark:border-slate-800">
-                    <img src="/assets/logo-main.png" alt="La Boutique Logo" className="w-10 h-10 object-contain" />
-                    <span className="hidden lg:block ml-3 font-cinzel font-bold text-lg text-slate-800 dark:text-white tracking-widest uppercase">La Boutique</span>
+            {/* BACKDROP MOBILE */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden animate-[fadeIn_.15s_ease-out]"
+                    onClick={() => setSidebarOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
+            {/* SIDEBAR / DRAWER */}
+            <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-sm shrink-0 transform transition-transform duration-300 ease-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center">
+                        <img src="/assets/logo-main.png" alt="La Boutique Logo" className="w-10 h-10 object-contain" />
+                        <span className="block ml-3 font-cinzel font-bold text-lg text-slate-800 dark:text-white tracking-widest uppercase">La Boutique</span>
+                    </div>
+                    <button onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú" className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <X className="w-5 h-5" />
+                    </button>
                 </div>
-                <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                <nav className="flex-1 p-4 space-y-1 overflow-y-auto" onClick={() => setSidebarOpen(false)}>
                     <SidebarItem icon={LayoutDashboard} label="Dashboard" active={adminTab === 'dashboard'} onClick={() => setAdminTab('dashboard')} />
                     <SidebarItem icon={Tag} label="Inventario" active={adminTab === 'inventory'} onClick={() => setAdminTab('inventory')} />
                     <SidebarItem icon={Package} label="Pedidos" active={adminTab === 'orders'} onClick={() => setAdminTab('orders')} count={orders.filter(o => o.status === 'pending').length} />
@@ -490,26 +517,33 @@ export const Admin = () => {
                     <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
                     <SidebarItem icon={ShoppingCartIcon} label="Carritos Abandonados" active={adminTab === 'abandoned'} onClick={() => setAdminTab('abandoned')} count={(abandonedCarts || []).filter(c => !c.recovered).length} />
                     <SidebarItem icon={CheckIcon} label="Reseñas" active={adminTab === 'reviews'} onClick={() => setAdminTab('reviews')} count={(reviews || []).filter(r => !r.approved).length} />
-                    <p className="hidden lg:block px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
+                    <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
                     <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
 
                     <div className="my-6 border-t border-slate-100 dark:border-slate-800"></div>
-                    <p className="hidden lg:block px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Sistema</p>
+                    <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Sistema</p>
                     <SidebarItem icon={Blocks} label="Integraciones" active={adminTab === 'integrations'} onClick={() => setAdminTab('integrations')} />
                     <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
                 </nav>
                 <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#111827] space-y-2">
-                    <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-center lg:justify-start p-2 transition-colors">
-                        <LinkIcon className="w-4 h-4" /> <span className="hidden lg:inline">Ir a la Tienda</span>
+                    <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-start p-2 transition-colors">
+                        <LinkIcon className="w-4 h-4" /> <span className="inline">Ir a la Tienda</span>
                     </a>
-                    <button onClick={logout} className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-red-600 w-full justify-center lg:justify-start p-2 transition-colors">
-                        <LogOut className="w-4 h-4" /> <span className="hidden lg:inline">Cerrar Sesión</span>
+                    <button onClick={logout} className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-red-600 w-full justify-start p-2 transition-colors">
+                        <LogOut className="w-4 h-4" /> <span className="inline">Cerrar Sesión</span>
                     </button>
                 </div>
             </aside>
 
             {/* MAIN CONTENT */}
             <main className="flex-1 overflow-y-auto relative scroll-smooth">
+                {/* TOPBAR MOBILE */}
+                <header className="lg:hidden sticky top-0 z-20 flex items-center gap-3 h-14 px-4 bg-white/90 dark:bg-[#1e293b]/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+                    <button onClick={() => setSidebarOpen(true)} aria-label="Abrir menú" className="p-2 -ml-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <Menu className="w-5 h-5" />
+                    </button>
+                    <span className="font-cinzel font-bold text-sm uppercase tracking-widest text-slate-800 dark:text-white">{TAB_LABELS[adminTab] || 'Admin'}</span>
+                </header>
                 {/* INVENTARIO */}
                 {adminTab === 'inventory' && (
                     <div className="max-w-7xl mx-auto p-6 lg:p-10 pb-24">
@@ -611,7 +645,7 @@ export const Admin = () => {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                                     {filteredInventory.length === 0 ? (
-                                        <tr><td colSpan="6" className="p-12 text-center text-slate-400">No hay productos que coincidan con la búsqueda.</td></tr>
+                                        <tr><td colSpan="6"><EmptyState icon={PackageOpen} title="Sin productos" subtitle={searchTerm || selectedCategory !== 'Todos' || filterLowStock ? 'Ningún producto coincide con los filtros aplicados.' : 'Empezá agregando tu primer diseño con el botón “+ Nuevo Diseño”.'} /></td></tr>
                                     ) : (
                                         filteredInventory.map(p => {
                                             const totalDirectCost = (Number(p.cost) || 0) + (Number(p.shippingCost) || 0) + (Number(p.packagingCost) || 0);
@@ -1297,9 +1331,9 @@ const SidebarItem = ({ icon: Icon, label, active, onClick, count }) => (
     <button onClick={onClick} className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition-all duration-200 group ${active ? 'bg-[#C19A6B] text-white shadow-lg shadow-[#C19A6B]/30' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
         <div className="flex items-center gap-3">
             <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-400 group-hover:text-[#C19A6B] transition-colors'}`} />
-            <span className="hidden lg:inline">{label}</span>
+            <span className="inline">{label}</span>
         </div>
-        {count > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center hidden lg:inline-block shadow-sm">{count}</span>}
+        {count > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center inline-block shadow-sm">{count}</span>}
     </button>
 );
 

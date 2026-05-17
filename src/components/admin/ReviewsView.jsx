@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { Star, Check, Trash2, MessageSquare, Image as ImageIcon } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useConfirm } from '../ui/ConfirmDialog';
 
 export const ReviewsView = () => {
     const { reviews, inventory, approveReview, rejectReview } = useStore();
+    const confirm = useConfirm();
     const [filter, setFilter] = useState('pending');
 
     const stats = useMemo(() => {
@@ -96,7 +98,7 @@ export const ReviewsView = () => {
                                             </button>
                                         )}
                                         <button
-                                            onClick={() => { if (confirm("¿Eliminar esta reseña?")) rejectReview(r.id); }}
+                                            onClick={async () => { if (await confirm({ title: 'Eliminar reseña', message: 'La reseña se eliminará permanentemente.', confirmText: 'Eliminar', danger: true })) rejectReview(r.id); }}
                                             className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                             title="Eliminar"
                                         >

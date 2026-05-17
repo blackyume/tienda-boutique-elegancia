@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ShoppingCart, Mail, Trash2, Check, Clock, RefreshCw } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
+import { useConfirm } from '../ui/ConfirmDialog';
 
 const relative = (ts) => {
     if (!ts) return '—';
@@ -16,6 +17,7 @@ const relative = (ts) => {
 
 export const AbandonedCartsView = () => {
     const { abandonedCarts, sendAbandonedCartReminder, deleteAbandonedCart, addToast } = useStore();
+    const confirm = useConfirm();
     const [filter, setFilter] = useState('pending'); // pending | recovered | all
     const [sendingId, setSendingId] = useState(null);
 
@@ -37,7 +39,7 @@ export const AbandonedCartsView = () => {
     }, [filter, stats, abandonedCarts]);
 
     const handleSend = async (cart) => {
-        if (!confirm(`¿Enviar recordatorio a ${cart.email}?`)) return;
+        if (!(await confirm({ title: 'Enviar recordatorio', message: `Se enviará un email de recordatorio a ${cart.email}.`, confirmText: 'Enviar' }))) return;
         setSendingId(cart.id);
         try {
             await sendAbandonedCartReminder(cart);
@@ -50,7 +52,7 @@ export const AbandonedCartsView = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm("¿Eliminar este registro?")) return;
+        if (!(await confirm({ title: 'Eliminar registro', message: 'Se eliminará este carrito abandonado del historial.', confirmText: 'Eliminar', danger: true }))) return;
         await deleteAbandonedCart(id);
     };
 

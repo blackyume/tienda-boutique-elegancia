@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { db } from '../lib/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, increment } from 'firebase/firestore';
 import { ref, deleteObject, listAll } from 'firebase/storage';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { storage, auth } from '../lib/firebase';
@@ -11,9 +11,10 @@ import { trackAddToCart, trackRemoveFromCart, trackAddToWishlist } from '../util
 import { buildReferralCode } from '../utils/referral';
 
 // --- CONFIGURACIÓN CLOUDINARY ---
-// TODO: El usuario debe completar esto
-const CLOUDINARY_CLOUD_NAME = "dhfjszhjl"; // Configurado desde screenshot
-const CLOUDINARY_UPLOAD_PRESET = "cielo_2026"; // Preset que creará el usuario
+// Defaults para que la subida de imágenes funcione out-of-the-box.
+// El doc Firestore `config/cloudinary` (editable desde Admin > Configuración) los sobrescribe.
+const CLOUDINARY_CLOUD_NAME = "dhfjszhjl";
+const CLOUDINARY_UPLOAD_PRESET = "cielo_2026";
 
 const StoreContext = createContext();
 
@@ -85,8 +86,8 @@ export const StoreProvider = ({ children }) => {
   });
 
   const [cloudinaryConfig, setCloudinaryConfig] = useState({
-    cloudName: "",
-    uploadPreset: ""
+    cloudName: CLOUDINARY_CLOUD_NAME,
+    uploadPreset: CLOUDINARY_UPLOAD_PRESET
   });
 
   // --- AI CONFIGURATION ---
@@ -182,7 +183,11 @@ export const StoreProvider = ({ children }) => {
     // Config (Cloudinary)
     const unsubCloudinary = onSnapshot(doc(db, "config", "cloudinary"), (doc) => {
       if (doc.exists()) {
-        setCloudinaryConfig(doc.data());
+        const data = doc.data() || {};
+        setCloudinaryConfig({
+          cloudName: data.cloudName || CLOUDINARY_CLOUD_NAME,
+          uploadPreset: data.uploadPreset || CLOUDINARY_UPLOAD_PRESET
+        });
       }
     });
 
@@ -592,23 +597,7 @@ export const StoreProvider = ({ children }) => {
     },
     incrementProductView: async (id) => {
       try {
-        // Use increment from firestore to be atomic
-        const ref = doc(db, "products", String(id));
-        // We need to import increment from firebase/firestore first, 
-        // but since I cannot easily change the top imports without reading the whole file again, 
-        // I will use a simple update for now or try to use the imported functions if 'increment' was imported. 
-        // Waiting... let's check imports.
-        // The file imports: collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc
-        // It does NOT import 'increment'. 
-        // I will use getDoc + updateDoc as a fallback for now to avoid breaking imports, or I can add the import.
-        // Let's add the import line first in a separate step? No, too slow.
-        // I'll just use the read-modify-write pattern roughly, or better yet, I will use a special field update if possible.
-        // Actually, let's just do get->update. It's low traffic.
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const current = snap.data().views || 0;
-          await updateDoc(ref, { views: current + 1 });
-        }
+        await updateDoc(doc(db, "products", String(id)), { views: increment(1) });
       } catch (err) {
         console.error("Error incrementing view:", err);
       }
@@ -649,7 +638,7 @@ export const StoreProvider = ({ children }) => {
     },
     toggleMaintenance: async () => {
       if (!isAdmin) {
-        alert("ERROR: No tienes permisos de ADMINISTRADOR.");
+        addToast("No tenés permisos de administrador", "error");
         return;
       }
       const newVal = !isMaintenance;

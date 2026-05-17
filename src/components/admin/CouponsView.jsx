@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
+import { useConfirm } from '../ui/ConfirmDialog';
 import {
     Ticket, Plus, Edit2, Trash2, X, Check,
     Percent, DollarSign, Calendar, Hash,
@@ -9,6 +10,7 @@ import {
 
 export const CouponsView = () => {
     const { coupons, addCoupon, updateCoupon, deleteCoupon, addToast } = useStore();
+    const confirm = useConfirm();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCoupon, setEditingCoupon] = useState(null);
     const [formData, setFormData] = useState({
@@ -81,7 +83,7 @@ export const CouponsView = () => {
     };
 
     const handleDelete = async (id) => {
-        if (confirm("¿Estás seguro de eliminar este cupón?")) {
+        if (await confirm({ title: 'Eliminar cupón', message: 'El cupón dejará de funcionar de inmediato. ¿Eliminarlo?', confirmText: 'Eliminar', danger: true })) {
             await deleteCoupon(id);
         }
     };

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
+import { useConfirm } from '../ui/ConfirmDialog';
 import {
     Building2, Search, Plus, Edit2, Trash2, X, Phone, Mail, MapPin,
     MessageCircle, Package, Check, Filter, Calendar, FileText, User
@@ -8,6 +9,7 @@ import {
 
 export const SuppliersView = () => {
     const { suppliers, addSupplier, updateSupplier, deleteSupplier, categories, addToast } = useStore();
+    const confirm = useConfirm();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -80,7 +82,7 @@ export const SuppliersView = () => {
     };
 
     const handleDelete = async (id) => {
-        if (confirm('¿Estás seguro de eliminar este proveedor?')) {
+        if (await confirm({ title: 'Eliminar proveedor', message: 'Se eliminará este proveedor de tu lista. ¿Continuar?', confirmText: 'Eliminar', danger: true })) {
             await deleteSupplier(id);
         }
     };

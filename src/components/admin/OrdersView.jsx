@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { formatMoney } from '../../utils/helpers';
 import { KanbanBoard } from './KanbanBoard';
-import { LayoutList, KanbanSquare } from 'lucide-react';
+import { EmptyState } from '../ui/EmptyState';
+import { LayoutList, KanbanSquare, PackageOpen } from 'lucide-react';
 
 export const OrdersView = ({ orders, updateOrderStatus }) => {
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'board'
@@ -56,9 +57,11 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
             ) : (
                 <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
                     {filteredOrders.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-slate-400">
-                            <p>No se encontraron pedidos.</p>
-                        </div>
+                        <EmptyState
+                            icon={PackageOpen}
+                            title={filter === 'all' ? 'Todavía no hay pedidos' : 'Sin pedidos en este estado'}
+                            subtitle={filter === 'all' ? 'Cuando entre la primera venta vas a verla acá en tiempo real.' : 'Probá cambiar el filtro para ver otros pedidos.'}
+                        />
                     ) : (
                         filteredOrders.map(o => (
                             <div key={o.id} className="group p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors gap-4">

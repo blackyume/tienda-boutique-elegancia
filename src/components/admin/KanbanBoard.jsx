@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
+import { useConfirm } from '../ui/ConfirmDialog';
 import { formatMoney } from '../../utils/helpers';
 import { Clock, CheckCircle, Truck, Package, AlertCircle } from 'lucide-react';
 
 export const KanbanBoard = ({ orders, updateOrderStatus }) => {
     const [draggedOrder, setDraggedOrder] = useState(null);
+    const confirm = useConfirm();
 
     // Columns Configuration
     const columns = [
@@ -24,7 +26,7 @@ export const KanbanBoard = ({ orders, updateOrderStatus }) => {
         e.dataTransfer.dropEffect = 'move';
     };
 
-    const handleDrop = (e, status) => {
+    const handleDrop = async (e, status) => {
         e.preventDefault();
         const orderId = e.dataTransfer.getData('text/plain');
 
@@ -34,7 +36,7 @@ export const KanbanBoard = ({ orders, updateOrderStatus }) => {
                 const tracking = prompt("Ingresa el código de seguimiento (opcional):");
                 updateOrderStatus(orderId, status, { trackingNumber: tracking || '' });
             } else {
-                if (confirm(`¿Mover pedido #${orderId.slice(-4)} a ${status.toUpperCase()}?`)) {
+                if (await confirm({ title: 'Mover pedido', message: `Se moverá el pedido #${orderId.slice(-4)} al estado ${status.toUpperCase()}.`, confirmText: 'Mover' })) {
                     updateOrderStatus(orderId, status);
                 }
             }

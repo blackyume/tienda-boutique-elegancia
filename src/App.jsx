@@ -4,6 +4,7 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/shop/CartDrawer';
 import { ToastContainer } from './components/ui/ToastContainer';
+import { ConfirmProvider } from './components/ui/ConfirmDialog';
 import { WhatsAppButton } from './components/ui/WhatsAppButton';
 import { ScrollProgress } from './components/ui/ScrollProgress';
 import { UpdatePrompt } from './components/ui/UpdatePrompt';
@@ -165,9 +166,11 @@ export default function App() {
   return (
     <GlobalErrorBoundary>
       <StoreProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <ConfirmProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </ConfirmProvider>
       </StoreProvider>
     </GlobalErrorBoundary>
   );

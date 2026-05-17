@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Lock, Settings, Mail, Bot, AlertTriangle, Send, Bell } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useConfirm } from '../ui/ConfirmDialog';
 import { SalesConfig } from './SalesConfig';
 
 export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig }) => {
     const { sendOrderEmail, aiConfig, updateAiConfig, addToast } = useStore();
+    const confirm = useConfirm();
     const [testEmail, setTestEmail] = useState("");
     const [isTestingEmail, setIsTestingEmail] = useState(false);
     const [isTestingKey, setIsTestingKey] = useState(false);
@@ -547,11 +549,11 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
 
                     <div className="p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30">
                         <p className="font-bold text-xs text-red-800 dark:text-red-400 mb-3">Migración de Datos</p>
-                        <Button onClick={() => {
+                        <Button onClick={async () => {
                             const localInv = JSON.parse(localStorage.getItem('cielo_inventory'));
                             const localOrd = JSON.parse(localStorage.getItem('cielo_orders'));
                             const localCat = JSON.parse(localStorage.getItem('cielo_categories'));
-                            if (confirm("¿ATENCIÓN: Estás seguro de subir TODOS los datos locales a Firebase? Esto podría sobrescribir datos reales.")) {
+                            if (await confirm({ title: '⚠️ Migración de datos', message: 'Se subirán TODOS los datos locales a Firebase. Esto puede sobrescribir datos reales. Esta acción es irreversible.', confirmText: 'Subir y sobrescribir', danger: true })) {
                                 migrateData(localInv, localOrd, localCat);
                             }
                         }} className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-xl font-bold text-xs shadow-lg shadow-red-500/20">
@@ -562,8 +564,8 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
 
                     <div className="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30 mt-4">
                         <p className="font-bold text-xs text-blue-800 dark:text-blue-400 mb-3">Control de Versiones</p>
-                        <Button onClick={() => {
-                            if (confirm("¿Notificar a todos los usuarios de una nueva actualización?")) updateSystemVersion();
+                        <Button onClick={async () => {
+                            if (await confirm({ title: 'Notificar actualización', message: 'Se mostrará un cartel a todos los clientes para que recarguen la página.', confirmText: 'Notificar' })) updateSystemVersion();
                         }} className="bg-blue-600 hover:bg-blue-700 text-white w-full py-3 rounded-xl font-bold text-xs shadow-lg shadow-blue-500/20">
                             NOTIFICAR ACTUALIZACIÓN
                         </Button>
@@ -572,7 +574,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                     <div className="p-4 bg-orange-50 dark:bg-orange-900/10 rounded-xl border border-orange-100 dark:border-orange-900/30 mt-4">
                         <p className="font-bold text-xs text-orange-800 dark:text-orange-400 mb-3">Limpieza de Almacenamiento</p>
                         <Button onClick={async () => {
-                            if (confirm("¿Escanear y eliminar imágenes no utilizadas? Esta acción es irreversible.")) {
+                            if (await confirm({ title: 'Limpiar almacenamiento', message: 'Se escanearán y eliminarán las imágenes no utilizadas. Esta acción es irreversible.', confirmText: 'Escanear y limpiar', danger: true })) {
                                 await cleanStorage();
                             }
                         }} className="bg-orange-600 hover:bg-orange-700 text-white w-full py-3 rounded-xl font-bold text-xs shadow-lg shadow-orange-500/20 mb-2">
