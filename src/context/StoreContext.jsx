@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { db } from '../lib/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, increment } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, increment, query, where } from 'firebase/firestore';
 import { ref, deleteObject, listAll } from 'firebase/storage';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { storage, auth } from '../lib/firebase';
@@ -9,6 +9,13 @@ import imageCompression from 'browser-image-compression';
 import { availableAfterCart, getTotalStock, getVariantStock } from '../utils/variants';
 import { trackAddToCart, trackRemoveFromCart, trackAddToWishlist } from '../utils/analytics';
 import { buildReferralCode } from '../utils/referral';
+import { isAdminEmail } from '../utils/admins';
+
+// Handler silencioso para onSnapshot: permission-denied es esperado para
+// no-admins en colecciones protegidas; no spamear consola en prod.
+const quietSnap = (label) => (err) => {
+  if (err?.code !== 'permission-denied') console.warn('[firestore]', label, err?.code || err);
+};
 
 // --- CONFIGURACIÓN CLOUDINARY ---
 // Defaults para que la subida de imágenes funcione out-of-the-box.
@@ -159,11 +166,8 @@ export const StoreProvider = ({ children }) => {
       setInventory(data.sort((a, b) => b.id - a.id));
     });
 
-    // Orders
-    const unsubOrders = onSnapshot(collection(db, "orders"), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setOrders(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
-    });
+    // Orders → suscripción por rol en el effect [user] (regla Firestore:
+    // admin lee todas; cliente solo las propias). No suscribir acá.
 
     // Categories
     const unsubCats = onSnapshot(collection(db, "categories"), (snap) => {
@@ -208,41 +212,14 @@ export const StoreProvider = ({ children }) => {
       }
     });
 
-    // Simulations
-    const unsubSims = onSnapshot(collection(db, "simulations"), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setSimulations(data.sort((a, b) => b.createdAt - a.createdAt));
-    });
-
-    // Coupons
+    // Coupons (público-read; se usa al validar cupón en checkout)
     const unsubCoupons = onSnapshot(collection(db, "coupons"), (snap) => {
       const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
       setCoupons(data.sort((a, b) => b.createdAt - a.createdAt));
-    });
+    }, quietSnap('coupons'));
 
-    // Suppliers
-    const unsubSuppliers = onSnapshot(collection(db, "suppliers"), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setSuppliers(data.sort((a, b) => b.createdAt - a.createdAt));
-    });
-
-    // AI History
-    const unsubAiHistory = onSnapshot(collection(db, "ai_history"), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setAiHistory(data.sort((a, b) => b.timestamp - a.timestamp).slice(0, 50));
-    });
-
-    // Scheduled Promotions
-    const unsubPromos = onSnapshot(collection(db, "scheduled_promotions"), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setScheduledPromotions(data.sort((a, b) => a.activateAt - b.activateAt));
-    });
-
-    // Wishlist Events (analytics collection)
-    const unsubWishlistEvents = onSnapshot(collection(db, "wishlist_events"), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setWishlistEvents(data.sort((a, b) => b.timestamp - a.timestamp).slice(0, 500));
-    });
+    // simulations / suppliers / ai_history / scheduled_promotions /
+    // wishlist_events → admin-only, suscritas en el effect [user].
 
     // Reviews (público, cualquiera ve todas; filtro approved=true en UI del cliente)
     const unsubReviews = onSnapshot(collection(db, "reviews"), (snap) => {
@@ -260,40 +237,84 @@ export const StoreProvider = ({ children }) => {
 
     setLoading(false);
     return () => {
-      unsubAuth(); unsubProd(); unsubOrders(); unsubCats();
+      unsubAuth(); unsubProd(); unsubCats();
       unsubSiteConfig(); unsubCloudinary(); unsubAiConfig();
-      unsubMaintenance(); unsubSims(); unsubCoupons();
-      unsubSuppliers(); unsubAiHistory(); unsubPromos();
-      unsubWishlistEvents(); unsubShipping(); unsubReviews();
+      unsubMaintenance(); unsubCoupons();
+      unsubShipping(); unsubReviews();
     };
   }, []);
 
-  // --- ADMIN-ONLY SUBSCRIPTIONS (abandoned carts, active sessions) ---
+  // --- SUSCRIPCIONES SEGÚN ROL ---
+  // Reglas Firestore: orders → admin lee todas, cliente solo las propias
+  // (resource.data.userId == uid). El resto es admin-only.
   useEffect(() => {
-    const ADMIN_EMAILS = ['laboutiquedelaeleganciaoficial@gmail.com', 'juampi218@gmail.com'];
-    if (!user || !ADMIN_EMAILS.includes(user.email)) {
-      setAbandonedCarts([]);
-      setActiveSessions([]);
-      setVisitStatsHourly([]);
-      return;
+    const admin = isAdminEmail(user?.email);
+    const subs = [];
+
+    if (admin) {
+      // Admin: todas las órdenes + colecciones de gestión
+      subs.push(onSnapshot(collection(db, 'orders'), (snap) => {
+        const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+        setOrders(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
+      }, quietSnap('orders')));
+
+      subs.push(onSnapshot(collection(db, 'simulations'), (snap) => {
+        setSimulations(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.createdAt - a.createdAt));
+      }, quietSnap('simulations')));
+
+      subs.push(onSnapshot(collection(db, 'suppliers'), (snap) => {
+        setSuppliers(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.createdAt - a.createdAt));
+      }, quietSnap('suppliers')));
+
+      subs.push(onSnapshot(collection(db, 'ai_history'), (snap) => {
+        setAiHistory(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.timestamp - a.timestamp).slice(0, 50));
+      }, quietSnap('ai_history')));
+
+      subs.push(onSnapshot(collection(db, 'scheduled_promotions'), (snap) => {
+        setScheduledPromotions(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => a.activateAt - b.activateAt));
+      }, quietSnap('scheduled_promotions')));
+
+      subs.push(onSnapshot(collection(db, 'wishlist_events'), (snap) => {
+        setWishlistEvents(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.timestamp - a.timestamp).slice(0, 500));
+      }, quietSnap('wishlist_events')));
+
+      subs.push(onSnapshot(collection(db, 'visit_stats_hourly'), (snap) => {
+        setVisitStatsHourly(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.id > b.id ? 1 : -1)));
+      }, quietSnap('visit_stats_hourly')));
+
+      subs.push(onSnapshot(collection(db, 'abandoned_carts'), (snap) => {
+        setAbandonedCarts(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => {
+          const at = a.lastUpdated?.toMillis?.() || 0;
+          const bt = b.lastUpdated?.toMillis?.() || 0;
+          return bt - at;
+        }));
+      }, quietSnap('abandoned_carts')));
+
+      subs.push(onSnapshot(collection(db, 'active_sessions'), (snap) => {
+        setActiveSessions(snap.docs.map(d => ({ ...d.data(), id: d.id })));
+      }, quietSnap('active_sessions')));
+    } else {
+      // Limpiar estados admin
+      setSimulations([]); setSuppliers([]); setAiHistory([]);
+      setScheduledPromotions([]); setWishlistEvents([]);
+      setVisitStatsHourly([]); setAbandonedCarts([]); setActiveSessions([]);
+
+      if (user) {
+        // Cliente logueado: solo sus propias órdenes (regla lo permite)
+        subs.push(onSnapshot(
+          query(collection(db, 'orders'), where('userId', '==', user.uid)),
+          (snap) => {
+            const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+            setOrders(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
+          },
+          quietSnap('orders(own)')
+        ));
+      } else {
+        setOrders([]);
+      }
     }
-    const unsubVisitStats = onSnapshot(collection(db, 'visit_stats_hourly'), (snap) => {
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setVisitStatsHourly(data.sort((a, b) => (a.id > b.id ? 1 : -1)));
-    });
-    const unsubAbandoned = onSnapshot(collection(db, 'abandoned_carts'), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setAbandonedCarts(data.sort((a, b) => {
-        const at = a.lastUpdated?.toMillis?.() || 0;
-        const bt = b.lastUpdated?.toMillis?.() || 0;
-        return bt - at;
-      }));
-    });
-    const unsubPresence = onSnapshot(collection(db, 'active_sessions'), (snap) => {
-      const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-      setActiveSessions(data);
-    });
-    return () => { unsubAbandoned(); unsubPresence(); unsubVisitStats(); };
+
+    return () => subs.forEach(u => u());
   }, [user]);
 
   // --- THEME (dark-only: el diseño de la web es oscuro por decisión) ---
@@ -440,9 +461,8 @@ export const StoreProvider = ({ children }) => {
     );
   }, [wishlist, user, wishlistSyncedForUid]);
 
-  const ADMIN_WHITELIST = ['laboutiquedelaeleganciaoficial@gmail.com', 'juampi218@gmail.com'];
-  // Admin is ONLY the specific email. Role is ignored for admin privilege to be safe.
-  const isAdmin = user && ADMIN_WHITELIST.includes(user.email);
+  // Admin SOLO por email whitelisteado (utils/admins.js). El role se ignora a propósito.
+  const isAdmin = isAdminEmail(user?.email);
 
   const login = async (email, password) => {
     try {
