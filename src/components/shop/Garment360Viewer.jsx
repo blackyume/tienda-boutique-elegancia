@@ -44,33 +44,52 @@ const FlipViewer = ({ front, back, alt, className }) => {
 
     return (
         <div
-            className={`relative group select-none cursor-pointer ${className}`}
+            className={`relative group select-none cursor-pointer overflow-hidden ${className}`}
             style={{ perspective: '1500px' }}
             onClick={() => setPaused((p) => !p)}
             title={paused ? 'Tocar para reanudar el giro' : 'Tocar para pausar'}
         >
+            {/* Sombra de contacto en el piso (se estira/encoge con el giro) */}
             <div
-                className="relative w-full h-full animate-spin-y motion-reduce:animate-none group-hover:[animation-play-state:paused]"
-                style={{ transformStyle: 'preserve-3d', animationPlayState: paused ? 'paused' : 'running' }}
+                aria-hidden
+                className={`pointer-events-none absolute bottom-3 left-1/2 w-2/3 h-5 rounded-[50%] blur-xl bg-black/70 animate-ground-shadow motion-reduce:animate-none ${paused ? '[animation-play-state:paused]' : ''} group-hover:[animation-play-state:paused]`}
+            />
+
+            <div
+                className={`relative w-full h-full animate-spin-y motion-reduce:animate-none group-hover:[animation-play-state:paused] ${paused ? '[animation-play-state:paused]' : ''}`}
+                style={{ transformStyle: 'preserve-3d', filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.55))' }}
             >
-                <img
-                    src={front}
-                    alt={alt}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{ backfaceVisibility: 'hidden' }}
-                />
-                <img
-                    src={back}
-                    alt={`${alt} (dorso)`}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                />
+                <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden' }}>
+                    <img
+                        src={front}
+                        alt={alt}
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                        className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    {/* Sheen de satén que barre la tela */}
+                    <span
+                        aria-hidden
+                        className={`pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 animate-sheen motion-reduce:hidden ${paused ? '[animation-play-state:paused]' : ''} group-hover:[animation-play-state:paused]`}
+                        style={{ background: 'linear-gradient(100deg, transparent, rgba(255,255,255,0.5), rgba(252,246,186,0.35), transparent)' }}
+                    />
+                </div>
+                <div className="absolute inset-0" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                    <img
+                        src={back}
+                        alt={`${alt} (dorso)`}
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                        className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <span
+                        aria-hidden
+                        className={`pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 animate-sheen motion-reduce:hidden ${paused ? '[animation-play-state:paused]' : ''} group-hover:[animation-play-state:paused]`}
+                        style={{ background: 'linear-gradient(100deg, transparent, rgba(255,255,255,0.5), rgba(252,246,186,0.35), transparent)' }}
+                    />
+                </div>
             </div>
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-4 py-2 rounded-full bg-black/55 text-white text-[11px] font-bold uppercase tracking-widest backdrop-blur pointer-events-none">
