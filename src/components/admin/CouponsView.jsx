@@ -12,6 +12,7 @@ export const CouponsView = () => {
     const { coupons, addCoupon, updateCoupon, deleteCoupon, addToast } = useStore();
     const confirm = useConfirm();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingCoupon, setEditingCoupon] = useState(null);
     const [formData, setFormData] = useState({
         code: '',
@@ -64,22 +65,40 @@ export const CouponsView = () => {
             addToast("El valor del descuento debe ser mayor a 0", "error");
             return;
         }
+        if (formData.type === 'percentage' && Number(formData.value) > 100) {
+            addToast("Un descuento porcentual no puede superar 100%", "error");
+            return;
+        }
+        if (formData.maxUses && (!Number.isInteger(Number(formData.maxUses)) || Number(formData.maxUses) <= 0)) {
+            addToast("El límite de usos debe ser un entero mayor a 0", "error");
+            return;
+        }
+        if (formData.expiresAt && isNaN(new Date(formData.expiresAt).getTime())) {
+            addToast("La fecha de expiración no es válida", "error");
+            return;
+        }
+        if (isSubmitting) return;
 
         const couponData = {
             ...formData,
+            code: formData.code.toUpperCase().trim(),
             value: Number(formData.value),
             minPurchase: formData.minPurchase ? Number(formData.minPurchase) : 0,
             maxUses: formData.maxUses ? Number(formData.maxUses) : null
         };
 
-        if (editingCoupon) {
-            await updateCoupon(editingCoupon.id, couponData);
-        } else {
-            await addCoupon(couponData);
+        setIsSubmitting(true);
+        try {
+            if (editingCoupon) {
+                await updateCoupon(editingCoupon.id, couponData);
+            } else {
+                await addCoupon(couponData);
+            }
+            setIsModalOpen(false);
+            resetForm();
+        } finally {
+            setIsSubmitting(false);
         }
-
-        setIsModalOpen(false);
-        resetForm();
     };
 
     const handleDelete = async (id) => {
@@ -436,9 +455,10 @@ export const CouponsView = () => {
                                 </Button>
                                 <Button
                                     type="submit"
-                                    className="flex-1 bg-[#C19A6B] hover:bg-[#a38056] text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-[#C19A6B]/20"
+                                    disabled={isSubmitting}
+                                    className="flex-1 bg-[#C19A6B] hover:bg-[#a38056] disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-[#C19A6B]/20"
                                 >
-                                    {editingCoupon ? 'Guardar Cambios' : 'Crear Cupón'}
+                                    {isSubmitting ? 'Guardando…' : (editingCoupon ? 'Guardar Cambios' : 'Crear Cupón')}
                                 </Button>
                             </div>
                         </form>

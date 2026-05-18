@@ -15,6 +15,7 @@ export const SuppliersView = () => {
     const [selectedCategory, setSelectedCategory] = useState('Todos');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentSupplier, setCurrentSupplier] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Form state
     const emptySupplier = {
@@ -34,8 +35,9 @@ export const SuppliersView = () => {
     // Filtered suppliers
     const filteredSuppliers = useMemo(() => {
         return (suppliers || []).filter(s => {
-            const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                s.contactName?.toLowerCase().includes(searchTerm.toLowerCase());
+            const q = searchTerm.toLowerCase();
+            const matchesSearch = (s.name || '').toLowerCase().includes(q) ||
+                (s.contactName || '').toLowerCase().includes(q);
             const matchesCategory = selectedCategory === 'Todos' || s.category === selectedCategory;
             return matchesSearch && matchesCategory;
         });
@@ -63,11 +65,17 @@ export const SuppliersView = () => {
     };
 
     const handleSave = async () => {
-        if (!currentSupplier.name.trim()) {
+        if (!currentSupplier.name?.trim()) {
             addToast('El nombre del proveedor es obligatorio', 'error');
             return;
         }
+        if (currentSupplier.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentSupplier.email.trim())) {
+            addToast('El email no tiene un formato válido', 'error');
+            return;
+        }
+        if (isSaving) return;
 
+        setIsSaving(true);
         try {
             if (suppliers?.find(s => s.id === currentSupplier.id)) {
                 await updateSupplier(currentSupplier.id, currentSupplier);
@@ -78,6 +86,8 @@ export const SuppliersView = () => {
         } catch (error) {
             console.error('Error saving supplier:', error);
             addToast('Error al guardar proveedor', 'error');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -463,9 +473,10 @@ export const SuppliersView = () => {
                             </button>
                             <button
                                 onClick={handleSave}
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#C19A6B] hover:bg-[#A88555] text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
+                                disabled={isSaving}
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#C19A6B] hover:bg-[#A88555] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
                             >
-                                <Check className="w-4 h-4" /> Guardar Proveedor
+                                <Check className="w-4 h-4" /> {isSaving ? 'Guardando…' : 'Guardar Proveedor'}
                             </button>
                         </div>
                     </div>

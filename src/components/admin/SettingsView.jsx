@@ -63,7 +63,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
     };
 
     const handleTestKey = async () => {
-        const keysText = document.getElementById('aiAdminKeys').value || aiConfig?.adminKeys || '';
+        const keysText = document.getElementById('aiAdminKeys')?.value || aiConfig?.adminKeys || '';
         const keysArray = keysText.split(/[,\n]+/).map(k => k.trim()).filter(k => k);
 
         if (keysArray.length === 0) {
@@ -438,8 +438,8 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             <Button
                                 onClick={() => {
                                     updateAiConfig({
-                                        adminKeys: document.getElementById('aiAdminKeys').value,
-                                        customerKeys: document.getElementById('aiCustomerKeys').value
+                                        adminKeys: document.getElementById('aiAdminKeys')?.value || '',
+                                        customerKeys: document.getElementById('aiCustomerKeys')?.value || ''
                                     });
                                     addToast("Llaves guardadas correctamente", "success");
                                 }}
