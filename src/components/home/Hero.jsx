@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Truck, CreditCard, RefreshCw } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { optimizeImage } from '../../utils/helpers';
 
@@ -47,7 +47,8 @@ export const Hero = () => {
     const heroImage = typeof siteConfig?.hero === 'string' ? siteConfig.hero : siteConfig?.hero?.image;
     const title = siteConfig?.hero?.title || 'LA BOUTIQUE';
     const subtitle = siteConfig?.hero?.subtitle || 'de la Elegancia';
-    const buttonText = siteConfig?.hero?.buttonText || 'Explorar Shop';
+    const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'Piezas curadas que duran temporadas, no semanas.';
+    const buttonText = siteConfig?.hero?.buttonText || 'Comprar ahora';
     const buttonLink = siteConfig?.hero?.buttonLink || 'shop';
 
     const primaryAction = (e) => {
@@ -61,7 +62,7 @@ export const Hero = () => {
     const heroSrc = heroImage ? optimizeImage(heroImage, 1800) : null;
 
     return (
-        <section className="relative min-h-screen flex items-end overflow-hidden bg-[#020617] px-6 md:px-16 lg:px-24 pb-20 md:pb-28">
+        <section className="relative min-h-screen flex items-center justify-center text-center overflow-hidden bg-[#020617] px-6 py-28">
             {heroSrc && (
                 <Helmet>
                     <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />
@@ -103,31 +104,32 @@ export const Hero = () => {
                 />
             )}
 
-            {/* Content — editorial, alineado abajo-izquierda */}
-            <div ref={contentRef} className="relative z-10 text-left max-w-4xl will-change-transform">
-                <div className="animate-fadeIn flex items-center gap-4 mb-6">
-                    <span className="h-px w-12 bg-cielo-gold/60" />
-                    <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-white/70">
+            {/* Content — centrado, impacto + invitación a comprar */}
+            <div ref={contentRef} className="relative z-10 mx-auto max-w-3xl flex flex-col items-center will-change-transform">
+                <div className="animate-fadeIn flex items-center gap-4 mb-7">
+                    <span className="h-px w-8 sm:w-12 bg-cielo-gold/60" />
+                    <span className="text-[10px] uppercase tracking-[0.45em] font-bold text-white/70 whitespace-nowrap">
                         Colección 2026 · Edición de autor
                     </span>
+                    <span className="h-px w-8 sm:w-12 bg-cielo-gold/60" />
                 </div>
 
-                <h1 className="font-cinzel text-5xl md:text-7xl lg:text-[6.5rem] leading-[0.95] tracking-tight text-white drop-shadow-[0_6px_28px_rgba(0,0,0,0.5)] animate-slideUp">
+                <h1 className="font-cinzel text-6xl md:text-8xl lg:text-[8.5rem] leading-[0.92] tracking-tight text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.7)] animate-slideUp">
                     {title}
-                    <span className="block italic font-serif text-2xl md:text-4xl lg:text-5xl mt-4 font-light tracking-normal text-white/85">
+                    <span className="block italic font-serif text-3xl md:text-5xl lg:text-6xl mt-3 font-light tracking-normal text-white/90">
                         {subtitle}
                     </span>
                 </h1>
 
-                <p className="mt-10 text-sm md:text-base text-slate-300/75 max-w-md font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:500ms]">
-                    Moda femenina curada a mano. Donde la tradición del oficio encuentra el lenguaje estético del presente.
+                <p className="mt-8 text-base md:text-xl text-white/80 max-w-xl font-light tracking-wide leading-relaxed animate-fadeIn opacity-0 [animation-delay:400ms]">
+                    {tagline}
                 </p>
 
-                <div className="mt-10 flex flex-wrap items-center gap-8 animate-fadeIn opacity-0 [animation-delay:800ms]">
+                <div className="mt-10 flex flex-col sm:flex-row items-center gap-5 animate-fadeIn opacity-0 [animation-delay:700ms]">
                     <Link
                         to="/shop"
                         onClick={primaryAction}
-                        className="group relative inline-flex items-center justify-center gap-3 px-12 py-4 text-black font-bold text-[11px] uppercase tracking-[0.35em] overflow-hidden rounded-sm shadow-[0_10px_50px_-12px_rgba(212,175,55,0.6)] transition-transform hover:scale-[1.03]"
+                        className="group relative inline-flex items-center justify-center gap-3 px-14 py-5 text-black font-bold text-xs uppercase tracking-[0.35em] overflow-hidden rounded-sm shadow-[0_14px_55px_-12px_rgba(212,175,55,0.7)] transition-transform hover:scale-[1.04]"
                         style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                     >
                         <span className="relative z-10">{buttonText}</span>
@@ -136,20 +138,35 @@ export const Hero = () => {
                     </Link>
                     <button
                         onClick={() => document.getElementById('editorial')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="group inline-flex items-center gap-2 text-white/60 hover:text-white text-[10px] uppercase tracking-[0.35em] font-bold transition-colors"
+                        className="group inline-flex items-center gap-2 text-white/65 hover:text-white text-[10px] uppercase tracking-[0.35em] font-bold transition-colors"
                     >
                         <span className="relative">
-                            Descubrir la colección
+                            Ver la colección
                             <span className="absolute -bottom-1 left-0 w-0 group-hover:w-full h-px bg-cielo-gold transition-all duration-500" />
                         </span>
                     </button>
                 </div>
+
+                {/* Microbarra de confianza — invita a comprar sin fricción */}
+                <div className="mt-12 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-white/55 animate-fadeIn opacity-0 [animation-delay:1000ms]">
+                    <span className="flex items-center gap-2 text-[11px] tracking-wide">
+                        <Truck className="w-4 h-4 text-cielo-gold/70" strokeWidth={1.5} /> Envío 24-72h a todo el país
+                    </span>
+                    <span className="hidden sm:block w-px h-4 bg-white/15" />
+                    <span className="flex items-center gap-2 text-[11px] tracking-wide">
+                        <CreditCard className="w-4 h-4 text-cielo-gold/70" strokeWidth={1.5} /> 6 cuotas sin interés
+                    </span>
+                    <span className="hidden sm:block w-px h-4 bg-white/15" />
+                    <span className="flex items-center gap-2 text-[11px] tracking-wide">
+                        <RefreshCw className="w-4 h-4 text-cielo-gold/70" strokeWidth={1.5} /> Cambios hasta 15 días
+                    </span>
+                </div>
             </div>
 
-            {/* Scroll hint — discreto, a la derecha */}
-            <div className="absolute bottom-10 right-8 md:right-16 z-10 hidden sm:flex flex-col items-center opacity-50">
-                <span className="text-[9px] uppercase tracking-[0.3em] text-white/60 mb-2 [writing-mode:vertical-rl] rotate-180">Scroll</span>
-                <div className="w-[1px] h-14 bg-gradient-to-b from-cielo-gold/70 to-transparent" />
+            {/* Scroll hint — centrado abajo */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center opacity-50">
+                <span className="text-[9px] uppercase tracking-[0.3em] text-white/60 mb-2">Scroll</span>
+                <div className="h-12 w-[1px] bg-gradient-to-b from-cielo-gold/70 to-transparent" />
             </div>
         </section>
     );
