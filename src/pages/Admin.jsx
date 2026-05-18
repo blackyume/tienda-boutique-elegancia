@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Button } from '../components/ui/Button';
 import { useConfirm } from '../components/ui/ConfirmDialog';
@@ -13,26 +13,34 @@ import {
     Check as CheckIcon, Lock, Settings, Blocks, Bot, Ticket, Building2,
     ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen
 } from 'lucide-react';
-import { SimulationsView } from '../components/admin/SimulationsView';
-import { IntegrationsView } from '../components/admin/IntegrationsView';
-import { CMSView } from '../components/admin/CMSView';
 import { StatusSelector } from '../components/admin/StatusSelector';
-import { ProductEditModal } from '../components/admin/ProductEditModal';
-import { DashboardView } from '../components/admin/DashboardView';
-import { SettingsView } from '../components/admin/SettingsView';
-import { OrdersView } from '../components/admin/OrdersView';
-import { CustomersView } from '../components/admin/CustomersView';
-import { AdminAssistantView } from '../components/admin/AdminAssistantView';
-import { CouponsView } from '../components/admin/CouponsView';
-
-import { SalesView } from '../components/admin/SalesView';
-import { SuppliersView } from '../components/admin/SuppliersView';
-import { AbandonedCartsView } from '../components/admin/AbandonedCartsView';
-import { ReviewsView } from '../components/admin/ReviewsView';
-import { generateProductCopy } from '../utils/gemini';
 import { getTotalStock } from '../utils/variants';
 import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock';
-import { getColorHex } from '../utils/colors';
+
+// Cada tab se carga bajo demanda (code-splitting) — el bundle inicial del
+// Admin baja fuerte y cada vista pesada (IA, CMS, Dashboard) no se descarga
+// hasta que se entra.
+const lazyNamed = (factory, name) => lazy(() => factory().then(m => ({ default: m[name] })));
+const SimulationsView = lazyNamed(() => import('../components/admin/SimulationsView'), 'SimulationsView');
+const IntegrationsView = lazyNamed(() => import('../components/admin/IntegrationsView'), 'IntegrationsView');
+const CMSView = lazyNamed(() => import('../components/admin/CMSView'), 'CMSView');
+const ProductEditModal = lazyNamed(() => import('../components/admin/ProductEditModal'), 'ProductEditModal');
+const DashboardView = lazyNamed(() => import('../components/admin/DashboardView'), 'DashboardView');
+const SettingsView = lazyNamed(() => import('../components/admin/SettingsView'), 'SettingsView');
+const OrdersView = lazyNamed(() => import('../components/admin/OrdersView'), 'OrdersView');
+const CustomersView = lazyNamed(() => import('../components/admin/CustomersView'), 'CustomersView');
+const AdminAssistantView = lazyNamed(() => import('../components/admin/AdminAssistantView'), 'AdminAssistantView');
+const CouponsView = lazyNamed(() => import('../components/admin/CouponsView'), 'CouponsView');
+const SalesView = lazyNamed(() => import('../components/admin/SalesView'), 'SalesView');
+const SuppliersView = lazyNamed(() => import('../components/admin/SuppliersView'), 'SuppliersView');
+const AbandonedCartsView = lazyNamed(() => import('../components/admin/AbandonedCartsView'), 'AbandonedCartsView');
+const ReviewsView = lazyNamed(() => import('../components/admin/ReviewsView'), 'ReviewsView');
+
+const TabLoader = () => (
+    <div className="flex items-center justify-center py-32">
+        <div className="w-10 h-10 border-2 border-[#C19A6B] border-t-transparent rounded-full animate-spin" />
+    </div>
+);
 
 
 const TAB_LABELS = {
@@ -542,7 +550,8 @@ export const Admin = () => {
                 )
                 }
 
-                {/* OTHER TABS (SIMPLIFIED FOR LENGTH - KEEPING KEY FUNCTIONALITY) */}
+                {/* OTHER TABS — carga lazy con Suspense */}
+                <Suspense fallback={<TabLoader />}>
                 {adminTab === 'dashboard' && <DashboardView
                     metrics={metrics}
                     visitCount={visitCount}
@@ -596,11 +605,14 @@ export const Admin = () => {
                 {adminTab === 'reviews' && <ReviewsView />}
                 {adminTab === 'integrations' && <IntegrationsView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
+                </Suspense>
             </main >
 
             {/* PRODUCT MODAL */}
             {isProductModalOpen && currentProduct && (
-                <ProductEditModal initialProduct={currentProduct} onClose={() => setIsProductModalOpen(false)} />
+                <Suspense fallback={null}>
+                    <ProductEditModal initialProduct={currentProduct} onClose={() => setIsProductModalOpen(false)} />
+                </Suspense>
             )}
 
                         <style>{`
