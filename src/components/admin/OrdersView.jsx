@@ -4,6 +4,7 @@ import { KanbanBoard } from './KanbanBoard';
 import { EmptyState } from '../ui/EmptyState';
 import { usePrompt } from '../ui/ConfirmDialog';
 import { LayoutList, KanbanSquare, PackageOpen } from 'lucide-react';
+import { usePagination, Pagination } from '../ui/Pagination';
 
 export const OrdersView = ({ orders, updateOrderStatus }) => {
     const askPrompt = usePrompt();
@@ -11,7 +12,8 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
     const [filter, setFilter] = useState('all');
 
     // Derived state
-    const filteredOrders = orders.filter(o => filter === 'all' || o.status === filter);
+    const filteredOrders = (orders || []).filter(o => filter === 'all' || o.status === filter);
+    const ordPage = usePagination(filteredOrders, 15);
 
     const getStatusColor = (status) => {
         if (status === 'shipped') return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
@@ -63,6 +65,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
             {viewMode === 'board' ? (
                 <KanbanBoard orders={orders} updateOrderStatus={updateOrderStatus} />
             ) : (
+                <>
                 <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
                     {filteredOrders.length === 0 ? (
                         <EmptyState
@@ -71,22 +74,22 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                             subtitle={filter === 'all' ? 'Cuando entre la primera venta vas a verla acá en tiempo real.' : 'Probá cambiar el filtro para ver otros pedidos.'}
                         />
                     ) : (
-                        filteredOrders.map(o => (
+                        ordPage.pageItems.map(o => (
                             <div key={o.id} className="group p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors gap-4">
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center font-bold text-slate-500">
-                                        {o.items.length}
+                                        {(o.items || []).length}
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-3">
-                                            <p className="font-bold text-[#C19A6B] text-lg font-mono">#{o.id.slice(-6)}</p>
+                                            <p className="font-bold text-[#C19A6B] text-lg font-mono">#{String(o.id || '').slice(-6)}</p>
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getStatusColor(o.status)}`}>
                                                 {o.status === 'pending' ? 'Pendiente' : o.status === 'shipped' ? 'Enviado' : 'Entregado'}
                                             </span>
                                         </div>
-                                        <p className="text-sm font-bold dark:text-white">{o.customer.nombre} {o.customer.apellido}</p>
+                                        <p className="text-sm font-bold dark:text-white">{o.customer?.nombre || 'Cliente'} {o.customer?.apellido || ''}</p>
                                         <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                                            {new Date(o.date).toLocaleDateString()} • {o.shipping.toUpperCase()}
+                                            {o.date ? new Date(o.date).toLocaleDateString() : '—'} • {(o.shipping || '').toUpperCase()}
                                             {o.trackingNumber && <span className="text-blue-500 font-mono bg-blue-50 dark:bg-blue-900/20 px-1 rounded">TRK: {o.trackingNumber}</span>}
                                         </p>
                                     </div>
@@ -119,6 +122,8 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                             </div>
                         )))}
                 </div>
+                <Pagination page={ordPage.page} setPage={ordPage.setPage} totalPages={ordPage.totalPages} total={ordPage.total} pageSize={15} />
+                </>
             )}
         </div>
     );

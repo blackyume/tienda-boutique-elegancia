@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { formatMoney } from '../../utils/helpers';
 import { Users, Mail, Phone, Calendar, ShoppingBag, BadgeCheck } from 'lucide-react';
+import { usePagination, Pagination } from '../ui/Pagination';
 
 export const CustomersView = ({ orders }) => {
 
@@ -8,19 +9,20 @@ export const CustomersView = ({ orders }) => {
     const customers = useMemo(() => {
         const customerMap = {};
 
-        orders.forEach(order => {
-            const email = order.customer.email;
+        (orders || []).forEach(order => {
+            const cust = order.customer || {};
+            const email = cust.email || 'sin-email';
             if (!customerMap[email]) {
                 customerMap[email] = {
                     id: email,
-                    name: `${order.customer.nombre} ${order.customer.apellido}`,
+                    name: `${cust.nombre || 'Cliente'} ${cust.apellido || ''}`.trim(),
                     email: email,
-                    phone: order.customer.telefono,
+                    phone: cust.telefono || '—',
                     totalSpent: 0,
                     orderCount: 0,
                     lastOrder: order.date,
-                    city: order.customer.ciudad,
-                    province: order.customer.provincia
+                    city: cust.ciudad || '—',
+                    province: cust.provincia || ''
                 };
             }
             customerMap[email].totalSpent += order.total;
@@ -33,6 +35,9 @@ export const CustomersView = ({ orders }) => {
         // Convert to array and sort by total spent (VIPs first)
         return Object.values(customerMap).sort((a, b) => b.totalSpent - a.totalSpent);
     }, [orders]);
+
+    const PAGE = 24;
+    const custPage = usePagination(customers, PAGE);
 
     return (
         <div className="max-w-7xl mx-auto p-6 lg:p-10 pb-24 animate-fadeIn">
@@ -50,7 +55,9 @@ export const CustomersView = ({ orders }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {customers.map((c, i) => (
+                {custPage.pageItems.map((c, idx) => {
+                    const i = (custPage.page - 1) * PAGE + idx;
+                    return (
                     <div key={c.id} className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
 
                         {/* VIP BADGE FOR TOP 3 */}
@@ -98,8 +105,11 @@ export const CustomersView = ({ orders }) => {
                             </div>
                         </div>
                     </div>
-                ))}
+                    );
+                })}
             </div>
+
+            <Pagination page={custPage.page} setPage={custPage.setPage} totalPages={custPage.totalPages} total={custPage.total} pageSize={PAGE} />
 
             {customers.length === 0 && (
                 <div className="text-center py-20 bg-white dark:bg-[#1e293b] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">

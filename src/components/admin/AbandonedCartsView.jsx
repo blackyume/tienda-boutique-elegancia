@@ -3,6 +3,7 @@ import { ShoppingCart, Mail, Trash2, Check, Clock, RefreshCw } from 'lucide-reac
 import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
 import { useConfirm } from '../ui/ConfirmDialog';
+import { usePagination, Pagination } from '../ui/Pagination';
 
 const relative = (ts) => {
     if (!ts) return '—';
@@ -22,12 +23,13 @@ export const AbandonedCartsView = () => {
     const [sendingId, setSendingId] = useState(null);
 
     const stats = useMemo(() => {
-        const pending = abandonedCarts.filter(c => !c.recovered);
-        const recovered = abandonedCarts.filter(c => c.recovered);
+        const all = abandonedCarts || [];
+        const pending = all.filter(c => !c.recovered);
+        const recovered = all.filter(c => c.recovered);
         const lostValue = pending.reduce((acc, c) => acc + (c.total || 0), 0);
         const recoveredValue = recovered.reduce((acc, c) => acc + (c.total || 0), 0);
-        const recoveryRate = abandonedCarts.length
-            ? (recovered.length / abandonedCarts.length) * 100
+        const recoveryRate = all.length
+            ? (recovered.length / all.length) * 100
             : 0;
         return { pending, recovered, lostValue, recoveredValue, recoveryRate };
     }, [abandonedCarts]);
@@ -35,8 +37,10 @@ export const AbandonedCartsView = () => {
     const filtered = useMemo(() => {
         if (filter === 'pending') return stats.pending;
         if (filter === 'recovered') return stats.recovered;
-        return abandonedCarts;
+        return abandonedCarts || [];
     }, [filter, stats, abandonedCarts]);
+
+    const cartsPage = usePagination(filtered, 20);
 
     const handleSend = async (cart) => {
         if (!(await confirm({ title: 'Enviar recordatorio', message: `Se enviará un email de recordatorio a ${cart.email}.`, confirmText: 'Enviar' }))) return;
@@ -77,7 +81,7 @@ export const AbandonedCartsView = () => {
             <div className="flex gap-2 mb-6">
                 <FilterBtn active={filter === 'pending'} onClick={() => setFilter('pending')}>Pendientes ({stats.pending.length})</FilterBtn>
                 <FilterBtn active={filter === 'recovered'} onClick={() => setFilter('recovered')}>Recuperados ({stats.recovered.length})</FilterBtn>
-                <FilterBtn active={filter === 'all'} onClick={() => setFilter('all')}>Todos ({abandonedCarts.length})</FilterBtn>
+                <FilterBtn active={filter === 'all'} onClick={() => setFilter('all')}>Todos ({(abandonedCarts || []).length})</FilterBtn>
             </div>
 
             {/* LIST */}
@@ -89,7 +93,7 @@ export const AbandonedCartsView = () => {
                     </div>
                 ) : (
                     <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {filtered.map(cart => (
+                        {cartsPage.pageItems.map(cart => (
                             <div key={cart.id} className={`p-5 ${cart.recovered ? 'bg-emerald-50/40 dark:bg-emerald-900/10' : ''}`}>
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                     <div className="flex-1 min-w-0">
@@ -151,6 +155,8 @@ export const AbandonedCartsView = () => {
                     </div>
                 )}
             </div>
+
+            <Pagination page={cartsPage.page} setPage={cartsPage.setPage} totalPages={cartsPage.totalPages} total={cartsPage.total} pageSize={20} />
         </div>
     );
 };

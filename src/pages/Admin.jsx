@@ -14,6 +14,7 @@ import {
     ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen
 } from 'lucide-react';
 import { StatusSelector } from '../components/admin/StatusSelector';
+import { usePagination, Pagination } from '../components/ui/Pagination';
 import { getTotalStock } from '../utils/variants';
 import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock';
 
@@ -136,6 +137,8 @@ export const Admin = () => {
             }
         });
     }, [inventory, searchTerm, selectedCategory, filterLowStock, sortOrder, lowStockThreshold]);
+
+    const invPage = usePagination(filteredInventory, 20);
 
     const lowStockItems = useMemo(
         () => getLowStockItems(inventory, lowStockThreshold),
@@ -419,7 +422,7 @@ export const Admin = () => {
                                     {filteredInventory.length === 0 ? (
                                         <tr><td colSpan="6"><EmptyState icon={PackageOpen} title="Sin productos" subtitle={searchTerm || selectedCategory !== 'Todos' || filterLowStock ? 'Ningún producto coincide con los filtros aplicados.' : 'Empezá agregando tu primer diseño con el botón “+ Nuevo Diseño”.'} /></td></tr>
                                     ) : (
-                                        filteredInventory.map(p => {
+                                        invPage.pageItems.map(p => {
                                             const totalDirectCost = (Number(p.cost) || 0) + (Number(p.shippingCost) || 0) + (Number(p.packagingCost) || 0);
                                             const fee = p.price * ((Number(p.feePercent) || 0) / 100);
                                             const netProfit = p.price - totalDirectCost - fee;
@@ -546,6 +549,7 @@ export const Admin = () => {
                                 </tbody>
                             </table>
                         </div>
+                        <Pagination page={invPage.page} setPage={invPage.setPage} totalPages={invPage.totalPages} total={invPage.total} pageSize={20} />
                     </div>
                 )
                 }
