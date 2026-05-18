@@ -261,7 +261,9 @@ export const useDbActions = ({
               street: orderData.customer.calle
             },
             shipping_cost: orderData.shippingCost,
-            external_reference: orderData.id
+            external_reference: orderData.id,
+            coupon: orderData.coupon || null,
+            referral: orderData.referral || null
           })
         });
         const data = await response.json();

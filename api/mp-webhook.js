@@ -15,6 +15,7 @@
 // Config en MP: Mercado Pago Dashboard → Webhooks → URL: /api/mp-webhook
 const crypto = require('crypto');
 const { getDb } = require('./_firebaseAdmin');
+const { applyStockDecrement, applyStockRestore } = require('./_pricing');
 
 const MP_STATUS_MAP = {
     approved: 'approved',
@@ -95,34 +96,103 @@ module.exports = async (req, res) => {
         }
 
         const newStatus = MP_STATUS_MAP[mpStatus] || 'pending';
+        const paidAmount = Number(payment.transaction_amount) || 0;
 
-        // Buscar la orden por id (el external_reference debe ser el order.id)
+        // Buscar la orden (external_reference == order.id; puede o no ser el docId)
         const db = getDb();
-        const docRef = db.collection('orders').doc(String(externalRef));
-        const snap = await docRef.get();
-
+        let docRef = db.collection('orders').doc(String(externalRef));
+        let snap = await docRef.get();
         if (!snap.exists) {
-            // También buscamos como id custom (order.id puede no ser el docId)
             const query = await db.collection('orders')
-                .where('id', '==', String(externalRef))
-                .limit(1)
-                .get();
+                .where('id', '==', String(externalRef)).limit(1).get();
             if (query.empty) {
                 return res.status(200).json({ ignored: true, reason: 'orden no encontrada', externalRef });
             }
-            await query.docs[0].ref.update({
-                status: newStatus,
-                mpStatus,
-                mpPaymentId: String(resourceId),
-                mpUpdatedAt: Date.now()
-            });
-        } else {
+            docRef = query.docs[0].ref;
+            snap = query.docs[0];
+        }
+        const order = snap.data() || {};
+
+        // Idempotencia: mismo pago + mismo estado ya procesado
+        if (order.mpPaymentId === String(resourceId) && order.status === newStatus) {
+            return res.status(200).json({ ok: true, deduped: true, status: newStatus });
+        }
+
+        const base = {
+            mpStatus,
+            mpPaymentId: String(resourceId),
+            mpUpdatedAt: Date.now(),
+            mpAmountPaid: paidAmount
+        };
+
+        // Verificar monto pagado vs esperado (anti-fraude / manipulación de precio)
+        const expected = Number(order.amountExpected ?? order.total) || 0;
+        if (newStatus === 'approved' && expected > 0 && Math.abs(paidAmount - expected) > 1) {
             await docRef.update({
-                status: newStatus,
-                mpStatus,
-                mpPaymentId: String(resourceId),
-                mpUpdatedAt: Date.now()
+                ...base,
+                status: 'review',
+                mpAmountMismatch: true
             });
+            console.warn(`[mp-webhook] MONTO NO COINCIDE order=${externalRef} esperado=${expected} pagado=${paidAmount}`);
+            return res.status(200).json({ ok: true, status: 'review', reason: 'amount_mismatch', expected, paid: paidAmount });
+        }
+
+        await docRef.update({ ...base, status: newStatus });
+
+        // Descontar stock al aprobar (idempotente vía flag stockApplied)
+        if (newStatus === 'approved' && !order.stockApplied && Array.isArray(order.items) && order.items.length) {
+            const lines = order.items.filter(i => i && i.id != null);
+            if (lines.length) {
+                try {
+                    await db.runTransaction(async (tx) => {
+                        const byProduct = new Map();
+                        for (const l of lines) {
+                            const pid = String(l.id);
+                            if (!byProduct.has(pid)) byProduct.set(pid, []);
+                            byProduct.get(pid).push({ size: l.size || '', color: l.color || '', quantity: Number(l.quantity) || 0 });
+                        }
+                        const refs = [...byProduct.keys()].map(pid => db.collection('products').doc(pid));
+                        const docs = await Promise.all(refs.map(r => tx.get(r)));
+                        docs.forEach((pdoc, idx) => {
+                            if (!pdoc.exists) return;
+                            const pid = [...byProduct.keys()][idx];
+                            const patch = applyStockDecrement(pdoc.data(), byProduct.get(pid));
+                            tx.update(pdoc.ref, patch);
+                        });
+                        tx.update(docRef, { stockApplied: true, stockAppliedAt: Date.now() });
+                    });
+                } catch (stockErr) {
+                    console.error(`[mp-webhook] stock decrement falló order=${externalRef}:`, stockErr.message);
+                    await docRef.update({ stockError: stockErr.message, needsStockReview: true });
+                }
+            }
+        }
+
+        // Reponer stock si se reembolsa/cancela tras haber descontado
+        if ((newStatus === 'refunded' || newStatus === 'cancelled') && order.stockApplied && Array.isArray(order.items)) {
+            const lines = order.items.filter(i => i && i.id != null);
+            if (lines.length) {
+                try {
+                    await db.runTransaction(async (tx) => {
+                        const byProduct = new Map();
+                        for (const l of lines) {
+                            const pid = String(l.id);
+                            if (!byProduct.has(pid)) byProduct.set(pid, []);
+                            byProduct.get(pid).push({ size: l.size || '', color: l.color || '', quantity: Number(l.quantity) || 0 });
+                        }
+                        const keys = [...byProduct.keys()];
+                        const docs = await Promise.all(keys.map(pid => tx.get(db.collection('products').doc(pid))));
+                        docs.forEach((pdoc, idx) => {
+                            if (!pdoc.exists) return;
+                            const patch = applyStockRestore(pdoc.data(), byProduct.get(keys[idx]));
+                            tx.update(pdoc.ref, patch);
+                        });
+                        tx.update(docRef, { stockApplied: false, stockRestoredAt: Date.now() });
+                    });
+                } catch (restoreErr) {
+                    console.error(`[mp-webhook] restock falló order=${externalRef}:`, restoreErr.message);
+                }
+            }
         }
 
         return res.status(200).json({ ok: true, status: newStatus, paymentId: resourceId });
