@@ -62,7 +62,8 @@ service cloud.firestore {
     // Usuarios pueden crear sus propias órdenes y leer las propias.
     // Admin puede leer/editar/eliminar todas.
     match /orders/{id} {
-      allow create: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid;
       allow read: if isAdmin()
         || (isSignedIn() && resource.data.userId == request.auth.uid);
       allow update, delete: if isAdmin();
@@ -73,7 +74,13 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
       allow create: if isSignedIn() && request.auth.uid == uid;
-      allow update: if isSignedIn() && request.auth.uid == uid;
+      // El usuario edita su doc pero NO puede auto-escalar rol ni inflar
+      // sus métricas de referidos (eso solo lo escribe el server con Admin SDK).
+      allow update: if isSignedIn() && request.auth.uid == uid
+        && request.resource.data.get('role', 'user') == resource.data.get('role', 'user')
+        && request.resource.data.get('referralsEarnings', 0) == resource.data.get('referralsEarnings', 0)
+        && request.resource.data.get('referralsCount', 0) == resource.data.get('referralsCount', 0)
+        && request.resource.data.get('referralsRevenue', 0) == resource.data.get('referralsRevenue', 0);
       allow delete: if isAdmin();
     }
 

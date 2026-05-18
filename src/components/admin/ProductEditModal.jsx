@@ -291,7 +291,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-4">
                                         {(currentProduct.media || []).map((item, index) => (
-                                            <div key={index} className={`aspect-square rounded-xl overflow-hidden relative group border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm transition-all hover:shadow-md ${item.isUploading ? 'opacity-70' : ''}`}>
+                                            <div key={item.tempId || item.url || index} className={`aspect-square rounded-xl overflow-hidden relative group border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm transition-all hover:shadow-md ${item.isUploading ? 'opacity-70' : ''}`}>
                                                 {item.type === 'image' ? (
                                                     <>
                                                         <img src={item.url} className={`w-full h-full object-cover ${item.status === 'error' ? 'grayscale opacity-50' : ''}`} alt="Media" />
@@ -438,7 +438,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                         </div>
                                         <div className="flex flex-wrap gap-2">
                                             {(currentProduct.colors || []).map((c, i) => (
-                                                <div key={i} className="relative group/color">
+                                                <div key={`${c}-${i}`} className="relative group/color">
                                                     <div
                                                         className="w-8 h-8 rounded-full border border-slate-200 shadow-sm cursor-help relative"
                                                         style={{ backgroundColor: getColorHex(c) }}

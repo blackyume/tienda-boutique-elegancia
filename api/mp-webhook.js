@@ -14,7 +14,7 @@
 //
 // Config en MP: Mercado Pago Dashboard → Webhooks → URL: /api/mp-webhook
 const crypto = require('crypto');
-const { getDb } = require('./_firebaseAdmin');
+const { getDb, admin } = require('./_firebaseAdmin');
 const { applyStockDecrement, applyStockRestore } = require('./_pricing');
 
 const MP_STATUS_MAP = {
@@ -166,6 +166,25 @@ module.exports = async (req, res) => {
                     await docRef.update({ stockError: stockErr.message, needsStockReview: true });
                 }
             }
+        }
+
+        // Acreditar al dueño del referido SOLO cuando el pago se aprobó
+        // (server-side, idempotente, sin auto-referido).
+        if (newStatus === 'approved' && !order.referralCredited && order.referral && order.referral.ownerUid) {
+            const ownerUid = String(order.referral.ownerUid);
+            const isSelf = order.userId && String(order.userId) === ownerUid;
+            if (!isSelf) {
+                try {
+                    await db.collection('users').doc(ownerUid).set({
+                        referralsCount: admin.firestore.FieldValue.increment(1),
+                        referralsEarnings: admin.firestore.FieldValue.increment(Number(order.referralDiscount) || 0),
+                        referralsRevenue: admin.firestore.FieldValue.increment(Number(order.total) || 0)
+                    }, { merge: true });
+                } catch (refErr) {
+                    console.error(`[mp-webhook] credit referido falló order=${externalRef}:`, refErr.message);
+                }
+            }
+            await docRef.update({ referralCredited: true });
         }
 
         // Reponer stock si se reembolsa/cancela tras haber descontado

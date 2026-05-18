@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { db } from '../lib/firebase';
-import { collection, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, increment } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, setDoc, increment } from 'firebase/firestore';
 import imageCompression from 'browser-image-compression';
 
 // Todas las acciones de escritura a Firestore (CRUD productos, órdenes,
@@ -56,9 +56,14 @@ export const useDbActions = ({
     },
     updateProduct: async (id, updates) => {
       if (!isAdmin) return;
-      const ref = doc(db, "products", String(id));
-      await updateDoc(ref, updates);
-      addToast("Producto actualizado", "success");
+      try {
+        await updateDoc(doc(db, "products", String(id)), updates);
+        addToast("Producto actualizado", "success");
+      } catch (e) {
+        console.error(e);
+        addToast("Error al actualizar producto", "error");
+        throw e;
+      }
     },
     incrementProductView: async (id) => {
       try {
@@ -75,12 +80,25 @@ export const useDbActions = ({
         // Front-end only delete is risky/complex. For now, we just delete products.
         // Images will stay in Cloudinary (minor cost/orphan file issue)
       }
-      await deleteDoc(doc(db, "products", String(id)));
+      try {
+        await deleteDoc(doc(db, "products", String(id)));
+        addToast("Producto eliminado", "success");
+      } catch (e) {
+        console.error(e);
+        addToast("Error al eliminar producto", "error");
+        throw e;
+      }
     },
     createOrder: async (order) => {
       const orderId = String(order.id || Date.now());
       const orderWithUser = { ...order, userId: user?.uid || 'guest' };
-      await setDoc(doc(db, "orders", orderId), orderWithUser);
+      try {
+        await setDoc(doc(db, "orders", orderId), orderWithUser);
+      } catch (e) {
+        console.error("Error creando orden:", e);
+        addToast("No se pudo registrar la orden. Reintentá.", "error");
+        throw e;
+      }
     },
     updateOrderStatus: async (id, status, extraData = {}) => {
       if (!isAdmin) return;
@@ -422,12 +440,8 @@ export const useDbActions = ({
     },
     redeemCoupon: async (id) => {
       try {
-        const couponRef = doc(db, "coupons", String(id));
-        const snap = await getDoc(couponRef);
-        if (snap.exists()) {
-          const current = snap.data().usedCount || 0;
-          await updateDoc(couponRef, { usedCount: current + 1 });
-        }
+        // Incremento atómico — evita race condition de read+write.
+        await updateDoc(doc(db, "coupons", String(id)), { usedCount: increment(1) });
       } catch (e) {
         console.error("Error using coupon:", e);
       }

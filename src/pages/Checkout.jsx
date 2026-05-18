@@ -7,7 +7,7 @@ import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, 
 import { formatMoney } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
-import { findReferralOwner, creditReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
+import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
 
 export const Checkout = () => {
     const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, redeemCoupon } = useStore();
@@ -19,7 +19,7 @@ export const Checkout = () => {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
     // Pre-fill email from user
-    useState(() => {
+    useEffect(() => {
         if (user?.email) {
             setFormData(prev => ({ ...prev, email: user.email }));
         }
@@ -228,7 +228,6 @@ export const Checkout = () => {
             trackBeginCheckout(cart, finalTotal);
             await createOrder(newOrder);
             if (appliedCoupon) await redeemCoupon(appliedCoupon.id);
-            if (appliedReferral) creditReferralOwner(appliedReferral.ownerUid, finalTotal, referralDiscount).catch(() => {});
             markAbandonedCartRecovered(formData.email, orderId).catch(() => {});
 
             const msg = encodeURIComponent(buildWhatsAppMessage(orderId));
@@ -271,7 +270,6 @@ export const Checkout = () => {
 
             // 1. Crear Orden en Firebase (Persistencia)
             await createOrder(newOrder);
-            if (appliedReferral) creditReferralOwner(appliedReferral.ownerUid, finalTotal, referralDiscount).catch(() => {});
             markAbandonedCartRecovered(formData.email, newOrder.id).catch(() => {});
 
             // 1.5 Register coupon usage if applied

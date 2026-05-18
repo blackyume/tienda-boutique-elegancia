@@ -4,6 +4,7 @@ import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
 import { Button } from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { getVariantStock } from '../../utils/variants';
 
 export const CartDrawer = ({ isOpen, onClose }) => {
    const { cart, removeFromCart, updateCartQty, cartTotal, cartCount, siteConfig, inventory } = useStore();
@@ -70,7 +71,10 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                      <p className="text-slate-400 text-sm font-montserrat">Descubrí nuestra nueva colección.</p>
                   </div>
                ) : (
-                  cart.map(item => (
+                  cart.map(item => {
+                     const prod = inventory.find(p => String(p.id) === String(item.id));
+                     const maxStock = prod ? getVariantStock(prod, item.size, item.color) : Infinity;
+                     return (
                      <div key={item.key} className="flex gap-4 group animate-fadeIn">
                         <div className="w-24 h-32 bg-slate-800 rounded-lg overflow-hidden flex-shrink-0 relative border border-white/5">
                            <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -98,7 +102,8 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                                  <span className="text-xs font-bold text-cielo-gold w-6 text-center">{item.quantity}</span>
                                  <button
                                     onClick={() => updateCartQty(item.key, item.quantity + 1)}
-                                    className="p-2 text-white hover:text-cielo-gold"
+                                    disabled={item.quantity >= maxStock}
+                                    className="p-2 text-white hover:text-cielo-gold disabled:opacity-30 disabled:cursor-not-allowed"
                                     aria-label="Sumar"
                                  >
                                     <Plus className="w-3 h-3" />
@@ -107,7 +112,8 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                            </div>
                         </div>
                      </div>
-                  ))
+                     );
+                  })
                )}
 
                {/* CROSS SELLING - You May Also Like */}
