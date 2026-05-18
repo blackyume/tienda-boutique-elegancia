@@ -38,6 +38,14 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
     const totalCost = (Number(currentProduct.cost) || 0) + (Number(currentProduct.shippingCost) || 0)
         + (Number(currentProduct.packagingCost) || 0) + (Number(currentProduct.fixedFee) || 0);
 
+    // Simulación (precio vacío => sin ganancia calculable, no número negativo)
+    const priceNum = Number(currentProduct.price) || 0;
+    const baseCosts = (Number(currentProduct.cost) || 0) + (Number(currentProduct.shippingCost) || 0) + (Number(currentProduct.packagingCost) || 0);
+    const fixedFeeNum = Number(currentProduct.fixedFee) || 0;
+    const feeVar = priceNum * ((Number(currentProduct.feePercent) || 0) / 100);
+    const netProfit = priceNum > 0 ? priceNum - baseCosts - fixedFeeNum - feeVar : null;
+    const marginPct = priceNum > 0 ? ((netProfit / priceNum) * 100).toFixed(1) : null;
+
     const validation = useMemo(() => {
         const blocking = [];
         const warnings = [];
@@ -382,7 +390,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                             </datalist>
                                         </InputGroup>
                                         <InputGroup label="Stock Actual">
-                                            <input type="number" placeholder="0" value={currentProduct.stock} onChange={e => setCurrentProduct({ ...currentProduct, stock: e.target.value })} className="input font-bold" />
+                                            <input type="number" min="0" placeholder="0" value={currentProduct.stock} onChange={e => setCurrentProduct({ ...currentProduct, stock: e.target.value })} className="input font-bold" />
                                             {showErrors && Number(currentProduct.stock) < 0 && <p className="text-[11px] text-red-500 mt-1 font-medium">No puede ser negativo</p>}
                                         </InputGroup>
                                     </div>
@@ -543,26 +551,26 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                                         <td className="py-2">
                                                             <input
                                                                 type="number"
+                                                                min="0"
                                                                 aria-label={`Precio variante ${variant.size} ${variant.color}`}
                                                                 value={variant.price}
-                                                                onChange={(e) => {
-                                                                    const updated = [...currentProduct.variants];
-                                                                    updated[idx].price = Number(e.target.value);
-                                                                    setCurrentProduct({ ...currentProduct, variants: updated });
-                                                                }}
+                                                                onChange={(e) => setCurrentProduct({
+                                                                    ...currentProduct,
+                                                                    variants: currentProduct.variants.map((v, i) => i === idx ? { ...v, price: Number(e.target.value) } : v)
+                                                                })}
                                                                 className="w-24 p-1 border rounded text-center font-bold dark:bg-slate-800 dark:border-slate-700"
                                                             />
                                                         </td>
                                                         <td className="py-2">
                                                             <input
                                                                 type="number"
+                                                                min="0"
                                                                 aria-label={`Stock variante ${variant.size} ${variant.color}`}
                                                                 value={variant.stock}
-                                                                onChange={(e) => {
-                                                                    const updated = [...currentProduct.variants];
-                                                                    updated[idx].stock = Number(e.target.value);
-                                                                    setCurrentProduct({ ...currentProduct, variants: updated });
-                                                                }}
+                                                                onChange={(e) => setCurrentProduct({
+                                                                    ...currentProduct,
+                                                                    variants: currentProduct.variants.map((v, i) => i === idx ? { ...v, stock: Number(e.target.value) } : v)
+                                                                })}
                                                                 className="w-20 p-1 border rounded text-center font-bold dark:bg-slate-800 dark:border-slate-700"
                                                             />
                                                         </td>
@@ -597,16 +605,16 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                     <h4 className="flex items-center gap-2 font-bold text-slate-800 dark:text-white mb-4"><DollarSign className="w-4 h-4 text-[#C19A6B]" /> Estructura de Costos</h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                         <InputGroup label="Costo Prenda ($)" help="Fabricación/Compra">
-                                            <input type="number" placeholder="0" value={currentProduct.cost} onChange={e => setCurrentProduct({ ...currentProduct, cost: e.target.value })} className="input" />
+                                            <input type="number" min="0" placeholder="0" value={currentProduct.cost} onChange={e => setCurrentProduct({ ...currentProduct, cost: e.target.value })} className="input" />
                                         </InputGroup>
                                         <InputGroup label="Packaging ($)" help="Bolsa, etiquetas">
-                                            <input type="number" placeholder="0" value={currentProduct.packagingCost} onChange={e => setCurrentProduct({ ...currentProduct, packagingCost: e.target.value })} className="input" />
+                                            <input type="number" min="0" placeholder="0" value={currentProduct.packagingCost} onChange={e => setCurrentProduct({ ...currentProduct, packagingCost: e.target.value })} className="input" />
                                         </InputGroup>
                                         <InputGroup label="Comisión MP (%)" help="Ej: 6%">
-                                            <input type="number" placeholder="0" value={currentProduct.feePercent} onChange={e => setCurrentProduct({ ...currentProduct, feePercent: e.target.value })} className="input" />
+                                            <input type="number" min="0" max="100" placeholder="0" value={currentProduct.feePercent} onChange={e => setCurrentProduct({ ...currentProduct, feePercent: e.target.value })} className="input" />
                                         </InputGroup>
                                         <InputGroup label="Costo Fijo MP ($)" help="Ej: 1500 (Opcional)">
-                                            <input type="number" placeholder="0" value={currentProduct.fixedFee} onChange={e => setCurrentProduct({ ...currentProduct, fixedFee: e.target.value })} className="input" />
+                                            <input type="number" min="0" placeholder="0" value={currentProduct.fixedFee} onChange={e => setCurrentProduct({ ...currentProduct, fixedFee: e.target.value })} className="input" />
                                         </InputGroup>
                                     </div>
                                     <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col gap-3 text-sm mt-4">
@@ -652,7 +660,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                         </div>
                                     </div>
                                     <InputGroup label="PRECIO DE VENTA PÚBLICO">
-                                        <input type="number" value={currentProduct.price} onChange={e => setCurrentProduct({ ...currentProduct, price: e.target.value })} className="w-full p-4 text-3xl font-black text-right bg-white dark:bg-[#111827] border-2 border-emerald-100 dark:border-emerald-900/50 rounded-xl text-emerald-700 dark:text-white focus:border-emerald-400 outline-none shadow-sm placeholder:text-slate-200 dark:placeholder:text-slate-700" placeholder="0.00" />
+                                        <input type="number" min="0" value={currentProduct.price} onChange={e => setCurrentProduct({ ...currentProduct, price: e.target.value })} className="w-full p-4 text-3xl font-black text-right bg-white dark:bg-[#111827] border-2 border-emerald-100 dark:border-emerald-900/50 rounded-xl text-emerald-700 dark:text-white focus:border-emerald-400 outline-none shadow-sm placeholder:text-slate-200 dark:placeholder:text-slate-700" placeholder="0.00" />
                                         {showErrors && (!currentProduct.price || Number(currentProduct.price) <= 0)
                                             ? <p className="text-right text-[11px] text-red-500 mt-2 font-medium">El precio debe ser mayor a 0</p>
                                             : <p className="text-right text-xs text-slate-400 mt-2 font-medium">Este es el precio final que verá el cliente</p>}
@@ -672,17 +680,17 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                             <div className="border-t border-slate-200 dark:border-slate-800 my-2"></div>
                             <Row label="Subtotal Costos" value={(Number(currentProduct.cost) || 0) + (Number(currentProduct.shippingCost) || 0) + (Number(currentProduct.packagingCost) || 0)} bold />
                             <div className="py-4"></div>
-                            <Row label={`Comisión Variable (${currentProduct.feePercent || 0}%)`} value={currentProduct.price * ((currentProduct.feePercent || 0) / 100)} isNegative />
-                            {Number(currentProduct.fixedFee) > 0 && <Row label="Comisión Fija MP" value={currentProduct.fixedFee} isNegative />}
+                            <Row label={`Comisión Variable (${currentProduct.feePercent || 0}%)`} value={feeVar} isNegative />
+                            {fixedFeeNum > 0 && <Row label="Comisión Fija MP" value={fixedFeeNum} isNegative />}
                             <div className="border-t border-slate-200 dark:border-slate-800 my-4"></div>
                             <div className="bg-white dark:bg-[#1e293b] p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                                 <p className="text-[10px] font-bold uppercase text-slate-400 mb-1 text-center">Tu Ganancia Neta</p>
-                                <p className="text-3xl font-black text-center text-emerald-600 dark:text-emerald-400 mb-2">
-                                    {formatMoney(currentProduct.price - ((Number(currentProduct.cost) || 0) + (Number(currentProduct.shippingCost) || 0) + (Number(currentProduct.packagingCost) || 0) + (Number(currentProduct.fixedFee) || 0) + (currentProduct.price * ((currentProduct.feePercent || 0) / 100))))}
+                                <p className={`text-3xl font-black text-center mb-2 ${netProfit === null ? 'text-slate-400' : netProfit < 0 ? 'text-red-500' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                    {netProfit === null ? '—' : formatMoney(netProfit)}
                                 </p>
                                 <div className="text-center">
                                     <span className="inline-block px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded text-[10px] font-bold uppercase">
-                                        Margen: {currentProduct.price > 0 ? (((currentProduct.price - ((Number(currentProduct.cost) || 0) + (Number(currentProduct.shippingCost) || 0) + (Number(currentProduct.packagingCost) || 0) + (Number(currentProduct.fixedFee) || 0) + (currentProduct.price * ((currentProduct.feePercent || 0) / 100)))) / currentProduct.price) * 100).toFixed(1) : 0}%
+                                        Margen: {marginPct === null ? '—' : `${marginPct}%`}
                                     </span>
                                 </div>
                             </div>
