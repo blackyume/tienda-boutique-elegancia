@@ -7,7 +7,7 @@ export const Editorial = () => {
     const editorialImg = siteConfig.editorial?.image;
 
     return (
-        <div className="relative w-full min-h-[600px] md:h-[80vh] flex flex-col md:flex-row bg-[#020617] text-white">
+        <div className="relative w-full min-h-[600px] md:h-[80vh] flex flex-col md:flex-row bg-[#070d1c] border-y border-white/[0.05] text-white">
             {/* Left Content */}
             <div className="w-full md:w-1/2 p-12 md:p-24 flex flex-col justify-center relative z-10">
                 <span className="text-[10px] font-bold tracking-[0.4em] text-white/40 mb-8 uppercase animate-fadeIn">{siteConfig.editorial?.subtitle}</span>

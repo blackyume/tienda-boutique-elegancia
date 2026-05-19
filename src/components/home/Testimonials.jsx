@@ -40,7 +40,7 @@ export const Testimonials = () => {
     }, [list.length]);
 
     return (
-        <section className="relative py-24 md:py-32 px-6 bg-[#020617] overflow-hidden">
+        <section className="relative py-24 md:py-32 px-6 bg-[#070d1c] border-y border-white/[0.05] overflow-hidden">
             <Reveal className="max-w-5xl mx-auto relative z-10">
                 <SectionHeader
                     eyebrow="La voz de nuestras clientas"
