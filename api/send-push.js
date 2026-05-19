@@ -72,8 +72,8 @@ module.exports = async (req, res) => {
             webpush: {
                 fcmOptions: { link: String(url || '/') },
                 notification: {
-                    icon: '/assets/logo-main.png',
-                    badge: '/assets/logo-main.png'
+                    icon: '/assets/logo-seal.png',
+                    badge: '/assets/logo-seal.png'
                 }
             }
         };

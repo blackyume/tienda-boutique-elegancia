@@ -142,7 +142,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 </svg>
                             </div>
 
-                            <img src="/assets/logo-main.png?v=4" alt="LBE Logo" className={`w-24 h-auto transition-all duration-500 group-hover:scale-105 ${scrolled ? 'w-20' : 'w-28'}`} />
+                            <img src="/assets/logo-main.png?v=5" alt="La Boutique de la Elegancia" className={`h-auto transition-all duration-500 group-hover:scale-[1.03] ${scrolled ? 'w-40 md:w-44' : 'w-52 md:w-60'}`} />
                         </Link>
 
                         {/* NAV LINKS (Desktop) */}

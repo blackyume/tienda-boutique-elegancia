@@ -24,17 +24,9 @@ export const Footer = () => {
 
                 {/* Brand */}
                 <div className="col-span-1">
-                    <div className="mb-6 flex items-center gap-4">
-                        {/* Footer Logo */}
-                        <img src="/assets/logo-footer.png?v=4" alt="LBE Footer Logo" className="w-24 h-auto shadow-lg" />
-                        <div>
-                            <h4 className="text-lg font-cinzel text-white leading-none tracking-wide">
-                                LA BOUTIQUE
-                            </h4>
-                            <span className="text-xs font-serif text-cielo-gold italic tracking-widest block mt-1">
-                                de la Elegancia
-                            </span>
-                        </div>
+                    <div className="mb-6">
+                        {/* Footer Logo (lockup metálico — contiene el nombre completo) */}
+                        <img src="/assets/logo-footer.png?v=5" alt="La Boutique de la Elegancia" className="w-48 h-auto" />
                     </div>
                     <p className="text-slate-400 text-sm font-light leading-relaxed mb-6">
                         Moda ética y atemporal diseñada para el mundo moderno. <br />

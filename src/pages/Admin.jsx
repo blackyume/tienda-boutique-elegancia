@@ -269,7 +269,7 @@ export const Admin = () => {
             <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-sm shrink-0 transform transition-transform duration-300 ease-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center">
-                        <img src="/assets/logo-main.png" alt="La Boutique Logo" className="w-10 h-10 object-contain" />
+                        <img src="/assets/logo-seal.png?v=5" alt="La Boutique Logo" className="w-10 h-10 object-contain" />
                         <span className="block ml-3 font-cinzel font-bold text-lg text-slate-800 dark:text-white tracking-widest uppercase">La Boutique</span>
                     </div>
                     <button onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú" className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">

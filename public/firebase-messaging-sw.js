@@ -19,8 +19,8 @@ messaging.onBackgroundMessage((payload) => {
     const title = notification?.title || 'La Boutique de la Elegancia';
     const options = {
         body: notification?.body || '',
-        icon: '/assets/logo-main.png',
-        badge: '/assets/logo-main.png',
+        icon: '/assets/logo-seal.png',
+        badge: '/assets/logo-seal.png',
         data: data || {}
     };
     self.registration.showNotification(title, options);
