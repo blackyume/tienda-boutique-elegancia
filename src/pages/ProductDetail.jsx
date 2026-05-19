@@ -58,6 +58,17 @@ export const ProductDetail = () => {
         }
     }, [id, inventory, navigate, incrementProductView]);
 
+    // Cinturón de seguridad: si algún modal previo dejó el body bloqueado
+    // (size-guide, quick-view, auth, etc.), forzamos que la ficha pueda
+    // scrollear al entrar. No interferimos con modales que se abran dentro
+    // de la ficha — sólo reseteamos una vez al montar.
+    useEffect(() => {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.height = '';
+    }, []);
+
     const images = useMemo(() => {
         if (!product) return [];
         if (Array.isArray(product.images) && product.images.length > 0) return product.images;
