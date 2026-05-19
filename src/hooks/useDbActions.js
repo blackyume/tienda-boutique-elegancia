@@ -33,7 +33,8 @@ export const useDbActions = ({
     },
     updateAiConfig: async (config) => {
       if (!isAdmin) return;
-      await setDoc(doc(db, "config", "ai_settings"), config);
+      // merge: no pisar otras llaves al guardar sólo una parte
+      await setDoc(doc(db, "config", "ai_settings"), config, { merge: true });
       addToast("Configuración de Inteligencia Artificial guardada", "success");
     },
     addProduct: async (product) => {

@@ -60,6 +60,8 @@ export const useFirestoreSubscriptions = ({
         const unsubAiConfig = onSnapshot(doc(db, "config", "ai_settings"), (docSnap) => {
             if (docSnap.exists()) {
                 setAiConfig({
+                    cerebrasKey: docSnap.data().cerebrasKey || "",
+                    cerebrasModel: docSnap.data().cerebrasModel || "",
                     adminKeys: docSnap.data().adminKeys || "",
                     customerKeys: docSnap.data().customerKeys || ""
                 });

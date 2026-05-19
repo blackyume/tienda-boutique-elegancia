@@ -8,7 +8,7 @@ import {
     AlertTriangle
 } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
-import { generateProductCopy } from '../../utils/gemini';
+import { generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { getTotalStock } from '../../utils/variants';
 import { getColorHex } from '../../utils/colors';
 
@@ -184,7 +184,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
 
     const handleGenerateCopy = async () => {
         if (!currentProduct?.name) return addToast('Agregá primero el nombre del producto', 'error');
-        if (!aiConfig?.adminKeys) return addToast('Configurá las API keys de Admin en Integraciones', 'error');
+        if (!hasAdminAI(aiConfig)) return addToast('Configurá la API key de Cerebras (o Gemini) en Admin → Configuración', 'error');
         setIsGeneratingCopy(true);
         try {
             const copy = await generateProductCopy(currentProduct, aiConfig);

@@ -414,6 +414,34 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             </p>
                         </div>
 
+                        {/* CEREBRAS — IA PRINCIPAL */}
+                        <div className="bg-gradient-to-br from-[#C19A6B]/10 to-transparent p-4 rounded-xl border border-[#C19A6B]/30 mb-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <Bot className="w-4 h-4 text-[#C19A6B]" />
+                                <span className="text-sm font-bold text-[#C19A6B] uppercase tracking-wider">Cerebras · IA Principal</span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+                                Motor principal de toda la IA (asistente y generación de textos). Si falla o está vacío, cae automáticamente a Gemini. Pegá tu key de <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener noreferrer" className="underline">cloud.cerebras.ai</a> (regenerala si la compartiste).
+                            </p>
+                            <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">API Key Cerebras</label>
+                            <input
+                                id="cerebrasKey"
+                                type="password"
+                                defaultValue={aiConfig?.cerebrasKey || ''}
+                                placeholder="csk-..."
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm font-mono outline-none focus:border-[#C19A6B] mb-3"
+                            />
+                            <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Modelo (opcional)</label>
+                            <input
+                                id="cerebrasModel"
+                                defaultValue={aiConfig?.cerebrasModel || ''}
+                                placeholder="qwen-3-235b-a22b-instruct-2507 (default · el más capaz)"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm font-mono outline-none focus:border-[#C19A6B]"
+                            />
+                            <p className="text-[10px] text-slate-400 mt-2">Disponibles: qwen-3-235b-a22b-instruct-2507 · zai-glm-4.7 · gpt-oss-120b · llama3.1-8b</p>
+                        </div>
+
+                        <p className="text-xs font-bold uppercase text-slate-400">Gemini · Fallback</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Llaves de Administrador (Cerebro IA)</label>
@@ -438,6 +466,8 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             <Button
                                 onClick={() => {
                                     updateAiConfig({
+                                        cerebrasKey: document.getElementById('cerebrasKey')?.value || '',
+                                        cerebrasModel: document.getElementById('cerebrasModel')?.value || '',
                                         adminKeys: document.getElementById('aiAdminKeys')?.value || '',
                                         customerKeys: document.getElementById('aiCustomerKeys')?.value || ''
                                     });

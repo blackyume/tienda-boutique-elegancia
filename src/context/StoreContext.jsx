@@ -86,8 +86,10 @@ export const StoreProvider = ({ children }) => {
 
   // --- AI CONFIGURATION ---
   const [aiConfig, setAiConfig] = useState({
-    adminKeys: "", // Comma-separated or array
-    customerKeys: "" // Comma-separated or array
+    cerebrasKey: "",   // IA principal (Cerebras)
+    cerebrasModel: "", // opcional: override de modelo
+    adminKeys: "",     // Gemini (fallback admin)
+    customerKeys: ""   // Gemini (fallback clientes)
   });
 
   const [simulations, setSimulations] = useState([]);

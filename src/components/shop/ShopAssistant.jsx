@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
+import { generateText } from '../../utils/ai';
 
 export const ShopAssistant = () => {
     const { inventory, siteConfig, shippingRates, cart, aiConfig } = useStore();
@@ -14,11 +14,6 @@ export const ShopAssistant = () => {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const listRef = useRef(null);
-
-    // Dynamic Keys for production (Fallback system)
-    const API_KEYS = aiConfig?.customerKeys
-        ? aiConfig.customerKeys.split(/[,\n]+/).map(k => k.trim()).filter(k => k)
-        : [];
 
     // Auto-scroll
     useEffect(() => {
@@ -102,47 +97,8 @@ export const ShopAssistant = () => {
                 ${userMsg.text}
             `;
 
-            let success = false;
-            let responseText = '';
-
-            if (API_KEYS.length === 0) {
-                throw new Error("No hay API keys de Elegancia IA configuradas en el Admin.");
-            }
-
-            const modelsToTry = [
-                "gemini-2.5-flash",
-                "gemini-2.0-flash",
-                "gemini-2.0-flash",
-                "gemini-2.5-pro",
-                "gemini-2.0-pro",
-                "gemini-2.0-pro-exp",
-                "gemini-1.0-pro",
-                "gemini-pro"
-            ];
-            let lastError = null;
-
-            for (const key of API_KEYS) {
-                for (const modelName of modelsToTry) {
-                    try {
-                        const genAI = new GoogleGenerativeAI(key);
-                        const model = genAI.getGenerativeModel({ model: modelName });
-                        const result = await model.generateContent(prompt);
-                        responseText = result.response.text();
-                        success = true;
-                        break;
-                    } catch (err) {
-                        console.warn(`Fallo llave Gemini con modelo ${modelName}, intentando fallback...`, err);
-                        lastError = err;
-                        if (err?.message?.includes("API key not valid")) break;
-                    }
-                }
-                if (success) break;
-            }
-
-            if (!success) {
-                throw lastError || new Error("Todas las API keys fallaron");
-            }
-
+            // Cerebras (principal) → Gemini (fallback). Capa única.
+            const responseText = await generateText(prompt, aiConfig, { scope: 'customer' });
             setMessages(prev => [...prev, { role: 'ai', text: responseText, timestamp: new Date() }]);
 
         } catch (error) {
