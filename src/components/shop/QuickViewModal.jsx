@@ -25,14 +25,19 @@ export const QuickViewModal = ({ product, onClose }) => {
 
     useEffect(() => {
         if (!product) return;
+        const prev = document.body.style.overflow;
         const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
         window.addEventListener('keydown', handleEsc);
         document.body.style.overflow = 'hidden';
         return () => {
             window.removeEventListener('keydown', handleEsc);
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = prev || '';
         };
-    }, [product, onClose]);
+        // onClose puede cambiar de identidad en cada render del padre — lo
+        // dejamos fuera de deps para evitar mount/unmount innecesarios que
+        // re-aplicaban el lock.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product]);
 
     if (!product) return null;
 

@@ -174,8 +174,9 @@ export const ProductDetail = () => {
                     )}
                 </div>
 
-                {/* Panel */}
-                <div className="lg:sticky lg:top-28 h-fit">
+                {/* Panel (no sticky — el panel completo es alto y sticky impedía
+                    llegar al fondo en pantallas chicas/medianas). */}
+                <div>
                     <div className="flex justify-between items-start mb-3">
                         <span className="text-xs font-bold tracking-[0.2em] text-cielo-gold uppercase">
                             {product.category}

@@ -23,7 +23,6 @@ import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock
 // hasta que se entra.
 const lazyNamed = (factory, name) => lazy(() => factory().then(m => ({ default: m[name] })));
 const SimulationsView = lazyNamed(() => import('../components/admin/SimulationsView'), 'SimulationsView');
-const IntegrationsView = lazyNamed(() => import('../components/admin/IntegrationsView'), 'IntegrationsView');
 const CMSView = lazyNamed(() => import('../components/admin/CMSView'), 'CMSView');
 const ProductEditModal = lazyNamed(() => import('../components/admin/ProductEditModal'), 'ProductEditModal');
 const DashboardView = lazyNamed(() => import('../components/admin/DashboardView'), 'DashboardView');
@@ -48,7 +47,7 @@ const TAB_LABELS = {
     dashboard: 'Dashboard', inventory: 'Inventario', orders: 'Pedidos', customers: 'Clientes',
     sales: 'Ventas', assistant: 'Asistente IA', cms: 'CMS / Diseño', coupons: 'Cupones',
     suppliers: 'Proveedores', abandoned: 'Carritos Abandonados', reviews: 'Reseñas',
-    calculator: 'Historial de Costos', integrations: 'Integraciones', settings: 'Configuración'
+    calculator: 'Historial de Costos', settings: 'Configuración'
 };
 
 export const Admin = () => {
@@ -295,7 +294,6 @@ export const Admin = () => {
 
                     <div className="my-6 border-t border-slate-100 dark:border-slate-800"></div>
                     <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Sistema</p>
-                    <SidebarItem icon={Blocks} label="Integraciones" active={adminTab === 'integrations'} onClick={() => setAdminTab('integrations')} />
                     <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
                 </nav>
                 <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#111827] space-y-2">
@@ -607,7 +605,6 @@ export const Admin = () => {
                 {adminTab === 'suppliers' && <SuppliersView />}
                 {adminTab === 'abandoned' && <AbandonedCartsView />}
                 {adminTab === 'reviews' && <ReviewsView />}
-                {adminTab === 'integrations' && <IntegrationsView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
                 </Suspense>
             </main >

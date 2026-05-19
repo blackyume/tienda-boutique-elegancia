@@ -39,6 +39,10 @@ const ScrollToTop = () => {
   useLayoutEffect(() => {
     if (hash) return; // respetar anclas en la URL
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    // Limpieza defensiva: si algún modal dejó el body bloqueado, al cambiar de
+    // ruta forzamos que el body vuelva a scrollear. Cura síntomas tipo
+    // "no puedo scrolear" después de cerrar un QuickView o navegar.
+    document.body.style.overflow = '';
   }, [pathname, hash]);
   return null;
 }
