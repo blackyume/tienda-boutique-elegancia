@@ -84,7 +84,14 @@ export const ProductDetail = () => {
             .slice(0, 4);
     }, [inventory, product]);
 
-    if (!product) return <div className="h-screen bg-white dark:bg-[#0B1120]" />;
+    if (!product) return (
+        <div className="min-h-screen bg-white dark:bg-[#0B1120] flex items-center justify-center">
+            <div className="flex items-center gap-3 text-[#C19A6B]">
+                <div className="w-8 h-8 border-2 border-[#C19A6B] border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm tracking-wide">Cargando producto…</span>
+            </div>
+        </div>
+    );
 
     const handleAddToCart = () => {
         if (!selectedSize && (product.sizes?.length || 0) > 0) {

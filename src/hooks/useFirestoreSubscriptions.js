@@ -63,7 +63,9 @@ export const useFirestoreSubscriptions = ({
                     cerebrasKey: docSnap.data().cerebrasKey || "",
                     cerebrasModel: docSnap.data().cerebrasModel || "",
                     adminKeys: docSnap.data().adminKeys || "",
-                    customerKeys: docSnap.data().customerKeys || ""
+                    customerKeys: docSnap.data().customerKeys || "",
+                    nvidiaKey: docSnap.data().nvidiaKey || "",
+                    nvidiaModel: docSnap.data().nvidiaModel || "",
                 });
             }
         });

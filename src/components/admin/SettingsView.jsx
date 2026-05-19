@@ -309,7 +309,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                         <div className={cardCls + ' border-l-4 border-l-purple-500'}>
                             <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bot className="w-5 h-5 text-purple-500" /> Inteligencia Artificial</h3>
                             <div className="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-900/30 mb-4">
-                                <p className="text-sm text-purple-800 dark:text-purple-300"><strong>Motor:</strong> Cerebras (rápido, para Laurina y copy). <strong>Visión:</strong> Gemini (analiza fotos de prendas). El asistente del cliente usa Gemini.</p>
+                                <p className="text-sm text-purple-800 dark:text-purple-300"><strong>Motor:</strong> Cerebras (texto · Laurina y copy). <strong>Visión:</strong> Gemini primario, NVIDIA NIM como fallback. El asistente del cliente usa Gemini.</p>
                             </div>
 
                             <div className="bg-gradient-to-br from-[#C19A6B]/10 to-transparent p-4 rounded-xl border border-[#C19A6B]/30 mb-4">
@@ -327,8 +327,18 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                 <div><label className={labelCls}>Llaves Administrador (Laurina, copy, visión)</label><textarea id="aiAdminKeys" defaultValue={aiConfig?.adminKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
                                 <div><label className={labelCls}>Llaves Cliente (Elegancia IA)</label><textarea id="aiCustomerKeys" defaultValue={aiConfig?.customerKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
                             </div>
+                            <div className="bg-gradient-to-br from-emerald-500/10 to-transparent p-4 rounded-xl border border-emerald-500/30 mt-4">
+                                <div className="flex items-center gap-2 mb-3"><Bot className="w-4 h-4 text-emerald-500" /><span className="text-sm font-bold text-emerald-600 uppercase tracking-wider">NVIDIA NIM · Visión de fallback</span></div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">Detrás de Gemini para analizar fotos de prendas. Key gratuita (créditos iniciales) en <a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer" className="underline">build.nvidia.com</a>.</p>
+                                <label className={labelCls}>API Key NVIDIA</label>
+                                <input id="nvidiaKey" type="password" defaultValue={aiConfig?.nvidiaKey || ''} placeholder="nvapi-..." className={inputCls + ' font-mono mb-3'} />
+                                <label className={labelCls}>Modelo (opcional)</label>
+                                <input id="nvidiaModel" defaultValue={aiConfig?.nvidiaModel || ''} placeholder="meta/llama-3.2-90b-vision-instruct (default)" className={inputCls + ' font-mono'} />
+                                <p className="text-[10px] text-slate-400 mt-2">Disponibles: meta/llama-3.2-90b-vision-instruct · meta/llama-3.2-11b-vision-instruct · mistralai/pixtral-12b-2409</p>
+                            </div>
+
                             <div className="flex gap-3 mt-4">
-                                <Button onClick={() => { updateAiConfig({ cerebrasKey: document.getElementById('cerebrasKey')?.value || '', cerebrasModel: document.getElementById('cerebrasModel')?.value || '', adminKeys: document.getElementById('aiAdminKeys')?.value || '', customerKeys: document.getElementById('aiCustomerKeys')?.value || '' }); addToast('Llaves guardadas', 'success'); }} className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-6 py-2.5 rounded-lg shadow-lg shadow-purple-500/20">Guardar Keys</Button>
+                                <Button onClick={() => { updateAiConfig({ cerebrasKey: document.getElementById('cerebrasKey')?.value || '', cerebrasModel: document.getElementById('cerebrasModel')?.value || '', adminKeys: document.getElementById('aiAdminKeys')?.value || '', customerKeys: document.getElementById('aiCustomerKeys')?.value || '', nvidiaKey: document.getElementById('nvidiaKey')?.value || '', nvidiaModel: document.getElementById('nvidiaModel')?.value || '' }); addToast('Llaves guardadas', 'success'); }} className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-6 py-2.5 rounded-lg shadow-lg shadow-purple-500/20">Guardar Keys</Button>
                                 <Button onClick={handleTestKey} isLoading={isTestingKey} className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-6 py-2.5 rounded-lg border border-slate-700">Probar (Gemini admin)</Button>
                             </div>
                         </div>

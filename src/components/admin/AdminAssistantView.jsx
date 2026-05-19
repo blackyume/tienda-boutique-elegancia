@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Paperclip, X, ShieldCheck, Loader2, Bot, User, AlertTriangle, Check } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
-import { analyzeProductImage } from '../../utils/geminiVision';
+import { analyzeProductImage } from '../../utils/vision';
 import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
 
 const HISTORY_KEY = 'laurina_copilot_v1';

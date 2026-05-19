@@ -86,10 +86,12 @@ export const StoreProvider = ({ children }) => {
 
   // --- AI CONFIGURATION ---
   const [aiConfig, setAiConfig] = useState({
-    cerebrasKey: "",   // IA principal (Cerebras)
+    cerebrasKey: "",   // IA principal (Cerebras) — texto
     cerebrasModel: "", // opcional: override de modelo
-    adminKeys: "",     // Gemini (fallback admin)
-    customerKeys: ""   // Gemini (fallback clientes)
+    adminKeys: "",     // Gemini (fallback admin + VISIÓN primaria)
+    customerKeys: "",  // Gemini (fallback clientes)
+    nvidiaKey: "",     // NVIDIA NIM — VISIÓN de fallback detrás de Gemini
+    nvidiaModel: "",   // opcional: override (meta/llama-3.2-90b-vision-instruct por defecto)
   });
 
   const [simulations, setSimulations] = useState([]);
