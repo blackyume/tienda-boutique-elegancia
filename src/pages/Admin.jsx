@@ -230,11 +230,29 @@ export const Admin = () => {
         setIsProductModalOpen(true);
     };
 
-    const paletteCommands = [
-        { id: 'act-new-product', label: 'Nuevo producto', group: 'Acción', icon: Tag, action: () => { setAdminTab('inventory'); openNewProduct(); } },
-        { id: 'act-store', label: 'Ir a la tienda', group: 'Acción', icon: LinkIcon, action: () => { window.location.href = '/'; } },
-        ...Object.entries(TAB_LABELS).map(([k, label]) => ({ id: `nav-${k}`, label, group: 'Sección', action: () => setAdminTab(k) }))
-    ];
+    const paletteCommands = useMemo(() => {
+        const cmds = [
+            { id: 'act-new-product', label: 'Nuevo producto', group: 'Acción', icon: Tag, action: () => { setAdminTab('inventory'); openNewProduct(); } },
+            { id: 'act-assistant', label: 'Abrir Laurina (copiloto IA)', group: 'Acción', icon: Bot, action: () => setAdminTab('assistant') },
+            { id: 'act-store', label: 'Ir a la tienda', group: 'Acción', icon: LinkIcon, action: () => { window.location.href = '/'; } },
+            ...Object.entries(TAB_LABELS).map(([k, label]) => ({ id: `nav-${k}`, label, group: 'Sección', action: () => setAdminTab(k) })),
+            ...inventory.slice(0, 80).map(p => ({
+                id: `prod-${p.id}`,
+                label: `${p.name} — $${Number(p.price || 0).toLocaleString('es-AR')}${p.active === false ? ' · borrador' : ''}`,
+                group: 'Producto',
+                icon: Tag,
+                action: () => { setAdminTab('inventory'); setCurrentProduct(p); setIsProductModalOpen(true); },
+            })),
+            ...orders.slice(0, 20).map(o => ({
+                id: `ord-${o.id}`,
+                label: `${o.id} · ${o.customer?.email || 's/email'} · $${Number(o.total || 0).toLocaleString('es-AR')} · ${o.status}`,
+                group: 'Pedido',
+                icon: Package,
+                action: () => setAdminTab('orders'),
+            })),
+        ];
+        return cmds;
+    }, [inventory, orders]);
 
     // --- RENDER HELPERS ---
 
@@ -574,6 +592,8 @@ export const Admin = () => {
                         });
                         setIsProductModalOpen(true);
                     }}
+                    onEditProduct={(p) => { setCurrentProduct(p); setIsProductModalOpen(true); }}
+                    onToggleVisible={(p) => updateProduct(p.id, { active: p.active === false ? true : false })}
                 />}
                 {adminTab === 'assistant' && <AdminAssistantView orders={orders} inventory={inventory} onClose={() => setAdminTab('dashboard')} />}
                 {adminTab === 'orders' && <OrdersView orders={orders} updateOrderStatus={updateOrderStatus} />}

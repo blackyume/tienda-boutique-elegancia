@@ -7,7 +7,7 @@ import { getLiveVisitors } from '../../utils/presence';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 // xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
 
-export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [] }) => {
+export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [] }) => {
 
     // Re-render cada 15s para actualizar el corte de sesiones "vivas"
     const [, tick] = useState(0);
@@ -468,6 +468,8 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                             items={lowStockItems}
                             threshold={lowStockThreshold}
                             onNavigateInventory={() => onNavigate('inventory')}
+                            onEditProduct={onEditProduct}
+                            onToggleVisible={onToggleVisible}
                             compact
                         />
 

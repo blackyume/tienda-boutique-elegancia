@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { AlertTriangle, ChevronRight, ChevronDown, Package } from 'lucide-react';
+import { AlertTriangle, ChevronRight, ChevronDown, Package, Edit2, EyeOff, Eye } from 'lucide-react';
 
-export const LowStockPanel = ({ items, threshold, onNavigateInventory, compact = false }) => {
+export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditProduct, onToggleVisible, compact = false }) => {
     const [expanded, setExpanded] = useState(null);
 
     if (!items || items.length === 0) {
@@ -55,30 +55,55 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, compact =
                     const canExpand = !isAggregate && variants.length > 0;
                     return (
                         <div key={product.id}>
-                            <button
-                                onClick={() => canExpand && setExpanded(isOpen ? null : product.id)}
-                                className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${canExpand ? 'hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer' : 'cursor-default'}`}
-                            >
-                                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
-                                    {product.image
-                                        ? <img src={product.image} className="w-full h-full object-cover" alt="" />
-                                        : <div className="w-full h-full flex items-center justify-center text-slate-300"><Package className="w-4 h-4" /></div>}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{product.name}</p>
-                                    <p className="text-[10px] text-slate-400 uppercase tracking-wider">
-                                        {isAggregate ? 'Sin variantes' : `${variants.length} variante${variants.length > 1 ? 's' : ''} baja${variants.length > 1 ? 's' : ''}`}
-                                    </p>
-                                </div>
-                                <div className="text-right shrink-0">
-                                    <p className={`text-sm font-black ${isCritical ? 'text-red-500' : total === 0 ? 'text-red-500' : 'text-amber-500'}`}>
-                                        {total}<span className="text-[10px] ml-0.5 opacity-70">u.</span>
-                                    </p>
-                                    {canExpand && (
-                                        <ChevronDown className={`w-3 h-3 text-slate-400 ml-auto mt-1 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                                    )}
-                                </div>
-                            </button>
+                            <div className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${canExpand ? 'hover:bg-slate-50 dark:hover:bg-slate-800/40' : ''}`}>
+                                <button
+                                    onClick={() => canExpand && setExpanded(isOpen ? null : product.id)}
+                                    disabled={!canExpand}
+                                    className="flex items-center gap-3 flex-1 min-w-0 text-left disabled:cursor-default"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
+                                        {product.image
+                                            ? <img src={product.image} className="w-full h-full object-cover" alt="" />
+                                            : <div className="w-full h-full flex items-center justify-center text-slate-300"><Package className="w-4 h-4" /></div>}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{product.name}</p>
+                                        <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                                            {isAggregate ? 'Sin variantes' : `${variants.length} variante${variants.length > 1 ? 's' : ''} baja${variants.length > 1 ? 's' : ''}`}
+                                        </p>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <p className={`text-sm font-black ${isCritical ? 'text-red-500' : total === 0 ? 'text-red-500' : 'text-amber-500'}`}>
+                                            {total}<span className="text-[10px] ml-0.5 opacity-70">u.</span>
+                                        </p>
+                                        {canExpand && (
+                                            <ChevronDown className={`w-3 h-3 text-slate-400 ml-auto mt-1 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                        )}
+                                    </div>
+                                </button>
+                                {(onEditProduct || onToggleVisible) && (
+                                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                                        {onEditProduct && (
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onEditProduct(product); }}
+                                                title="Reponer / editar"
+                                                className="p-2 rounded-lg text-slate-500 hover:text-[#C19A6B] hover:bg-[#C19A6B]/10 transition-colors"
+                                            >
+                                                <Edit2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
+                                        {onToggleVisible && (
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onToggleVisible(product); }}
+                                                title={product.active === false ? 'Mostrar' : 'Ocultar'}
+                                                className="p-2 rounded-lg text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+                                            >
+                                                {product.active === false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
 
                             {canExpand && isOpen && (
                                 <div className="px-4 pb-4 pl-[4.5rem] bg-slate-50/50 dark:bg-slate-900/30">
