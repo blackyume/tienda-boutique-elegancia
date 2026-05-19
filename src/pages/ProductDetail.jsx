@@ -38,6 +38,10 @@ export const ProductDetail = () => {
     const [activeImage, setActiveImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
 
+    // PASO 1 — Resolver producto. Esto sí depende de `inventory` porque puede
+    // llegar tarde (Firestore async). Pero NO scrolleamos ni disparamos
+    // analytics acá: inventory es un snapshot live y muta sola cada pocos
+    // segundos. Si scrolleábamos acá, el usuario se "rebotaba" arriba.
     useEffect(() => {
         const found = inventory.find(
             (p) => String(p.id) === String(id) || p.id === Number(id)
@@ -49,25 +53,32 @@ export const ProductDetail = () => {
         if (found) {
             setProduct(found);
             setSelectedColor((prev) => (found.colors?.includes(prev) ? prev : found.colors?.[0] || ''));
-            setSelectedSize('');
-            setActiveImage(0);
-            setQuantity(1);
-            window.scrollTo(0, 0);
-            incrementProductView(found.id);
-            trackViewItem(found);
         }
-    }, [id, inventory, navigate, incrementProductView]);
+    }, [id, inventory, navigate]);
 
-    // Cinturón de seguridad: si algún modal previo dejó el body bloqueado
-    // (size-guide, quick-view, auth, etc.), forzamos que la ficha pueda
-    // scrollear al entrar. No interferimos con modales que se abran dentro
-    // de la ficha — sólo reseteamos una vez al montar.
+    // PASO 2 — Al cambiar el id (navegación a otra ficha), reset de UI +
+    // scroll-to-top + analytics. Una sola vez por producto, no por cada
+    // snapshot de Firestore.
     useEffect(() => {
+        setSelectedSize('');
+        setActiveImage(0);
+        setQuantity(1);
+        window.scrollTo(0, 0);
+        // Cinturón de seguridad por si algún modal previo dejó el body
+        // bloqueado (size-guide, quick-view, auth, newsletter, etc.).
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
         document.body.style.position = '';
         document.body.style.height = '';
-    }, []);
+    }, [id]);
+
+    // Analytics: una sola vez por producto, no en cada update del inventory.
+    useEffect(() => {
+        if (!product?.id) return;
+        incrementProductView(product.id);
+        trackViewItem(product);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product?.id]);
 
     const images = useMemo(() => {
         if (!product) return [];
