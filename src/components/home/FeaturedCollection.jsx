@@ -4,6 +4,7 @@ import { useStore } from '../../context/StoreContext';
 import { ArrowRight } from 'lucide-react';
 import { formatMoney, getColorHex, optimizeImage } from '../../utils/helpers';
 import { Reveal } from '../ui/Reveal';
+import { SectionHeader } from './SectionHeader';
 
 const Card = ({ item, onQuickView, tall = false, small = false }) => (
     <div
@@ -63,12 +64,14 @@ export const FeaturedCollection = ({ onQuickView }) => {
     const [hero, ...rest] = featured;
 
     return (
-        <section className="py-28 px-4 bg-[#020617] relative overflow-hidden">
-            <Reveal className="max-w-[1700px] mx-auto relative">
-                <div className="text-center mb-16">
-                    <span className="text-white/40 text-[10px] uppercase tracking-[0.4em] font-bold">Selección limitada</span>
-                    <h2 className="text-5xl md:text-6xl font-serif text-white mt-4">Highlights</h2>
-                </div>
+        <section className="py-24 md:py-32 px-6 bg-[#020617] relative overflow-hidden">
+            <Reveal className="max-w-[1400px] mx-auto relative">
+                <SectionHeader
+                    eyebrow="Selección limitada"
+                    title="Highlights"
+                    subtitle="Las piezas que definen la temporada — pocas, elegidas a mano."
+                    className="mb-16"
+                />
 
                 {rest.length >= 2 ? (
                     <div className="grid md:grid-cols-12 gap-5 md:gap-6">

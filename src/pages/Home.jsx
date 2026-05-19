@@ -22,6 +22,7 @@ const Atelier = lazy(() => import('../components/home/Atelier').then(m => ({ def
 
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { Reveal } from '../components/ui/Reveal';
+import { SectionHeader } from '../components/home/SectionHeader';
 import { SEO } from '../components/seo/SEO';
 
 export const Home = () => {
@@ -73,16 +74,13 @@ export const Home = () => {
             </Suspense>
 
             {/* Categorías — solo renderiza si hay categorías válidas */}
-            {validCategories.length > 0 && <section id="categories" className="py-24 px-4 bg-[#020617] relative">
-                <Reveal className="max-w-[1700px] mx-auto">
-                    <div className="flex justify-between items-end mb-12 px-2">
-                        <div>
-                            <span className="text-white/40 text-[10px] uppercase tracking-[0.4em] font-bold">Categorías</span>
-                            <h2 className="text-4xl md:text-5xl font-serif text-white mt-3">Curaduría exclusiva</h2>
-                        </div>
+            {validCategories.length > 0 && <section id="categories" className="py-24 md:py-32 px-6 bg-[#020617] relative">
+                <Reveal className="max-w-[1400px] mx-auto">
+                    <div className="flex justify-between items-end mb-12">
+                        <SectionHeader align="left" eyebrow="Categorías" title="Curaduría exclusiva" />
                         <Link
                             to="/shop"
-                            className="hidden md:inline-flex items-center gap-2 px-5 py-3 border border-white/20 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-white/5 rounded-sm"
+                            className="hidden md:inline-flex items-center gap-2 px-5 py-3 border border-white/20 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-white/5 rounded-sm shrink-0"
                         >
                             Ver todo <ArrowRight className="w-3 h-3" />
                         </Link>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Quote, Star } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { Reveal } from '../ui/Reveal';
+import { SectionHeader } from './SectionHeader';
 
 const FALLBACK = [
     {
@@ -39,12 +40,13 @@ export const Testimonials = () => {
     }, [list.length]);
 
     return (
-        <section className="relative py-28 px-4 bg-[#020617] overflow-hidden">
+        <section className="relative py-24 md:py-32 px-6 bg-[#020617] overflow-hidden">
             <Reveal className="max-w-5xl mx-auto relative z-10">
-                <div className="text-center mb-14">
-                    <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-3">La voz de nuestras clientas</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-white">Experiencias reales</h2>
-                </div>
+                <SectionHeader
+                    eyebrow="La voz de nuestras clientas"
+                    title="Experiencias reales"
+                    className="mb-14"
+                />
 
                 <div className="grid md:grid-cols-3 gap-6">
                     {list.map((t, i) => (

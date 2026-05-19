@@ -1,6 +1,7 @@
 import React from 'react';
 import { Instagram, ExternalLink } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { SectionHeader } from './SectionHeader';
 
 export const InstagramFeed = () => {
     const { siteConfig, inventory } = useStore();
@@ -27,16 +28,14 @@ export const InstagramFeed = () => {
     const handle = getHandle(instagramUrl);
 
     return (
-        <div className="py-20 bg-[#020617] border-t border-white/5">
-            <div className="max-w-7xl mx-auto px-4">
-                {/* Header */}
-                <div className="text-center mb-12">
-                    <div className="flex items-center justify-center gap-2 mb-4 text-white/40 font-bold uppercase tracking-widest text-xs">
-                        <Instagram className="w-4 h-4" /> Seguinos en Instagram
-                    </div>
-                    <h2 className="text-4xl font-cinzel text-white mb-3">{handle}</h2>
-                    <p className="text-slate-500 text-sm">Mirá nuestros últimos looks y novedades</p>
-                </div>
+        <div className="py-24 md:py-32 bg-[#020617] border-t border-white/5">
+            <div className="max-w-[1400px] mx-auto px-6">
+                <SectionHeader
+                    eyebrow={<span className="inline-flex items-center gap-2"><Instagram className="w-3.5 h-3.5" /> Seguinos en Instagram</span>}
+                    title={handle}
+                    subtitle="Mirá nuestros últimos looks y novedades"
+                    className="mb-12"
+                />
 
                 {/* Grid — fotos reales del catálogo; si no hay, no se muestra */}
                 {feedImages.length > 0 && (

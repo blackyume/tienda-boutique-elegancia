@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Check, ArrowRight } from 'lucide-react';
 import { Reveal } from '../ui/Reveal';
+import { SectionHeader } from './SectionHeader';
 
 export const NewsletterInline = () => {
     const [email, setEmail] = useState('');
@@ -17,16 +18,14 @@ export const NewsletterInline = () => {
     };
 
     return (
-        <section className="relative py-24 px-4 bg-[#020617] overflow-hidden">
+        <section className="relative py-24 md:py-32 px-6 bg-[#020617] overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.05),transparent_60%)] pointer-events-none" />
             <Reveal className="relative max-w-3xl mx-auto text-center">
-                <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-3">Lista de espera</span>
-                <h2 className="text-3xl md:text-5xl font-serif text-white leading-tight">
-                    Acceso a drops <span className="italic text-cielo-gold">48 horas antes</span>
-                </h2>
-                <p className="mt-4 text-slate-400 text-sm font-light max-w-xl mx-auto">
-                    Suscribite y recibí cupones privados, editoriales exclusivos y el aviso anticipado de cada nueva colección.
-                </p>
+                <SectionHeader
+                    eyebrow="Lista de espera"
+                    title={<>Acceso a drops <span className="italic text-cielo-gold">48 horas antes</span></>}
+                    subtitle="Suscribite y recibí cupones privados, editoriales exclusivos y el aviso anticipado de cada nueva colección."
+                />
 
                 {status === 'success' ? (
                     <div className="mt-10 inline-flex items-center gap-3 px-6 py-4 rounded-full border border-cielo-gold/40 bg-cielo-gold/10 text-cielo-gold">

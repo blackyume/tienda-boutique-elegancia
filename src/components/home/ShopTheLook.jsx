@@ -4,6 +4,7 @@ import { Plus, X, ShoppingBag } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { formatMoney, optimizeImage } from '../../utils/helpers';
 import { Reveal } from '../ui/Reveal';
+import { SectionHeader } from './SectionHeader';
 
 export const ShopTheLook = () => {
     const { inventory, siteConfig, addToCart } = useStore();
@@ -34,13 +35,14 @@ export const ShopTheLook = () => {
     if (!hotspots.length) return null;
 
     return (
-        <section className="relative py-24 px-4 bg-[#020617] overflow-hidden">
-            <Reveal className="max-w-[1600px] mx-auto">
-                <div className="text-center mb-14">
-                    <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-3">Shop The Look</span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-white">Vestí el editorial</h2>
-                    <p className="mt-3 text-slate-400 text-sm font-light max-w-md mx-auto">Tocá los puntos dorados y descubrí cada prenda.</p>
-                </div>
+        <section className="relative py-24 md:py-32 px-6 bg-[#020617] overflow-hidden">
+            <Reveal className="max-w-[1400px] mx-auto">
+                <SectionHeader
+                    eyebrow="Shop The Look"
+                    title="Vestí el editorial"
+                    subtitle="Tocá los puntos y descubrí cada prenda del look."
+                    className="mb-14"
+                />
 
                 <div className="relative mx-auto max-w-5xl aspect-[4/5] md:aspect-[16/10] rounded-sm overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] border border-white/5">
                     <img

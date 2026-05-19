@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, CreditCard, Package } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 const steps = [
     {
@@ -24,20 +25,14 @@ const steps = [
 
 export const HowItWorks = () => {
     return (
-        <section className="relative py-28 px-4 bg-[#020617] overflow-hidden">
+        <section className="relative py-24 md:py-32 px-6 bg-[#020617] overflow-hidden">
             <div className="max-w-6xl mx-auto relative z-10">
-                {/* Header */}
-                <div className="text-center mb-20">
-                    <span className="inline-block text-white/40 text-[10px] font-bold uppercase tracking-[0.4em] mb-4">
-                        La experiencia LBE
-                    </span>
-                    <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight">
-                        Comprar, sin fricción
-                    </h2>
-                    <p className="mt-4 text-slate-400 text-sm font-light max-w-md mx-auto leading-relaxed">
-                        Curaduría, pago protegido y entrega en todo el país. Vos elegís — del resto nos ocupamos nosotros.
-                    </p>
-                </div>
+                <SectionHeader
+                    eyebrow="La experiencia LBE"
+                    title="Comprar, sin fricción"
+                    subtitle="Curaduría, pago protegido y entrega en todo el país. Vos elegís — del resto nos ocupamos nosotros."
+                    className="mb-20"
+                />
 
                 {/* Steps */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
