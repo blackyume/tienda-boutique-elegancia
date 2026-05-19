@@ -5,9 +5,9 @@ import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { analyzeProductImage } from '../../utils/geminiVision';
 import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
 
-const HISTORY_KEY = 'laura_copilot_v1';
+const HISTORY_KEY = 'laurina_copilot_v1';
 const MAX_STEPS = 5;
-const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Laura, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (podés adjuntar la foto), cambiar precios o stock, cupones, destacar en la home, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
+const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Laurina, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (podés adjuntar la foto), cambiar precios o stock, cupones, destacar en la home, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
 
 const toArr = (v) => Array.isArray(v) ? v.map(String).map(s => s.trim()).filter(Boolean)
     : (typeof v === 'string' ? v.split(/[,/]+/).map(s => s.trim()).filter(Boolean) : []);
@@ -334,7 +334,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         <Sparkles className="w-5 h-5 text-cielo-dark" />
                     </div>
                     <div>
-                        <h2 className="text-white font-cinzel tracking-widest text-sm">LAURA · COPILOTO</h2>
+                        <h2 className="text-white font-cinzel tracking-widest text-sm">LAURINA · COPILOTO</h2>
                         <p className="text-[11px] text-white/40">{aiConfigured ? 'Cerebras + Gemini · ejecuta acciones reales' : 'IA no configurada'}</p>
                     </div>
                 </div>
@@ -408,7 +408,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                             rows={1}
-                            placeholder="Pedile algo a Laura… (Enter para enviar)"
+                            placeholder="Pedile algo a Laurina… (Enter para enviar)"
                             disabled={loading}
                             className="flex-1 resize-none bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#BF953F]/60 max-h-32"
                         />
