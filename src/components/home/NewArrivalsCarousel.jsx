@@ -15,8 +15,11 @@ export const NewArrivalsCarousel = ({ products, onQuickView }) => {
 
     return (
         <div className="relative group">
-            <div className="flex justify-between items-end mb-8 px-4">
-                <h2 className="text-3xl md:text-4xl font-serif text-white">New Arrivals</h2>
+            <div className="flex justify-between items-end mb-10">
+                <div>
+                    <span className="block text-[11px] uppercase tracking-[0.35em] font-semibold text-white/40 mb-3">Recién llegado</span>
+                    <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight">New Arrivals</h2>
+                </div>
                 <div className="flex gap-2">
                     <button onClick={() => scroll('left')} className="p-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-colors">
                         <ArrowLeft className="w-5 h-5" />

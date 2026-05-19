@@ -93,27 +93,26 @@ export const Home = () => {
                                 to="/shop"
                                 onClick={() => setGlobalFilter({ category: cat.name, search: "" })}
                                 aria-label={`Ver categoría ${cat.name}`}
-                                className={`relative group cursor-pointer overflow-hidden rounded-sm transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(212,175,55,0.3)] ${index === 0 ? 'md:col-span-2' : ''}`}
+                                className={`relative group cursor-pointer overflow-hidden rounded-sm transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.12)] ${index === 0 ? 'md:col-span-2' : ''}`}
                             >
                                 <div className="absolute inset-0 bg-slate-800 animate-pulse" />
                                 <img
                                     src={optimizeImage(cat.image, 800)}
                                     alt={cat.name}
                                     loading="lazy"
-                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[40%] group-hover:grayscale-0"
+                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-[1.07] grayscale-[20%] group-hover:grayscale-0"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 opacity-70 group-hover:opacity-50 transition-opacity duration-700" />
-                                <div className="absolute inset-0 bg-gradient-to-tr from-cielo-gold/0 via-cielo-gold/5 to-cielo-gold/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 opacity-70 group-hover:opacity-55 transition-opacity duration-700" />
 
                                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
-                                    <span className="px-3 py-1 bg-cielo-gold/90 text-black text-[9px] font-bold uppercase tracking-widest rounded-sm">Ver todo</span>
+                                    <span className="px-3 py-1 bg-white/90 text-black text-[9px] font-bold uppercase tracking-widest rounded-sm">Ver todo</span>
                                 </div>
 
                                 <div className="absolute bottom-0 left-0 p-8">
-                                    <h3 className="text-3xl font-cinzel text-white mb-2 drop-shadow-lg group-hover:text-cielo-gold transition-colors duration-500">{cat.name}</h3>
-                                    <div className="w-8 h-[1px] bg-cielo-gold/60 mb-4 group-hover:w-28 transition-all duration-700 ease-out" />
+                                    <h3 className="text-3xl font-serif text-white mb-2 drop-shadow-lg">{cat.name}</h3>
+                                    <div className="w-8 h-[1px] bg-white/40 mb-4 group-hover:w-28 transition-all duration-700 ease-out" />
                                     <p className="text-xs uppercase tracking-widest text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center gap-2 transform translate-y-3 group-hover:translate-y-0 delay-100">
-                                        Explorar <ArrowRight className="w-3 h-3 text-cielo-gold" />
+                                        Explorar <ArrowRight className="w-3 h-3 text-white/70" />
                                     </p>
                                 </div>
                             </Link>
@@ -123,8 +122,8 @@ export const Home = () => {
             </section>}
 
             {/* New Arrivals */}
-            <section className="py-20 px-4 sm:px-8 bg-[#020617]">
-                <div className="max-w-[1800px] mx-auto">
+            <section className="py-24 md:py-32 px-6 bg-[#020617]">
+                <div className="max-w-[1400px] mx-auto">
                     <Suspense fallback={<div className="h-[400px]" />}>
                         <NewArrivalsCarousel
                             products={newArrivals}

@@ -6,23 +6,23 @@ import { formatMoney, getColorHex, optimizeImage } from '../../utils/helpers';
 import { Reveal } from '../ui/Reveal';
 import { SectionHeader } from './SectionHeader';
 
-const Card = ({ item, onQuickView, tall = false, small = false }) => (
+const Card = ({ item, onQuickView, tall = false }) => (
     <div
         onClick={() => onQuickView?.(item)}
         role="button"
         aria-label={`Vista rápida de ${item.name}`}
-        className={`group relative overflow-hidden rounded-sm cursor-pointer ${tall ? 'aspect-[3/4] md:h-full' : small ? 'aspect-[4/5]' : 'aspect-[4/5]'}`}
+        className={`group relative overflow-hidden rounded-sm cursor-pointer ring-1 ring-transparent hover:ring-white/10 transition-[box-shadow] duration-500 ${tall ? 'aspect-[3/4] md:h-full' : 'aspect-[4/5]'}`}
     >
         <img
             src={optimizeImage(item.image, tall ? 900 : 600)}
             alt={item.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.8s] ease-out group-hover:scale-[1.08]"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.06]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 p-5 md:p-7 text-white">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-1">{item.category}</p>
+            <p className="text-[10px] uppercase tracking-[0.25em] text-white/50 mb-1.5">{item.category}</p>
             <h3 className="font-serif text-xl md:text-2xl leading-tight line-clamp-2">{item.name}</h3>
 
             <div className="mt-3 flex items-center justify-between gap-3">
@@ -80,7 +80,7 @@ export const FeaturedCollection = ({ onQuickView }) => {
                         </div>
                         <div className="md:col-span-5 flex flex-col gap-5 md:gap-6">
                             {rest.map((p) => (
-                                <Card key={p.id} item={p} onQuickView={onQuickView} small />
+                                <Card key={p.id} item={p} onQuickView={onQuickView} />
                             ))}
                         </div>
                     </div>

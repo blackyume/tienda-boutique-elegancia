@@ -23,15 +23,16 @@ export const QuickAddCard = ({ product, onQuickView }) => {
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleOpenModal}
         >
-            <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-900 mb-4 rounded-sm">
+            <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-900 mb-4 rounded-sm ring-1 ring-transparent group-hover:ring-white/10 transition-[box-shadow] duration-500">
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.06]"
                 />
 
-                {/* Dark Overlay on Hover */}
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Velo sutil al hover (sin oscurecer de más) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {/* Badges */}
                 {product.stock === 0 && (
@@ -66,10 +67,13 @@ export const QuickAddCard = ({ product, onQuickView }) => {
                 )}
             </div>
 
-            <div className="text-center group-hover:-translate-y-1 transition-transform duration-500">
-                <h3 className="font-serif text-lg text-slate-900 dark:text-white mb-1 group-hover:text-cielo-gold transition-colors duration-300">{product.name}</h3>
+            <div className="text-center">
+                {product.category && (
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500 mb-1.5">{product.category}</p>
+                )}
+                <h3 className="font-serif text-lg text-slate-900 dark:text-white mb-1.5 transition-opacity duration-300 group-hover:opacity-70">{product.name}</h3>
                 <div className="flex justify-center items-center gap-3 text-sm">
-                    <span className="font-bold font-montserrat text-slate-500 dark:text-slate-400">{formatMoney(product.price)}</span>
+                    <span className="font-medium font-montserrat text-slate-700 dark:text-slate-200">{formatMoney(product.price)}</span>
 
                     {/* Color Dots */}
                     {(product.colors || []).length > 0 && (
