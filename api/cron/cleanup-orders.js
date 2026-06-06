@@ -7,6 +7,7 @@
 //   FIREBASE_SERVICE_ACCOUNT   — JSON service account de Firebase
 //   CRON_SECRET                — opcional. Si está, valida Authorization: Bearer <secret>
 const { getDb } = require('../_firebaseAdmin');
+const { safeEqual } = require('../_rateLimit');
 
 const MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 horas
 
@@ -14,7 +15,7 @@ module.exports = async (req, res) => {
     const expectedSecret = process.env.CRON_SECRET;
     if (expectedSecret) {
         const authHeader = req.headers['authorization'] || '';
-        if (authHeader !== `Bearer ${expectedSecret}`) {
+        if (!safeEqual(authHeader, `Bearer ${expectedSecret}`)) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
     }

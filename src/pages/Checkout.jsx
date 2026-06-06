@@ -3,14 +3,14 @@ import { useStore } from '../context/StoreContext';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { User, Lock, Truck, ChevronRight, CreditCard, ShieldCheck, ShoppingBag, Ticket, X, Check, MessageCircle } from 'lucide-react';
+import { User, Lock, ChevronRight, ShieldCheck, ShoppingBag, Ticket, X, MessageCircle } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
 import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
 
 export const Checkout = () => {
-    const { cart, cartTotal, createOrder, updateProduct, inventory, setCart, addToast, user, shippingRates, paymentConfig, createPreferenceMP, sendOrderEmail, siteConfig, coupons, redeemCoupon } = useStore();
+    const { cart, cartTotal, createOrder, addToast, user, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons } = useStore();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '' });
@@ -185,7 +185,7 @@ export const Checkout = () => {
         const itemsList = cart.map(i => `• ${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity} — ${formatMoney(i.price * i.quantity)}`).join('\n');
         const shippingLine = `*Envío:* ${shippingOptions[shippingMethod]?.name || shippingMethod} — ${formatMoney(shippingOptions[shippingMethod]?.cost || 0)}`;
         const couponLine = appliedCoupon ? `\n*Cupón:* ${appliedCoupon.code} (-${formatMoney(couponDiscount)})` : '';
-        const addressLine = formData.direccion ? `\n*Dirección:* ${formData.direccion}, ${formData.ciudad || ''} ${formData.cp ? '(' + formData.cp + ')' : ''}` : '';
+        const addressLine = formData.calle ? `\n*Dirección:* ${formData.calle}${formData.altura ? ' ' + formData.altura : ''}${formData.ciudad ? ', ' + formData.ciudad : ''}${formData.cp ? ' (' + formData.cp + ')' : ''}` : '';
         return [
             `¡Hola! Quisiera finalizar mi pedido *#${orderId}* por WhatsApp.`,
             '',
@@ -227,7 +227,9 @@ export const Checkout = () => {
 
             trackBeginCheckout(cart, finalTotal);
             await createOrder(newOrder);
-            if (appliedCoupon) await redeemCoupon(appliedCoupon.id);
+            // El cupón se redime cuando el pedido se confirma (admin marca el
+            // pedido de WhatsApp como pagado/enviado), no al crearlo — así no se
+            // quema un uso si el cliente nunca concreta la compra.
             markAbandonedCartRecovered(formData.email, orderId).catch(() => {});
 
             const msg = encodeURIComponent(buildWhatsAppMessage(orderId));
@@ -272,10 +274,9 @@ export const Checkout = () => {
             await createOrder(newOrder);
             markAbandonedCartRecovered(formData.email, newOrder.id).catch(() => {});
 
-            // 1.5 Register coupon usage if applied
-            if (appliedCoupon) {
-                await redeemCoupon(appliedCoupon.id);
-            }
+            // El cupón se redime server-side en el webhook de MP cuando el pago
+            // se aprueba (idempotente). No lo incrementamos acá para no quemar un
+            // uso en checkouts abandonados o pagos rechazados.
 
             // 2. Generar Link de Pago (Backend Vercel)
             try {
@@ -305,7 +306,7 @@ export const Checkout = () => {
     };
 
     if (cart.length === 0) return (
-        <div className="min-h-screen flex flex-col items-center justify-center pt-20 bg-white dark:bg-[#0B1120] text-slate-900 dark:text-white transition-colors">
+        <div className="min-h-screen flex flex-col items-center justify-center pt-20 bg-white dark:bg-[#0A0A0A] text-slate-900 dark:text-white transition-colors">
             <ShoppingBag className="w-16 h-16 text-state-300 dark:text-slate-600 mb-6" />
             <h2 className="text-3xl font-cinzel mb-4">Tu bolsa está vacía</h2>
             <Button onClick={() => navigate('/')} className="bg-slate-900 text-white dark:bg-white dark:text-slate-900">Volver al Shop</Button>
@@ -315,7 +316,7 @@ export const Checkout = () => {
     // Gated Content for Non-Auth Users
     if (!user) {
         return (
-            <div className="min-h-screen pt-32 pb-20 bg-white dark:bg-[#0B1120] font-sans flex flex-col items-center justify-center max-w-md mx-auto px-6 text-center transition-colors">
+            <div className="min-h-screen pt-32 pb-20 bg-white dark:bg-[#0A0A0A] font-sans flex flex-col items-center justify-center max-w-md mx-auto px-6 text-center transition-colors">
                 <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
                 <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-8">
                     <Lock className="w-8 h-8 text-cielo-gold" />
@@ -336,7 +337,7 @@ export const Checkout = () => {
     }
 
     return (
-        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#0B1120] font-sans text-slate-900 dark:text-white transition-colors">
+        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#0A0A0A] font-sans text-slate-900 dark:text-white transition-colors">
             <div className="max-w-[1400px] mx-auto px-4 lg:px-12 grid lg:grid-cols-12 gap-12 lg:gap-20">
 
                 {/* --- IZQUIERDA: FORMULARIO --- */}
@@ -556,7 +557,7 @@ export const Checkout = () => {
                         <button
                             onClick={handleCheckout}
                             disabled={loading}
-                            className="w-full bg-cielo-gold hover:bg-[#a38056] text-black hover:text-white py-5 rounded-xl font-bold text-sm uppercase tracking-[0.2em] shadow-lg shadow-cielo-gold/20 transition-all transform hover:-translate-y-1 active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                            className="w-full bg-cielo-gold hover:bg-[#B8932E] text-black hover:text-white py-5 rounded-xl font-bold text-sm uppercase tracking-[0.2em] shadow-lg shadow-cielo-gold/20 transition-all transform hover:-translate-y-1 active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {loading ? <span className="animate-pulse">Procesando...</span> : <span>Pagar con Mercado Pago</span>}
                         </button>

@@ -47,7 +47,7 @@ export const WhatsAppButton = () => {
                 className={`mb-3 origin-bottom-right transition-all duration-400 ${showTip ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'
                     }`}
             >
-                <div className="relative bg-slate-900/95 backdrop-blur-xl border border-[#C19A6B]/30 px-4 py-3 rounded-xl rounded-br-none shadow-[0_8px_32px_rgba(0,0,0,0.45)] max-w-[220px]">
+                <div className="relative bg-slate-900/95 backdrop-blur-xl border border-[#D4AF37]/30 px-4 py-3 rounded-xl rounded-br-none shadow-[0_8px_32px_rgba(0,0,0,0.45)] max-w-[220px]">
                     <p className="text-[11px] font-semibold tracking-wide text-[#D4AF37] mb-0.5" style={{ fontFamily: "'Cinzel', serif" }}>
                         Atención Personalizada
                     </p>
@@ -55,14 +55,14 @@ export const WhatsAppButton = () => {
                         Escribinos por WhatsApp, te asesoramos al instante.
                     </p>
                     {/* Tail */}
-                    <span className="absolute -bottom-[6px] right-3 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-[#C19A6B]/30" />
+                    <span className="absolute -bottom-[6px] right-3 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-[#D4AF37]/30" />
                 </div>
             </div>
 
             {/* Botón */}
             <div className="relative">
                 {/* Anillo dorado sutil */}
-                <span className="absolute -inset-1 rounded-full border border-[#C19A6B]/25 animate-pulse" />
+                <span className="absolute -inset-1 rounded-full border border-[#D4AF37]/25 animate-pulse" />
                 {/* Halo verde suave para afirmar el canal */}
                 <span className="absolute inset-0 rounded-full bg-[#25D366]/30 blur-lg opacity-70 group-hover:opacity-90 transition-opacity" />
 
@@ -78,7 +78,7 @@ export const WhatsAppButton = () => {
                 </div>
 
                 {/* Punto de notificación dorado (estético) */}
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#C19A6B] border-2 border-white shadow" />
+                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#D4AF37] border-2 border-white shadow" />
             </div>
         </a>
     );

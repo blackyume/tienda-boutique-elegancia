@@ -42,12 +42,12 @@ export const SizeGuideModal = ({ onClose }) => {
                 className="relative w-full max-w-lg rounded-[22px] p-[1.5px] overflow-hidden shadow-[0_0_60px_-14px_rgba(193,154,107,0.5)] animate-slideUp"
                 onClick={(e) => e.stopPropagation()}
             >
-                <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[22px] ring-1 ring-[#C19A6B]/25" />
-                <div className="relative bg-[#0B1120] rounded-[20px] overflow-hidden">
+                <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[22px] ring-1 ring-[#D4AF37]/25" />
+                <div className="relative bg-[#0A0A0A] rounded-[20px] overflow-hidden">
                     {/* Header */}
                     <div className="px-7 py-5 border-b border-white/10 flex justify-between items-center">
                         <h3 className="font-serif text-xl text-white flex items-center gap-2.5">
-                            <Ruler className="w-5 h-5 text-[#C19A6B]" /> Guía de Talles
+                            <Ruler className="w-5 h-5 text-[#D4AF37]" /> Guía de Talles
                         </h3>
                         <button
                             onClick={onClose}
@@ -64,10 +64,10 @@ export const SizeGuideModal = ({ onClose }) => {
                             <button
                                 key={key}
                                 onClick={() => setTab(key)}
-                                className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors relative ${tab === key ? 'text-[#C19A6B]' : 'text-white/40 hover:text-white/70'}`}
+                                className={`flex-1 py-4 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors relative ${tab === key ? 'text-[#D4AF37]' : 'text-white/40 hover:text-white/70'}`}
                             >
                                 {label}
-                                {tab === key && <span className="absolute bottom-0 inset-x-6 h-px bg-gradient-to-r from-transparent via-[#C19A6B] to-transparent" />}
+                                {tab === key && <span className="absolute bottom-0 inset-x-6 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />}
                             </button>
                         ))}
                     </div>
@@ -76,7 +76,7 @@ export const SizeGuideModal = ({ onClose }) => {
                     <div className="p-7">
                         <div className="overflow-hidden rounded-xl border border-white/10">
                             <table className="w-full text-sm text-left">
-                                <thead className="bg-white/[0.03] text-[#C19A6B]/80 uppercase text-[10px] tracking-[0.15em]">
+                                <thead className="bg-white/[0.03] text-[#D4AF37]/80 uppercase text-[10px] tracking-[0.15em]">
                                     <tr>
                                         <th className="p-3 pl-5 font-bold">Talle</th>
                                         <th className="p-3 font-bold">{isTops ? 'Busto (cm)' : 'Cintura (cm)'}</th>
@@ -95,8 +95,8 @@ export const SizeGuideModal = ({ onClose }) => {
                             </table>
                         </div>
 
-                        <div className="mt-5 rounded-xl border border-[#C19A6B]/20 bg-[#C19A6B]/[0.06] p-4 text-xs text-slate-300 leading-relaxed">
-                            <strong className="text-[#C19A6B]">Cómo medir:</strong>{' '}
+                        <div className="mt-5 rounded-xl border border-[#D4AF37]/20 bg-[#D4AF37]/[0.06] p-4 text-xs text-slate-300 leading-relaxed">
+                            <strong className="text-[#D4AF37]">Cómo medir:</strong>{' '}
                             {isTops
                                 ? 'Tomá el contorno del busto por la parte más saliente y el largo desde el hombro hasta la cadera.'
                                 : 'Tomá la cintura por la parte más estrecha y la cadera por la parte más ancha.'}

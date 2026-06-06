@@ -132,7 +132,7 @@ export const CouponsView = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl font-luxury font-bold dark:text-white text-slate-900 tracking-wider flex items-center gap-3">
-                        <Ticket className="w-8 h-8 text-[#C19A6B]" />
+                        <Ticket className="w-8 h-8 text-[#D4AF37]" />
                         Cupones de Descuento
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">
@@ -141,7 +141,7 @@ export const CouponsView = () => {
                 </div>
                 <Button
                     onClick={() => openModal()}
-                    className="bg-black hover:bg-[#C19A6B] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#C19A6B] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1"
+                    className="bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1"
                 >
                     <Plus className="w-4 h-4 mr-2" /> Nuevo Cupón
                 </Button>
@@ -149,7 +149,7 @@ export const CouponsView = () => {
 
             {/* STATS */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white dark:bg-[#1e293b] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
                             <Ticket className="w-5 h-5 text-emerald-600" />
@@ -160,7 +160,7 @@ export const CouponsView = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-[#1e293b] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                             <Check className="w-5 h-5 text-blue-600" />
@@ -173,7 +173,7 @@ export const CouponsView = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-[#1e293b] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
                             <Hash className="w-5 h-5 text-orange-600" />
@@ -186,7 +186,7 @@ export const CouponsView = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-[#1e293b] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
                             <Calendar className="w-5 h-5 text-red-600" />
@@ -202,9 +202,9 @@ export const CouponsView = () => {
             </div>
 
             {/* COUPONS TABLE */}
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
+            <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
                 <table className="w-full text-left text-sm min-w-[800px]">
-                    <thead className="bg-slate-50/50 dark:bg-[#111827] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
+                    <thead className="bg-slate-50/50 dark:bg-[#161616] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
                         <tr>
                             <th className="p-4 pl-6">Código</th>
                             <th className="p-4 text-center">Descuento</th>
@@ -250,7 +250,7 @@ export const CouponsView = () => {
 
                                         {/* DISCOUNT */}
                                         <td className="p-4 text-center">
-                                            <span className="inline-flex items-center gap-1 font-bold text-[#C19A6B]">
+                                            <span className="inline-flex items-center gap-1 font-bold text-[#D4AF37]">
                                                 {coupon.type === 'percentage' ? (
                                                     <><Percent className="w-4 h-4" /> {coupon.value}%</>
                                                 ) : (
@@ -327,11 +327,11 @@ export const CouponsView = () => {
             {/* MODAL */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-white dark:bg-[#1e293b] w-full max-w-lg rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl">
+                    <div className="bg-white dark:bg-[#1a1a1a] w-full max-w-lg rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl">
                         {/* Modal Header */}
-                        <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-[#111827]">
+                        <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-[#161616]">
                             <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
-                                <Ticket className="w-5 h-5 text-[#C19A6B]" />
+                                <Ticket className="w-5 h-5 text-[#D4AF37]" />
                                 {editingCoupon ? 'Editar Cupón' : 'Nuevo Cupón'}
                             </h3>
                             <button
@@ -353,7 +353,7 @@ export const CouponsView = () => {
                                     type="text"
                                     value={formData.code}
                                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-mono font-bold text-lg tracking-widest outline-none focus:border-[#C19A6B] focus:ring-1 focus:ring-[#C19A6B]/20 transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-mono font-bold text-lg tracking-widest outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/20 transition-all"
                                     placeholder="EJ: VERANO20"
                                 />
                             </div>
@@ -369,8 +369,8 @@ export const CouponsView = () => {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'percentage' })}
                                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold text-sm transition-all ${formData.type === 'percentage'
-                                                ? 'bg-[#C19A6B] text-white border-[#C19A6B]'
-                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#C19A6B]'
+                                                ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
+                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#D4AF37]'
                                                 }`}
                                         >
                                             <Percent className="w-4 h-4" /> %
@@ -379,8 +379,8 @@ export const CouponsView = () => {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'fixed' })}
                                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold text-sm transition-all ${formData.type === 'fixed'
-                                                ? 'bg-[#C19A6B] text-white border-[#C19A6B]'
-                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#C19A6B]'
+                                                ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
+                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#D4AF37]'
                                                 }`}
                                         >
                                             <DollarSign className="w-4 h-4" /> $
@@ -395,7 +395,7 @@ export const CouponsView = () => {
                                         type="number"
                                         value={formData.value}
                                         onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder={formData.type === 'percentage' ? 'Ej: 20' : 'Ej: 5000'}
                                         min="1"
                                     />
@@ -411,7 +411,7 @@ export const CouponsView = () => {
                                     type="number"
                                     value={formData.minPurchase}
                                     onChange={(e) => setFormData({ ...formData, minPurchase: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                     placeholder="Sin mínimo"
                                 />
                             </div>
@@ -426,7 +426,7 @@ export const CouponsView = () => {
                                         type="date"
                                         value={formData.expiresAt}
                                         onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                     />
                                 </div>
                                 <div>
@@ -437,7 +437,7 @@ export const CouponsView = () => {
                                         type="number"
                                         value={formData.maxUses}
                                         onChange={(e) => setFormData({ ...formData, maxUses: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder="Sin límite"
                                         min="1"
                                     />
@@ -456,7 +456,7 @@ export const CouponsView = () => {
                                 <Button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="flex-1 bg-[#C19A6B] hover:bg-[#a38056] disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-[#C19A6B]/20"
+                                    className="flex-1 bg-[#D4AF37] hover:bg-[#B8932E] disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-[#D4AF37]/20"
                                 >
                                     {isSubmitting ? 'Guardando…' : (editingCoupon ? 'Guardar Cambios' : 'Crear Cupón')}
                                 </Button>

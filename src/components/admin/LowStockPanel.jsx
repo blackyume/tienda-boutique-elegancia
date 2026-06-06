@@ -24,7 +24,7 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
     const shown = compact ? items.slice(0, 5) : items;
 
     return (
-        <div className="bg-white dark:bg-[#1e293b] border border-amber-200 dark:border-amber-900/40 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-[#1a1a1a] border border-amber-200 dark:border-amber-900/40 rounded-2xl overflow-hidden shadow-sm">
             <div className="p-5 bg-gradient-to-r from-amber-50 to-transparent dark:from-amber-900/10 border-b border-amber-100 dark:border-amber-900/30 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
@@ -42,7 +42,7 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
                 {onNavigateInventory && (
                     <button
                         onClick={onNavigateInventory}
-                        className="text-[10px] font-bold uppercase tracking-wider text-[#C19A6B] hover:text-[#a87f4f] flex items-center gap-1 transition-colors"
+                        className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] hover:text-[#C19A2E] flex items-center gap-1 transition-colors"
                     >
                         Ver inventario <ChevronRight className="w-3 h-3" />
                     </button>
@@ -87,7 +87,7 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onEditProduct(product); }}
                                                 title="Reponer / editar"
-                                                className="p-2 rounded-lg text-slate-500 hover:text-[#C19A6B] hover:bg-[#C19A6B]/10 transition-colors"
+                                                className="p-2 rounded-lg text-slate-500 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors"
                                             >
                                                 <Edit2 className="w-3.5 h-3.5" />
                                             </button>
@@ -131,7 +131,7 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
             {compact && items.length > shown.length && onNavigateInventory && (
                 <button
                     onClick={onNavigateInventory}
-                    className="w-full py-3 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-[#C19A6B] bg-slate-50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 transition-colors"
+                    className="w-full py-3 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-[#D4AF37] bg-slate-50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 transition-colors"
                 >
                     Ver {items.length - shown.length} más
                 </button>

@@ -5,8 +5,41 @@ import { generateWithGemini, parseJsonFromResponse } from './gemini';
 
 export { parseJsonFromResponse };
 
+// Proxy server-side: si está configurado (env vars en Vercel), las API keys NO
+// se exponen al cliente. Mientras no lo esté, caemos al método client-side de
+// abajo y nada se rompe. Se cachea "no disponible" por sesión para no reintentar
+// en cada mensaje.
+const AI_PROXY_URL = 'https://tienda-boutique-elegancia.vercel.app/api/ai-proxy';
+let proxyUnavailable = false;
+
+const tryProxy = async (prompt, scope) => {
+    if (proxyUnavailable) return null;
+    try {
+        const r = await fetch(AI_PROXY_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, scope }),
+        });
+        if (!r.ok) {
+            if (r.status === 404) proxyUnavailable = true; // todavía no deployado en Vercel
+            return null;
+        }
+        const data = await r.json();
+        if (data?.configured === false) { proxyUnavailable = true; return null; }
+        return data?.text || null;
+    } catch {
+        proxyUnavailable = true; // sin red al proxy → no reintentar esta sesión
+        return null;
+    }
+};
+
 // scope: 'admin' (cerebro interno) | 'customer' (asistente de la tienda)
 export const generateText = async (prompt, aiConfig, { scope = 'admin' } = {}) => {
+    // 1. Proxy server-side (camino seguro: las keys viven sólo en Vercel).
+    const viaProxy = await tryProxy(prompt, scope);
+    if (viaProxy) return viaProxy;
+
+    // 2. Fallback client-side (modo actual, hasta configurar las env vars).
     const cerebrasKey = (aiConfig?.cerebrasKey || '').trim();
     if (cerebrasKey) {
         try {

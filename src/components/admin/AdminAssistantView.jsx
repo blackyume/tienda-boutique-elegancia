@@ -7,7 +7,7 @@ import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/
 
 const HISTORY_KEY = 'laurina_copilot_v1';
 const MAX_STEPS = 5;
-const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Laurina, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (podés adjuntar la foto), cambiar precios o stock, cupones, destacar en la home, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
+const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Laurina, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (podés adjuntar la foto), precios y ofertas, cupones, destacar en la home, gestionar pedidos (marcar enviados/entregados), moderar reseñas, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
 
 const toArr = (v) => Array.isArray(v) ? v.map(String).map(s => s.trim()).filter(Boolean)
     : (typeof v === 'string' ? v.split(/[,/]+/).map(s => s.trim()).filter(Boolean) : []);
@@ -22,6 +22,9 @@ const actionLabel = (a) => {
         case 'toggle_visible': return `${A.visible ? 'Mostrar' : 'Ocultar'} producto ${A.productId}`;
         case 'delete_product': return `ELIMINAR producto ${A.productId}`;
         case 'delete_coupon': return `ELIMINAR cupón ${A.couponId}`;
+        case 'set_order_status': return `Pedido ${A.orderId} → ${A.status}${A.tracking ? ` (tracking ${A.tracking})` : ''}`;
+        case 'set_sale': return Number(A.percent) > 0 ? `Poner ${A.productId} en oferta −${A.percent}%` : `Quitar oferta de ${A.productId}`;
+        case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
         case 'toggle_maintenance': return `Mantenimiento → ${A.on ? 'ACTIVAR' : 'desactivar'}`;
         default: return `${a.tool} ${JSON.stringify(A)}`;
@@ -30,9 +33,10 @@ const actionLabel = (a) => {
 
 export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const {
-        siteConfig, aiConfig, categories, coupons, isMaintenance,
+        siteConfig, aiConfig, categories, coupons, reviews, isMaintenance,
         addProduct, updateProduct, deleteProduct, addCategory, addCoupon, deleteCoupon,
         updateSiteConfig, toggleMaintenance, uploadImage, logAiAction,
+        updateOrderStatus, approveReview, rejectReview,
     } = useStore();
 
     const [messages, setMessages] = useState(() => {
@@ -77,7 +81,45 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             }
             case 'get_product': {
                 const p = findProduct(A.idOrName); if (!p) return 'No encontré ese producto.';
-                return JSON.stringify({ id: p.id, name: p.name, price: p.price, stock: p.stock, category: p.category, colors: p.colors, sizes: p.sizes, visible: p.active !== false, badges: p.badges, description: p.description }, null, 1);
+                return JSON.stringify({ id: p.id, name: p.name, price: p.price, compareAtPrice: p.compareAtPrice, stock: p.stock, variants: p.variants || null, hasVariants: Array.isArray(p.variants) && p.variants.length > 0, category: p.category, colors: p.colors, sizes: p.sizes, visible: p.active !== false, badges: p.badges, description: p.description }, null, 1);
+            }
+            case 'query_reviews': {
+                let r = [...(reviews || [])];
+                if (A.onlyPending) r = r.filter(x => !x.approved);
+                if (A.productId) { const p = findProduct(A.productId); if (p) r = r.filter(x => String(x.productId) === String(p.id)); }
+                return r.length
+                    ? r.slice(0, 20).map(x => `#${x.id} ${'★'.repeat(x.rating || 0)} "${(x.text || '').slice(0, 70)}" — ${x.userName || '?'} ${x.approved ? '[aprobada]' : '[PENDIENTE]'}`).join('\n')
+                    : 'Sin reseñas.';
+            }
+            case 'approve_review': {
+                if (!A.reviewId) return 'Falta el id de la reseña.';
+                await approveReview(A.reviewId);
+                return `Reseña ${A.reviewId} aprobada y publicada.`;
+            }
+            case 'reject_review': {
+                if (!A.reviewId) return 'Falta el id de la reseña.';
+                await rejectReview(A.reviewId);
+                return `Reseña ${A.reviewId} eliminada.`;
+            }
+            case 'set_order_status': {
+                const o = orders.find(x => String(x.id).toLowerCase() === String(A.orderId).toLowerCase());
+                if (!o) return 'No encontré ese pedido.';
+                const st = String(A.status || '').toLowerCase();
+                if (!['pending', 'shipped', 'delivered', 'cancelled', 'approved'].includes(st)) return `Estado inválido: ${A.status}.`;
+                await updateOrderStatus(o.id, st, A.tracking ? { trackingNumber: String(A.tracking) } : {});
+                return `Pedido ${o.id} → ${st}${A.tracking ? ` (tracking ${A.tracking})` : ''}.`;
+            }
+            case 'set_sale': {
+                const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
+                const pct = Number(A.percent) || 0;
+                if (pct <= 0) {
+                    await updateProduct(p.id, { compareAtPrice: 0, badges: { ...(p.badges || {}), isOnSale: false } });
+                    return `Oferta quitada de "${p.name}".`;
+                }
+                const original = Number(p.compareAtPrice) > Number(p.price) ? Number(p.compareAtPrice) : Number(p.price);
+                const newPrice = Math.round(original * (1 - pct / 100));
+                await updateProduct(p.id, { price: newPrice, compareAtPrice: original, badges: { ...(p.badges || {}), isOnSale: true } });
+                return `"${p.name}" −${pct}% → $${newPrice.toLocaleString('es-AR')} (antes $${original.toLocaleString('es-AR')}).`;
             }
             case 'query_orders': {
                 let r = [...orders];
@@ -179,6 +221,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             }
             case 'set_stock': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
+                if (Array.isArray(p.variants) && p.variants.length) {
+                    return `"${p.name}" maneja stock por VARIANTES (talle/color), así que un único número no aplica. Editá el stock por variante desde el editor del producto. (No cambié nada para no romper el stock real.)`;
+                }
                 await updateProduct(p.id, { stock: Number(A.stock) || 0 });
                 return `Stock de "${p.name}" → ${Number(A.stock) || 0}.`;
             }
@@ -305,7 +350,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 transcript.push({ role: 'system', content: `El usuario adjuntó la foto de una prenda. Imagen YA subida (usá esta URL en imageUrl): ${url}\nAnálisis automático de la imagen: ${JSON.stringify(an)}\nProponé create_product con esos datos (precio = suggestedPrice como sugerencia editable) salvo que el usuario pida otra cosa.` });
             }
             transcript.push({ role: 'user', content: text || 'Publicá esta prenda.' });
-            await agentLoop(transcript, { inventory, orders, categories, coupons, isMaintenance, siteConfig });
+            await agentLoop(transcript, { inventory, orders, categories, coupons, reviews, isMaintenance, siteConfig });
             logAiAction?.('copilot', text || '(imagen)', 'ok');
         } catch (e) {
             push({ role: 'system', text: `Error: ${e?.message || e}` });
@@ -321,8 +366,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
     const SUGGESTIONS = [
         '¿Cuánto vendí esta semana?',
-        '¿Qué productos tienen stock bajo?',
-        'Creá un cupón VERANO15 de 15%',
+        '¿Qué pedidos tengo pendientes de enviar?',
+        'Aprobá las reseñas que estén pendientes',
         'Destacá en la home los 4 productos más nuevos',
     ];
 

@@ -131,3 +131,8 @@ list-models.mjs
 /playwright/.cache/
 /screenshots/
 
+# Vite / esbuild temp configs y archivos basura
+vite.config.js.timestamp-*.mjs
+*.bak
+.fuse_hidden*
+

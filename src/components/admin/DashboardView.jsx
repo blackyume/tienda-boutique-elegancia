@@ -102,7 +102,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
             .map(([name, value]) => ({ name, value }))
             .sort((a, b) => b.value - a.value);
 
-        const COLORS = ['#C19A6B', '#334155', '#94a3b8', '#475569', '#1e293b'];
+        const COLORS = ['#D4AF37', '#334155', '#94a3b8', '#475569', '#1a1a1a'];
 
         // Best Selling Category
         const bestCategory = categoryData.length > 0 ? categoryData[0].name : "N/A";
@@ -202,7 +202,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] relative overflow-hidden font-sans text-slate-900 dark:text-slate-100">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#121212] relative overflow-hidden font-sans text-slate-900 dark:text-slate-100">
             {/* Premium Background Texture */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] dark:invert"></div>
 
@@ -307,13 +307,13 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         {/* ACCESOS DIRECTOS */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <ActionButton icon={Plus} label="Nuevo Producto" onClick={onCreateProduct} color="bg-slate-800 text-white hover:bg-black border-transparent" />
-                            <ActionButton icon={Search} label="Ver Pedidos" onClick={() => onNavigate('orders')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
-                            <ActionButton icon={Users} label="Clientes" onClick={() => onNavigate('customers')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
-                            <ActionButton icon={Package} label="Inventario" onClick={() => onNavigate('inventory')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
+                            <ActionButton icon={Search} label="Ver Pedidos" onClick={() => onNavigate('orders')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
+                            <ActionButton icon={Users} label="Clientes" onClick={() => onNavigate('customers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
+                            <ActionButton icon={Package} label="Inventario" onClick={() => onNavigate('inventory')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
 
-                            <ActionButton icon={Settings} label="CMS / Diseño" onClick={() => onNavigate('cms')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
-                            <ActionButton icon={Percent} label="Cupones" onClick={() => onNavigate('coupons')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
-                            <ActionButton icon={Truck} label="Proveedores" onClick={() => onNavigate('suppliers')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
+                            <ActionButton icon={Settings} label="CMS / Diseño" onClick={() => onNavigate('cms')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
+                            <ActionButton icon={Percent} label="Cupones" onClick={() => onNavigate('coupons')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
+                            <ActionButton icon={Truck} label="Proveedores" onClick={() => onNavigate('suppliers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
                             <div className="col-span-2 sm:col-span-1">
                                 <ActionButton
                                     icon={MessageSquare}
@@ -322,11 +322,11 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                     color="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 text-white border-purple-500/50 hover:shadow-purple-500/20 shadow-lg animate-pulse-slow"
                                 />
                             </div>
-                            <ActionButton icon={Settings} label="Configuración" onClick={() => onNavigate('settings')} color="bg-white dark:bg-[#1e293b] text-slate-600 dark:text-white hover:text-[#C19A6B] hover:border-[#C19A6B]" />
+                            <ActionButton icon={Settings} label="Configuración" onClick={() => onNavigate('settings')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
                         </div>
 
                         {/* CHART: VISITANTES ÚLTIMAS 48H */}
-                        <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
                                     <Radio className="w-4 h-4 text-emerald-500" /> Tráfico (últimas 48h)
@@ -353,22 +353,22 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         </div>
 
                         {/* CHART: VENTAS SEMANALES */}
-                        <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                            <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#C19A6B]" /> Tendencia de Ventas</h3>
+                        <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#D4AF37]" /> Tendencia de Ventas</h3>
                             <div className="h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={salesInteractions.chartData}>
                                         <defs>
                                             <linearGradient id="colorVentas" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#C19A6B" stopOpacity={0.8} />
-                                                <stop offset="95%" stopColor="#C19A6B" stopOpacity={0} />
+                                                <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.8} />
+                                                <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
                                         <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
                                         <YAxis hide={true} />
                                         <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} formatter={(value) => [formatMoney(value), 'Ventas']} />
-                                        <Area type="monotone" dataKey="ventas" stroke="#C19A6B" strokeWidth={3} fillOpacity={1} fill="url(#colorVentas)" />
+                                        <Area type="monotone" dataKey="ventas" stroke="#D4AF37" strokeWidth={3} fillOpacity={1} fill="url(#colorVentas)" />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
@@ -376,8 +376,8 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* CHART: VENTAS POR CATEGORIA */}
-                            <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                                <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><Package className="w-4 h-4 text-[#C19A6B]" /> Ventas por Categoría</h3>
+                            <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><Package className="w-4 h-4 text-[#D4AF37]" /> Ventas por Categoría</h3>
                                 <div className="h-[250px] w-full relative">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
@@ -405,13 +405,13 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                             </div>
 
                             {/* TOP PRODUCTS */}
-                            <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                                <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><Trophy className="w-4 h-4 text-[#C19A6B]" /> Top Productos</h3>
+                            <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><Trophy className="w-4 h-4 text-[#D4AF37]" /> Top Productos</h3>
                                 <div className="space-y-4">
                                     {salesInteractions.topProducts.map((p, i) => (
                                         <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                             <div className="flex items-center gap-3">
-                                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-[#C19A6B] text-white' : 'bg-slate-200 text-slate-600'}`}>
+                                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-[#D4AF37] text-white' : 'bg-slate-200 text-slate-600'}`}>
                                                     {i + 1}
                                                 </span>
                                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate max-w-[120px]">{p.name}</span>
@@ -430,7 +430,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                     {/* SIDEBAR INFO */}
                     <div className="space-y-6">
                         {/* LIVE VISITORS */}
-                        <div className="bg-white dark:bg-[#1e293b] border border-emerald-200 dark:border-emerald-900/40 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                        <div className="bg-white dark:bg-[#1a1a1a] border border-emerald-200 dark:border-emerald-900/40 rounded-2xl p-6 shadow-sm relative overflow-hidden">
                             <div className="absolute -top-6 -right-6 w-24 h-24 bg-emerald-100 dark:bg-emerald-900/20 rounded-full opacity-60" />
                             <div className="relative z-10">
                                 <div className="flex items-center gap-2 mb-2">
@@ -449,7 +449,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         </div>
 
                         {/* STOCK LEVEL */}
-                        <div className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+                        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#121212] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
                             <div className="relative z-10">
                                 <h3 className="font-bold text-lg mb-1">Estado del Stock</h3>
                                 <p className="text-slate-400 text-xs mb-6">Resumen de inventario actual</p>
@@ -458,7 +458,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                     <span className="text-sm font-medium opacity-70 mb-1">/ Prendas Totales</span>
                                 </div>
                                 <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                                    <div className="h-full bg-[#C19A6B]" style={{ width: '100%' }}></div>
+                                    <div className="h-full bg-[#D4AF37]" style={{ width: '100%' }}></div>
                                 </div>
                             </div>
                         </div>
@@ -474,13 +474,13 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         />
 
                         {/* RECENT ACTIVITY LOG (EXPANDED) */}
-                        <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                        <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
                             <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                                <Activity className="w-4 h-4 text-[#C19A6B]" /> Actividad Reciente
+                                <Activity className="w-4 h-4 text-[#D4AF37]" /> Actividad Reciente
                             </h3>
                             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
                                 {filteredOrders.slice(0, 8).map(order => (
-                                    <div key={order.id} className="flex flex-col gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-l-2 border-transparent hover:border-[#C19A6B]">
+                                    <div key={order.id} className="flex flex-col gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-l-2 border-transparent hover:border-[#D4AF37]">
                                         <div className="flex justify-between items-start">
                                             <div className="flex items-center gap-2">
                                                 <span className={`w-2 h-2 rounded-full ${order.status === 'pending' ? 'bg-amber-500' : 'bg-green-500'}`} />
@@ -502,7 +502,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         </div>
 
                         {/* CATEGORY LEADER (NEW) */}
-                        <div className="bg-[#C19A6B] text-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                        <div className="bg-[#D4AF37] text-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-bold uppercase opacity-80 mb-1">Categoría Líder</p>
                                 <h3 className="text-2xl font-black">{salesInteractions.bestCategory}</h3>

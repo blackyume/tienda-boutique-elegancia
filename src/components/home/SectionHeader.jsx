@@ -1,21 +1,23 @@
 import React from 'react';
 
-// Header de sección único — un solo lenguaje visual para toda la home.
-// eyebrow neutro (white/40), título serif con escala fija, subtítulo opcional.
 export const SectionHeader = ({ eyebrow, title, subtitle, align = 'center', className = '' }) => {
     const centered = align === 'center';
     return (
         <div className={`${centered ? 'text-center mx-auto' : 'text-left'} ${className}`}>
             {eyebrow && (
-                <span className="block text-[11px] uppercase tracking-[0.35em] font-semibold text-white/40">
-                    {eyebrow}
-                </span>
+                <div className={`flex items-center gap-4 mb-5 ${centered ? 'justify-center' : 'justify-start'}`}>
+                    <span className="h-px w-8 bg-cielo-gold/50 flex-shrink-0" />
+                    <span className="text-2xs uppercase tracking-[0.4em] font-semibold text-cielo-gold/70 whitespace-nowrap">
+                        {eyebrow}
+                    </span>
+                    <span className="h-px w-8 bg-cielo-gold/50 flex-shrink-0" />
+                </div>
             )}
-            <h2 className="mt-3 font-serif text-4xl md:text-5xl leading-tight text-white">
+            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
                 {title}
             </h2>
             {subtitle && (
-                <p className={`mt-4 text-sm md:text-[15px] font-light leading-relaxed text-slate-400 ${centered ? 'max-w-xl mx-auto' : 'max-w-xl'}`}>
+                <p className={`mt-5 text-sm md:text-base font-light leading-relaxed text-white/55 ${centered ? 'mx-auto' : ''} max-w-xl`}>
                     {subtitle}
                 </p>
             )}

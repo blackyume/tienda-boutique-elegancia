@@ -8,6 +8,7 @@
 //   CRON_SECRET                — opcional. Si está, validar header Authorization: Bearer <secret>
 //   PUBLIC_SITE_URL            — opcional. Para el link de recuperación. Default: https://la-boutique-de-la-elegancia.web.app
 const { getDb } = require('../_firebaseAdmin');
+const { safeEqual } = require('../_rateLimit');
 
 const MIN_AGE_MS = 2 * 60 * 60 * 1000;   // 2 horas
 const MAX_AGE_MS = 72 * 60 * 60 * 1000;  // 72 horas
@@ -54,7 +55,7 @@ module.exports = async (req, res) => {
     const expectedSecret = process.env.CRON_SECRET;
     if (expectedSecret) {
         const authHeader = req.headers['authorization'] || '';
-        if (authHeader !== `Bearer ${expectedSecret}`) {
+        if (!safeEqual(authHeader, `Bearer ${expectedSecret}`)) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
     }

@@ -41,8 +41,8 @@ const ImageUploader = ({ currentImage, onUpload, label, className = "" }) => {
                 onDrop={handleDrop}
                 className={`
                     relative w-full overflow-hidden rounded-xl border-2 border-dashed transition-all duration-300
-                    ${currentImage ? 'h-48 border-transparent' : 'h-32 border-slate-300 dark:border-slate-700 hover:border-[#C19A6B] bg-slate-50 dark:bg-slate-900'}
-                    ${isDragging ? 'border-[#C19A6B] bg-[#C19A6B]/10' : ''}
+                    ${currentImage ? 'h-48 border-transparent' : 'h-32 border-slate-300 dark:border-slate-700 hover:border-[#D4AF37] bg-slate-50 dark:bg-slate-900'}
+                    ${isDragging ? 'border-[#D4AF37] bg-[#D4AF37]/10' : ''}
                 `}
             >
                 {currentImage ? (
@@ -56,7 +56,7 @@ const ImageUploader = ({ currentImage, onUpload, label, className = "" }) => {
                         </div>
                     </>
                 ) : (
-                    <label className="absolute inset-0 cursor-pointer flex flex-col items-center justify-center text-slate-400 hover:text-[#C19A6B] transition-colors">
+                    <label className="absolute inset-0 cursor-pointer flex flex-col items-center justify-center text-slate-400 hover:text-[#D4AF37] transition-colors">
                         {isUploading ? (
                             <div className="flex flex-col items-center animate-pulse">
                                 <UploadCloud className="w-8 h-8 mb-2" />
@@ -90,7 +90,7 @@ const SmartImageUploader = ({ currentImage, onUpload, label, className = "" }) =
                 <input
                     type="text"
                     placeholder="O pega una URL de imagen aquí..."
-                    className="flex-1 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#C19A6B] outline-none text-xs py-1 dark:text-slate-300 transition-colors"
+                    className="flex-1 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#D4AF37] outline-none text-xs py-1 dark:text-slate-300 transition-colors"
                     defaultValue={""}
                     onBlur={(e) => {
                         const val = e.target.value;
@@ -187,10 +187,10 @@ export const CMSView = () => {
             </div>
 
             {activeTab === 'config' && (
-                <div className="bg-white dark:bg-[#1e293b] p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl">
+                <div className="bg-white dark:bg-[#1a1a1a] p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl">
                     {/* ... Cloudinary config form (same as before) ... */}
                     <h3 className="font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-4">
-                        <Monitor className="w-5 h-5 text-[#C19A6B]" /> Configuración de Cloudinary (Imágenes)
+                        <Monitor className="w-5 h-5 text-[#D4AF37]" /> Configuración de Cloudinary (Imágenes)
                     </h3>
                     <div className="space-y-4">
                         <div>
@@ -198,7 +198,7 @@ export const CMSView = () => {
                             <input
                                 value={cloudCfg.cloudName}
                                 onChange={e => setCloudCfg({ ...cloudCfg, cloudName: e.target.value })}
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37]"
                             />
                         </div>
                         <div>
@@ -206,7 +206,7 @@ export const CMSView = () => {
                             <input
                                 value={cloudCfg.uploadPreset}
                                 onChange={e => setCloudCfg({ ...cloudCfg, uploadPreset: e.target.value })}
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37]"
                             />
                         </div>
                         <Button onClick={handleSaveCloudConfig} className="w-full mt-4">Guardar Configuración</Button>
@@ -219,8 +219,8 @@ export const CMSView = () => {
                     {/* TOP ROW: Global Settings (Grid 3 Cols) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* 1. VISIBILITY */}
-                        <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
-                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Layout className="w-5 h-5 text-[#C19A6B]" /> Visibilidad</h3>
+                        <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
+                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Layout className="w-5 h-5 text-[#D4AF37]" /> Visibilidad</h3>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
                                     <span className="text-sm font-bold dark:text-white">Cintilla (Marquee)</span>
@@ -238,19 +238,19 @@ export const CMSView = () => {
                         </section>
 
                         {/* 2. MARQUEE TEXT */}
-                        <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
-                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Tag className="w-5 h-5 text-[#C19A6B]" /> Texto Cintilla</h3>
+                        <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
+                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Tag className="w-5 h-5 text-[#D4AF37]" /> Texto Cintilla</h3>
                             <textarea
                                 value={siteConfig.marquee || ""}
                                 onChange={(e) => updateSection('root', 'marquee', e.target.value)}
-                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border-none outline-none focus:ring-2 focus:ring-[#C19A6B]/50 h-32 text-sm resize-none"
+                                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border-none outline-none focus:ring-2 focus:ring-[#D4AF37]/50 h-32 text-sm resize-none"
                                 placeholder="Texto en movimiento..."
                             />
                         </section>
 
                         {/* 3. SOCIALS */}
-                        <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
-                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Share2 className="w-5 h-5 text-[#C19A6B]" /> Redes Sociales</h3>
+                        <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
+                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Share2 className="w-5 h-5 text-[#D4AF37]" /> Redes Sociales</h3>
                             <div className="space-y-3">
                                 {['instagram', 'youtube', 'tiktok'].map((social) => (
                                     <div key={social} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
@@ -269,11 +269,11 @@ export const CMSView = () => {
                     </div>
 
                     {/* FULL WIDTH HERO SECTION */}
-                    <section className="bg-white dark:bg-[#1e293b] p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-lg relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C19A6B] to-transparent opacity-50" />
+                    <section className="bg-white dark:bg-[#1a1a1a] p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-lg relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-50" />
 
                         <h3 className="font-bold mb-8 flex items-center gap-2 text-2xl text-slate-800 dark:text-white">
-                            <Monitor className="w-6 h-6 text-[#C19A6B]" /> Portada Principal (Hero)
+                            <Monitor className="w-6 h-6 text-[#D4AF37]" /> Portada Principal (Hero)
                         </h3>
 
                         <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
@@ -295,7 +295,7 @@ export const CMSView = () => {
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12 text-white pointer-events-none">
                                         <p className="font-cinzel text-xs tracking-[0.3em] mb-4 opacity-90 drop-shadow-lg">EST. 2026</p>
                                         <h2 className="font-cinzel text-4xl md:text-6xl mb-4 drop-shadow-xl font-medium">{siteConfig.hero?.title || "TITULO"}</h2>
-                                        <p className="font-serif text-2xl italic text-[#C19A6B] mb-10 drop-shadow-lg">{siteConfig.hero?.subtitle || "Subtítulo"}</p>
+                                        <p className="font-serif text-2xl italic text-[#D4AF37] mb-10 drop-shadow-lg">{siteConfig.hero?.subtitle || "Subtítulo"}</p>
                                         <div className="px-10 py-4 bg-white text-slate-900 font-bold text-sm tracking-[0.2em] uppercase shadow-2xl">
                                             {siteConfig.hero?.buttonText || "BOTÓN"}
                                         </div>
@@ -320,7 +320,7 @@ export const CMSView = () => {
                                         <input
                                             type="text"
                                             placeholder="O pega URL aquí..."
-                                            className="w-full bg-transparent text-xs py-2 border-b border-slate-300 dark:border-slate-700 focus:border-[#C19A6B] outline-none dark:text-slate-300"
+                                            className="w-full bg-transparent text-xs py-2 border-b border-slate-300 dark:border-slate-700 focus:border-[#D4AF37] outline-none dark:text-slate-300"
                                             onBlur={(e) => e.target.value && updateSection('hero', 'image', e.target.value)}
                                         />
                                     </div>
@@ -331,7 +331,7 @@ export const CMSView = () => {
                                             <input
                                                 value={siteConfig.hero?.title || ""}
                                                 onChange={(e) => updateSection('hero', 'title', e.target.value)}
-                                                className="w-full px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#C19A6B] outline-none font-cinzel"
+                                                className="w-full px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#D4AF37] outline-none font-cinzel"
                                                 placeholder="LA BOUTIQUE"
                                             />
                                         </div>
@@ -340,7 +340,7 @@ export const CMSView = () => {
                                             <input
                                                 value={siteConfig.hero?.subtitle || ""}
                                                 onChange={(e) => updateSection('hero', 'subtitle', e.target.value)}
-                                                className="w-full px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#C19A6B] outline-none italic font-serif"
+                                                className="w-full px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#D4AF37] outline-none italic font-serif"
                                                 placeholder="de la Elegancia"
                                             />
                                         </div>
@@ -350,7 +350,7 @@ export const CMSView = () => {
                                                 <input
                                                     value={siteConfig.hero?.buttonText || ""}
                                                     onChange={(e) => updateSection('hero', 'buttonText', e.target.value)}
-                                                    className="w-full px-3 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#C19A6B] outline-none text-center"
+                                                    className="w-full px-3 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#D4AF37] outline-none text-center"
                                                 />
                                             </div>
                                             <div>
@@ -358,7 +358,7 @@ export const CMSView = () => {
                                                 <input
                                                     value={siteConfig.hero?.buttonLink || ""}
                                                     onChange={(e) => updateSection('hero', 'buttonLink', e.target.value)}
-                                                    className="w-full px-3 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#C19A6B] outline-none"
+                                                    className="w-full px-3 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#D4AF37] outline-none"
                                                     placeholder="shop"
                                                 />
                                             </div>
@@ -374,8 +374,8 @@ export const CMSView = () => {
             {activeTab === 'promo' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* ANNOUNCEMENT BAR */}
-                    <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Megaphone className="w-5 h-5 text-[#C19A6B]" /> Barra de Anuncios (Top Bar)</h3>
+                    <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Megaphone className="w-5 h-5 text-[#D4AF37]" /> Barra de Anuncios (Top Bar)</h3>
                         <div className="flex items-center justify-between mb-4 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg">
                             <span className="text-xs font-bold uppercase">Estado: {siteConfig.announcement?.enabled ? 'Activo' : 'Inactivo'}</span>
                             <button onClick={() => updateSection('announcement', 'enabled', !siteConfig.announcement?.enabled)} className={`text-2xl ${siteConfig.announcement?.enabled ? 'text-green-500' : 'text-slate-300'}`}>
@@ -392,8 +392,8 @@ export const CMSView = () => {
                     </section>
 
                     {/* POPUP */}
-                    <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm row-span-2">
-                        <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Gift className="w-5 h-5 text-[#C19A6B]" /> Popup Promocional</h3>
+                    <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm row-span-2">
+                        <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Gift className="w-5 h-5 text-[#D4AF37]" /> Popup Promocional</h3>
 
                         <div className="flex items-center justify-between mb-6 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg">
                             <span className="text-xs font-bold uppercase">Activar Popup</span>
@@ -438,9 +438,9 @@ export const CMSView = () => {
             {activeTab === 'categories' && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* NEW CATEGORY FORM */}
-                    <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                         <h3 className="font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <Plus className="w-5 h-5 text-[#C19A6B]" /> Nueva Categoría
+                            <Plus className="w-5 h-5 text-[#D4AF37]" /> Nueva Categoría
                         </h3>
 
                         <div className="space-y-4">
@@ -451,7 +451,7 @@ export const CMSView = () => {
                                     value={newCatName}
                                     onChange={(e) => setNewCatName(e.target.value)}
                                     placeholder="Ej: Vestidos de Noche"
-                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border-none outline-none focus:ring-2 focus:ring-[#C19A6B]/50 transition-all font-medium text-slate-800 dark:text-slate-100"
+                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border-none outline-none focus:ring-2 focus:ring-[#D4AF37]/50 transition-all font-medium text-slate-800 dark:text-slate-100"
                                 />
                             </div>
 
@@ -467,7 +467,7 @@ export const CMSView = () => {
                             <Button
                                 onClick={handleAddCategory}
                                 disabled={!newCatName}
-                                className="w-full bg-[#C19A6B] hover:bg-[#a38056] text-white py-3 rounded-xl mt-2 font-bold shadow-lg shadow-[#C19A6B]/20"
+                                className="w-full bg-[#D4AF37] hover:bg-[#B8932E] text-white py-3 rounded-xl mt-2 font-bold shadow-lg shadow-[#D4AF37]/20"
                             >
                                 CREAR CATEGORÍA
                             </Button>
@@ -475,9 +475,9 @@ export const CMSView = () => {
                     </section>
 
                     {/* CATEGORIES GRID */}
-                    <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                         <h3 className="font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <Tag className="w-5 h-5 text-[#C19A6B]" /> Categorías Activas ({categories.length})
+                            <Tag className="w-5 h-5 text-[#D4AF37]" /> Categorías Activas ({categories.length})
                         </h3>
 
                         <div className="grid grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-hide">
@@ -563,12 +563,12 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
     return (
         <div className="space-y-8">
             {/* TESTIMONIALS */}
-            <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-                        <Quote className="w-5 h-5 text-[#C19A6B]" /> Testimonios ({testimonials.length})
+                        <Quote className="w-5 h-5 text-[#D4AF37]" /> Testimonios ({testimonials.length})
                     </h3>
-                    <button onClick={addTestimonial} className="inline-flex items-center gap-1 px-4 py-2 bg-[#C19A6B] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#a38056] transition-colors">
+                    <button onClick={addTestimonial} className="inline-flex items-center gap-1 px-4 py-2 bg-[#D4AF37] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#B8932E] transition-colors">
                         <Plus className="w-4 h-4" /> Agregar
                     </button>
                 </div>
@@ -587,7 +587,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                                     value={t.name || ''}
                                     onChange={(e) => updateTestimonial(idx, { name: e.target.value })}
                                     placeholder="Nombre (ej: Sofía G.)"
-                                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                                    className="flex-1 px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37]"
                                 />
                                 <button onClick={() => removeTestimonial(idx)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg" title="Eliminar">
                                     <Trash2 className="w-4 h-4" />
@@ -597,14 +597,14 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                                 value={t.location || ''}
                                 onChange={(e) => updateTestimonial(idx, { location: e.target.value })}
                                 placeholder="Ciudad (ej: Buenos Aires)"
-                                className="w-full px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                                className="w-full px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37]"
                             />
                             <textarea
                                 value={t.text || ''}
                                 onChange={(e) => updateTestimonial(idx, { text: e.target.value })}
                                 placeholder="Comentario del cliente…"
                                 rows={3}
-                                className="w-full px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B] resize-none"
+                                className="w-full px-3 py-2 bg-white dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37] resize-none"
                             />
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Estrellas</span>
@@ -622,9 +622,9 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
             </section>
 
             {/* SHOP THE LOOK */}
-            <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-6">
-                    <Target className="w-5 h-5 text-[#C19A6B]" /> Shop the Look (Hotspots)
+                    <Target className="w-5 h-5 text-[#D4AF37]" /> Shop the Look (Hotspots)
                 </h3>
 
                 <div className="grid md:grid-cols-2 gap-6">
@@ -640,7 +640,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                             placeholder="O pega URL aquí…"
                             defaultValue=""
                             onBlur={(e) => e.target.value && saveNested('shopTheLook', { image: e.target.value })}
-                            className="w-full bg-transparent text-xs py-2 border-b border-slate-300 dark:border-slate-700 focus:border-[#C19A6B] outline-none dark:text-slate-300"
+                            className="w-full bg-transparent text-xs py-2 border-b border-slate-300 dark:border-slate-700 focus:border-[#D4AF37] outline-none dark:text-slate-300"
                         />
                         <p className="text-[11px] text-slate-500 leading-relaxed">
                             Si no subís imagen, se usa la imagen del Editorial como fallback.
@@ -651,7 +651,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase text-slate-500">Puntos ({hotspots.length})</span>
-                            <button onClick={addHotspot} className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#C19A6B] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg hover:bg-[#a38056]">
+                            <button onClick={addHotspot} className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#D4AF37] text-white text-[10px] font-bold uppercase tracking-wider rounded-lg hover:bg-[#B8932E]">
                                 <Plus className="w-3 h-3" /> Nuevo
                             </button>
                         </div>
@@ -707,9 +707,9 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
             </section>
 
             {/* DROP / COUNTDOWN */}
-            <section className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white mb-6">
-                    <Clock className="w-5 h-5 text-[#C19A6B]" /> Próximo Drop / Cuenta Regresiva
+                    <Clock className="w-5 h-5 text-[#D4AF37]" /> Próximo Drop / Cuenta Regresiva
                 </h3>
                 <p className="text-xs text-slate-500 mb-6">
                     Si tenés una promoción programada en Firestore (<code>scheduled_promotions</code>), se prioriza esa.
@@ -722,7 +722,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                             value={drop.title || ''}
                             onChange={(e) => saveNested('drop', { title: e.target.value })}
                             placeholder="Ej: Colección Otoño 2026"
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37]"
                         />
                     </div>
                     <div>
@@ -735,7 +735,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                                 if (!v) return saveNested('drop', { nextAt: '' });
                                 saveNested('drop', { nextAt: new Date(v).toISOString() });
                             }}
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B]"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37]"
                         />
                     </div>
                     <div className="md:col-span-2">
@@ -745,7 +745,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                             value={drop.description || ''}
                             onChange={(e) => saveNested('drop', { description: e.target.value })}
                             placeholder="Ej: Acceso anticipado para subscriptoras. No te lo pierdas."
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#C19A6B] resize-none"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#D4AF37] resize-none"
                         />
                     </div>
                 </div>

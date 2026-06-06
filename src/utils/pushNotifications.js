@@ -5,14 +5,20 @@
 //   1. requestAndRegister(user, siteConfig) → pide permiso, obtiene FCM token
 //   2. Guarda {uid, email, token, createdAt} en `push_subscriptions`
 //   3. Admin puede enviar notificaciones desde `api/send-push.js`
-import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
 import { firebaseApp, db } from '../lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+
+// firebase/messaging se importa dinámicamente: así el SDK de push (que sólo se
+// usa si el visitante acepta notificaciones) no entra en el bundle inicial de
+// todas las páginas. Se cachea el módulo tras la primera carga.
+let _fmPromise = null;
+const loadMessaging = () => (_fmPromise ||= import('firebase/messaging'));
 
 let messagingInstance = null;
 
 const getMessagingSafe = async () => {
     if (messagingInstance) return messagingInstance;
+    const { getMessaging, isSupported } = await loadMessaging();
     if (!(await isSupported())) return null;
     try {
         messagingInstance = getMessaging(firebaseApp);
@@ -26,7 +32,10 @@ export const isPushSupported = async () => {
     if (typeof window === 'undefined') return false;
     if (!('Notification' in window)) return false;
     if (!('serviceWorker' in navigator)) return false;
-    return await isSupported();
+    if (!('PushManager' in window)) return false;
+    // Chequeo barato vía APIs del navegador — evita cargar firebase/messaging
+    // sólo para saber si está soportado.
+    return true;
 };
 
 export const getCurrentPermission = () => {
@@ -49,6 +58,7 @@ export const requestAndRegister = async (user, vapidKey) => {
     const messaging = await getMessagingSafe();
     if (!messaging) throw new Error('Messaging no soportado');
 
+    const { getToken } = await loadMessaging();
     const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: swReg });
     if (!token) throw new Error('No se obtuvo token');
 
@@ -68,6 +78,7 @@ export const requestAndRegister = async (user, vapidKey) => {
 export const listenForegroundMessages = async (onNotif) => {
     const messaging = await getMessagingSafe();
     if (!messaging) return () => { };
+    const { onMessage } = await loadMessaging();
     return onMessage(messaging, (payload) => {
         if (typeof onNotif === 'function') onNotif(payload);
     });

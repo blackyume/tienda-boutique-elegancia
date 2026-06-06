@@ -8,7 +8,7 @@ const PILLARS = [
 ];
 
 export const Atelier = () => (
-    <section className="relative py-24 md:py-32 px-6 bg-[#070d1c] border-y border-white/[0.05] overflow-hidden">
+    <section className="relative py-24 md:py-32 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(193,154,107,0.05),transparent_60%)] pointer-events-none" />
 
         <Reveal className="relative max-w-5xl mx-auto text-center">
@@ -25,7 +25,7 @@ export const Atelier = () => (
 
         <Reveal className="relative max-w-5xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-3 gap-px bg-white/5 rounded-sm overflow-hidden">
             {PILLARS.map((p) => (
-                <div key={p.k} className="bg-[#020617] p-8 md:p-10 text-center md:text-left">
+                <div key={p.k} className="bg-[#0A0A0A] p-8 md:p-10 text-center md:text-left">
                     <h3 className="font-cinzel text-lg tracking-[0.15em] text-white mb-3">{p.k}</h3>
                     <p className="text-slate-400 text-sm font-light leading-relaxed">{p.d}</p>
                 </div>

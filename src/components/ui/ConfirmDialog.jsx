@@ -74,10 +74,10 @@ export const ConfirmProvider = ({ children }) => {
                         className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-[fadeIn_.15s_ease-out]"
                         onClick={() => settle(isPrompt ? null : false)}
                     />
-                    <div className="relative w-full max-w-md bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-[scaleIn_.18s_ease-out]">
+                    <div className="relative w-full max-w-md bg-white dark:bg-[#1a1a1a] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-[scaleIn_.18s_ease-out]">
                         <div className="p-6">
                             <div className="flex items-start gap-4">
-                                <div className={`shrink-0 p-3 rounded-xl ${state.danger ? 'bg-red-50 text-red-500 dark:bg-red-900/20' : 'bg-[#C19A6B]/10 text-[#C19A6B]'}`}>
+                                <div className={`shrink-0 p-3 rounded-xl ${state.danger ? 'bg-red-50 text-red-500 dark:bg-red-900/20' : 'bg-[#D4AF37]/10 text-[#D4AF37]'}`}>
                                     <AlertTriangle className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -96,7 +96,7 @@ export const ConfirmProvider = ({ children }) => {
                                             onChange={(e) => setInputValue(e.target.value)}
                                             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); settle(inputValue); } }}
                                             placeholder={state.placeholder}
-                                            className="mt-4 w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 dark:text-white outline-none focus:border-[#C19A6B] focus:ring-1 focus:ring-[#C19A6B]/20 transition-all"
+                                            className="mt-4 w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 dark:text-white outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/20 transition-all"
                                         />
                                     )}
                                 </div>
@@ -109,7 +109,7 @@ export const ConfirmProvider = ({ children }) => {
                                 </button>
                             </div>
                         </div>
-                        <div className="flex gap-3 px-6 py-4 bg-slate-50 dark:bg-[#111827] border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex gap-3 px-6 py-4 bg-slate-50 dark:bg-[#161616] border-t border-slate-100 dark:border-slate-800">
                             <button
                                 onClick={() => settle(isPrompt ? null : false)}
                                 className="flex-1 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors"
@@ -119,7 +119,7 @@ export const ConfirmProvider = ({ children }) => {
                             <button
                                 ref={primaryRef}
                                 onClick={() => settle(isPrompt ? inputValue : true)}
-                                className={`flex-1 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-white transition-all hover:-translate-y-0.5 ${state.danger ? 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20' : 'bg-[#C19A6B] hover:bg-[#a8835a] shadow-lg shadow-[#C19A6B]/20'}`}
+                                className={`flex-1 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-[0.15em] text-white transition-all hover:-translate-y-0.5 ${state.danger ? 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20' : 'bg-[#D4AF37] hover:bg-[#C19A2E] shadow-lg shadow-[#D4AF37]/20'}`}
                             >
                                 {state.confirmText}
                             </button>

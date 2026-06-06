@@ -38,7 +38,7 @@ const ReviewsView = lazyNamed(() => import('../components/admin/ReviewsView'), '
 
 const TabLoader = () => (
     <div className="flex items-center justify-center py-32">
-        <div className="w-10 h-10 border-2 border-[#C19A6B] border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
     </div>
 );
 
@@ -259,7 +259,7 @@ export const Admin = () => {
     if (!isAdmin) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white">
-                <div className="w-16 h-16 bg-[#C19A6B] rounded-full flex items-center justify-center mb-6 animate-pulse">
+                <div className="w-16 h-16 bg-[#D4AF37] rounded-full flex items-center justify-center mb-6 animate-pulse">
                     <Lock className="w-8 h-8 text-white" />
                 </div>
                 <h1 className="text-3xl font-luxury font-bold mb-2">Acceso Restringido</h1>
@@ -272,7 +272,7 @@ export const Admin = () => {
     }
 
     return (
-        <div className="flex h-screen bg-[#F5F2EB] dark:bg-[#0B1120] font-sans text-slate-800 dark:text-slate-200 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        <div className="flex h-screen bg-[#F5F2EB] dark:bg-[#0A0A0A] font-sans text-slate-800 dark:text-slate-200 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
             <CommandPalette commands={paletteCommands} />
             {/* BACKDROP MOBILE */}
             {sidebarOpen && (
@@ -283,7 +283,7 @@ export const Admin = () => {
                 />
             )}
             {/* SIDEBAR / DRAWER */}
-            <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-sm shrink-0 transform transition-transform duration-300 ease-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#1a1a1a] border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-sm shrink-0 transform transition-transform duration-300 ease-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center">
                         <img src="/assets/logo-seal.png?v=5" alt="La Boutique Logo" className="w-10 h-10 object-contain" />
@@ -314,16 +314,16 @@ export const Admin = () => {
                     <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Sistema</p>
                     <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
                 </nav>
-                <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#111827] space-y-2">
+                <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#161616] space-y-2">
                     <button
                         onClick={() => window.dispatchEvent(new Event('admin:open-command-palette'))}
-                        className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-start p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-[#C19A6B]/40 transition-colors"
+                        className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#D4AF37] w-full justify-start p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-[#D4AF37]/40 transition-colors"
                     >
                         <Search className="w-4 h-4" />
                         <span className="inline flex-1 text-left">Buscar</span>
                         <kbd className="text-[9px] font-bold text-slate-400 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5">⌘K</kbd>
                     </button>
-                    <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#C19A6B] w-full justify-start p-2 transition-colors">
+                    <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#D4AF37] w-full justify-start p-2 transition-colors">
                         <LinkIcon className="w-4 h-4" /> <span className="inline">Ir a la Tienda</span>
                     </a>
                     <button onClick={logout} className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-red-600 w-full justify-start p-2 transition-colors">
@@ -335,7 +335,7 @@ export const Admin = () => {
             {/* MAIN CONTENT */}
             <main className="flex-1 overflow-y-auto relative scroll-smooth">
                 {/* TOPBAR MOBILE */}
-                <header className="lg:hidden sticky top-0 z-20 flex items-center gap-3 h-14 px-4 bg-white/90 dark:bg-[#1e293b]/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+                <header className="lg:hidden sticky top-0 z-20 flex items-center gap-3 h-14 px-4 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
                     <button onClick={() => setSidebarOpen(true)} aria-label="Abrir menú" className="p-2 -ml-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                         <Menu className="w-5 h-5" />
                     </button>
@@ -349,7 +349,7 @@ export const Admin = () => {
                                 <h1 className="text-3xl font-luxury font-bold dark:text-white text-slate-900 tracking-wider">Inventario Exclusivo</h1>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Gestiona tu colección premium.</p>
                             </div>
-                            <Button onClick={openNewProduct} className="bg-black hover:bg-[#C19A6B] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#C19A6B] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
+                            <Button onClick={openNewProduct} className="bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
                                 + Nuevo Diseño
                             </Button>
                         </div>
@@ -358,19 +358,19 @@ export const Admin = () => {
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                             <StatSmall label="Valor Inventario" value={formatMoney(metrics.totalValue)} icon={DollarSign} color="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
                             <StatSmall label="Inversión" value={formatMoney(metrics.invested)} icon={Wallet} color="text-blue-600 bg-blue-50 dark:bg-blue-900/20" />
-                            <StatSmall label="Ganancia Potencial" value={formatMoney(metrics.potentialProfit)} icon={TrendingUp} color="text-[#C19A6B] bg-orange-50 dark:bg-orange-900/20" />
+                            <StatSmall label="Ganancia Potencial" value={formatMoney(metrics.potentialProfit)} icon={TrendingUp} color="text-[#D4AF37] bg-orange-50 dark:bg-orange-900/20" />
                             <StatSmall label="Total Prendas" value={metrics.totalStock} icon={Tag} color="text-purple-600 bg-purple-50 dark:bg-purple-900/20" />
                         </div>
 
                         {/* FILTERS TOOLBAR */}
-                        <div className="bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur-xl p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between sticky top-0 z-30">
+                        <div className="bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between sticky top-0 z-30">
                             {/* SEARCH */}
                             <div className="relative w-full lg:w-96 group">
-                                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#C19A6B] transition-colors" />
+                                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#D4AF37] transition-colors" />
                                 <input
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 pr-4 py-2.5 w-full text-sm border border-slate-200 rounded-xl bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:border-[#C19A6B] focus:ring-1 focus:ring-[#C19A6B]/20 transition-all"
+                                    className="pl-10 pr-4 py-2.5 w-full text-sm border border-slate-200 rounded-xl bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/20 transition-all"
                                     placeholder="Buscar producto..."
                                 />
                             </div>
@@ -384,7 +384,7 @@ export const Admin = () => {
                                     <select
                                         value={selectedCategory}
                                         onChange={(e) => setSelectedCategory(e.target.value)}
-                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#C19A6B] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors min-w-[140px]"
+                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#D4AF37] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors min-w-[140px]"
                                     >
                                         <option value="Todos">Todas las Cats</option>
                                         {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -399,7 +399,7 @@ export const Admin = () => {
                                     <select
                                         value={sortOrder}
                                         onChange={(e) => setSortOrder(e.target.value)}
-                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#C19A6B] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors min-w-[160px]"
+                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#D4AF37] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors min-w-[160px]"
                                     >
                                         <option value="newest">Más Recientes</option>
                                         <option value="price-asc">Menor Precio</option>
@@ -422,9 +422,9 @@ export const Admin = () => {
                         </div>
 
                         {/* TABLE */}
-                        <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+                        <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
                             <table className="w-full text-left text-sm">
-                                <thead className="bg-slate-50/50 dark:bg-[#111827] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
+                                <thead className="bg-slate-50/50 dark:bg-[#161616] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
                                     <tr>
                                         <th className="p-4 pl-6 w-1/3">Producto</th>
                                         <th className="p-4 text-center">Disponibilidad</th>
@@ -456,8 +456,8 @@ export const Admin = () => {
                                                                 </div>
                                                                 <div>
                                                                     <div className="flex items-center gap-2">
-                                                                        <span className="font-bold text-slate-800 dark:text-white group-hover:text-[#C19A6B] transition-colors">{p.name}</span>
-                                                                        {isExpanded ? <ChevronUp className="w-3 h-3 text-[#C19A6B]" /> : <ChevronDown className="w-3 h-3 text-slate-300 group-hover:text-[#C19A6B]" />}
+                                                                        <span className="font-bold text-slate-800 dark:text-white group-hover:text-[#D4AF37] transition-colors">{p.name}</span>
+                                                                        {isExpanded ? <ChevronUp className="w-3 h-3 text-[#D4AF37]" /> : <ChevronDown className="w-3 h-3 text-slate-300 group-hover:text-[#D4AF37]" />}
                                                                     </div>
                                                                     <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 mt-1">{p.category}</span>
                                                                 </div>
@@ -545,7 +545,7 @@ export const Admin = () => {
                                                                                 <div className="flex justify-between"><span>Comisión Cobro ({p.feePercent}%):</span> <span className="text-red-500 line-through decoration-red-200">-{formatMoney(fee)}</span></div>
                                                                             </div>
                                                                         </div>
-                                                                        <div className="bg-white dark:bg-[#1e293b] p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-4">
+                                                                        <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-4">
                                                                             <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-full text-emerald-600 dark:text-emerald-400"><Wallet className="w-5 h-5" /></div>
                                                                             <div>
                                                                                 <p className="text-[10px] uppercase font-bold text-slate-400">Ganancia Real</p>
@@ -638,9 +638,9 @@ export const Admin = () => {
 
                         <style>{`
                 .input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; outline: none; transition: all 0.2s; font-size: 0.875rem; }
-                .input:focus { border-color: #C19A6B; box-shadow: 0 0 0 2px rgba(193,154,107,0.1); }
-                .dark .input { background: #0f172a; border-color: #334155; color: white; }
-                .dark .input:focus { border-color: #C19A6B; }
+                .input:focus { border-color: #D4AF37; box-shadow: 0 0 0 2px rgba(193,154,107,0.1); }
+                .dark .input { background: #121212; border-color: #334155; color: white; }
+                .dark .input:focus { border-color: #D4AF37; }
                 /* Hide spin buttons */
                 input[type=number]::-webkit-inner-spin-button, 
                 input[type=number]::-webkit-outer-spin-button { 
@@ -658,9 +658,9 @@ export const Admin = () => {
 // --- SUBCOMPONENTS (Clean & extracted) ---
 
 const SidebarItem = ({ icon: Icon, label, active, onClick, count }) => (
-    <button onClick={onClick} className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition-all duration-200 group ${active ? 'bg-[#C19A6B] text-white shadow-lg shadow-[#C19A6B]/30' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+    <button onClick={onClick} className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition-all duration-200 group ${active ? 'bg-[#D4AF37] text-white shadow-lg shadow-[#D4AF37]/30' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
         <div className="flex items-center gap-3">
-            <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-400 group-hover:text-[#C19A6B] transition-colors'}`} />
+            <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-400 group-hover:text-[#D4AF37] transition-colors'}`} />
             <span className="inline">{label}</span>
         </div>
         {count > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center inline-block shadow-sm">{count}</span>}
@@ -668,7 +668,7 @@ const SidebarItem = ({ icon: Icon, label, active, onClick, count }) => (
 );
 
 const StatSmall = ({ label, value, icon: Icon, color }) => (
-    <div className="bg-white dark:bg-[#1e293b] p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
+    <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
         <div className={`p-3 rounded-xl ${color}`}><Icon className="w-5 h-5" /></div>
         <div><p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">{label}</p><p className="text-xl font-bold dark:text-white">{value}</p></div>
     </div>

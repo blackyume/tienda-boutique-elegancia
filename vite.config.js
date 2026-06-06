@@ -13,12 +13,14 @@ export default defineConfig({
             output: {
                 manualChunks: {
                     'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+                    // firebase/messaging NO va acá: se importa dinámicamente en
+                    // pushNotifications.js para que quede en su propio chunk lazy
+                    // y no pese en la carga inicial de todas las páginas.
                     'firebase-vendor': [
                         'firebase/app',
                         'firebase/auth',
                         'firebase/firestore',
-                        'firebase/storage',
-                        'firebase/messaging'
+                        'firebase/storage'
                     ],
                     'mp-vendor': ['@mercadopago/sdk-react'],
                     'charts-vendor': ['recharts'],

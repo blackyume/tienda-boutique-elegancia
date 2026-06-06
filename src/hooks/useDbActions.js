@@ -103,7 +103,25 @@ export const useDbActions = ({
     },
     updateOrderStatus: async (id, status, extraData = {}) => {
       if (!isAdmin) return;
-      await updateDoc(doc(db, "orders", String(id)), { status, ...extraData });
+      const orderId = String(id);
+      const PAID = ['approved', 'paid', 'shipped', 'delivered'];
+      // Redimir el cupón cuando el admin confirma un pedido (típicamente uno de
+      // WhatsApp, que no pasa por el webhook de MP). Idempotente vía la flag
+      // couponRedeemed para no contar el uso dos veces.
+      const order = (orders || []).find(o => String(o.id) === orderId);
+      const couponCode = order?.couponCode || order?.coupon?.code;
+      if (PAID.includes(status) && couponCode && !order?.couponRedeemed) {
+        const c = coupons.find(cp => cp.code === couponCode);
+        if (c?.id) {
+          try {
+            await updateDoc(doc(db, "coupons", String(c.id)), { usedCount: increment(1) });
+            extraData = { ...extraData, couponRedeemed: true };
+          } catch (e) {
+            console.error("Error redeeming coupon on order confirm:", e);
+          }
+        }
+      }
+      await updateDoc(doc(db, "orders", orderId), { status, ...extraData });
     },
     addCategory: async (category) => {
       if (!isAdmin) return;

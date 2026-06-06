@@ -5,7 +5,7 @@
 // Opcional:
 //   TELEGRAM_ADMIN_SECRET — si se setea, el cliente debe mandarlo en headers/body
 //                            para evitar que terceros abusen del endpoint.
-const { checkRateLimit, getClientIp } = require('./_rateLimit');
+const { checkRateLimit, getClientIp, safeEqual } = require('./_rateLimit');
 
 const STATIC_ALLOWED_ORIGINS = [
     'https://la-boutique-de-la-elegancia.web.app',
@@ -71,7 +71,7 @@ module.exports = async (req, res) => {
     // Si el admin configuró un secret, exigirlo.
     if (ADMIN_SECRET) {
         const provided = req.headers['x-admin-secret'] || req.body?.secret || '';
-        if (provided !== ADMIN_SECRET) {
+        if (!safeEqual(provided, ADMIN_SECRET)) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
     }

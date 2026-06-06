@@ -3,7 +3,7 @@
 // cliente usar `getColorHex` de utils/helpers.js (maneja #hex y CSS names).
 
 export const COLOR_MAP = {
-    'blanco': '#ffffff', 'negro': '#000000', 'gris': '#808080', 'gris claro': '#d3d3d3', 'gris oscuro': '#a9a9a9', 'plata': '#c0c0c0', 'humo': '#848884', 'carbon': '#36454f', 'blanco tiza': '#f5f5f5', 'hueso': '#e3dac9', 'marfil': '#fffff0', 'crema': '#fffdd0', 'vainilla': '#f3e5ab', 'nude': '#f5d0b5', 'piel': '#f5d0b5', 'natural': '#faebd7', 'champagne': '#fad6a5', 'vison': '#9e9e9e', 'taupe': '#483c32', 'camel': '#c19a6b', 'beige': '#f5f5dc', 'arena': '#f4a460', 'crudo': '#dbd7d2', 'tiza': '#f5f5f5',
+    'blanco': '#ffffff', 'negro': '#000000', 'gris': '#808080', 'gris claro': '#d3d3d3', 'gris oscuro': '#a9a9a9', 'plata': '#c0c0c0', 'humo': '#848884', 'carbon': '#36454f', 'blanco tiza': '#f5f5f5', 'hueso': '#e3dac9', 'marfil': '#fffff0', 'crema': '#fffdd0', 'vainilla': '#f3e5ab', 'nude': '#f5d0b5', 'piel': '#f5d0b5', 'natural': '#faebd7', 'champagne': '#fad6a5', 'vison': '#9e9e9e', 'taupe': '#483c32', 'camel': '#D4AF37', 'beige': '#f5f5dc', 'arena': '#f4a460', 'crudo': '#dbd7d2', 'tiza': '#f5f5f5',
 
     // Rojos / Rosas / Naranjas
     'rojo': '#ff0000', 'bordo': '#800000', 'bordó': '#800000', 'vino': '#722f37', 'terracota': '#e2725b', 'ladrillo': '#b22222', 'cereza': '#de3163', 'carmesi': '#dc143c', 'granate': '#800000', 'rubi': '#e0115f', 'coral': '#ff7f50', 'salmon': '#fa8072', 'durazno': '#ffe5b4', 'naranja': '#ffa500', 'calabaza': '#ff7518', 'oxido': '#b7410e', 'mandarina': '#f28500',

@@ -44,14 +44,22 @@
   <meta name="twitter:image" content="https://la-boutique-de-la-elegancia.web.app/og-image.png" />
 
   <!-- Theme Color (para móviles) -->
-  <meta name="theme-color" content="#020617" />
-  <meta name="msapplication-TileColor" content="#020617" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="msapplication-TileColor" content="#0A0A0A" />
 
   <!-- Performance: Preconnect to external origins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://res.cloudinary.com">
+
+  <!-- Fonts: carga no-bloqueante (antes iban con @import en el CSS, que frena el primer pintado) -->
+  <link rel="stylesheet" media="print" onload="this.media='all'"
+    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap">
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap">
+  </noscript>
 
   <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGLGH9DZP8"></script>
@@ -95,7 +103,7 @@
   </style>
 
   <div id="loadingScreen"
-    style="position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease;">
+    style="position: fixed; inset: 0; background: #0A0A0A; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease;">
 
     <div style="text-align: center; color: white; display: flex; flex-direction: column; align-items: center;">
 

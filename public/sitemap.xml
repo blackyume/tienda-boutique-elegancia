@@ -35,16 +35,4 @@
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
-  <url>
-    <loc>https://la-boutique-de-la-elegancia.web.app/product/3cKqpkFH5deOn8TnT2a0</loc>
-    <lastmod>2026-05-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://la-boutique-de-la-elegancia.web.app/product/jHtf0gaLGAkmXJ3r8Kow</loc>
-    <lastmod>2026-05-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
 </urlset>

@@ -5,7 +5,7 @@
 //
 // No es un cupón Firestore tradicional — se maneja por fuera para simpleza.
 import { db } from '../lib/firebase';
-import { doc, getDoc, updateDoc, increment, collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 // Porcentaje de descuento por default para el referido
 export const REFERRAL_DISCOUNT_PERCENT = 10;
@@ -42,20 +42,5 @@ export const findReferralOwner = async (code) => {
     } catch (err) {
         console.warn('[referral] findOwner failed:', err?.message);
         return null;
-    }
-};
-
-// Se llama al completar un checkout que usó referralCode válido.
-// Incrementa stats del dueño: +1 conversión, + X monto acreditado.
-export const creditReferralOwner = async (ownerUid, orderTotal, discount) => {
-    if (!ownerUid) return;
-    try {
-        await updateDoc(doc(db, 'users', ownerUid), {
-            referralsCount: increment(1),
-            referralsEarnings: increment(Number(discount) || 0),
-            referralsRevenue: increment(Number(orderTotal) || 0)
-        });
-    } catch (err) {
-        console.warn('[referral] credit failed:', err?.message);
     }
 };

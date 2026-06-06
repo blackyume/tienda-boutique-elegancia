@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { collection, onSnapshot, doc, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, doc, query, where, orderBy, limit } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../lib/firebase';
 import { isAdminEmail } from '../utils/admins';
@@ -125,16 +125,18 @@ export const useFirestoreSubscriptions = ({
                 setSuppliers(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.createdAt - a.createdAt));
             }, quietSnap('suppliers')));
 
-            subs.push(onSnapshot(collection(db, 'ai_history'), (snap) => {
-                setAiHistory(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.timestamp - a.timestamp).slice(0, 50));
+            // limit server-side (antes traía toda la colección y cortaba en cliente:
+            // Firestore facturaba todas las lecturas igual).
+            subs.push(onSnapshot(query(collection(db, 'ai_history'), orderBy('timestamp', 'desc'), limit(50)), (snap) => {
+                setAiHistory(snap.docs.map(d => ({ ...d.data(), id: d.id })));
             }, quietSnap('ai_history')));
 
             subs.push(onSnapshot(collection(db, 'scheduled_promotions'), (snap) => {
                 setScheduledPromotions(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => a.activateAt - b.activateAt));
             }, quietSnap('scheduled_promotions')));
 
-            subs.push(onSnapshot(collection(db, 'wishlist_events'), (snap) => {
-                setWishlistEvents(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.timestamp - a.timestamp).slice(0, 500));
+            subs.push(onSnapshot(query(collection(db, 'wishlist_events'), orderBy('timestamp', 'desc'), limit(500)), (snap) => {
+                setWishlistEvents(snap.docs.map(d => ({ ...d.data(), id: d.id })));
             }, quietSnap('wishlist_events')));
 
             subs.push(onSnapshot(collection(db, 'visit_stats_hourly'), (snap) => {

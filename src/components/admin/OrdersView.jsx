@@ -5,6 +5,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { usePrompt } from '../ui/ConfirmDialog';
 import { LayoutList, KanbanSquare, PackageOpen } from 'lucide-react';
 import { usePagination, Pagination } from '../ui/Pagination';
+import { getStatusLabel, getStatusClasses, isFulfillable } from '../../utils/orderStatus';
 
 export const OrdersView = ({ orders, updateOrderStatus }) => {
     const askPrompt = usePrompt();
@@ -14,12 +15,6 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
     // Derived state
     const filteredOrders = (orders || []).filter(o => filter === 'all' || o.status === filter);
     const ordPage = usePagination(filteredOrders, 15);
-
-    const getStatusColor = (status) => {
-        if (status === 'shipped') return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
-        if (status === 'delivered') return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
-        return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
-    };
 
     const handleUpdate = async (id, newStatus) => {
         if (newStatus === 'shipped') {
@@ -66,7 +61,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                 <KanbanBoard orders={orders} updateOrderStatus={updateOrderStatus} />
             ) : (
                 <>
-                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
+                <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden min-h-[400px]">
                     {filteredOrders.length === 0 ? (
                         <EmptyState
                             icon={PackageOpen}
@@ -82,9 +77,9 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-3">
-                                            <p className="font-bold text-[#C19A6B] text-lg font-mono">#{String(o.id || '').slice(-6)}</p>
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getStatusColor(o.status)}`}>
-                                                {o.status === 'pending' ? 'Pendiente' : o.status === 'shipped' ? 'Enviado' : 'Entregado'}
+                                            <p className="font-bold text-[#D4AF37] text-lg font-mono">#{String(o.id || '').slice(-6)}</p>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getStatusClasses(o.status)}`}>
+                                                {getStatusLabel(o.status)}
                                             </span>
                                         </div>
                                         <p className="text-sm font-bold dark:text-white">{o.customer?.nombre || 'Cliente'} {o.customer?.apellido || ''}</p>
@@ -98,7 +93,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                                 <div className="flex flex-col items-end gap-2 w-full md:w-auto pl-16 md:pl-0">
                                     <span className="font-bold text-xl dark:text-white mb-2">{formatMoney(o.total)}</span>
                                     <div className="flex items-center gap-2">
-                                        {o.status === 'pending' && (
+                                        {isFulfillable(o.status) && (
                                             <button
                                                 onClick={() => handleUpdate(o.id, 'shipped')}
                                                 className="bg-slate-900 text-white dark:bg-white dark:text-black px-4 py-2 rounded-lg text-xs font-bold uppercase hover:opacity-80 transition-opacity"

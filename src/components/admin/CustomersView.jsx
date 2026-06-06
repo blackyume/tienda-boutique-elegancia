@@ -48,7 +48,7 @@ export const CustomersView = ({ orders }) => {
                         {customers.length} clientes registrados históricamente.
                     </p>
                 </div>
-                <div className="bg-[#C19A6B]/10 text-[#C19A6B] px-4 py-2 rounded-xl flex items-center gap-2 border border-[#C19A6B]/20">
+                <div className="bg-[#D4AF37]/10 text-[#D4AF37] px-4 py-2 rounded-xl flex items-center gap-2 border border-[#D4AF37]/20">
                     <Users className="w-5 h-5" />
                     <span className="font-bold text-sm">CRM Activo</span>
                 </div>
@@ -58,7 +58,7 @@ export const CustomersView = ({ orders }) => {
                 {custPage.pageItems.map((c, idx) => {
                     const i = (custPage.page - 1) * PAGE + idx;
                     return (
-                    <div key={c.id} className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div key={c.id} className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
 
                         {/* VIP BADGE FOR TOP 3 */}
                         {i < 3 && (
@@ -95,10 +95,10 @@ export const CustomersView = ({ orders }) => {
 
                         <div className="space-y-2 text-xs text-slate-500 font-medium">
                             <div className="flex items-center gap-2">
-                                <Phone className="w-3 h-3 text-[#C19A6B]" /> {c.phone}
+                                <Phone className="w-3 h-3 text-[#D4AF37]" /> {c.phone}
                             </div>
                             <div className="flex items-center gap-2">
-                                <BadgeCheck className="w-3 h-3 text-[#C19A6B]" /> {c.city}, {c.province}
+                                <BadgeCheck className="w-3 h-3 text-[#D4AF37]" /> {c.city}, {c.province}
                             </div>
                             <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 mt-3">
                                 <Calendar className="w-3 h-3 text-slate-400" /> Última compra: {new Date(c.lastOrder).toLocaleDateString()}
@@ -112,7 +112,7 @@ export const CustomersView = ({ orders }) => {
             <Pagination page={custPage.page} setPage={custPage.setPage} totalPages={custPage.totalPages} total={custPage.total} pageSize={PAGE} />
 
             {customers.length === 0 && (
-                <div className="text-center py-20 bg-white dark:bg-[#1e293b] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                     <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                     <p className="text-slate-500 font-bold">Aún no tienes clientes registrados.</p>
                 </div>

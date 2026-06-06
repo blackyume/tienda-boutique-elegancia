@@ -73,7 +73,7 @@ export const StatusSelector = ({ product }) => {
                             key={opt.value}
                             type="button"
                             onClick={(e) => { e.stopPropagation(); handleStatusChange(opt.value); }}
-                            className={`w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 ${currentStatus === opt.value ? 'bg-slate-50 dark:bg-slate-700/50 text-[#C19A6B]' : 'text-slate-500 dark:text-slate-400'}`}
+                            className={`w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 ${currentStatus === opt.value ? 'bg-slate-50 dark:bg-slate-700/50 text-[#D4AF37]' : 'text-slate-500 dark:text-slate-400'}`}
                         >
                             <span className={`w-1.5 h-1.5 rounded-full ${opt.dot}`} />
                             {opt.label}

@@ -46,7 +46,7 @@ export const ReviewsView = () => {
                 </FilterBtn>
             </div>
 
-            <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
                 {list.length === 0 ? (
                     <div className="p-12 text-center text-slate-400">
                         <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-30" />
@@ -73,7 +73,7 @@ export const ReviewsView = () => {
                                         </div>
                                         <div className="flex items-center gap-1 mb-2">
                                             {[1, 2, 3, 4, 5].map(n => (
-                                                <Star key={n} className={`w-3.5 h-3.5 ${n <= (r.rating || 0) ? 'text-[#C19A6B] fill-[#C19A6B]' : 'text-slate-300 dark:text-slate-600'}`} />
+                                                <Star key={n} className={`w-3.5 h-3.5 ${n <= (r.rating || 0) ? 'text-[#D4AF37] fill-[#D4AF37]' : 'text-slate-300 dark:text-slate-600'}`} />
                                             ))}
                                             <span className="ml-1 text-xs text-slate-400">· {new Date(r.createdAt || 0).toLocaleString()}</span>
                                         </div>

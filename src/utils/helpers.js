@@ -33,7 +33,7 @@ export const getColorHex = (colorName) => {
 
         // Azules / Celestes
         'azul': '#2563EB', 'blue': '#2563EB',
-        'azul marino': '#1E3A8A', 'navy': '#1E3A8A', 'azul noche': '#0F172A', 'marino': '#1E3A8A',
+        'azul marino': '#1E3A8A', 'navy': '#1E3A8A', 'azul noche': '#121212', 'marino': '#1E3A8A',
         'azul francia': '#1D4ED8', 'royal': '#1D4ED8', 'cobalto': '#1E40AF', 'eléctrico': '#2563EB',
         'celeste': '#38BDF8', 'skyblue': '#38BDF8', 'cielo': '#E0F2FE', 'pastel': '#E0F2FE',
         'turquesa': '#2DD4BF', 'turquoise': '#2DD4BF', 'petroleo': '#0E7490', 'cian': '#22D3EE', 'aquamarina': '#7FFFD4',
@@ -52,7 +52,7 @@ export const getColorHex = (colorName) => {
         'mostaza': '#D97706', 'mustard': '#D97706', 'ocre': '#B45309', 'miel': '#F59E0B',
         'naranja': '#F97316', 'orange': '#F97316', 'ladrillo': '#9A3412', 'terracota': '#C05621', 'calabaza': '#EA580C',
         'chocolate': '#5D4037', 'brown': '#5D4037', 'marron': '#78350F', 'cafe': '#3E2723', 'tabaco': '#451a03',
-        'camel': '#C19A6B', 'suela': '#C19A6B', 'tostado': '#A0522D',
+        'camel': '#D4AF37', 'suela': '#D4AF37', 'tostado': '#A0522D',
         'beige': '#D2B48C', 'arena': '#E5D0A1', 'champagne': '#F7E7CE', 'avellana': '#D2B48C',
         'nude': '#E5D0C6', 'piel': '#E5D0C6', 'durazno': '#FFDAB9',
         'crema': '#FFFDD0', 'crudo': '#F5F5DC', 'natural': '#E8E4C9', 'maiz': '#FAE087', 'vainilla': '#FEF3C7',

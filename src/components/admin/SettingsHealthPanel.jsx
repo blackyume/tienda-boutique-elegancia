@@ -41,10 +41,10 @@ export const SettingsHealthPanel = ({ onJump }) => {
     const total = checks.length;
 
     return (
-        <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border dark:border-slate-700 shadow-sm">
+        <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border dark:border-slate-700 shadow-sm">
             <div className="flex items-center justify-between mb-5">
                 <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-                    <Activity className="w-5 h-5 text-[#C19A6B]" /> Salud de la tienda
+                    <Activity className="w-5 h-5 text-[#D4AF37]" /> Salud de la tienda
                 </h3>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${okCount === total ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'}`}>
                     {okCount}/{total} conectado

@@ -45,7 +45,7 @@ export const Home = () => {
     );
 
     return (
-        <div className="font-sans bg-[#020617] text-white overflow-x-hidden">
+        <div className="font-sans bg-[#0A0A0A] text-white overflow-x-hidden">
             <SEO
                 title={siteConfig?.hero?.title}
                 description={siteConfig?.editorial?.text}
@@ -58,23 +58,23 @@ export const Home = () => {
             <TrustBar />
 
             {/* Producto primero: el visitante ve mercadería apenas baja */}
-            <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[600px] bg-[#0A0A0A]" />}>
                 <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
             </Suspense>
 
             {/* Editorial como pausa de marca */}
-            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
                 <div id="editorial">
                     {siteConfig?.showEditorial !== false && <Editorial />}
                 </div>
             </Suspense>
 
-            <Suspense fallback={<div className="h-[600px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[600px] bg-[#0A0A0A]" />}>
                 <ShopTheLook />
             </Suspense>
 
             {/* Categorías — solo renderiza si hay categorías válidas */}
-            {validCategories.length > 0 && <section id="categories" className="py-24 md:py-32 px-6 bg-[#020617] relative">
+            {validCategories.length > 0 && <section id="categories" className="py-24 md:py-32 px-6 bg-[#0A0A0A] relative">
                 <Reveal className="max-w-[1400px] mx-auto">
                     <div className="flex justify-between items-end mb-12">
                         <SectionHeader align="left" eyebrow="Categorías" title="Curaduría exclusiva" />
@@ -122,7 +122,7 @@ export const Home = () => {
             </section>}
 
             {/* New Arrivals */}
-            <section className="py-24 md:py-32 px-6 bg-[#020617]">
+            <section className="py-24 md:py-32 px-6 bg-[#0A0A0A]">
                 <div className="max-w-[1400px] mx-auto">
                     <Suspense fallback={<div className="h-[400px]" />}>
                         <NewArrivalsCarousel
@@ -133,28 +133,28 @@ export const Home = () => {
                 </div>
             </section>
 
-            <Suspense fallback={<div className="h-[200px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[200px] bg-[#0A0A0A]" />}>
                 <CountdownBanner />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
                 <Testimonials />
             </Suspense>
 
             {/* Pausa de marca, distribuida lejos de la Editorial */}
-            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
                 <Atelier />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
                 <HowItWorks />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[200px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[200px] bg-[#0A0A0A]" />}>
                 <NewsletterInline />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[400px] bg-[#020617]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
                 <InstagramFeed />
             </Suspense>
         </div>

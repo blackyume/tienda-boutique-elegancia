@@ -5,6 +5,8 @@
 //
 // API: checkRateLimit(ip, { windowMs, max }) -> { ok, retryAfterSec }
 
+const crypto = require('crypto');
+
 const DEFAULT_WINDOW_MS = 60_000;
 const DEFAULT_MAX = 8;
 
@@ -88,9 +90,22 @@ const checkRateLimit = async (ip, opts = {}) => {
 };
 
 const getClientIp = (req) => {
+    // En Vercel, x-real-ip lo setea el proxy con la IP real del cliente y NO es
+    // falsificable. x-forwarded-for sí puede ser manipulado por el cliente
+    // (agrega valores a la izquierda), así que lo usamos sólo como fallback.
+    const real = req.headers['x-real-ip'];
+    if (typeof real === 'string' && real.length) return real.trim();
     const fwd = req.headers['x-forwarded-for'];
     if (typeof fwd === 'string' && fwd.length) return fwd.split(',')[0].trim();
     return req.socket?.remoteAddress || 'unknown';
 };
 
-module.exports = { checkRateLimit, getClientIp };
+// Comparación de strings en tiempo constante para secretos (evita timing attacks).
+const safeEqual = (a, b) => {
+    const bufA = Buffer.from(String(a || ''));
+    const bufB = Buffer.from(String(b || ''));
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+};
+
+module.exports = { checkRateLimit, getClientIp, safeEqual };

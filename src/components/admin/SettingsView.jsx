@@ -122,9 +122,9 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
         } catch (e) { addToast('Archivo inválido: ' + e.message, 'error'); }
     };
 
-    const cardCls = 'bg-white dark:bg-[#1e293b] p-6 rounded-2xl border dark:border-slate-700 shadow-sm';
+    const cardCls = 'bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border dark:border-slate-700 shadow-sm';
     const labelCls = 'text-xs font-bold uppercase text-slate-400 mb-1 block';
-    const inputCls = 'w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-[#C19A6B]';
+    const inputCls = 'w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:border-[#D4AF37]';
 
     return (
         <div className="max-w-7xl mx-auto p-4 md:p-8">
@@ -139,7 +139,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             const Icon = s.icon;
                             const active = section === s.id;
                             return (
-                                <button key={s.id} onClick={() => setSection(s.id)} className={`flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all text-left ${active ? 'bg-[#C19A6B] text-white shadow-lg shadow-[#C19A6B]/20' : 'bg-white dark:bg-[#1e293b] text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                <button key={s.id} onClick={() => setSection(s.id)} className={`flex items-center gap-3 p-3 rounded-xl text-sm font-bold transition-all text-left ${active ? 'bg-[#D4AF37] text-white shadow-lg shadow-[#D4AF37]/20' : 'bg-white dark:bg-[#1a1a1a] text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                                     <Icon className="w-4 h-4" />{s.label}
                                 </button>
                             );
@@ -161,7 +161,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                     {section === 'marca' && (
                         <>
                             <div className={cardCls}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Phone className="w-5 h-5 text-[#C19A6B]" /> WhatsApp</h3>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Phone className="w-5 h-5 text-[#D4AF37]" /> WhatsApp</h3>
                                 <label className={labelCls}>Número (formato internacional sin + ni espacios)</label>
                                 <div className="flex gap-2">
                                     <input type="text" defaultValue={siteConfig?.whatsappNumber || ''} placeholder="5491144444444" className={inputCls + ' flex-1 font-mono'} id="whatsappInput" />
@@ -170,7 +170,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             </div>
 
                             <div className={cardCls}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><BarChart3 className="w-5 h-5 text-[#C19A6B]" /> Google Analytics 4</h3>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><BarChart3 className="w-5 h-5 text-[#D4AF37]" /> Google Analytics 4</h3>
                                 <label className={labelCls}>Measurement ID</label>
                                 <div className="flex gap-2">
                                     <input type="text" defaultValue={siteConfig?.gaMeasurementId || ''} placeholder="G-XXXXXXXXXX" className={inputCls + ' flex-1 font-mono'} id="gaInput" />
@@ -312,8 +312,8 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                 <p className="text-sm text-purple-800 dark:text-purple-300"><strong>Motor:</strong> Cerebras (texto · Laurina y copy). <strong>Visión:</strong> Gemini primario, NVIDIA NIM como fallback. El asistente del cliente usa Gemini.</p>
                             </div>
 
-                            <div className="bg-gradient-to-br from-[#C19A6B]/10 to-transparent p-4 rounded-xl border border-[#C19A6B]/30 mb-4">
-                                <div className="flex items-center gap-2 mb-3"><Bot className="w-4 h-4 text-[#C19A6B]" /><span className="text-sm font-bold text-[#C19A6B] uppercase tracking-wider">Cerebras · IA Principal</span></div>
+                            <div className="bg-gradient-to-br from-[#D4AF37]/10 to-transparent p-4 rounded-xl border border-[#D4AF37]/30 mb-4">
+                                <div className="flex items-center gap-2 mb-3"><Bot className="w-4 h-4 text-[#D4AF37]" /><span className="text-sm font-bold text-[#D4AF37] uppercase tracking-wider">Cerebras · IA Principal</span></div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">Obtené tu key en <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener noreferrer" className="underline">cloud.cerebras.ai</a>.</p>
                                 <label className={labelCls}>API Key Cerebras</label>
                                 <input id="cerebrasKey" type="password" defaultValue={aiConfig?.cerebrasKey || ''} placeholder="csk-..." className={inputCls + ' font-mono mb-3'} />
@@ -348,20 +348,20 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                     {section === 'tienda' && (
                         <>
                             <div className={cardCls}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Lock className="w-5 h-5 text-[#C19A6B]" /> Disponibilidad</h3>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Lock className="w-5 h-5 text-[#D4AF37]" /> Disponibilidad</h3>
                                 <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-xl">
                                     <div>
                                         <p className="font-bold text-sm dark:text-white">Modo Mantenimiento</p>
                                         <p className="text-xs text-slate-500 mt-1 max-w-[300px]">Los clientes ven una pantalla de "Próximamente". Vos seguís entrando.</p>
                                     </div>
-                                    <button type="button" onClick={toggleMaintenance} className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${isMaintenance ? 'bg-[#C19A6B]' : 'bg-slate-300 dark:bg-slate-700'}`}>
+                                    <button type="button" onClick={toggleMaintenance} className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${isMaintenance ? 'bg-[#D4AF37]' : 'bg-slate-300 dark:bg-slate-700'}`}>
                                         <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isMaintenance ? 'translate-x-6' : 'translate-x-1'}`} />
                                     </button>
                                 </div>
                             </div>
 
                             <div className={cardCls}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><ImageIcon className="w-5 h-5 text-[#C19A6B]" /> Cloudinary (imágenes)</h3>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><ImageIcon className="w-5 h-5 text-[#D4AF37]" /> Cloudinary (imágenes)</h3>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div><label className={labelCls}>Cloud Name</label><input value={cldLocal.cloudName} onChange={e => setCldLocal({ ...cldLocal, cloudName: e.target.value })} className={inputCls + ' font-mono'} placeholder="mi-cuenta" /></div>
                                     <div><label className={labelCls}>Upload Preset (unsigned)</label><input value={cldLocal.uploadPreset} onChange={e => setCldLocal({ ...cldLocal, uploadPreset: e.target.value })} className={inputCls + ' font-mono'} placeholder="ml_default" /></div>
@@ -371,7 +371,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             </div>
 
                             <div className={cardCls}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Download className="w-5 h-5 text-[#C19A6B]" /> Backup / Restore configuración</h3>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Download className="w-5 h-5 text-[#D4AF37]" /> Backup / Restore configuración</h3>
                                 <p className="text-xs text-slate-500 mb-4">Exportá un JSON con toda tu configuración (sin API keys por seguridad). Útil antes de cambios grandes.</p>
                                 <div className="flex gap-3">
                                     <Button onClick={exportConfig} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-5 py-2.5 rounded-lg"><Download className="w-4 h-4 mr-2 inline" /> Exportar JSON</Button>

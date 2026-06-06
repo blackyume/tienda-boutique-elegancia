@@ -63,7 +63,7 @@ export const PushOptIn = () => {
                             <button
                                 onClick={handleEnable}
                                 disabled={loading}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider bg-cielo-gold hover:bg-[#a87f4f] text-black transition-colors disabled:opacity-50"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider bg-cielo-gold hover:bg-[#C19A2E] text-black transition-colors disabled:opacity-50"
                             >
                                 <Check className="w-3 h-3" /> {loading ? 'Activando…' : 'Activar'}
                             </button>

@@ -114,18 +114,18 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
         <div className="max-w-6xl mx-auto p-4 md:p-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2">
-                    <Calculator className="w-8 h-8 text-[#C19A6B]" /> Simulador de Costos
+                    <Calculator className="w-8 h-8 text-[#D4AF37]" /> Simulador de Costos
                 </h1>
                 <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl gap-2">
                     <button
                         onClick={() => setViewMode('new')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${viewMode === 'new' ? 'bg-white dark:bg-slate-700 shadow-sm text-[#C19A6B]' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${viewMode === 'new' ? 'bg-white dark:bg-slate-700 shadow-sm text-[#D4AF37]' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         Calculadora Rápida
                     </button>
                     <button
                         onClick={() => setViewMode('history')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${viewMode === 'history' ? 'bg-white dark:bg-slate-700 shadow-sm text-[#C19A6B]' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${viewMode === 'history' ? 'bg-white dark:bg-slate-700 shadow-sm text-[#D4AF37]' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         Inventario y Costos
                     </button>
@@ -135,13 +135,13 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
             {viewMode === 'new' ? (
                 <div className="animate-fadeIn">
                     <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 rounded-3xl shadow-2xl overflow-hidden relative mb-8">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C19A6B]/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
                         <div className="relative z-10 grid lg:grid-cols-12 gap-12 items-center">
 
                             {/* RESULTS DISPLAY - LEFT/TOP (Hero Section) */}
                             <div className="lg:col-span-5 text-center lg:text-left space-y-6">
                                 <div>
-                                    <h2 className="text-[#C19A6B] font-bold text-sm tracking-[0.2em] uppercase mb-2">Precio Sugerido de Venta</h2>
+                                    <h2 className="text-[#D4AF37] font-bold text-sm tracking-[0.2em] uppercase mb-2">Precio Sugerido de Venta</h2>
                                     <div className="text-6xl md:text-7xl font-black tracking-tighter text-white drop-shadow-lg">
                                         {formatMoney(suggestedPrice)}
                                     </div>
@@ -163,7 +163,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                         <Save className="w-4 h-4 mr-2" /> Guardar en Historial
                                     </Button>
                                     {onSaveToProduct && (
-                                        <Button onClick={() => onSaveToProduct({ name: form.name, price: suggestedPrice, cost: totalCost })} className="flex-1 bg-[#C19A6B] text-white hover:bg-[#a38056] font-bold">
+                                        <Button onClick={() => onSaveToProduct({ name: form.name, price: suggestedPrice, cost: totalCost })} className="flex-1 bg-[#D4AF37] text-white hover:bg-[#B8932E] font-bold">
                                             <Plus className="w-4 h-4 mr-2" /> Crear Producto
                                         </Button>
                                     )}
@@ -171,7 +171,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                             </div>
 
                             {/* INPUTS - RIGHT (Control Panel) */}
-                            <div className="lg:col-span-7 bg-white dark:bg-[#0f172a] p-6 md:p-8 rounded-2xl text-slate-900 dark:text-white shadow-lg border border-slate-100 dark:border-slate-800">
+                            <div className="lg:col-span-7 bg-white dark:bg-[#121212] p-6 md:p-8 rounded-2xl text-slate-900 dark:text-white shadow-lg border border-slate-100 dark:border-slate-800">
                                 <div className="space-y-6">
                                     {/* ID */}
                                     <div>
@@ -180,57 +180,57 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                             value={form.name}
                                             onChange={e => setForm({ ...form, name: e.target.value })}
                                             placeholder="Ej: Campera Cuero Invierno"
-                                            className="w-full text-lg font-bold border-b-2 border-slate-200 dark:border-slate-700 bg-transparent px-2 py-3 outline-none focus:border-[#C19A6B] transition-colors placeholder:text-slate-300 dark:placeholder:text-slate-600"
+                                            className="w-full text-lg font-bold border-b-2 border-slate-200 dark:border-slate-700 bg-transparent px-2 py-3 outline-none focus:border-[#D4AF37] transition-colors placeholder:text-slate-300 dark:placeholder:text-slate-600"
                                         />
                                     </div>
 
                                     {/* COST GRID */}
                                     <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
                                         <div className="group">
-                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#C19A6B] transition-colors">Costo Prenda ($)</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#D4AF37] transition-colors">Costo Prenda ($)</label>
                                             <div className="relative">
-                                                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#C19A6B]" />
+                                                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#D4AF37]" />
                                                 <input
                                                     type="number"
                                                     value={form.costPr}
                                                     onChange={e => setForm({ ...form, costPr: Math.max(0, e.target.value) })}
-                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#C19A6B]/20 transition-all"
+                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#D4AF37]/20 transition-all"
                                                 />
                                             </div>
                                         </div>
                                         <div className="group">
-                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#C19A6B] transition-colors">Packaging ($)</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#D4AF37] transition-colors">Packaging ($)</label>
                                             <div className="relative">
-                                                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#C19A6B]" />
+                                                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#D4AF37]" />
                                                 <input
                                                     type="number"
                                                     value={form.costPack}
                                                     onChange={e => setForm({ ...form, costPack: Math.max(0, e.target.value) })}
-                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#C19A6B]/20 transition-all"
+                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#D4AF37]/20 transition-all"
                                                 />
                                             </div>
                                         </div>
                                         <div className="group">
-                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#C19A6B] transition-colors">Flete Unitario ($)</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#D4AF37] transition-colors">Flete Unitario ($)</label>
                                             <div className="relative">
-                                                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#C19A6B]" />
+                                                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#D4AF37]" />
                                                 <input
                                                     type="number"
                                                     value={form.shipUnit}
                                                     onChange={e => setForm({ ...form, shipUnit: Math.max(0, e.target.value) })}
-                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#C19A6B]/20 transition-all"
+                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#D4AF37]/20 transition-all"
                                                 />
                                             </div>
                                         </div>
                                         <div className="group">
-                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#C19A6B] transition-colors">Comisión Plataforma (%)</label>
+                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block group-focus-within:text-[#D4AF37] transition-colors">Comisión Plataforma (%)</label>
                                             <div className="relative">
                                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">%</span>
                                                 <input
                                                     type="number"
                                                     value={form.comision}
                                                     onChange={e => setForm({ ...form, comision: Math.max(0, e.target.value) })}
-                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#C19A6B]/20 transition-all"
+                                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl font-mono text-sm outline-none focus:ring-2 focus:ring-[#D4AF37]/20 transition-all"
                                                 />
                                             </div>
                                         </div>
@@ -240,7 +240,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                     <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
                                         <div className="flex justify-between items-center mb-4">
                                             <label className="text-xs font-bold uppercase text-slate-500">Margen de Ganancia Deseado</label>
-                                            <span className="text-2xl font-black text-[#C19A6B]">{form.marginDesired}%</span>
+                                            <span className="text-2xl font-black text-[#D4AF37]">{form.marginDesired}%</span>
                                         </div>
                                         <input
                                             type="range"
@@ -248,7 +248,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                             step="5"
                                             value={form.marginDesired}
                                             onChange={e => setForm({ ...form, marginDesired: Number(e.target.value) })}
-                                            className="w-full accent-[#C19A6B] h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                                            className="w-full accent-[#D4AF37] h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
                                         />
                                         <div className="flex justify-between text-[10px] text-slate-400 mt-2 font-mono">
                                             <span>0%</span>
@@ -262,7 +262,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                     </div>
                 </div>
             ) : (
-                <div className="bg-white dark:bg-[#1e293b] rounded-2xl border dark:border-slate-700 shadow-sm overflow-hidden animate-fadeIn">
+                <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border dark:border-slate-700 shadow-sm overflow-hidden animate-fadeIn">
                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-xs uppercase font-bold text-slate-500">Mostrando Inventario Activo</p>
                         <div className="flex">
@@ -332,7 +332,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                                     <div className="flex justify-end gap-1">
                                                         <button
                                                             onClick={() => onEditProduct && onEditProduct(p)}
-                                                            className="p-2 text-slate-400 hover:text-[#C19A6B] transition-colors"
+                                                            className="p-2 text-slate-400 hover:text-[#D4AF37] transition-colors"
                                                             title="Editar Costos"
                                                         >
                                                             <Calculator className="w-4 h-4" />

@@ -7,7 +7,7 @@ export const Editorial = () => {
     const editorialImg = siteConfig.editorial?.image;
 
     return (
-        <div className="relative w-full min-h-[600px] md:h-[80vh] flex flex-col md:flex-row bg-[#070d1c] border-y border-white/[0.05] text-white">
+        <div className="relative w-full min-h-[600px] md:h-[80vh] flex flex-col md:flex-row bg-[#050505] border-y border-white/[0.05] text-white">
             {/* Left Content */}
             <div className="w-full md:w-1/2 p-12 md:p-24 flex flex-col justify-center relative z-10">
                 <span className="text-[10px] font-bold tracking-[0.4em] text-white/40 mb-8 uppercase animate-fadeIn">{siteConfig.editorial?.subtitle}</span>
@@ -39,8 +39,8 @@ export const Editorial = () => {
             {/* Right Image */}
             <div className="w-full md:w-1/2 relative h-[420px] md:h-full overflow-hidden bg-[#0a0f1e]">
                 {/* Scrim sólo del lado del texto + base inferior para la cita */}
-                <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-[#020617] via-[#020617]/30 to-transparent z-10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/70 via-transparent to-transparent z-10" />
+                <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-[#0A0A0A] via-[#0A0A0A]/30 to-transparent z-10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/70 via-transparent to-transparent z-10" />
                 {editorialImg && imgOk ? (
                     <img
                         src={editorialImg}
@@ -54,7 +54,7 @@ export const Editorial = () => {
                     // Fallback premium si la imagen falla/falta (no <img> roto)
                     <div
                         className="w-full h-full flex flex-col items-center justify-center gap-5"
-                        style={{ background: 'radial-gradient(circle at 60% 40%, rgba(193,154,107,0.18), transparent 60%), linear-gradient(135deg, #0a0f1e 0%, #020617 60%, #0a0f1e 100%)' }}
+                        style={{ background: 'radial-gradient(circle at 60% 40%, rgba(193,154,107,0.18), transparent 60%), linear-gradient(135deg, #0a0f1e 0%, #0A0A0A 60%, #0a0f1e 100%)' }}
                     >
                         <span className="font-cinzel text-6xl tracking-[0.2em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] bg-clip-text text-transparent">LBE</span>
                         <span className="text-[10px] uppercase tracking-[0.5em] text-cielo-gold/60">La Boutique de la Elegancia</span>

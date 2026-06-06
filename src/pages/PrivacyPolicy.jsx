@@ -4,7 +4,7 @@ export const PrivacyPolicy = () => {
     useLayoutEffect(() => { window.scrollTo(0, 0); }, []);
 
     return (
-        <div className="bg-white dark:bg-[#0B1120] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
+        <div className="bg-white dark:bg-[#0A0A0A] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mb-8 tracking-wide">Política de Privacidad</h1>
                 <p className="text-sm text-slate-400 mb-12 uppercase tracking-widest">Última actualización: 01 de Enero de 2026</p>
@@ -22,7 +22,7 @@ export const PrivacyPolicy = () => {
                         <p className="leading-relaxed mb-4">
                             Recopilamos información únicamente cuando usted interactúa activamente con nuestro sitio, incluyendo pero no limitado a:
                         </p>
-                        <ul className="list-disc pl-6 space-y-2 marker:text-[#C19A6B]">
+                        <ul className="list-disc pl-6 space-y-2 marker:text-[#D4AF37]">
                             <li>Datos de contacto (Nombre, Email, Teléfono) al realizar una compra o consulta.</li>
                             <li>Datos de envío y facturación para el procesamiento de pedidos.</li>
                             <li>Preferencias de navegación y datos técnicos a través de cookies (ver Política de Cookies).</li>
@@ -34,7 +34,7 @@ export const PrivacyPolicy = () => {
                         <p className="leading-relaxed">
                             Sus datos serán utilizados exclusivamente para:
                         </p>
-                        <ul className="list-disc pl-6 space-y-2 mt-4 marker:text-[#C19A6B]">
+                        <ul className="list-disc pl-6 space-y-2 mt-4 marker:text-[#D4AF37]">
                             <li>Procesar, confirmar y enviar sus pedidos.</li>
                             <li>Brindar asistencia al cliente y seguimiento de compras.</li>
                             <li>Enviar comunicaciones promocionales (solo si ha dado su consentimiento explícito).</li>
@@ -58,7 +58,7 @@ export const PrivacyPolicy = () => {
 
                     <div className="border-t border-slate-200 dark:border-slate-800 pt-8 mt-12">
                         <p className="text-sm italic text-slate-500">
-                            Para consultas legales: <a href="mailto:legal@laboutique.com" className="text-[#C19A6B] hover:underline">legal@laboutique.com</a>
+                            Para consultas legales: <a href="mailto:legal@laboutique.com" className="text-[#D4AF37] hover:underline">legal@laboutique.com</a>
                         </p>
                     </div>
                 </div>

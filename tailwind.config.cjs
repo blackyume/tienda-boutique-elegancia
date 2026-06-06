@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+const { neutral } = require('tailwindcss/colors');
+
+module.exports = {
     darkMode: 'class',
     content: [
         "./index.html",
@@ -8,15 +10,22 @@ export default {
     theme: {
         extend: {
             colors: {
-                'cielo-dark': '#020617',
+                // Paleta black + gold. Remapeamos `slate` a gris neutro para
+                // eliminar el tinte azulado en toda la app (cards, bordes, textos)
+                // sin tocar cada componente. El acento dorado se mantiene.
+                slate: neutral,
+                'cielo-dark': '#0A0A0A',
                 'cielo-gold': '#D4AF37',
-                // Inferring remaining colors or placeholders
-                'gold-metallic': 'linear-gradient(45deg, #FFD700, #FDB931)',
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],
-                serif: ['Playfair Display', 'serif'],
+                serif: ['Bodoni Moda', 'Playfair Display', 'serif'],
                 luxury: ['Cinzel', 'serif'],
+                cinzel: ['Cinzel', 'serif'],
+            },
+            fontSize: {
+                '2xs': '10px',
+                '3xs': '9px',
             },
             backgroundImage: {
                 'gold-metallic': 'linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C)',

@@ -33,7 +33,7 @@ export const RegretModal = ({ isOpen, onClose }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative bg-[#020617] border border-white/10 rounded-2xl w-full max-w-md p-8 shadow-2xl animate-fadeIn">
+            <div className="relative bg-[#0A0A0A] border border-white/10 rounded-2xl w-full max-w-md p-8 shadow-2xl animate-fadeIn">
                 <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
 
                 {step === 1 ? (
@@ -53,7 +53,7 @@ export const RegretModal = ({ isOpen, onClose }) => {
                                 <input
                                     required
                                     type="text"
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-[#C19A6B] outline-none transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-[#D4AF37] outline-none transition-colors"
                                     placeholder="#123456"
                                     value={formData.orderId}
                                     onChange={e => setFormData({ ...formData, orderId: e.target.value })}
@@ -64,7 +64,7 @@ export const RegretModal = ({ isOpen, onClose }) => {
                                 <input
                                     required
                                     type="email"
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-[#C19A6B] outline-none transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-[#D4AF37] outline-none transition-colors"
                                     placeholder="tu@email.com"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}

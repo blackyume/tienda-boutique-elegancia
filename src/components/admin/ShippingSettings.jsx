@@ -31,9 +31,9 @@ export const ShippingSettings = () => {
     };
 
     return (
-        <div className="bg-white dark:bg-[#1e293b] p-6 rounded-2xl border dark:border-slate-700 shadow-sm">
+        <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border dark:border-slate-700 shadow-sm">
             <h3 className="font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
-                <Truck className="w-5 h-5 text-[#C19A6B]" /> Tarifas de Envío
+                <Truck className="w-5 h-5 text-[#D4AF37]" /> Tarifas de Envío
             </h3>
 
             <div className="space-y-6">
@@ -46,7 +46,7 @@ export const ShippingSettings = () => {
                                     value={data.cost}
                                     type="number"
                                     onChange={(e) => handleChange(key, 'cost', Number(e.target.value))}
-                                    className="w-24 p-2 text-right font-mono font-bold text-slate-900 dark:text-white bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#C19A6B] outline-none transition-colors"
+                                    className="w-24 p-2 text-right font-mono font-bold text-slate-900 dark:text-white bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none transition-colors"
                                     placeholder="Precio"
                                 />
                             </div>
@@ -55,13 +55,13 @@ export const ShippingSettings = () => {
                             <input
                                 value={data.name}
                                 onChange={(e) => handleChange(key, 'name', e.target.value)}
-                                className="flex-1 p-2 text-sm bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#C19A6B] transition-colors"
+                                className="flex-1 p-2 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors"
                                 placeholder="Nombre Visible"
                             />
                             <input
                                 value={data.time}
                                 onChange={(e) => handleChange(key, 'time', e.target.value)}
-                                className="w-32 p-2 text-sm bg-white dark:bg-[#0f172a] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#C19A6B] transition-colors"
+                                className="w-32 p-2 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors"
                                 placeholder="Tiempo"
                             />
                         </div>
@@ -70,7 +70,7 @@ export const ShippingSettings = () => {
             </div>
 
             <div className="mt-6 flex justify-end">
-                <Button onClick={handleSave} disabled={isSaving} className="bg-[#C19A6B] hover:bg-[#a38056] text-white">
+                <Button onClick={handleSave} disabled={isSaving} className="bg-[#D4AF37] hover:bg-[#B8932E] text-white">
                     {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                     Guardar Tarifas
                 </Button>

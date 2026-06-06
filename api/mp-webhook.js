@@ -187,6 +187,26 @@ module.exports = async (req, res) => {
             await docRef.update({ referralCredited: true });
         }
 
+        // Consumir el cupón SOLO cuando el pago se aprobó (idempotente).
+        // Antes el cliente lo incrementaba al crear la orden, así que un
+        // checkout abandonado o un pago fallido quemaba un uso del cupón.
+        if (newStatus === 'approved' && !order.couponRedeemed) {
+            const code = order.couponCode || order.coupon?.code;
+            if (code) {
+                try {
+                    const cq = await db.collection('coupons').where('code', '==', String(code)).limit(1).get();
+                    if (!cq.empty) {
+                        await cq.docs[0].ref.update({
+                            usedCount: admin.firestore.FieldValue.increment(1)
+                        });
+                    }
+                    await docRef.update({ couponRedeemed: true });
+                } catch (couponErr) {
+                    console.error(`[mp-webhook] redeem cupón falló order=${externalRef}:`, couponErr.message);
+                }
+            }
+        }
+
         // Reponer stock si se reembolsa/cancela tras haber descontado
         if ((newStatus === 'refunded' || newStatus === 'cancelled') && order.stockApplied && Array.isArray(order.items)) {
             const lines = order.items.filter(i => i && i.id != null);

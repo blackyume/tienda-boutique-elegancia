@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Package, Truck, LogOut, User, MapPin, Gift, Copy, Share2 } from 'lucide-react';
+import { Package, Truck, LogOut, User, Gift, Copy, Share2 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { buildReferralCode, getReferralLink, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
+import { getStatusLabel, getStatusClasses } from '../utils/orderStatus';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
@@ -58,9 +59,9 @@ export const UserProfile = () => {
             <div className="max-w-5xl mx-auto px-6">
 
                 {/* HEADER */}
-                <div className="bg-white dark:bg-[#1e293b] p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div className="bg-white dark:bg-[#1a1a1a] p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-3xl font-serif text-[#C19A6B] border border-slate-200 dark:border-slate-700">
+                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-3xl font-serif text-[#D4AF37] border border-slate-200 dark:border-slate-700">
                             {user.email[0].toUpperCase()}
                         </div>
                         <div>
@@ -76,9 +77,9 @@ export const UserProfile = () => {
                 </div>
 
                 {/* REFERRAL SECTION */}
-                <div className="bg-gradient-to-br from-[#C19A6B]/10 via-white to-sky-50 dark:from-[#C19A6B]/10 dark:via-slate-900/50 dark:to-sky-900/10 rounded-2xl border border-[#C19A6B]/30 p-6 md:p-8 mb-8 shadow-sm">
+                <div className="bg-gradient-to-br from-[#D4AF37]/10 via-white to-sky-50 dark:from-[#D4AF37]/10 dark:via-slate-900/50 dark:to-sky-900/10 rounded-2xl border border-[#D4AF37]/30 p-6 md:p-8 mb-8 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-full bg-[#C19A6B] flex items-center justify-center text-white">
+                        <div className="w-12 h-12 rounded-full bg-[#D4AF37] flex items-center justify-center text-white">
                             <Gift className="w-5 h-5" />
                         </div>
                         <div>
@@ -89,7 +90,7 @@ export const UserProfile = () => {
                     <div className="grid md:grid-cols-[auto_1fr_auto] items-center gap-3 bg-white dark:bg-slate-900/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                         <div>
                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Tu código</p>
-                            <p className="font-mono font-black text-xl text-[#C19A6B] tracking-wider">{referralCode}</p>
+                            <p className="font-mono font-black text-xl text-[#D4AF37] tracking-wider">{referralCode}</p>
                         </div>
                         <div className="md:border-l md:pl-4 md:border-slate-200 md:dark:border-slate-700">
                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Link para compartir</p>
@@ -99,7 +100,7 @@ export const UserProfile = () => {
                             <button onClick={() => copy(referralLink)} className="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors" title="Copiar link">
                                 <Copy className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                             </button>
-                            <button onClick={share} className="p-2.5 rounded-lg bg-[#C19A6B] hover:bg-[#a87f4f] text-white transition-colors" title="Compartir">
+                            <button onClick={share} className="p-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#C19A2E] text-white transition-colors" title="Compartir">
                                 <Share2 className="w-4 h-4" />
                             </button>
                         </div>
@@ -113,18 +114,18 @@ export const UserProfile = () => {
 
                 {/* ORDERS SECTION */}
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                    <Package className="w-5 h-5 text-[#C19A6B]" /> Mis Pedidos
+                    <Package className="w-5 h-5 text-[#D4AF37]" /> Mis Pedidos
                 </h2>
 
                 <div className="space-y-4">
                     {myOrders.length === 0 ? (
-                        <div className="text-center py-16 bg-white dark:bg-[#1e293b] rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                        <div className="text-center py-16 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
                             <p className="text-slate-400 mb-4">Aún no has realizado pedidos.</p>
                             <Button onClick={() => navigate('/shop')}>Ir a la Tienda</Button>
                         </div>
                     ) : (
                         myOrders.map(order => (
-                            <div key={order.id} className="bg-white dark:bg-[#1e293b] rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
+                            <div key={order.id} className="bg-white dark:bg-[#1a1a1a] rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
                                 {/* Order Header */}
                                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between md:items-center gap-4 bg-slate-50/50 dark:bg-slate-900/50">
                                     <div>
@@ -136,7 +137,7 @@ export const UserProfile = () => {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm text-slate-500 dark:text-slate-400">Total</p>
-                                        <p className="text-xl font-bold text-[#C19A6B]">{formatMoney(order.total)}</p>
+                                        <p className="text-xl font-bold text-[#D4AF37]">{formatMoney(order.total)}</p>
                                     </div>
                                 </div>
 
@@ -181,27 +182,11 @@ export const UserProfile = () => {
     );
 };
 
-const StatusBadge = ({ status }) => {
-    const styles = {
-        pending: 'bg-amber-100 text-amber-700 border-amber-200',
-        shipped: 'bg-blue-100 text-blue-700 border-blue-200',
-        delivered: 'bg-green-100 text-green-700 border-green-200',
-        cancelled: 'bg-red-100 text-red-700 border-red-200'
-    };
-
-    const labels = {
-        pending: 'Pendiente',
-        shipped: 'Enviado',
-        delivered: 'Entregado',
-        cancelled: 'Cancelado'
-    };
-
-    return (
-        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${styles[status] || 'bg-slate-100 text-slate-600'}`}>
-            {labels[status] || status}
-        </span>
-    );
-};
+const StatusBadge = ({ status }) => (
+    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${getStatusClasses(status)}`}>
+        {getStatusLabel(status)}
+    </span>
+);
 
 const Stat = ({ label, value }) => (
     <div className="bg-white/60 dark:bg-slate-800/40 rounded-lg p-3 border border-slate-100 dark:border-slate-700">

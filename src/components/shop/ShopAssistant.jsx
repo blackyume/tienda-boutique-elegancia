@@ -133,7 +133,7 @@ export const ShopAssistant = () => {
 
             {/* CHAT WINDOW */}
             {isOpen && (
-                <div className="mb-4 w-[calc(100vw-32px)] sm:w-[340px] h-[400px] sm:h-[440px] max-h-[calc(100vh-140px)] bg-white dark:bg-[#1e293b] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden animate-slideUp pointer-events-auto">
+                <div className="mb-4 w-[calc(100vw-32px)] sm:w-[340px] h-[400px] sm:h-[440px] max-h-[calc(100vh-140px)] bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden animate-slideUp pointer-events-auto">
                     {/* Header */}
                     <div className="bg-[#1e1e1e] p-4 flex justify-between items-center text-white">
                         <div className="flex items-center gap-3">
@@ -154,13 +154,13 @@ export const ShopAssistant = () => {
                     </div>
 
                     {/* Messages */}
-                    <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#151c2c]">
+                    <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#141414]">
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-lg overflow-hidden border ${msg.role === 'ai' ? 'bg-black border-[#C19A6B]/30' : 'bg-gradient-to-br from-[#d4af37] to-[#8a6a24] border-white/20 text-white'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-lg overflow-hidden border ${msg.role === 'ai' ? 'bg-black border-[#D4AF37]/30' : 'bg-gradient-to-br from-[#d4af37] to-[#8a6a24] border-white/20 text-white'}`}>
                                     {msg.role === 'ai' ? <img src="/elegancia-ia-logo.png" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
                                 </div>
-                                <div className={`max-w-[85%] rounded-[20px] p-3.5 text-[13px] leading-relaxed whitespace-pre-wrap shadow-lg transition-all ${msg.role === 'ai' ? 'bg-gradient-to-b from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-tl-sm' : 'bg-gradient-to-r from-[#b3895d] to-[#d4aa7a] text-white rounded-tr-sm border border-[#d4aa7a]/50'}`}>
+                                <div className={`max-w-[85%] rounded-[20px] p-3.5 text-[13px] leading-relaxed whitespace-pre-wrap shadow-lg transition-all ${msg.role === 'ai' ? 'bg-gradient-to-b from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-tl-sm' : 'bg-gradient-to-r from-[#C19A2E] to-[#d4aa7a] text-white rounded-tr-sm border border-[#d4aa7a]/50'}`}>
                                     {msg.text}
                                     <div className={`text-[10px] mt-2 opacity-60 font-medium ${msg.role === 'user' ? 'text-right text-white/80' : 'text-left text-slate-400'}`}>
                                         {msg.timestamp ? new Date(msg.timestamp).toLocaleString('es-AR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
@@ -182,19 +182,19 @@ export const ShopAssistant = () => {
                     </div>
 
                     {/* Input */}
-                    <div className="p-3 bg-white dark:bg-[#1e293b] border-t border-slate-100 dark:border-slate-800">
+                    <div className="p-3 bg-white dark:bg-[#1a1a1a] border-t border-slate-100 dark:border-slate-800">
                         <div className="relative flex items-center">
                             <input
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Escribe tu consulta..."
-                                className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-full py-2.5 pl-4 pr-10 text-xs focus:ring-1 focus:ring-[#C19A6B] outline-none text-slate-800 dark:text-white"
+                                className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-full py-2.5 pl-4 pr-10 text-xs focus:ring-1 focus:ring-[#D4AF37] outline-none text-slate-800 dark:text-white"
                             />
                             <button
                                 onClick={handleSend}
                                 disabled={!input.trim()}
-                                className="absolute right-1 w-8 h-8 bg-[#C19A6B] rounded-full flex items-center justify-center text-white hover:bg-[#a38056] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="absolute right-1 w-8 h-8 bg-[#D4AF37] rounded-full flex items-center justify-center text-white hover:bg-[#B8932E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Send className="w-3.5 h-3.5 ml-0.5" />
                             </button>

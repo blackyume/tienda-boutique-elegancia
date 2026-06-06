@@ -15,7 +15,7 @@ export const Features = () => {
     ];
 
     return (
-        <div className="bg-[#020617] py-20 relative z-10 border-b border-white/5">
+        <div className="bg-[#0A0A0A] py-20 relative z-10 border-b border-white/5">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {items.map((item, idx) => {

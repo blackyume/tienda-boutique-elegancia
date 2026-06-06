@@ -108,7 +108,7 @@ export const ShopTheLook = () => {
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="block p-3"
                                             >
-                                                <div className="w-full aspect-[3/2] overflow-hidden mb-3 bg-[#0d1525]">
+                                                <div className="w-full aspect-[3/2] overflow-hidden mb-3 bg-[#080808]">
                                                     <img
                                                         src={optimizeImage(product.image, 400) || product.image}
                                                         alt={product.name}

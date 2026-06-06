@@ -2,28 +2,30 @@ import React from 'react';
 import { Truck, CreditCard, RefreshCw, MessageCircle } from 'lucide-react';
 
 const items = [
-    { Icon: Truck, title: 'Envíos a todo el país', desc: 'En 24/72h hábiles' },
-    { Icon: CreditCard, title: '6 cuotas sin interés', desc: 'Con Mercado Pago' },
-    { Icon: RefreshCw, title: 'Cambios garantizados', desc: 'Hasta 15 días' },
-    { Icon: MessageCircle, title: 'Asesoría personalizada', desc: 'Vía WhatsApp' },
+    { Icon: Truck, title: 'Envios a todo el pais', desc: 'En 24/72h habiles' },
+    { Icon: CreditCard, title: '6 cuotas sin interes', desc: 'Con Mercado Pago' },
+    { Icon: RefreshCw, title: 'Cambios garantizados', desc: 'Hasta 15 dias' },
+    { Icon: MessageCircle, title: 'Asesoria personalizada', desc: 'Via WhatsApp' },
 ];
 
 export const TrustBar = () => (
-    <div className="relative bg-[#020617] border-y border-white/5">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-            <ul className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
+    <div className="relative bg-cielo-dark border-y border-white/[0.06]">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-cielo-gold/60 to-transparent" />
+        <div className="max-w-6xl mx-auto px-6 py-8">
+            <ul className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-6">
                 {items.map(({ Icon, title, desc }, i) => (
-                    <li key={i} className="flex items-center gap-3 justify-center md:justify-start">
-                        <span className="shrink-0 w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-white/70 bg-white/[0.02]">
-                            <Icon className="w-4 h-4" strokeWidth={1.5} />
+                    <li key={i} className="group flex items-center gap-4 justify-center md:justify-start">
+                        <span className="shrink-0 w-10 h-10 flex items-center justify-center text-cielo-gold/70 group-hover:text-cielo-gold transition-colors duration-300">
+                            <Icon className="w-5 h-5" strokeWidth={1.2} />
                         </span>
                         <div className="leading-tight">
-                            <p className="text-[11px] uppercase tracking-[0.2em] text-white font-semibold">{title}</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5">{desc}</p>
+                            <p className="text-2xs uppercase tracking-[0.22em] text-white/90 font-semibold">{title}</p>
+                            <p className="text-2xs text-white/40 mt-0.5">{desc}</p>
                         </div>
                     </li>
                 ))}
             </ul>
         </div>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-cielo-gold/30 to-transparent" />
     </div>
 );

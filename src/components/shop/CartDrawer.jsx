@@ -31,7 +31,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
          />
 
          {/* Drawer */}
-         <div className={`absolute right-0 top-0 h-full w-full max-w-md bg-[#0B1120]/95 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out-quint flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+         <div className={`absolute right-0 top-0 h-full w-full max-w-md bg-[#0A0A0A]/95 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out-quint flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
@@ -154,7 +154,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
 
             {/* Footer */}
             {cart.length > 0 && (
-               <div className="p-8 bg-[#0f172a]/80 backdrop-blur-xl border-t border-white/10">
+               <div className="p-8 bg-[#121212]/80 backdrop-blur-xl border-t border-white/10">
 
                   {/* Shipping Estimator */}
                   <div className="mb-8 p-4 rounded-xl bg-white/5 border border-white/5">

@@ -1,12 +1,18 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 
-const MarqueeItem = ({ text }) => (
-    <div className="flex items-center">
-        {text.split('•').map((segment, i) => (
+const Diamond = () => (
+    <svg viewBox="0 0 8 8" width="6" height="6" className="mx-5 opacity-60 shrink-0" fill="currentColor" aria-hidden="true">
+        <polygon points="4,0 8,4 4,8 0,4" />
+    </svg>
+);
+
+const MarqueeTrack = ({ segments, className = '' }) => (
+    <div className={`flex items-center whitespace-nowrap font-cinzel font-semibold tracking-[0.35em] text-2xs uppercase ${className}`}>
+        {segments.map((seg, i) => (
             <React.Fragment key={i}>
-                <span className="mx-4">{segment.trim()}</span>
-                <span className="mx-4">•</span>
+                <span>{seg.trim()}</span>
+                <Diamond />
             </React.Fragment>
         ))}
     </div>
@@ -14,20 +20,16 @@ const MarqueeItem = ({ text }) => (
 
 export const Marquee = () => {
     const { siteConfig } = useStore();
-    const text = siteConfig.marquee || "La Boutique de la Elegancia • Collection 2026";
+    const raw = siteConfig?.marquee || 'La Boutique de la Elegancia - Collection 2026 - Moda Atemporal';
+    const segments = Array.from({ length: 6 }, () => raw.split('-')).flat();
 
     return (
-        <div className="relative flex overflow-x-hidden bg-cielo-gold text-black py-3 border-y border-white/10 z-20">
-            <div className="animate-marquee whitespace-nowrap flex font-bold tracking-[0.3em] text-xs uppercase">
-                <MarqueeItem text={text} />
-                <MarqueeItem text={text} />
-                <MarqueeItem text={text} />
+        <div className="relative flex overflow-x-hidden bg-cielo-gold text-black py-3 z-20" aria-hidden="true">
+            <div className="flex items-center min-w-full">
+                <MarqueeTrack segments={segments} className="animate-marquee" />
             </div>
-
-            <div className="absolute top-0 animate-marquee2 whitespace-nowrap flex font-bold tracking-[0.3em] text-xs uppercase">
-                <MarqueeItem text={text} />
-                <MarqueeItem text={text} />
-                <MarqueeItem text={text} />
+            <div className="flex items-center min-w-full absolute top-0 left-0 h-full">
+                <MarqueeTrack segments={segments} className="animate-marquee2" />
             </div>
         </div>
     );

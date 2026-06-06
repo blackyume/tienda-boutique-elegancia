@@ -1,3 +1,4 @@
+import { LogoSVG } from './LogoSVG';
 import { AuthModal } from '../auth/AuthModal';
 import { User, Menu, ChevronDown, Search, ShieldCheck, ShoppingBag, X, LogOut, Heart, Package } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -90,7 +91,7 @@ export const Navbar = ({ onOpenCart }) => {
 
             {/* ANNOUNCEMENT BANNER */}
             {(siteConfig.announcement?.enabled) && (
-                <div className={`fixed top-0 left-0 right-0 z-[55] bg-[#0B1120] text-cielo-gold text-[10px] font-bold tracking-[0.2em] uppercase py-2 text-center transition-transform duration-500 overflow-hidden ${scrolled ? '-translate-y-full' : 'translate-y-0'}`}>
+                <div className={`fixed top-0 left-0 right-0 z-[55] bg-[#0A0A0A] text-cielo-gold text-[10px] font-bold tracking-[0.2em] uppercase py-2 text-center transition-transform duration-500 overflow-hidden ${scrolled ? '-translate-y-full' : 'translate-y-0'}`}>
                     <div className="flex items-center justify-center gap-8 animate-pulse-slow">
                         {siteConfig.announcement.text || "Compra Segura | Envíos a todo el País"}
                     </div>
@@ -142,7 +143,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 </svg>
                             </div>
 
-                            <img src="/assets/logo-main.png?v=5" alt="La Boutique de la Elegancia" className={`h-auto transition-all duration-500 group-hover:scale-[1.03] ${scrolled ? 'w-40 md:w-44' : 'w-52 md:w-60'}`} />
+                            <LogoSVG to="/" width={scrolled ? 160 : 200} />
                         </Link>
 
                         {/* NAV LINKS (Desktop) */}
@@ -153,7 +154,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 </button>
 
                                 {/* MEGA MENU */}
-                                <div className={`absolute top-full left-0 mt-2 min-w-[200px] bg-[#0B1120]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 transition-all duration-300 origin-top-left ${isShopMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+                                <div className={`absolute top-full left-0 mt-2 min-w-[200px] bg-[#0A0A0A]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 transition-all duration-300 origin-top-left ${isShopMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                                     <button onClick={() => handleCategoryClick("Todos")} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">Ver Todo</button>
                                     <div className="h-px bg-white/10 my-1"></div>
                                     {categories.map(cat => (
@@ -169,14 +170,7 @@ export const Navbar = ({ onOpenCart }) => {
                     </div>
 
                     {/* CENTER: WORDMARK TITLE */}
-                    <Link to="/" onClick={() => handleCategoryClick("Todos")} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group text-center z-10">
-                        <h1 className={`font-cinzel font-bold tracking-widest text-cielo-gold/90 transition-all duration-500 whitespace-nowrap ${scrolled ? 'text-lg' : 'text-2xl lg:text-3xl text-shadow-sm'}`}>
-                            LA BOUTIQUE
-                        </h1>
-                        <span className={`block font-serif italic text-white/60 transition-all duration-500 ${scrolled ? 'text-[8px] tracking-widest' : 'text-[10px] tracking-[0.3em]'} mt-0.5`}>
-                            de la Elegancia
-                        </span>
-                    </Link>
+
 
                     {/* ICONS (RIGHT) */}
                     <div className="flex items-center gap-4 pr-2">
@@ -197,7 +191,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 />
                             </div>
                             {isSearchOpen && suggestions.length > 0 && (
-                                <div className="absolute top-full right-0 mt-2 w-80 bg-[#0B1120]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-40">
+                                <div className="absolute top-full right-0 mt-2 w-80 bg-[#0A0A0A]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-40">
                                     <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-white/5">
                                         Sugerencias
                                     </div>
@@ -245,7 +239,7 @@ export const Navbar = ({ onOpenCart }) => {
                             {/* USER DROPDOWN - WITH INVISIBLE BRIDGE */}
                             {user && (
                                 <div className={`absolute top-full right-0 pt-4 w-60 transform transition-all duration-300 origin-top-right z-20 ${isUserMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}>
-                                    <div className="bg-[#0B1120]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                                    <div className="bg-[#0A0A0A]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
                                         <div className="px-5 py-4 border-b border-white/5 bg-white/5">
                                             <p className="text-xs font-bold text-white truncate font-cinzel">{user.email}</p>
                                             <div className="flex items-center gap-2 mt-1">
@@ -287,7 +281,7 @@ export const Navbar = ({ onOpenCart }) => {
                         <button onClick={onOpenCart} className="relative p-2 text-white hover:text-cielo-gold transition-colors magnetic-btn group">
                             <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             {cart.length > 0 && (
-                                <span className="absolute top-1 right-1 min-w-[14px] h-[14px] bg-cielo-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center shadow-md border border-[#0B1120] animate-bounce-slow leading-none pt-[1px]">
+                                <span className="absolute top-1 right-1 min-w-[14px] h-[14px] bg-cielo-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center shadow-md border border-[#0A0A0A] animate-bounce-slow leading-none pt-[1px]">
                                     {cart.reduce((a, b) => a + b.quantity, 0)}
                                 </span>
                             )}
@@ -297,7 +291,7 @@ export const Navbar = ({ onOpenCart }) => {
             </div>
 
             {/* MOBILE MENU (Full Screen Glass) */}
-            <div className={`fixed inset-0 z-[60] bg-[#0B1120]/95 backdrop-blur-2xl transition-all duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+            <div className={`fixed inset-0 z-[60] bg-[#0A0A0A]/95 backdrop-blur-2xl transition-all duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-6 right-6 p-4 text-white hover:rotate-90 transition-transform duration-500"><X className="w-8 h-8" /></button>
                 <div className="flex flex-col items-center justify-center h-full gap-8">
                     <h2 className="text-3xl font-cinzel text-cielo-gold mb-8">MENÚ</h2>

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { db } from '../lib/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, doc, setDoc, increment } from 'firebase/firestore';
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from '../lib/cloudinaryConfig';
 import { useFirestoreSubscriptions } from '../hooks/useFirestoreSubscriptions';
 import { useCart } from '../hooks/useCart';
@@ -250,13 +250,11 @@ export const StoreProvider = ({ children }) => {
     const visited = sessionStorage.getItem('cielo_visited');
     if (!visited) {
       try {
+        // Incremento atómico (evita la race condition del read-modify-write:
+        // dos visitantes concurrentes perdían cuentas). merge:true crea el doc
+        // si no existe.
         const statsRef = doc(db, "stats", "visits");
-        const docSnap = await getDoc(statsRef);
-        if (!docSnap.exists()) {
-          await setDoc(statsRef, { count: 1 });
-        } else {
-          await updateDoc(statsRef, { count: docSnap.data().count + 1 });
-        }
+        await setDoc(statsRef, { count: increment(1) }, { merge: true });
         sessionStorage.setItem('cielo_visited', 'true');
       } catch (e) {
         console.error("Error incrementing visits", e);

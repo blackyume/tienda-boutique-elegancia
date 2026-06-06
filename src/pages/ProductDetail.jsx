@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { formatMoney, getColorHex, optimizeImage } from '../utils/helpers';
 import { Button } from '../components/ui/Button';
-import { Heart, Truck, ShieldCheck, Star, Share2, Minus, Plus } from 'lucide-react';
+import { Heart, Truck, ShieldCheck, Star, Share2, Minus, Plus, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { Accordion } from '../components/ui/Accordion';
 import { SEO } from '../components/seo/SEO';
 import { Breadcrumbs } from '../components/ui/Breadcrumbs';
@@ -37,6 +37,8 @@ export const ProductDetail = () => {
     const [selectedColor, setSelectedColor] = useState('');
     const [activeImage, setActiveImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
+    const [lightbox, setLightbox] = useState(false);
+    const [zoomed, setZoomed] = useState(false);
 
     // PASO 1 — Resolver producto. Esto sí depende de `inventory` porque puede
     // llegar tarde (Firestore async). Pero NO scrolleamos ni disparamos
@@ -86,6 +88,23 @@ export const ProductDetail = () => {
         return [product.image];
     }, [product]);
 
+    const prevImage = () => setActiveImage((i) => (i - 1 + images.length) % images.length);
+    const nextImage = () => setActiveImage((i) => (i + 1) % images.length);
+
+    // Visor (lightbox): teclado + bloqueo de scroll mientras está abierto.
+    useEffect(() => {
+        if (!lightbox) return;
+        const onKey = (e) => {
+            if (e.key === 'Escape') { setLightbox(false); setZoomed(false); }
+            else if (e.key === 'ArrowLeft') prevImage();
+            else if (e.key === 'ArrowRight') nextImage();
+        };
+        window.addEventListener('keydown', onKey);
+        document.body.style.overflow = 'hidden';
+        return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lightbox, images.length]);
+
     const { reviews: allReviews } = useStore();
     const { reviewAverage, reviewCount } = useMemo(() => {
         const r = (allReviews || []).filter(x => x.approved && String(x.productId) === String(product?.id));
@@ -107,9 +126,9 @@ export const ProductDetail = () => {
     }, [inventory, product]);
 
     if (!product) return (
-        <div className="min-h-screen bg-white dark:bg-[#0B1120] flex items-center justify-center">
-            <div className="flex items-center gap-3 text-[#C19A6B]">
-                <div className="w-8 h-8 border-2 border-[#C19A6B] border-t-transparent rounded-full animate-spin" />
+        <div className="min-h-screen bg-white dark:bg-[#0A0A0A] flex items-center justify-center">
+            <div className="flex items-center gap-3 text-[#D4AF37]">
+                <div className="w-8 h-8 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm tracking-wide">Cargando producto…</span>
             </div>
         </div>
@@ -145,7 +164,7 @@ export const ProductDetail = () => {
     const showScarcity = siteConfig?.sales?.scarcity?.enabled && totalStock > 0 && totalStock <= scarcityThreshold;
 
     return (
-        <div className="bg-white dark:bg-[#0B1120] min-h-screen text-slate-900 dark:text-white transition-colors">
+        <div className="bg-white dark:bg-[#0A0A0A] min-h-screen text-slate-900 dark:text-white transition-colors">
             <SEO
                 title={product.name}
                 description={
@@ -171,16 +190,22 @@ export const ProductDetail = () => {
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
                 {/* Galería */}
                 <div>
-                    <div className="aspect-[3/4] bg-slate-100 dark:bg-[#0f172a] overflow-hidden relative rounded-md">
+                    <div
+                        className="aspect-[3/4] bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group"
+                        onClick={() => setLightbox(true)}
+                    >
                         <img
                             key={images[activeImage]}
                             src={optimizeImage(images[activeImage], 1200)}
                             alt={product.name}
-                            className="w-full h-full object-cover animate-fadeIn"
+                            className="w-full h-full object-cover animate-fadeIn transition-transform duration-700 group-hover:scale-105"
                             loading="eager"
                             fetchPriority="high"
                             decoding="async"
                         />
+                        <div className="absolute top-3 left-3 bg-black/50 text-white p-2 rounded-full backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            <ZoomIn className="w-4 h-4" />
+                        </div>
                         {images.length > 1 && (
                             <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur">
                                 {activeImage + 1} / {images.length}
@@ -279,7 +304,7 @@ export const ProductDetail = () => {
                                             >
                                                 <span className="absolute inset-0 rounded-full border border-slate-200 dark:border-slate-700" />
                                                 <span
-                                                    className={`w-7 h-7 rounded-full shadow-sm ${selected ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0B1120] ring-slate-900 dark:ring-white' : ''}`}
+                                                    className={`w-7 h-7 rounded-full shadow-sm ${selected ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0A0A0A] ring-slate-900 dark:ring-white' : ''}`}
                                                     style={{ backgroundColor: getColorHex(c) }}
                                                 />
                                                 {!available && (
@@ -476,6 +501,52 @@ export const ProductDetail = () => {
             </div>
             {/* padding para que el sticky no tape contenido */}
             <div className="md:hidden h-20" />
+
+            {/* VISOR / LIGHTBOX de imágenes con zoom */}
+            {lightbox && (
+                <div
+                    className="fixed inset-0 z-[120] bg-black/95 backdrop-blur-sm flex items-center justify-center animate-fadeIn"
+                    onClick={() => { setLightbox(false); setZoomed(false); }}
+                >
+                    <button
+                        onClick={(e) => { e.stopPropagation(); setLightbox(false); setZoomed(false); }}
+                        className="absolute top-5 right-5 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        aria-label="Cerrar"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+
+                    {images.length > 1 && (
+                        <>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setZoomed(false); prevImage(); }}
+                                className="absolute left-3 md:left-6 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                                aria-label="Anterior"
+                            >
+                                <ChevronLeft className="w-7 h-7" />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setZoomed(false); nextImage(); }}
+                                className="absolute right-3 md:right-6 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                                aria-label="Siguiente"
+                            >
+                                <ChevronRight className="w-7 h-7" />
+                            </button>
+                        </>
+                    )}
+
+                    <img
+                        src={optimizeImage(images[activeImage], 1600)}
+                        alt={product.name}
+                        onClick={(e) => { e.stopPropagation(); setZoomed((z) => !z); }}
+                        className={`select-none transition-transform duration-300 ${zoomed ? 'scale-[1.8] cursor-zoom-out' : 'max-h-[88vh] max-w-[92vw] object-contain cursor-zoom-in'}`}
+                    />
+
+                    <div className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/60 text-xs uppercase tracking-widest pointer-events-none">
+                        {images.length > 1 ? `${activeImage + 1} / ${images.length} · ` : ''}Tocá para {zoomed ? 'alejar' : 'acercar'}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

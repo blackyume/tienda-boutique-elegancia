@@ -5,7 +5,7 @@ import React from 'react';
       const styles = {
         primary: "bg-slate-900 text-white hover:bg-slate-800",
         secondary: "bg-white text-slate-900 border border-slate-900 hover:bg-slate-50",
-        accent: "bg-[#C19A6B] text-white hover:bg-[#A08055]",
+        accent: "bg-[#D4AF37] text-white hover:bg-[#C19A2E]",
         outline: "border border-slate-300 hover:border-slate-900"
       };
       return (

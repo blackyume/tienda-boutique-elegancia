@@ -60,7 +60,7 @@ export const CommandPalette = ({ commands }) => {
     return (
         <div className="fixed inset-0 z-[80] flex items-start justify-center pt-[12vh] px-4" role="dialog" aria-modal="true" aria-label="Paleta de comandos">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-[fadeIn_.12s_ease-out]" onClick={() => setOpen(false)} />
-            <div className="relative w-full max-w-xl bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-[scaleIn_.15s_ease-out]">
+            <div className="relative w-full max-w-xl bg-white dark:bg-[#1a1a1a] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-[scaleIn_.15s_ease-out]">
                 <div className="flex items-center gap-3 px-4 border-b border-slate-100 dark:border-slate-800">
                     <Search className="w-4 h-4 text-slate-400 shrink-0" />
                     <input
@@ -82,7 +82,7 @@ export const CommandPalette = ({ commands }) => {
                                 key={c.id}
                                 onMouseEnter={() => setActive(i)}
                                 onClick={() => run(c)}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors ${i === active ? 'bg-[#C19A6B] text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors ${i === active ? 'bg-[#D4AF37] text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                             >
                                 {c.icon && <c.icon className={`w-4 h-4 shrink-0 ${i === active ? 'text-white' : 'text-slate-400'}`} />}
                                 <span className="flex-1 text-sm font-medium">{c.label}</span>

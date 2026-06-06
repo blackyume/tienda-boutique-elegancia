@@ -116,7 +116,7 @@ export const SuppliersView = () => {
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-black hover:bg-[#C19A6B] text-white shadow-xl shadow-black/10 px-4 sm:px-6 py-2 sm:py-3 rounded-none border border-[#C19A6B] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1 w-full sm:w-auto justify-center"
+                    className="flex items-center gap-2 bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-4 sm:px-6 py-2 sm:py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1 w-full sm:w-auto justify-center"
                 >
                     <Plus className="w-4 h-4" /> Nuevo Proveedor
                 </button>
@@ -124,29 +124,29 @@ export const SuppliersView = () => {
 
             {/* STATS */}
             <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <div className="bg-white dark:bg-[#1e293b] p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+                <div className="bg-white dark:bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                     <span className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white">{stats.total}</span>
                     <p className="text-[10px] sm:text-xs text-slate-400 uppercase font-bold mt-1">Total</p>
                 </div>
-                <div className="bg-white dark:bg-[#1e293b] p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+                <div className="bg-white dark:bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                     <span className="text-xl sm:text-2xl font-black text-emerald-600">{stats.active}</span>
                     <p className="text-[10px] sm:text-xs text-slate-400 uppercase font-bold mt-1">Activos</p>
                 </div>
-                <div className="bg-white dark:bg-[#1e293b] p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+                <div className="bg-white dark:bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                     <span className="text-xl sm:text-2xl font-black text-slate-400">{stats.inactive}</span>
                     <p className="text-[10px] sm:text-xs text-slate-400 uppercase font-bold mt-1">Inactivos</p>
                 </div>
             </div>
 
             {/* FILTERS */}
-            <div className="bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur-xl p-3 sm:p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
+            <div className="bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-xl p-3 sm:p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
                 {/* Search */}
                 <div className="relative flex-1">
                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-4 py-2.5 w-full text-sm border border-slate-200 rounded-xl bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                        className="pl-10 pr-4 py-2.5 w-full text-sm border border-slate-200 rounded-xl bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                         placeholder="Buscar proveedor..."
                     />
                 </div>
@@ -159,7 +159,7 @@ export const SuppliersView = () => {
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#C19A6B] appearance-none cursor-pointer font-medium w-full sm:min-w-[160px]"
+                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#D4AF37] appearance-none cursor-pointer font-medium w-full sm:min-w-[160px]"
                     >
                         <option value="Todos">Todas las Categorías</option>
                         {(categories || []).map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -172,7 +172,7 @@ export const SuppliersView = () => {
                 {filteredSuppliers.map((supplier) => (
                     <div
                         key={supplier.id}
-                        className={`bg-white dark:bg-[#1e293b] p-4 sm:p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all relative overflow-hidden group ${supplier.active === false ? 'border-slate-300 dark:border-slate-700 opacity-60' : 'border-slate-200 dark:border-slate-800'}`}
+                        className={`bg-white dark:bg-[#1a1a1a] p-4 sm:p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all relative overflow-hidden group ${supplier.active === false ? 'border-slate-300 dark:border-slate-700 opacity-60' : 'border-slate-200 dark:border-slate-800'}`}
                     >
                         {/* Status Badge */}
                         {supplier.active === false && (
@@ -183,7 +183,7 @@ export const SuppliersView = () => {
 
                         {/* Header */}
                         <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#C19A6B]/10 flex items-center justify-center text-[#C19A6B] border border-[#C19A6B]/20 shrink-0">
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/20 shrink-0">
                                 <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -202,25 +202,25 @@ export const SuppliersView = () => {
                         <div className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4 sm:mb-6">
                             {supplier.contactName && (
                                 <div className="flex items-center gap-2">
-                                    <User className="w-3.5 h-3.5 text-[#C19A6B] shrink-0" />
+                                    <User className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
                                     <span className="truncate">{supplier.contactName}</span>
                                 </div>
                             )}
                             {supplier.phone && (
                                 <div className="flex items-center gap-2">
-                                    <Phone className="w-3.5 h-3.5 text-[#C19A6B] shrink-0" />
+                                    <Phone className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
                                     <span>{supplier.phone}</span>
                                 </div>
                             )}
                             {supplier.email && (
                                 <div className="flex items-center gap-2">
-                                    <Mail className="w-3.5 h-3.5 text-[#C19A6B] shrink-0" />
+                                    <Mail className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
                                     <span className="truncate">{supplier.email}</span>
                                 </div>
                             )}
                             {(supplier.city || supplier.province) && (
                                 <div className="flex items-center gap-2">
-                                    <MapPin className="w-3.5 h-3.5 text-[#C19A6B] shrink-0" />
+                                    <MapPin className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
                                     <span className="truncate">{[supplier.city, supplier.province].filter(Boolean).join(', ')}</span>
                                 </div>
                             )}
@@ -276,13 +276,13 @@ export const SuppliersView = () => {
 
             {/* Empty State */}
             {filteredSuppliers.length === 0 && (
-                <div className="text-center py-16 sm:py-20 bg-white dark:bg-[#1e293b] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                <div className="text-center py-16 sm:py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                     <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                     <p className="text-slate-500 font-bold mb-2">No hay proveedores registrados</p>
                     <p className="text-slate-400 text-sm mb-6">Agrega tu primer proveedor para comenzar.</p>
                     <button
                         onClick={() => handleOpenModal()}
-                        className="inline-flex items-center gap-2 bg-[#C19A6B] hover:bg-[#A88555] text-white px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
+                        className="inline-flex items-center gap-2 bg-[#D4AF37] hover:bg-[#C19A2E] text-white px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
                     >
                         <Plus className="w-4 h-4" /> Agregar Proveedor
                     </button>
@@ -292,11 +292,11 @@ export const SuppliersView = () => {
             {/* MODAL */}
             {isModalOpen && currentSupplier && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/80 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-white dark:bg-[#0f172a] w-full max-w-2xl rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col max-h-[95vh] border border-slate-200 dark:border-slate-800 shadow-2xl">
+                    <div className="bg-white dark:bg-[#121212] w-full max-w-2xl rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col max-h-[95vh] border border-slate-200 dark:border-slate-800 shadow-2xl">
                         {/* Modal Header */}
-                        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-[#1e293b] shrink-0">
+                        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-[#1a1a1a] shrink-0">
                             <h3 className="font-bold text-base sm:text-lg dark:text-white flex items-center gap-2">
-                                <Building2 className="w-5 h-5 text-[#C19A6B]" />
+                                <Building2 className="w-5 h-5 text-[#D4AF37]" />
                                 {suppliers?.find(s => s.id === currentSupplier.id) ? 'Editar Proveedor' : 'Nuevo Proveedor'}
                             </h3>
                             <button
@@ -318,7 +318,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.name}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, name: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder="Ej: Textiles del Sur"
                                     />
                                 </div>
@@ -330,7 +330,7 @@ export const SuppliersView = () => {
                                         list="supplier-categories"
                                         value={currentSupplier.category}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, category: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder="Ej: Vestidos"
                                     />
                                     <datalist id="supplier-categories">
@@ -347,7 +347,7 @@ export const SuppliersView = () => {
                                 <input
                                     value={currentSupplier.contactName}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, contactName: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                     placeholder="Ej: María López"
                                 />
                             </div>
@@ -361,7 +361,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.phone}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, phone: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder="Ej: 011 4444-5555"
                                     />
                                 </div>
@@ -372,7 +372,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.whatsapp}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, whatsapp: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder="Ej: 5491123456789"
                                     />
                                 </div>
@@ -387,7 +387,7 @@ export const SuppliersView = () => {
                                     type="email"
                                     value={currentSupplier.email}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, email: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                     placeholder="Ej: contacto@proveedor.com"
                                 />
                             </div>
@@ -400,7 +400,7 @@ export const SuppliersView = () => {
                                 <input
                                     value={currentSupplier.address}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, address: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                     placeholder="Ej: Av. Corrientes 1234"
                                 />
                             </div>
@@ -414,7 +414,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.city}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, city: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder="Ej: Buenos Aires"
                                     />
                                 </div>
@@ -425,7 +425,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.province}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, province: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
                                         placeholder="Ej: CABA"
                                     />
                                 </div>
@@ -439,7 +439,7 @@ export const SuppliersView = () => {
                                 <textarea
                                     value={currentSupplier.notes}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, notes: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#C19A6B] transition-all min-h-[100px] resize-none"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all min-h-[100px] resize-none"
                                     placeholder="Información adicional sobre el proveedor, condiciones de pago, horarios de atención, etc."
                                 />
                             </div>
@@ -464,7 +464,7 @@ export const SuppliersView = () => {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-3 bg-slate-50 dark:bg-[#1e293b] shrink-0">
+                        <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-3 bg-slate-50 dark:bg-[#1a1a1a] shrink-0">
                             <button
                                 onClick={handleCloseModal}
                                 className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
@@ -474,7 +474,7 @@ export const SuppliersView = () => {
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#C19A6B] hover:bg-[#A88555] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#D4AF37] hover:bg-[#C19A2E] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
                             >
                                 <Check className="w-4 h-4" /> {isSaving ? 'Guardando…' : 'Guardar Proveedor'}
                             </button>

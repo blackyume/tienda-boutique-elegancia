@@ -80,7 +80,7 @@ const AppContent = () => {
     return stop;
   }, [user]);
 
-  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-[#C19A6B]">Cargando...</div>;
+  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-[#D4AF37]">Cargando...</div>;
 
   // Si está en mantenimiento y NO es admin, muestra pantalla de bloqueo
   if (isMaintenance && !isAdmin && !hasQaBypass()) {
@@ -90,7 +90,7 @@ const AppContent = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0B1120] transition-colors duration-500">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-500">
       <ScrollToTop />
       <NavbarWrapper onOpenCart={() => setIsCartOpen(true)} />
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
@@ -144,8 +144,8 @@ const FooterWrapper = () => {
 
 const RouteFallback = () => (
   <div className="min-h-[50vh] flex items-center justify-center">
-    <div className="flex items-center gap-3 text-[#C19A6B]">
-      <div className="w-8 h-8 border-2 border-[#C19A6B] border-t-transparent rounded-full animate-spin" />
+    <div className="flex items-center gap-3 text-[#D4AF37]">
+      <div className="w-8 h-8 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
       <span className="text-sm tracking-wide">Cargando…</span>
     </div>
   </div>

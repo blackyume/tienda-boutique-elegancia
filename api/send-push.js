@@ -5,7 +5,7 @@
 //   FIREBASE_SERVICE_ACCOUNT  — JSON del service account
 //   PUSH_ADMIN_SECRET         — string secreto compartido con Admin
 const { admin, getDb } = require('./_firebaseAdmin');
-const { checkRateLimit, getClientIp } = require('./_rateLimit');
+const { checkRateLimit, getClientIp, safeEqual } = require('./_rateLimit');
 
 const STATIC_ALLOWED_ORIGINS = [
     'https://la-boutique-de-la-elegancia.web.app',
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
 
     const expected = process.env.PUSH_ADMIN_SECRET;
     const provided = req.headers['x-admin-secret'] || req.body?.secret || '';
-    if (!expected || provided !== expected) {
+    if (!expected || !safeEqual(provided, expected)) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
