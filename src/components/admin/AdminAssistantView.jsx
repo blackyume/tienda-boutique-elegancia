@@ -7,7 +7,7 @@ import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/
 
 const HISTORY_KEY = 'laurina_copilot_v1';
 const MAX_STEPS = 5;
-const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Laurina, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (podés adjuntar la foto), precios y ofertas, cupones, destacar en la home, gestionar pedidos (marcar enviados/entregados), moderar reseñas, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
+const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Laurina, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (mandame la foto y, si querés, el COSTO y te calculo el precio cubriendo la comisión de Mercado Pago + tu margen), precios y ofertas, cupones, destacar en la home, gestionar pedidos (marcar enviados/entregados), moderar reseñas, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
 
 const toArr = (v) => Array.isArray(v) ? v.map(String).map(s => s.trim()).filter(Boolean)
     : (typeof v === 'string' ? v.split(/[,/]+/).map(s => s.trim()).filter(Boolean) : []);
@@ -82,6 +82,21 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             case 'get_product': {
                 const p = findProduct(A.idOrName); if (!p) return 'No encontré ese producto.';
                 return JSON.stringify({ id: p.id, name: p.name, price: p.price, compareAtPrice: p.compareAtPrice, stock: p.stock, variants: p.variants || null, hasVariants: Array.isArray(p.variants) && p.variants.length > 0, category: p.category, colors: p.colors, sizes: p.sizes, visible: p.active !== false, badges: p.badges, description: p.description }, null, 1);
+            }
+            case 'quote_price': {
+                const cost = Number(A.cost) || 0;
+                if (cost <= 0) return 'Decime el costo de la prenda para calcular el precio.';
+                const pack = Number(A.packaging) || 0;
+                const ship = Number(A.shipping) || 0;
+                const margin = A.margin != null ? Number(A.margin) : 50;
+                const commission = A.commission != null ? Number(A.commission) : 6;
+                const totalCost = cost + pack + ship;
+                const denom = 1 - (margin + commission) / 100;
+                if (denom <= 0) return `El margen (${margin}%) + comisión (${commission}%) suman 100% o más, no se puede calcular. Bajá el margen.`;
+                const price = Math.round(totalCost / denom);
+                const commissionAmount = Math.round(price * commission / 100);
+                const net = price - totalCost - commissionAmount;
+                return `Precio de venta sugerido: $${price.toLocaleString('es-AR')}. Desglose: costo $${totalCost.toLocaleString('es-AR')}${(pack || ship) ? ` (prenda $${cost.toLocaleString('es-AR')}${pack ? ' + packaging $' + pack.toLocaleString('es-AR') : ''}${ship ? ' + envío $' + ship.toLocaleString('es-AR') : ''})` : ''}, comisión MP ${commission}% = $${commissionAmount.toLocaleString('es-AR')}, margen ${margin}%. Ganás $${net.toLocaleString('es-AR')} netos por venta. Para publicarlo usá create_product con price ${price}.`;
             }
             case 'query_reviews': {
                 let r = [...(reviews || [])];
@@ -365,9 +380,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     };
 
     const SUGGESTIONS = [
+        'Cargá este producto, me costó $8000 y quiero 50% de margen',
         '¿Cuánto vendí esta semana?',
         '¿Qué pedidos tengo pendientes de enviar?',
-        'Aprobá las reseñas que estén pendientes',
         'Destacá en la home los 4 productos más nuevos',
     ];
 

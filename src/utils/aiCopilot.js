@@ -14,6 +14,7 @@ export const TOOLS = [
     { name: 'query_customers', sensitive: false, desc: 'Top clientes por gasto. args: {top?}' },
     { name: 'query_coupons', sensitive: false, desc: 'Listar cupones. args: {}' },
     { name: 'query_reviews', sensitive: false, desc: 'Listar reseñas. args: {onlyPending?(bool), productId?}' },
+    { name: 'quote_price', sensitive: false, desc: 'Calcular el PRECIO DE VENTA a partir del costo, cubriendo la comisión de Mercado Pago y el margen deseado. args: {cost(costo de la prenda), packaging?(0), shipping?(0), margin?(50, en %), commission?(6, % comisión MP)}. Devuelve precio sugerido + ganancia neta. Usalo SIEMPRE que el usuario te dé un COSTO o "me costó X" en vez de un precio final.' },
     // --- ESCRITURA SUAVE (auto) ---
     { name: 'create_category', sensitive: false, desc: 'Crear categoría. args: {name}' },
     { name: 'generate_copy', sensitive: false, desc: 'Generar y guardar descripción + keywords SEO de un producto. args: {productId}' },
@@ -79,6 +80,7 @@ Reglas:
 - Para CONSULTAR datos (ventas, stock, clientes, órdenes) usá las herramientas query_*; NO inventes números. Poné done:false y después de ver los resultados respondé con done:true.
 - Las herramientas [SENSIBLE] (crear/publicar producto, precios, stock, borrar, home, mantenimiento) las confirma el usuario; igual proponelas normalmente, el sistema le pedirá OK.
 - Precios: SIEMPRE en pesos argentinos (ARS), número entero. Si el usuario no da precio para un producto nuevo, proponé uno razonable y aclaralo en "reply".
+- CÁLCULO DE PRECIO: si el usuario te da el COSTO ("me costó X", "lo pagué X") en vez de un precio de venta, usá primero quote_price para obtener el precio que cubre la comisión de Mercado Pago + el margen, decile el precio sugerido y la ganancia neta, y recién después creá el producto (create_product) con ESE precio. Si no aclara la comisión de MP usá 6% por defecto y aclaralo; si no aclara margen usá 50%. Packaging/envío sólo si los menciona.
 - Si el usuario adjuntó una imagen vas a recibir su análisis en el contexto; usalo para crear el producto (create_product) con datos completos y buena descripción.
 - Si falta info crítica y no la podés inferir razonablemente, preguntá (actions vacío, done:true).
 - Sé proactiva pero no destructiva: nunca borres ni hagas cambios masivos sin que lo haya pedido.
