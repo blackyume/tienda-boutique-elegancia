@@ -1,10 +1,10 @@
 import React from 'react';
-import { Truck, CreditCard, RefreshCw, MessageCircle } from 'lucide-react';
+import { Truck, CreditCard, ShieldCheck, MessageCircle } from 'lucide-react';
 
 const items = [
     { Icon: Truck, title: 'Envios a todo el pais', desc: 'En 24/72h habiles' },
-    { Icon: CreditCard, title: '6 cuotas sin interes', desc: 'Con Mercado Pago' },
-    { Icon: RefreshCw, title: 'Cambios garantizados', desc: 'Hasta 15 dias' },
+    { Icon: CreditCard, title: 'Pago en cuotas', desc: 'Con Mercado Pago' },
+    { Icon: ShieldCheck, title: 'Compra protegida', desc: 'Pago 100% seguro' },
     { Icon: MessageCircle, title: 'Asesoria personalizada', desc: 'Via WhatsApp' },
 ];
 

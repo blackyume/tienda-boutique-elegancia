@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, Truck, CreditCard, RefreshCw } from 'lucide-react';
+import { ArrowRight, Truck, CreditCard, ShieldCheck } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { optimizeImage } from '../../utils/helpers';
 
@@ -167,12 +167,12 @@ export const Hero = () => {
                     <span className="w-px h-3 bg-white/10" />
                     <span className="flex items-center gap-2 text-2xs text-white/35 tracking-wide">
                         <CreditCard className="w-3.5 h-3.5 text-cielo-gold/50" strokeWidth={1.5} />
-                        6 cuotas sin interes
+                        Pago en cuotas
                     </span>
                     <span className="w-px h-3 bg-white/10" />
                     <span className="flex items-center gap-2 text-2xs text-white/35 tracking-wide">
-                        <RefreshCw className="w-3.5 h-3.5 text-cielo-gold/50" strokeWidth={1.5} />
-                        Cambios hasta 15 dias
+                        <ShieldCheck className="w-3.5 h-3.5 text-cielo-gold/50" strokeWidth={1.5} />
+                        Compra protegida
                     </span>
                 </div>
             </div>

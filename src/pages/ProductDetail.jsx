@@ -455,7 +455,7 @@ export const ProductDetail = () => {
                             </div>
                         </Accordion>
                         <Accordion title="Cambios & Devoluciones">
-                            Tenés 30 días desde que recibís tu pedido para cambios sin cargo. La prenda debe estar sin uso y con etiqueta.
+                            Por la naturaleza de nuestras prendas (alta costura y ediciones limitadas), y para garantizar la higiene y exclusividad de cada pieza, <strong>no contamos con política de cambios ni devoluciones</strong> por gusto o talle. Antes de comprar te asesoramos por WhatsApp para que elijas el talle ideal. Esto no afecta el derecho de revocación de 10 días corridos que establece la Ley de Defensa del Consumidor.
                         </Accordion>
                     </div>
                 </div>
