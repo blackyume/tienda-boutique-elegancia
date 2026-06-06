@@ -264,7 +264,7 @@ export const Admin = () => {
                 </div>
                 <h1 className="text-3xl font-luxury font-bold mb-2">Acceso Restringido</h1>
                 <p className="text-slate-400 mb-8">Esta área es exclusiva para personal autorizado.</p>
-                <Button onClick={() => window.location.href = '/'} className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-slate-200 transition-colors">
+                <Button variant="secondary" onClick={() => window.location.href = '/'} className="!bg-white !text-black px-8 py-3 rounded-full font-bold hover:!bg-slate-200 transition-colors">
                     Volver a la Tienda
                 </Button>
             </div>
