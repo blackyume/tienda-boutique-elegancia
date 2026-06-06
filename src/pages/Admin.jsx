@@ -45,7 +45,7 @@ const TabLoader = () => (
 
 const TAB_LABELS = {
     dashboard: 'Dashboard', inventory: 'Inventario', orders: 'Pedidos', customers: 'Clientes',
-    sales: 'Ventas', assistant: 'Asistente IA', cms: 'CMS / Diseño', coupons: 'Cupones',
+    sales: 'Ventas', assistant: 'Asistente Laurina', cms: 'CMS / Diseño', coupons: 'Cupones',
     suppliers: 'Proveedores', abandoned: 'Carritos Abandonados', reviews: 'Reseñas',
     calculator: 'Historial de Costos', settings: 'Configuración'
 };
@@ -301,7 +301,7 @@ export const Admin = () => {
                     <SidebarItem icon={TrendingUp} label="Ventas" active={adminTab === 'sales'} onClick={() => setAdminTab('sales')} />
 
                     <div className="h-px bg-slate-200 dark:bg-slate-800 my-2" />
-                    <SidebarItem icon={Bot} label="Asistente IA" active={adminTab === 'assistant'} onClick={() => setAdminTab('assistant')} />
+                    <SidebarItem icon={Bot} label="Asistente Laurina" active={adminTab === 'assistant'} onClick={() => setAdminTab('assistant')} />
                     <SidebarItem icon={Blocks} label="CMS / Diseño" active={adminTab === 'cms'} onClick={() => setAdminTab('cms')} />
                     <SidebarItem icon={Ticket} label="Cupones" active={adminTab === 'coupons'} onClick={() => setAdminTab('coupons')} />
                     <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
