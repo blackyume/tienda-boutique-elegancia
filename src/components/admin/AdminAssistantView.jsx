@@ -56,6 +56,31 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     useEffect(() => { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(messages.slice(-60))); } catch { /* noop */ } }, [messages]);
     useEffect(() => { listRef.current?.scrollTo(0, listRef.current.scrollHeight); }, [messages, loading, confirm]);
 
+    // Parte del día: al abrir Laurina (una vez por día) resume ventas, pedidos
+    // por enviar y stock que se está agotando. Cero configuración.
+    useEffect(() => {
+        try {
+            const today = new Date().toDateString();
+            if (localStorage.getItem('laurina_briefing') === today) return;
+            const ordersToday = (orders || []).filter(o => { try { return new Date(o.date).toDateString() === today; } catch { return false; } });
+            const revToday = ordersToday.reduce((a, o) => a + (Number(o.total) || 0), 0);
+            const threshold = parseInt(siteConfig?.sales?.scarcity?.threshold) || 5;
+            const low = (inventory || []).filter(p => !(p.variants?.length) && Number(p.stock) > 0 && Number(p.stock) <= threshold);
+            const out = (inventory || []).filter(p => !(p.variants?.length) && Number(p.stock) === 0 && p.active !== false);
+            const toShip = (orders || []).filter(o => ['approved', 'paid', 'pending'].includes(o.status)).length;
+            if (!ordersToday.length && !low.length && !out.length && !toShip) return;
+            const lines = ['📊 ¡Hola! Resumen de hoy:'];
+            lines.push(ordersToday.length ? `• 💰 ${ordersToday.length} venta(s) por $${revToday.toLocaleString('es-AR')}.` : '• Todavía no hubo ventas hoy.');
+            if (toShip) lines.push(`• 📦 ${toShip} pedido(s) pendientes de enviar.`);
+            if (out.length) lines.push(`• ⛔ SIN stock (reponer): ${out.slice(0, 6).map(p => p.name).join(', ')}${out.length > 6 ? '…' : ''}.`);
+            if (low.length) lines.push(`• ⚠️ Poco stock: ${low.slice(0, 6).map(p => `${p.name} (${p.stock})`).join(', ')}${low.length > 6 ? '…' : ''}.`);
+            lines.push('Pedime lo que necesites 💛');
+            localStorage.setItem('laurina_briefing', today);
+            setMessages(prev => [...prev, { role: 'ai', text: lines.join('\n') }]);
+        } catch { /* noop */ }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const push = (m) => setMessages(prev => [...prev, m]);
     const aiConfigured = hasAdminAI(aiConfig);
 

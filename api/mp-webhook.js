@@ -207,6 +207,36 @@ module.exports = async (req, res) => {
             }
         }
 
+        // Avisar al dueño por Telegram cuando entra una venta (si está configurado).
+        // Incluye alerta de stock bajo de los productos vendidos.
+        if (newStatus === 'approved') {
+            const botToken = process.env.TELEGRAM_BOT_TOKEN;
+            const ownerChat = process.env.TELEGRAM_OWNER_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
+            if (botToken && ownerChat) {
+                try {
+                    const { getTotalStock } = require('./_pricing');
+                    const items = (order.items || []).map(i => `• ${i.name || 'Producto'}${i.size ? ` (${i.size})` : ''}${i.color ? `/${i.color}` : ''} x${i.quantity}`).join('\n');
+                    let lowMsg = '';
+                    try {
+                        const ids = [...new Set((order.items || []).filter(i => i && i.id != null).map(i => String(i.id)))];
+                        const pdocs = await Promise.all(ids.map(id => db.collection('products').doc(id).get()));
+                        const lows = [];
+                        pdocs.forEach(d => { if (d.exists) { const p = d.data(); const s = getTotalStock(p); if (s <= 5) lows.push(`${p.name || d.id}: ${s}`); } });
+                        if (lows.length) lowMsg = `\n\n⚠️ Stock bajo (reponer): ${lows.join(', ')}`;
+                    } catch { /* noop */ }
+                    const cliente = order.customer?.nombre || order.customer?.email || '—';
+                    const text = `💰 ¡Nueva venta!\nPedido: ${order.id || externalRef}\nTotal: $${(Number(order.total) || 0).toLocaleString('es-AR')}\nCliente: ${cliente}\n\n${items}${lowMsg}`;
+                    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: ownerChat, text })
+                    });
+                } catch (notifyErr) {
+                    console.error(`[mp-webhook] aviso de venta falló order=${externalRef}:`, notifyErr.message);
+                }
+            }
+        }
+
         // Reponer stock si se reembolsa/cancela tras haber descontado
         if ((newStatus === 'refunded' || newStatus === 'cancelled') && order.stockApplied && Array.isArray(order.items)) {
             const lines = order.items.filter(i => i && i.id != null);
