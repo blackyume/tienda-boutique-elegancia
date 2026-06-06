@@ -1,7 +1,7 @@
 // Crea la preferencia de Mercado Pago. AUTORITATIVO: no confía en los precios
 // que manda el cliente — recalcula todo contra Firestore (productos, stock,
 // cupón) y reescribe la orden con el total verificado antes de cobrar.
-const mercadopago = require('mercadopago');
+const { MercadoPagoConfig, Preference } = require('mercadopago');
 const { checkRateLimit, getClientIp } = require('./_rateLimit');
 const { getDb } = require('./_firebaseAdmin');
 const { getVariantPrice, getVariantStock, hasVariantMap, getTotalStock } = require('./_pricing');
@@ -62,7 +62,7 @@ module.exports = async (req, res) => {
         return res.status(500).json({ error: 'Pago no disponible: falta configuración del servidor (FIREBASE_SERVICE_ACCOUNT).' });
     }
 
-    mercadopago.configure({ access_token: ACCESS_TOKEN });
+    const mpClient = new MercadoPagoConfig({ accessToken: ACCESS_TOKEN });
 
     try {
         const { items, payer, shipping_cost, external_reference, coupon, referral } = req.body || {};
@@ -180,11 +180,11 @@ module.exports = async (req, res) => {
             shipments: { cost: shippingCost, mode: 'not_specified' }
         };
 
-        const response = await mercadopago.preferences.create(preference);
+        const response = await new Preference(mpClient).create({ body: preference });
         return res.status(200).json({
-            init_point: response.body.init_point,
-            sandbox_init_point: response.body.sandbox_init_point,
-            id: response.body.id,
+            init_point: response.init_point,
+            sandbox_init_point: response.sandbox_init_point,
+            id: response.id,
             verified_total: total
         });
     } catch (error) {

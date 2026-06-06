@@ -136,3 +136,7 @@ vite.config.js.timestamp-*.mjs
 *.bak
 .fuse_hidden*
 
+# Claves de servicio de Firebase (NUNCA subir a git)
+*firebase-adminsdk*.json
+serviceAccount*.json
+
