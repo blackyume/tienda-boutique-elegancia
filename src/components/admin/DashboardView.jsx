@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Package, Users, Wallet, TrendingUp, ShoppingCart, Plus, Search, MessageSquare, Settings, Lock, Calendar, Download, Activity, Trophy, Percent, Truck, Radio } from 'lucide-react';
+import { Package, Users, Wallet, TrendingUp, ShoppingCart, Plus, Search, MessageSquare, Settings, Lock, Calendar, Download, Activity, Trophy, Percent, Truck, Radio, Palette } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
 import { RealTimeClock, StatCard, ActionButton } from './AdminShared';
 import { LowStockPanel } from './LowStockPanel';
+import { OnboardingPanel } from './OnboardingPanel';
 import { getLiveVisitors } from '../../utils/presence';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 // xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
@@ -245,6 +246,14 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                     </div>
                 </div>
 
+                {/* PRIMEROS PASOS (puesta en marcha) */}
+                <OnboardingPanel
+                    onCreateProduct={onCreateProduct}
+                    onNavigate={onNavigate}
+                    toggleMaintenance={toggleMaintenance}
+                    isMaintenance={isMaintenance}
+                />
+
                 {/* KPI GRID */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                     <StatCard
@@ -311,7 +320,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                             <ActionButton icon={Users} label="Clientes" onClick={() => onNavigate('customers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
                             <ActionButton icon={Package} label="Inventario" onClick={() => onNavigate('inventory')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
 
-                            <ActionButton icon={Settings} label="CMS / Diseño" onClick={() => onNavigate('cms')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
+                            <ActionButton icon={Palette} label="CMS / Diseño" onClick={() => onNavigate('cms')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
                             <ActionButton icon={Percent} label="Cupones" onClick={() => onNavigate('coupons')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
                             <ActionButton icon={Truck} label="Proveedores" onClick={() => onNavigate('suppliers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#D4AF37] hover:border-[#D4AF37]" />
                             <div className="col-span-2 sm:col-span-1">
