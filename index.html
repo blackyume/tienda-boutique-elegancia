@@ -53,6 +53,9 @@
   <link rel="preconnect" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://res.cloudinary.com">
 
+  <!-- Precargar el logo del loader para que aparezca al instante -->
+  <link rel="preload" as="image" href="/assets/logo-main.png?v=5" fetchpriority="high">
+
   <!-- Fonts: carga no-bloqueante (antes iban con @import en el CSS, que frena el primer pintado) -->
   <link rel="stylesheet" media="print" onload="this.media='all'"
     href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap">
@@ -161,8 +164,8 @@
       if (loader) {
         setTimeout(() => {
           loader.style.opacity = '0';
-          setTimeout(() => { loader.remove(); }, 500);
-        }, 800);
+          setTimeout(() => { loader.remove(); }, 400);
+        }, 300);
       }
     });
   </script>

@@ -46,8 +46,8 @@ export const Footer = () => {
             <div className="max-w-7xl mx-auto px-6 pt-20 pb-10">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
 
-                    {/* Brand — 4 cols */}
-                    <div className="md:col-span-4">
+                    {/* Brand — 3 cols */}
+                    <div className="md:col-span-3">
                         <LogoSVGFooter width={240} className="mb-6 opacity-95" />
                         <p className="text-white/40 text-sm font-light leading-relaxed mb-8 max-w-xs">
                             Moda atemporal dise&ntilde;ada para la mujer moderna.
@@ -78,8 +78,24 @@ export const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Spacer */}
-                    <div className="hidden md:block md:col-span-1" />
+                    {/* Tienda — 2 cols */}
+                    <div className="md:col-span-2">
+                        <FooterHeading>Tienda</FooterHeading>
+                        <ul className="space-y-3">
+                            {[
+                                { to: '/', label: 'Inicio' },
+                                { to: '/shop', label: 'Ver Tienda' },
+                                { to: '/about', label: 'Quiénes Somos' },
+                            ].map(({ to, label }) => (
+                                <li key={label}>
+                                    <Link to={to} className="text-sm text-white/40 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
+                                        <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
+                                        <span>{label}</span>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
 
                     {/* Ayuda — 2 cols */}
                     <div className="md:col-span-2">

@@ -143,7 +143,7 @@ export const Navbar = ({ onOpenCart }) => {
                                     ))}
                                 </div>
                             </div>
-                            <Link to="/about" className="text-white hover:text-cielo-gold transition-colors">La Empresa</Link>
+                            <Link to="/about" className="text-white hover:text-cielo-gold transition-colors">Nosotros</Link>
                         </div>
                     </div>
 
@@ -322,7 +322,15 @@ export const Navbar = ({ onOpenCart }) => {
                         </button>
                     ))}
                     <div className="w-16 h-px bg-white/20 my-4"></div>
-                    <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg uppercase tracking-widest text-slate-400">La Empresa</Link>
+                    <div className="flex flex-col items-center gap-4">
+                        <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg uppercase tracking-widest text-white/80 hover:text-cielo-gold transition-colors">Nosotros</Link>
+                        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs uppercase tracking-widest text-slate-400">
+                            <Link to="/faq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Preguntas</Link>
+                            <Link to="/envios" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Envíos</Link>
+                            <Link to="/tracking" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Seguimiento</Link>
+                            <Link to="/contacto" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Contacto</Link>
+                        </div>
+                    </div>
 
                 </div>
             </div>
