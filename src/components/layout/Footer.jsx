@@ -4,6 +4,7 @@ import { Instagram, Youtube, ArrowRight, Mail, MessageCircle } from 'lucide-reac
 import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { RegretModal } from './RegretModal';
+import { BrandStrip } from '../ui/BrandBadges';
 
 
 const TikTokIcon = ({ className }) => (
@@ -209,6 +210,12 @@ export const Footer = () => {
 
                 {/* Divider */}
                 <div className="h-px bg-gradient-to-r from-transparent via-white/[0.07] to-transparent mb-8" />
+
+                {/* Medios de pago y envío */}
+                <div className="flex flex-col items-center gap-3 mb-10">
+                    <span className="text-2xs uppercase tracking-[0.25em] text-white/30">Medios de pago y envío</span>
+                    <BrandStrip />
+                </div>
 
                 {/* Bottom bar */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">

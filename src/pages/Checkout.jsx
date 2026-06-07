@@ -8,6 +8,7 @@ import { formatMoney } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
 import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
+import { BrandStrip } from '../components/ui/BrandBadges';
 
 export const Checkout = () => {
     const { cart, cartTotal, createOrder, addToast, user, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
@@ -604,6 +605,10 @@ export const Checkout = () => {
                             <Lock className="w-4 h-4" />
                             <span className="text-[10px] uppercase font-bold tracking-widest">Pago 100% Protegido</span>
                             <ShieldCheck className="w-4 h-4" />
+                        </div>
+
+                        <div className="mt-5 pt-5 border-t border-slate-100 dark:border-white/10">
+                            <BrandStrip />
                         </div>
                     </div>
                 </div>
