@@ -72,7 +72,7 @@ const actionLabel = (a) => {
 
 export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const {
-        siteConfig, aiConfig, categories, coupons, reviews, isMaintenance,
+        siteConfig, aiConfig, categories, coupons, reviews, isMaintenance, paymentConfig,
         addProduct, updateProduct, deleteProduct, addCategory, addCoupon, deleteCoupon,
         updateSiteConfig, toggleMaintenance, uploadImage, logAiAction,
         updateOrderStatus, approveReview, rejectReview,
@@ -153,7 +153,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const pack = Number(A.packaging) || 0;
                 const ship = Number(A.shipping) || 0;
                 const margin = A.margin != null ? Number(A.margin) : 50;
-                const commission = A.commission != null ? Number(A.commission) : 6;
+                const defaultFee = Number(paymentConfig?.realMpFeePercent) || 6;
+                const commission = A.commission != null ? Number(A.commission) : defaultFee;
                 const totalCost = cost + pack + ship;
                 const denom = 1 - (margin + commission) / 100;
                 if (denom <= 0) return `El margen (${margin}%) + comisión (${commission}%) suman 100% o más, no se puede calcular. Bajá el margen.`;

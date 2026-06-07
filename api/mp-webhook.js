@@ -98,6 +98,14 @@ module.exports = async (req, res) => {
         const newStatus = MP_STATUS_MAP[mpStatus] || 'pending';
         const paidAmount = Number(payment.transaction_amount) || 0;
 
+        // Comisión REAL que Mercado Pago nos cobró en este pago (la que paga el
+        // vendedor). La usamos para auto-cargar la comisión en la calculadora.
+        const feeDetails = Array.isArray(payment.fee_details) ? payment.fee_details : [];
+        const mpFeeAmount = feeDetails
+            .filter(f => f && (f.fee_payer === 'collector' || f.type === 'mercadopago_fee'))
+            .reduce((a, f) => a + (Number(f.amount) || 0), 0);
+        const mpFeePercent = paidAmount > 0 ? Math.round((mpFeeAmount / paidAmount) * 1000) / 10 : 0;
+
         // Buscar la orden (external_reference == order.id; puede o no ser el docId)
         const db = getDb();
         let docRef = db.collection('orders').doc(String(externalRef));
@@ -122,8 +130,23 @@ module.exports = async (req, res) => {
             mpStatus,
             mpPaymentId: String(resourceId),
             mpUpdatedAt: Date.now(),
-            mpAmountPaid: paidAmount
+            mpAmountPaid: paidAmount,
+            mpFeeAmount,
+            mpFeePercent
         };
+
+        // Guardamos la comisión real en config para que la calculadora y Lau la
+        // usen como default (se va afinando con cada venta real).
+        if (newStatus === 'approved' && mpFeePercent > 0) {
+            try {
+                await db.collection('config').doc('payments').set({
+                    realMpFeePercent: mpFeePercent,
+                    realMpFeeUpdatedAt: Date.now()
+                }, { merge: true });
+            } catch (feeErr) {
+                console.error('[mp-webhook] guardar comisión real falló:', feeErr.message);
+            }
+        }
 
         // Verificar monto pagado vs esperado (anti-fraude / manipulación de precio)
         const expected = Number(order.amountExpected ?? order.total) || 0;

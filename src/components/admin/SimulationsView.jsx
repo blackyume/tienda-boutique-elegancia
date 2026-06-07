@@ -8,7 +8,7 @@ import { formatMoney, getColorHex } from '../../utils/helpers';
 // jsPDF, jspdf-autotable y xlsx se importan dinámicamente al usarse.
 
 export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduct }) => {
-    const { simulations, saveSimulation, deleteSimulation, addToast, inventory } = useStore();
+    const { simulations, saveSimulation, deleteSimulation, addToast, inventory, paymentConfig } = useStore();
     const [viewMode, setViewMode] = useState('history'); // Default to showing the list
 
     // Form State — recordamos comisión/packaging/flete/margen entre usos
@@ -33,6 +33,13 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
             }));
         } catch { /* noop */ }
     }, [form.costPack, form.shipUnit, form.comision, form.marginDesired]);
+
+    // Si todavía no cargaste una comisión, usamos la REAL que Mercado Pago te
+    // cobró en tus ventas (la captura el webhook). Se va afinando con cada venta.
+    useEffect(() => {
+        const real = Number(paymentConfig?.realMpFeePercent);
+        if (real > 0) setForm(f => (f.comision === '' || f.comision == null) ? { ...f, comision: String(real) } : f);
+    }, [paymentConfig?.realMpFeePercent]);
 
     const totalCost = Number(form.costPr) + Number(form.costPack) + Number(form.shipUnit);
     // Formula: Price = Cost / (1 - (Margin + Comision)/100)
