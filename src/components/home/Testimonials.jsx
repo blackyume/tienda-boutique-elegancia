@@ -14,7 +14,7 @@ const FALLBACK = [
     {
         name: 'Martina P.',
         location: 'Córdoba',
-        text: 'Llegó en 48 hs perfectamente embalado. Ya me compré tres vestidos y siempre una experiencia premium.',
+        text: 'Llegó perfectamente embalado. Ya me compré tres vestidos y siempre una experiencia premium.',
         rating: 5,
     },
     {

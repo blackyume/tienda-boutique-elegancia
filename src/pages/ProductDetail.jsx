@@ -444,14 +444,14 @@ export const ProductDetail = () => {
                             )}
                         </Accordion>
                         <Accordion title="Envíos & Entregas">
-                            Realizamos envíos a todo el país a través de Andreani y OCA.
+                            Realizamos envíos a todo el país a través de Correo Argentino.
                             <br />
                             <br />
                             <div className="flex items-center gap-2 mb-2">
-                                <Truck className="w-4 h-4" /> <strong>Envío standard:</strong> 3-6 días hábiles.
+                                <Truck className="w-4 h-4" /> <strong>A domicilio:</strong> te llega a tu casa.
                             </div>
                             <div className="flex items-center gap-2">
-                                <ShieldCheck className="w-4 h-4" /> <strong>Express:</strong> 24-48 hs (CABA).
+                                <ShieldCheck className="w-4 h-4" /> <strong>Retiro en sucursal:</strong> lo retirás en la sucursal más cercana.
                             </div>
                         </Accordion>
                         <Accordion title="Cambios & Devoluciones">

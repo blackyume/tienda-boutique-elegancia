@@ -26,7 +26,7 @@ const FAQS = [
     },
     {
         q: '¿Puedo cambiar o devolver un producto?',
-        a: 'Por higiene y exclusividad no aceptamos cambios por gusto o talle fuera del plazo legal. Sí tenés derecho a arrepentirte dentro de los 10 días corridos de recibido el producto (sin uso, con etiquetas y empaque original), según la Resolución 424/2020. En caso de falla de fábrica o error en el envío, escribinos dentro de las 48 hs.',
+        a: 'Por higiene y exclusividad no aceptamos cambios por gusto o talle fuera del plazo legal. Sí tenés derecho a arrepentirte dentro de los 10 días corridos de recibido el producto (sin uso, con etiquetas y empaque original), según la Resolución 424/2020. En caso de falla de fábrica o error en el envío, escribinos apenas lo recibas y lo resolvemos.',
     },
     {
         q: '¿Cómo sé qué talle elegir?',

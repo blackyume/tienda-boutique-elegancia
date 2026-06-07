@@ -23,7 +23,7 @@ export const NewsletterInline = () => {
             <Reveal className="relative max-w-3xl mx-auto text-center">
                 <SectionHeader
                     eyebrow="Lista de espera"
-                    title={<>Acceso a drops <span className="italic text-cielo-gold">48 horas antes</span></>}
+                    title={<>Acceso <span className="italic text-cielo-gold">anticipado</span> a los drops</>}
                     subtitle="Suscribite y recibí cupones privados, editoriales exclusivos y el aviso anticipado de cada nueva colección."
                 />
 

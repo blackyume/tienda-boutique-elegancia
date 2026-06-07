@@ -50,7 +50,7 @@ export const Shipping = () => {
                             Por la naturaleza de nuestros productos (indumentaria y ediciones limitadas) y por higiene, no realizamos cambios por gusto o talle fuera del plazo legal. Te recomendamos revisar bien la <strong>Tabla de Talles</strong> antes de comprar o consultarnos.
                         </p>
                         <ul className="text-sm leading-relaxed space-y-2 list-disc pl-5 marker:text-[#D4AF37]">
-                            <li><strong>Falla de fábrica o error en el envío:</strong> escribinos dentro de las 48 hs de recibido el paquete y lo resolvemos.</li>
+                            <li><strong>Falla de fábrica o error en el envío:</strong> escribinos apenas recibas el paquete y lo resolvemos.</li>
                             <li><strong>Derecho de arrepentimiento:</strong> tenés 10 días corridos desde la entrega para arrepentirte (producto sin uso, con etiquetas y empaque original), según la Resolución 424/2020.</li>
                         </ul>
                         <p className="text-xs text-slate-400 mt-4">Más detalle en los <Link to="/terms" className="text-[#D4AF37] hover:underline">Términos y Condiciones</Link>.</p>

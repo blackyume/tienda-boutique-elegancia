@@ -83,7 +83,7 @@ export const RegretModal = ({ isOpen, onClose }) => {
                         </div>
                         <h3 className="text-xl font-bold text-white mb-2">Solicitud Recibida</h3>
                         <p className="text-slate-300 text-sm mb-6">
-                            Te hemos enviado un email con el número de gestión de tu trámite. Nos pondremos en contacto dentro de las 24hs hábiles.
+                            Te hemos enviado un email con el número de gestión de tu trámite. Nos pondremos en contacto a la brevedad.
                         </p>
                         <Button onClick={onClose} variant="outline" className="text-white border-white/20">Cerrar</Button>
                     </div>
