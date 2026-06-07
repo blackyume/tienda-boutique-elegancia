@@ -167,6 +167,17 @@ html {
     user-select: none;
 }
 
+/* Brillo sutil que recorre la barra de anuncios dorada */
+@keyframes bannerShine {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}
+.banner-shine {
+    background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.6) 50%, transparent 62%);
+    background-size: 200% 100%;
+    animation: bannerShine 6s linear infinite;
+}
+
 /* ─────────────────────────────────────────────────────────────
    PULIDO PREMIUM GLOBAL (negro + oro)
    ───────────────────────────────────────────────────────────── */

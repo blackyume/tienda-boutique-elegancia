@@ -89,11 +89,24 @@ export const Navbar = ({ onOpenCart }) => {
         <>
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
-            {/* ANNOUNCEMENT BANNER */}
+            {/* ANNOUNCEMENT BANNER — barra dorada premium */}
             {(siteConfig.announcement?.enabled) && (
-                <div className={`fixed top-0 left-0 right-0 z-[55] bg-[#0A0A0A] text-cielo-gold text-[10px] font-bold tracking-[0.2em] uppercase py-2 text-center transition-transform duration-500 overflow-hidden ${scrolled ? '-translate-y-full' : 'translate-y-0'}`}>
-                    <div className="flex items-center justify-center gap-8 animate-pulse-slow">
-                        {siteConfig.announcement.text || "Compra Segura | Envíos a todo el País"}
+                <div className={`fixed top-0 left-0 right-0 z-[55] overflow-hidden transition-transform duration-500 ${scrolled ? '-translate-y-full' : 'translate-y-0'}`}>
+                    <div
+                        className="relative py-2 text-center"
+                        style={{ background: 'linear-gradient(90deg, #9A781D, #BF953F 16%, #FBF1B0 50%, #BF953F 84%, #9A781D)' }}
+                    >
+                        {/* brillo que recorre */}
+                        <div className="banner-shine pointer-events-none absolute inset-0 opacity-70" />
+                        {/* línea de luz superior */}
+                        <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-white/40" />
+                        <p className="relative flex items-center justify-center gap-3 text-[10px] md:text-[11px] font-extrabold tracking-[0.22em] uppercase text-[#211705]">
+                            <span className="text-[#5c4410]/60 text-[8px]">◆</span>
+                            <span className="drop-shadow-[0_1px_0_rgba(255,255,255,0.25)]">
+                                {siteConfig.announcement.text || "Compra Segura · Envíos a todo el País · Nueva Colección 2026"}
+                            </span>
+                            <span className="text-[#5c4410]/60 text-[8px]">◆</span>
+                        </p>
                     </div>
                 </div>
             )}
