@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
 import { StatusSelector } from './StatusSelector';
@@ -11,15 +11,28 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
     const { simulations, saveSimulation, deleteSimulation, addToast, inventory } = useStore();
     const [viewMode, setViewMode] = useState('history'); // Default to showing the list
 
-    // Form State
-    const [form, setForm] = useState({
-        name: '',
-        costPr: '',
-        costPack: '',
-        shipUnit: '',
-        comision: '',
-        marginDesired: 50, // %
+    // Form State — recordamos comisión/packaging/flete/margen entre usos
+    // (sólo el nombre y el costo de la prenda arrancan vacíos cada vez).
+    const [form, setForm] = useState(() => {
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem('lbe_calc_prefs') || '{}'); } catch { /* noop */ }
+        return {
+            name: '',
+            costPr: '',
+            costPack: saved.costPack ?? '',
+            shipUnit: saved.shipUnit ?? '',
+            comision: saved.comision ?? '',
+            marginDesired: saved.marginDesired ?? 50, // %
+        };
     });
+
+    useEffect(() => {
+        try {
+            localStorage.setItem('lbe_calc_prefs', JSON.stringify({
+                costPack: form.costPack, shipUnit: form.shipUnit, comision: form.comision, marginDesired: form.marginDesired
+            }));
+        } catch { /* noop */ }
+    }, [form.costPack, form.shipUnit, form.comision, form.marginDesired]);
 
     const totalCost = Number(form.costPr) + Number(form.costPack) + Number(form.shipUnit);
     // Formula: Price = Cost / (1 - (Margin + Comision)/100)
@@ -38,6 +51,9 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
 
     const comisionAmount = suggestedPrice * (Number(form.comision) / 100);
     const netProfit = suggestedPrice - totalCost - comisionAmount;
+    // Precio redondeado hacia arriba al múltiplo de 100 más cercano (queda lindo
+    // en la tienda y nunca por debajo del precio calculado, así no perdés margen).
+    const roundedPrice = suggestedPrice > 0 ? Math.ceil(suggestedPrice / 100) * 100 : 0;
 
     const handleSave = async () => {
         if (!form.name) return addToast("Ingresá un nombre para la simulación", "error");
@@ -145,6 +161,11 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                     <div className="text-6xl md:text-7xl font-black tracking-tighter text-white drop-shadow-lg">
                                         {formatMoney(suggestedPrice)}
                                     </div>
+                                    {roundedPrice > 0 && roundedPrice !== suggestedPrice && (
+                                        <p className="mt-2 text-sm text-white/60">
+                                            Redondeado (recomendado): <span className="font-bold text-[#D4AF37]">{formatMoney(roundedPrice)}</span>
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl backdrop-blur-sm border border-white/10">
@@ -163,7 +184,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                         <Save className="w-4 h-4 mr-2" /> Guardar en Historial
                                     </Button>
                                     {onSaveToProduct && (
-                                        <Button onClick={() => onSaveToProduct({ name: form.name, price: suggestedPrice, cost: totalCost })} className="flex-1 bg-[#D4AF37] text-white hover:bg-[#B8932E] font-bold">
+                                        <Button onClick={() => onSaveToProduct({ name: form.name, price: roundedPrice || suggestedPrice, cost: totalCost })} className="flex-1 bg-[#D4AF37] text-white hover:bg-[#B8932E] font-bold">
                                             <Plus className="w-4 h-4 mr-2" /> Crear Producto
                                         </Button>
                                     )}
