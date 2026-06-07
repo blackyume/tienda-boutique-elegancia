@@ -36,7 +36,6 @@ export const QuickViewModal = ({ product, onClose }) => {
         // onClose puede cambiar de identidad en cada render del padre — lo
         // dejamos fuera de deps para evitar mount/unmount innecesarios que
         // re-aplicaban el lock.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product]);
 
     if (!product) return null;

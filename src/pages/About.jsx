@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
-import { Award, Heart, Truck, ShieldCheck, Instagram, MapPin } from 'lucide-react';
+import { Award, Heart, ShieldCheck, Instagram, MapPin } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 export const About = () => {

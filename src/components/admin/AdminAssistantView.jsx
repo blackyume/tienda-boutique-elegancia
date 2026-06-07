@@ -182,7 +182,6 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             localStorage.setItem('lau_briefing', today);
             setMessages(prev => [...prev, { role: 'ai', text: lines.join('\n') }]);
         } catch { /* noop */ }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const push = (m) => setMessages(prev => [...prev, m]);

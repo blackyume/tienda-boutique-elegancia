@@ -101,7 +101,6 @@ export const useAuth = ({ user, wishlist, setWishlist, addToast }) => {
     }).catch((err) => {
       if (err?.code && err.code !== 'auth/no-current-user') console.warn('[auth] redirect result:', err.code);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loginWithGoogle = async () => {

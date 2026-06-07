@@ -48,7 +48,6 @@ export const Checkout = () => {
     useEffect(() => {
         const keys = Object.keys(shippingOptions);
         if (keys.length && !shippingOptions[shippingMethod]) setShippingMethod(keys[0]);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [shippingRates]);
 
     // Calculate Surcharge based on config

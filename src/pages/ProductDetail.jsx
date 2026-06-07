@@ -79,7 +79,6 @@ export const ProductDetail = () => {
         if (!product?.id) return;
         incrementProductView(product.id);
         trackViewItem(product);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product?.id]);
 
     const images = useMemo(() => {
@@ -102,7 +101,6 @@ export const ProductDetail = () => {
         window.addEventListener('keydown', onKey);
         document.body.style.overflow = 'hidden';
         return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lightbox, images.length]);
 
     const { reviews: allReviews } = useStore();
