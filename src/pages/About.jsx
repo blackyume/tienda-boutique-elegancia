@@ -25,7 +25,7 @@ export const About = () => {
                         Más que Moda, <br /> <span className="italic font-serif">Un Legado.</span>
                     </h1>
                     <p className="text-lg md:text-xl font-light text-white/90 max-w-2xl mx-auto leading-relaxed">
-                        Desde 2018, redefiniendo la elegancia contemporánea con raíces argentinas y visión global.
+                        Una nueva casa de moda argentina: elegancia contemporánea, atemporal y con alma.
                     </p>
                 </div>
             </div>
@@ -46,12 +46,12 @@ export const About = () => {
                         </p>
                         <div className="pt-4 flex gap-4">
                             <div className="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-900 rounded-xl w-32 border border-slate-100 dark:border-slate-800">
-                                <span className="text-3xl font-bold text-[#D4AF37] font-cinzel">8+</span>
-                                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider mt-1">Años de Exp.</span>
+                                <span className="text-3xl font-bold text-[#D4AF37] font-cinzel">100%</span>
+                                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider mt-1 text-center">Hecho en Argentina</span>
                             </div>
                             <div className="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-900 rounded-xl w-32 border border-slate-100 dark:border-slate-800">
-                                <span className="text-3xl font-bold text-[#D4AF37] font-cinzel">10k+</span>
-                                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider mt-1">Clientas Felices</span>
+                                <span className="text-3xl font-bold text-[#D4AF37] font-cinzel">País</span>
+                                <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider mt-1 text-center">Envíos a todo el país</span>
                             </div>
                         </div>
                     </div>
