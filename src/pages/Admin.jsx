@@ -233,32 +233,137 @@ export const Admin = () => {
     // Exportar todo el inventario a Excel (stock, precios, costos, ganancia…)
     const exportInventory = async () => {
         if (!inventory || inventory.length === 0) return addToast('No hay productos para exportar', 'error');
+        addToast('Generando Excel con fotos…', 'info');
         try {
-            const XLSX = await import('xlsx');
-            const rows = inventory.map(p => {
+            const ExcelJS = (await import('exceljs')).default;
+
+            // Genera un thumbnail chico en JPG para que pese poco y entre prolijo en la celda
+            const thumbUrl = (url) => {
+                if (!url || typeof url !== 'string') return null;
+                if (url.includes('/upload/')) return url.replace('/upload/', '/upload/c_fill,w_160,h_180,f_jpg,q_auto/');
+                return url;
+            };
+            const fetchImg = async (url) => {
+                try {
+                    const u = thumbUrl(url);
+                    if (!u) return null;
+                    const res = await fetch(u);
+                    if (!res.ok) return null;
+                    return await res.arrayBuffer();
+                } catch { return null; }
+            };
+
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'La Boutique de la Elegancia';
+            const ws = wb.addWorksheet('Inventario', {
+                views: [{ state: 'frozen', ySplit: 1 }],
+                pageSetup: { fitToPage: true, fitToWidth: 1 },
+            });
+
+            ws.columns = [
+                { header: 'Foto', key: 'foto', width: 12 },
+                { header: 'Producto', key: 'producto', width: 34 },
+                { header: 'Categoría', key: 'categoria', width: 16 },
+                { header: 'Precio venta', key: 'precio', width: 14 },
+                { header: 'Costo', key: 'costo', width: 12 },
+                { header: 'Ganancia x unidad', key: 'ganancia', width: 16 },
+                { header: 'Stock', key: 'stock', width: 9 },
+                { header: 'Valor en stock', key: 'valor', width: 15 },
+                { header: 'Talles', key: 'talles', width: 16 },
+                { header: 'Colores', key: 'colores', width: 16 },
+                { header: 'Estado', key: 'estado', width: 12 },
+            ];
+
+            // Encabezado dorado
+            const head = ws.getRow(1);
+            head.height = 30;
+            head.eachCell((c) => {
+                c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD4AF37' } };
+                c.font = { bold: true, color: { argb: 'FF1A1308' }, size: 11, name: 'Calibri' };
+                c.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                c.border = { bottom: { style: 'medium', color: { argb: 'FFB8932E' } } };
+            });
+
+            const imgs = await Promise.all(inventory.map(p => fetchImg(p.image)));
+
+            inventory.forEach((p, i) => {
                 const stock = getTotalStock(p);
                 const price = Number(p.price) || 0;
                 const cost = Number(p.cost) || 0;
-                return {
-                    Producto: p.name || '',
-                    Categoría: p.category || '',
-                    'Precio venta': price,
-                    Costo: cost || '',
-                    'Ganancia x unidad': cost ? price - cost : '',
-                    Stock: stock,
-                    'Valor en stock': price * stock,
-                    Talles: Array.isArray(p.sizes) ? p.sizes.join(', ') : '',
-                    Colores: Array.isArray(p.colors) ? p.colors.join(', ') : '',
-                    Estado: p.active === false ? 'Borrador' : 'Publicado',
-                    ID: p.id,
-                };
+                const row = ws.addRow({
+                    foto: '',
+                    producto: p.name || '',
+                    categoria: p.category || '',
+                    precio: price,
+                    costo: cost || null,
+                    ganancia: cost ? price - cost : null,
+                    stock,
+                    valor: price * stock,
+                    talles: Array.isArray(p.sizes) ? p.sizes.join(', ') : '',
+                    colores: Array.isArray(p.colors) ? p.colors.join(', ') : '',
+                    estado: p.active === false ? 'Borrador' : 'Publicado',
+                });
+                row.height = 75;
+                row.eachCell({ includeEmpty: true }, (c) => {
+                    c.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+                    c.border = { bottom: { style: 'thin', color: { argb: 'FFE8E0CC' } } };
+                });
+                // Filas alternadas (zebra) en crema suave
+                if (i % 2 === 1) {
+                    row.eachCell({ includeEmpty: true }, (c) => {
+                        c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFBF8F0' } };
+                    });
+                }
+                // Formato moneda
+                ['precio', 'costo', 'ganancia', 'valor'].forEach((k) => {
+                    const c = row.getCell(k);
+                    c.numFmt = '"$"#,##0';
+                    c.alignment = { vertical: 'middle', horizontal: 'right' };
+                });
+                row.getCell('stock').alignment = { vertical: 'middle', horizontal: 'center' };
+                // Estado con color
+                const est = row.getCell('estado');
+                est.alignment = { vertical: 'middle', horizontal: 'center' };
+                est.font = { bold: true, color: { argb: p.active === false ? 'FF9A6B00' : 'FF1E7A3D' } };
+
+                // Foto embebida
+                const buf = imgs[i];
+                if (buf) {
+                    const imgId = wb.addImage({ buffer: buf, extension: 'jpeg' });
+                    ws.addImage(imgId, {
+                        tl: { col: 0.15, row: row.number - 1 + 0.08 },
+                        ext: { width: 66, height: 73 },
+                        editAs: 'oneCell',
+                    });
+                }
             });
-            const ws = XLSX.utils.json_to_sheet(rows);
-            ws['!cols'] = [{ wch: 30 }, { wch: 16 }, { wch: 12 }, { wch: 12 }, { wch: 16 }, { wch: 8 }, { wch: 14 }, { wch: 18 }, { wch: 18 }, { wch: 12 }, { wch: 14 }];
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
-            XLSX.writeFile(wb, `Inventario_${new Date().toISOString().slice(0, 10)}.xlsx`);
-            addToast('Inventario exportado a Excel', 'success');
+
+            // Fila total
+            const totalStockVal = inventory.reduce((a, p) => a + (Number(p.price) || 0) * getTotalStock(p), 0);
+            const totalCostVal = inventory.reduce((a, p) => a + (Number(p.cost) || 0) * getTotalStock(p), 0);
+            const tot = ws.addRow({ producto: 'TOTAL', valor: totalStockVal, ganancia: totalStockVal - totalCostVal });
+            tot.height = 24;
+            tot.eachCell({ includeEmpty: true }, (c) => {
+                c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1A1308' } };
+                c.font = { bold: true, color: { argb: 'FFD4AF37' } };
+                c.alignment = { vertical: 'middle' };
+            });
+            tot.getCell('valor').numFmt = '"$"#,##0';
+            tot.getCell('ganancia').numFmt = '"$"#,##0';
+            tot.getCell('valor').alignment = { vertical: 'middle', horizontal: 'right' };
+            tot.getCell('ganancia').alignment = { vertical: 'middle', horizontal: 'right' };
+
+            const out = await wb.xlsx.writeBuffer();
+            const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Inventario_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            addToast('Excel con fotos descargado ✓', 'success');
         } catch (e) {
             console.error(e);
             addToast('Error al exportar el inventario', 'error');
