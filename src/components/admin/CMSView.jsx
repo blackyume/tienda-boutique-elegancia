@@ -114,6 +114,80 @@ const SmartImageUploader = ({ currentImage, onUpload, label, className = "" }) =
     );
 };
 
+// Editor de la barra de anuncios: borrador local + vista previa en vivo (igual
+// a como se ve en la tienda) + atajos. Sólo guarda al apretar el botón.
+const ANNOUNCEMENT_PRESETS = [
+    'Compra Segura · Envíos a todo el País',
+    'Nueva Colección 2026 · Ya Disponible',
+    'Envíos a todo el País · Atención Personalizada',
+    'Compra Protegida con Mercado Pago',
+];
+
+const AnnouncementEditor = ({ text, enabled, onSaveText, onToggle }) => {
+    const [draft, setDraft] = useState(text || '');
+    useEffect(() => { setDraft(text || ''); }, [text]);
+    const dirty = draft !== (text || '');
+
+    return (
+        <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white">
+                <Megaphone className="w-5 h-5 text-[#D4AF37]" /> Barra de Anuncios (Top Bar)
+            </h3>
+
+            {/* ESTADO */}
+            <div className="flex items-center justify-between mb-5 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg">
+                <span className="text-xs font-bold uppercase">Estado: {enabled ? 'Activo' : 'Inactivo'}</span>
+                <button onClick={onToggle} className={`text-2xl ${enabled ? 'text-green-500' : 'text-slate-300'}`}>
+                    {enabled ? <ToggleRight /> : <ToggleLeft />}
+                </button>
+            </div>
+
+            {/* VISTA PREVIA EN VIVO */}
+            <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Vista previa</label>
+            <div className={`rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 mb-5 ${enabled ? '' : 'opacity-50'}`}>
+                <div className="relative py-2 text-center" style={{ background: 'linear-gradient(90deg, #9A781D, #BF953F 16%, #FBF1B0 50%, #BF953F 84%, #9A781D)' }}>
+                    <div className="banner-shine pointer-events-none absolute inset-0 opacity-70" />
+                    <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-white/40" />
+                    <p className="relative flex items-center justify-center gap-3 text-[10px] font-extrabold tracking-[0.22em] uppercase text-[#211705]">
+                        <span className="text-[#5c4410]/60 text-[8px]">◆</span>
+                        <span>{draft || 'Compra Segura · Envíos a todo el País · Nueva Colección 2026'}</span>
+                        <span className="text-[#5c4410]/60 text-[8px]">◆</span>
+                    </p>
+                </div>
+            </div>
+
+            {/* TEXTO */}
+            <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Texto del Anuncio</label>
+            <input
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && dirty) onSaveText(draft); }}
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-900 rounded-lg text-sm outline-none focus:ring-1 focus:ring-[#D4AF37] border border-slate-200 dark:border-slate-700"
+                placeholder="Ej: Envíos a todo el país · Nueva colección"
+            />
+            <p className="text-[11px] text-slate-400 mt-1.5">Separá los mensajes con <span className="font-mono text-[#D4AF37] font-bold">·</span> o <span className="font-mono text-[#D4AF37] font-bold">|</span>.</p>
+
+            {/* ATAJOS */}
+            <div className="flex flex-wrap gap-2 mt-3">
+                {ANNOUNCEMENT_PRESETS.map((p) => (
+                    <button key={p} onClick={() => setDraft(p)} className="text-[11px] px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors">
+                        {p}
+                    </button>
+                ))}
+            </div>
+
+            {/* GUARDAR */}
+            <button
+                onClick={() => onSaveText(draft)}
+                disabled={!dirty}
+                className={`mt-5 w-full py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${dirty ? 'bg-[#D4AF37] text-black hover:brightness-110' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default'}`}
+            >
+                {dirty ? 'Guardar texto' : 'Guardado ✓'}
+            </button>
+        </section>
+    );
+};
+
 export const CMSView = () => {
     const { categories, addCategory, deleteCategory, siteConfig, updateSiteConfig, addToast, cloudinaryConfig, updateCloudinaryConfig, inventory } = useStore();
     const [activeTab, setActiveTab] = useState('home'); // home | promo | categories | config
@@ -374,22 +448,12 @@ export const CMSView = () => {
             {activeTab === 'promo' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* ANNOUNCEMENT BAR */}
-                    <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Megaphone className="w-5 h-5 text-[#D4AF37]" /> Barra de Anuncios (Top Bar)</h3>
-                        <div className="flex items-center justify-between mb-4 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg">
-                            <span className="text-xs font-bold uppercase">Estado: {siteConfig.announcement?.enabled ? 'Activo' : 'Inactivo'}</span>
-                            <button onClick={() => updateSection('announcement', 'enabled', !siteConfig.announcement?.enabled)} className={`text-2xl ${siteConfig.announcement?.enabled ? 'text-green-500' : 'text-slate-300'}`}>
-                                {siteConfig.announcement?.enabled ? <ToggleRight /> : <ToggleLeft />}
-                            </button>
-                        </div>
-                        <label className="text-xs font-bold uppercase text-slate-500 mb-2 block">Texto del Anuncio</label>
-                        <input
-                            value={siteConfig.announcement?.text || ""}
-                            onChange={(e) => updateSection('announcement', 'text', e.target.value)}
-                            className="w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-lg text-sm mb-2"
-                            placeholder="Ej: Envíos Gratis en compras..."
-                        />
-                    </section>
+                    <AnnouncementEditor
+                        text={siteConfig.announcement?.text}
+                        enabled={siteConfig.announcement?.enabled}
+                        onSaveText={(t) => updateSection('announcement', 'text', t)}
+                        onToggle={() => updateSection('announcement', 'enabled', !siteConfig.announcement?.enabled)}
+                    />
 
                     {/* POPUP */}
                     <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm row-span-2">
