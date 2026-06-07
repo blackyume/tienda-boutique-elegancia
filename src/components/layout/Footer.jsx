@@ -87,8 +87,10 @@ export const Footer = () => {
                         <ul className="space-y-3">
                             {[
                                 { to: '/tracking', label: 'Seguimiento' },
+                                { to: '/envios', label: 'Envíos y Devoluciones' },
+                                { to: '/faq', label: 'Preguntas Frecuentes' },
+                                { to: '/contacto', label: 'Contacto' },
                                 { action: () => setIsSizeGuideOpen(true), label: 'Tabla de Talles' },
-                                { to: '/about', label: 'Envíos' },
                             ].map(({ to, action, label }) => (
                                 <li key={label}>
                                     {to ? (

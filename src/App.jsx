@@ -33,6 +33,9 @@ const Wishlist = lazy(() => import('./pages/Wishlist').then(m => ({ default: m.W
 const UserProfile = lazy(() => import('./pages/UserProfile').then(m => ({ default: m.UserProfile })));
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 const Success = lazy(() => import('./pages/Success').then(m => ({ default: m.Success })));
+const FAQ = lazy(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
+const Shipping = lazy(() => import('./pages/Shipping').then(m => ({ default: m.Shipping })));
+const Contact = lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
@@ -117,6 +120,9 @@ const AppContent = () => {
             <Route path="/success" element={<Success />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/tracking" element={<Tracking />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/envios" element={<Shipping />} />
+            <Route path="/contacto" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsConditions />} />
             <Route path="/wishlist" element={<Wishlist />} />
