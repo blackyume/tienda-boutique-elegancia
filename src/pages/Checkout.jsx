@@ -38,13 +38,12 @@ export const Checkout = () => {
     const [applyingReferral, setApplyingReferral] = useState(false);
 
     const shippingOptions = shippingRates || {
-        andreani: { name: 'Andreani', cost: 5800, time: '2-4 días' },
-        oca: { name: 'OCA', cost: 4900, time: '3-6 días' },
-        correo_argentino: { name: 'Correo Argentino', cost: 3500, time: '5-7 días' },
-        retiro: { name: 'Retiro en persona', cost: 0, time: 'Coordinás por WhatsApp', pickup: true }
+        andreani: { name: 'Andreani a domicilio', cost: 5800, time: '2-4 días' },
+        oca: { name: 'OCA a domicilio', cost: 4900, time: '3-6 días' },
+        correo_argentino: { name: 'Correo Argentino a domicilio', cost: 3500, time: '5-7 días' },
+        sucursal: { name: 'Retiro en sucursal del correo', cost: 2500, time: '3-5 días', note: 'Lo enviamos a la sucursal de correo más cercana a tu domicilio para que lo retires. Te avisamos cuál cuando lo despachamos.' }
     };
     const selectedShipping = shippingOptions[shippingMethod] || {};
-    const isPickup = !!selectedShipping.pickup;
 
     // Calculate Surcharge based on config
     const mpFeePercentage = paymentConfig?.mpFee ? parseFloat(paymentConfig.mpFee) : 0;
@@ -280,8 +279,8 @@ export const Checkout = () => {
             // 1. Crear Orden en Firebase (Persistencia)
             await createOrder(newOrder);
             markAbandonedCartRecovered(formData.email, newOrder.id).catch(() => {});
-            // Email "recibimos tu pedido" (no bloquea si EmailJS no está configurado)
-            await sendOrderEmail(newOrder).catch(() => {});
+            // El email de confirmación de MercadoPago lo manda el servidor (webhook)
+            // recién cuando el pago se aprueba, para no avisar antes de cobrar.
 
             // El cupón se redime server-side en el webhook de MP cuando el pago
             // se aprueba (idempotente). No lo incrementamos acá para no quemar un
@@ -403,28 +402,18 @@ export const Checkout = () => {
                         <section className="bg-white dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-sm">
                             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-cielo-gold mb-8 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-cielo-gold/10 flex items-center justify-center text-cielo-gold text-lg font-serif">2</span>
-                                {isPickup ? 'Retiro en persona' : 'Envío a Domicilio'}
+                                Envío
                             </h3>
-                            {isPickup ? (
-                                <div className="mb-8 p-5 rounded-2xl border border-cielo-gold/30 bg-cielo-gold/5 flex items-start gap-4">
-                                    <span className="text-2xl">🛍️</span>
-                                    <div>
-                                        <p className="font-serif font-bold text-slate-900 dark:text-white text-lg leading-tight">No necesitás cargar dirección</p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{selectedShipping.time || 'Coordinás lugar y horario de retiro por WhatsApp después de confirmar el pedido.'}</p>
-                                    </div>
+                            <div className="grid grid-cols-2 gap-6 mb-8">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">Dirección</label>
+                                    <input required name="calle" value={formData.calle} onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" placeholder="Calle y número" />
                                 </div>
-                            ) : (
-                                <div className="grid grid-cols-2 gap-6 mb-8">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold uppercase text-slate-400 ml-1">Dirección</label>
-                                        <input required name="calle" value={formData.calle} onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" placeholder="Calle y número" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold uppercase text-slate-400 ml-1">CP</label>
-                                        <input required name="cp" value={formData.cp} onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" />
-                                    </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">CP</label>
+                                    <input required name="cp" value={formData.cp} onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" />
                                 </div>
-                            )}
+                            </div>
 
                             <div className="space-y-4">
                                 {Object.entries(shippingOptions).map(([key, option]) => (
@@ -436,13 +425,19 @@ export const Checkout = () => {
                                             <input type="radio" checked={shippingMethod === key} onChange={() => setShippingMethod(key)} className="hidden" />
                                             <div>
                                                 <span className="font-bold font-serif text-lg block tracking-wide">{option.name}</span>
-                                                <span className={`text-xs uppercase tracking-widest font-bold ${shippingMethod === key ? 'text-white/60 dark:text-black/60' : 'text-slate-400'}`}>{option.pickup ? option.time : `Llega en ${option.time}`}</span>
+                                                <span className={`text-xs uppercase tracking-widest font-bold ${shippingMethod === key ? 'text-white/60 dark:text-black/60' : 'text-slate-400'}`}>Llega en {option.time}</span>
                                             </div>
                                         </div>
                                         <span className="font-montserrat font-bold text-lg">{Number(option.cost) > 0 ? formatMoney(option.cost) : 'Gratis'}</span>
                                     </label>
                                 ))}
                             </div>
+                            {selectedShipping.note && (
+                                <div className="mt-5 p-4 rounded-2xl border border-cielo-gold/30 bg-cielo-gold/5 flex items-start gap-3">
+                                    <span className="text-xl">📦</span>
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-snug">{selectedShipping.note}</p>
+                                </div>
+                            )}
                         </section>
                     </form>
                 </div>
@@ -470,7 +465,7 @@ export const Checkout = () => {
 
                         <div className="space-y-3 pt-6 border-t border-dashed border-slate-200 dark:border-white/10">
                             <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>Subtotal</span><span>{formatMoney(cartTotal)}</span></div>
-                            <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>{isPickup ? 'Retiro' : 'Envío'}</span><span>{Number(selectedShipping.cost) > 0 ? formatMoney(selectedShipping.cost) : 'Gratis'}</span></div>
+                            <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>Envío</span><span>{Number(selectedShipping.cost) > 0 ? formatMoney(selectedShipping.cost) : 'Gratis'}</span></div>
                             {paymentConfig?.mpFee > 0 && (
                                 <div className="flex justify-between text-slate-500 text-xs italic">
                                     <span>Recargo Gestión de Pago ({paymentConfig.mpFee}%)</span>

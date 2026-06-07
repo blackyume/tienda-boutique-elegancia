@@ -24,12 +24,12 @@ export const ShippingSettings = () => {
         setLocalRates(prev => ({ ...prev, [key]: { name: 'Nuevo método', cost: 0, time: '2-4 días' } }));
     };
 
-    const addPickup = () => {
+    const addSucursal = () => {
         setLocalRates(prev => ({
             ...prev,
-            retiro: { name: 'Retiro en persona', cost: 0, time: 'Coordinás por WhatsApp', pickup: true }
+            sucursal: { name: 'Retiro en sucursal del correo', cost: 2500, time: '3-5 días', note: 'Lo enviamos a la sucursal de correo más cercana a tu domicilio para que lo retires. Te avisamos cuál cuando lo despachamos.' }
         }));
-        addToast('Agregá la dirección/horario en el campo de instrucciones y guardá', 'info');
+        addToast('Listo, ajustá el precio y guardá', 'info');
     };
 
     const removeMethod = (key) => {
@@ -51,18 +51,18 @@ export const ShippingSettings = () => {
         setIsSaving(false);
     };
 
-    const hasPickup = Object.values(localRates).some(d => d?.pickup);
+    const hasSucursal = Object.keys(localRates).some(k => k === 'sucursal');
 
     return (
         <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border dark:border-slate-700 shadow-sm">
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                 <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-                    <Truck className="w-5 h-5 text-[#D4AF37]" /> Métodos de Envío y Retiro
+                    <Truck className="w-5 h-5 text-[#D4AF37]" /> Métodos de Envío
                 </h3>
                 <div className="flex gap-2">
-                    {!hasPickup && (
-                        <button onClick={addPickup} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors">
-                            <Store className="w-4 h-4" /> Retiro en persona
+                    {!hasSucursal && (
+                        <button onClick={addSucursal} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors">
+                            <Store className="w-4 h-4" /> Retiro en sucursal
                         </button>
                     )}
                     <button onClick={addMethod} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors">
@@ -75,11 +75,13 @@ export const ShippingSettings = () => {
                 {Object.entries(localRates).length === 0 && (
                     <p className="text-sm text-slate-400 text-center py-6">No hay métodos cargados. Agregá uno con los botones de arriba.</p>
                 )}
-                {Object.entries(localRates).map(([key, data]) => (
-                    <div key={key} className={`p-4 rounded-xl border ${data?.pickup ? 'bg-[#D4AF37]/5 border-[#D4AF37]/30' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
+                {Object.entries(localRates).map(([key, data]) => {
+                    const isSucursal = key === 'sucursal';
+                    return (
+                    <div key={key} className={`p-4 rounded-xl border ${isSucursal ? 'bg-[#D4AF37]/5 border-[#D4AF37]/30' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
                         <div className="flex justify-between items-center mb-4">
                             <span className="font-bold text-sm uppercase text-slate-500 flex items-center gap-1.5">
-                                {data?.pickup && <Store className="w-3.5 h-3.5 text-[#D4AF37]" />}
+                                {isSucursal && <Store className="w-3.5 h-3.5 text-[#D4AF37]" />}
                                 {key.replace(/_/g, ' ')}
                             </span>
                             <div className="flex gap-2 items-center">
@@ -108,13 +110,19 @@ export const ShippingSettings = () => {
                             <input
                                 value={data.time}
                                 onChange={(e) => handleChange(key, 'time', e.target.value)}
-                                className="flex-1 p-2 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors"
-                                placeholder={data?.pickup ? 'Dirección / horario de retiro' : 'Tiempo (ej: 2-4 días)'}
+                                className="w-40 p-2 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors"
+                                placeholder="Tiempo (ej: 2-4 días)"
                             />
                         </div>
-                        {data?.pickup && <p className="text-[11px] text-[#D4AF37] mt-2">📍 Con este método el cliente no carga dirección. Poné acá dónde y cuándo retira.</p>}
+                        <input
+                            value={data.note || ''}
+                            onChange={(e) => handleChange(key, 'note', e.target.value)}
+                            className="w-full mt-3 p-2 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors"
+                            placeholder="Nota opcional para el cliente (aparece al elegir este método)"
+                        />
                     </div>
-                ))}
+                    );
+                })}
             </div>
 
             <div className="mt-6 flex justify-end">

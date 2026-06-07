@@ -29,6 +29,62 @@ const MP_STATUS_MAP = {
     cancelled: 'cancelled'
 };
 
+// Email de confirmación al cliente cuando el pago se aprueba (EmailJS server-side).
+// Lee las credenciales desde Firestore (config/site_content.emailjs) — las mismas
+// que se cargan en Admin → Configuración. El accessToken (private key) va por env
+// var EMAILJS_PRIVATE_KEY si EmailJS tiene activada la restricción de no-browser.
+async function sendConfirmationEmail(db, order) {
+    let ej = {};
+    try {
+        const snap = await db.collection('config').doc('site_content').get();
+        ej = (snap.exists && snap.data().emailjs) || {};
+    } catch { return; }
+
+    const service_id = ej.serviceId || process.env.EMAILJS_SERVICE_ID;
+    const user_id = ej.publicKey || process.env.EMAILJS_PUBLIC_KEY;
+    const template_id = ej.paidTemplateId || ej.templateId || process.env.EMAILJS_ORDER_TEMPLATE_ID;
+    const accessToken = process.env.EMAILJS_PRIVATE_KEY;
+
+    if (!service_id || !user_id || !template_id) return; // sin config → no-op silencioso
+    const c = order.customer || {};
+    const toEmail = c.email || order.email;
+    if (!toEmail) return;
+
+    const itemsSummary = (order.items || [])
+        .map(i => `${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity}`)
+        .join(', ') || 'Sin items';
+    const address = [c.calle, c.altura, c.piso, c.ciudad, c.cp].filter(Boolean).join(' ');
+
+    const body = {
+        service_id, template_id, user_id,
+        template_params: {
+            to_name: c.nombre || 'Cliente',
+            to_email: toEmail,
+            order_id: order.id || '',
+            total: `$${(Number(order.total) || 0).toLocaleString('es-AR')}`,
+            items_summary: itemsSummary,
+            shipping_method: order.shippingName || order.shipping || 'No especificado',
+            shipping_address: address || '-',
+            tracking: '',
+            email_type: 'paid',
+            subject: `¡Tu pago fue aprobado! Pedido ${order.id || ''} ✅`,
+            status_label: 'Pago aprobado',
+            message: '¡Confirmamos tu pago! Ya estamos preparando tu pedido con todo el cariño. Te avisamos por este medio cuando lo despachemos.'
+        }
+    };
+    if (accessToken) body.accessToken = accessToken;
+
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+        const t = await res.text().catch(() => '');
+        throw new Error(`EmailJS ${res.status}: ${t}`);
+    }
+}
+
 const verifySignature = (req, paymentId) => {
     const secret = process.env.MP_WEBHOOK_SECRET;
     if (!secret) return true; // Validación opcional
@@ -257,6 +313,16 @@ module.exports = async (req, res) => {
                 } catch (notifyErr) {
                     console.error(`[mp-webhook] aviso de venta falló order=${externalRef}:`, notifyErr.message);
                 }
+            }
+        }
+
+        // Email de confirmación de pago al cliente (idempotente vía flag).
+        if (newStatus === 'approved' && !order.confirmationEmailSent) {
+            try {
+                await sendConfirmationEmail(db, order);
+                await docRef.update({ confirmationEmailSent: true });
+            } catch (emailErr) {
+                console.error(`[mp-webhook] email confirmación falló order=${externalRef}:`, emailErr.message);
             }
         }
 

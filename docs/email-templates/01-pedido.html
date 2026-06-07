@@ -1,0 +1,120 @@
+<!--
+  TEMPLATE UNIVERSAL DE PEDIDO — La Boutique de la Elegancia
+  Sirve para los 3 emails: confirmación, pago aprobado y pedido enviado.
+  El texto cambia solo según las variables que manda la tienda.
+
+  CÓMO USARLO EN EmailJS:
+  1. Entrá a emailjs.com → Email Templates → Create New Template.
+  2. En "Subject" (asunto) poné EXACTAMENTE:  {{subject}}
+  3. En el cuerpo, tocá "</> Code editor" (o "Edit Content" → modo HTML) y pegá TODO este archivo.
+  4. En "To Email" poné:  {{to_email}}     y en "To Name":  {{to_name}}
+  5. Guardá. Copiá el Template ID (template_xxx) y pegalo en
+     Admin → Configuración → EmailJS → "Template — Confirmación de pedido".
+  (Con este único template alcanza para los tres avisos.)
+
+  Variables que usa: subject, to_name, status_label, message, order_id,
+                     items_summary, total, shipping_method, shipping_address, tracking
+-->
+<div style="margin:0;padding:0;background:#0a0a0a;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:92%;background:#111111;border:1px solid #262626;border-radius:16px;overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background:#0a0a0a;padding:36px 24px 28px;border-bottom:1px solid #1f1f1f;">
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;letter-spacing:2px;color:#D4AF37;font-weight:700;">
+                LA BOUTIQUE
+              </div>
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;letter-spacing:6px;color:#9a8347;margin-top:4px;text-transform:uppercase;">
+                de la Elegancia
+              </div>
+            </td>
+          </tr>
+
+          <!-- Status banner -->
+          <tr>
+            <td align="center" style="padding:30px 24px 6px;">
+              <div style="display:inline-block;background:#D4AF37;color:#1a1308;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:999px;">
+                {{status_label}}
+              </div>
+            </td>
+          </tr>
+
+          <!-- Saludo + mensaje -->
+          <tr>
+            <td style="padding:18px 40px 8px;">
+              <p style="color:#ffffff;font-size:20px;font-weight:600;margin:0 0 10px;">¡Hola, {{to_name}}!</p>
+              <p style="color:#b9b9b9;font-size:15px;line-height:1.6;margin:0;">{{message}}</p>
+            </td>
+          </tr>
+
+          <!-- Detalle del pedido -->
+          <tr>
+            <td style="padding:24px 40px 8px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0d0d0d;border:1px solid #242424;border-radius:12px;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <p style="color:#7a7a7a;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px;">Pedido</p>
+                    <p style="color:#D4AF37;font-size:17px;font-weight:700;margin:0 0 16px;">{{order_id}}</p>
+
+                    <p style="color:#7a7a7a;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px;">Productos</p>
+                    <p style="color:#e6e6e6;font-size:14px;line-height:1.6;margin:0 0 16px;">{{items_summary}}</p>
+
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="color:#7a7a7a;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:0;">Total</td>
+                        <td align="right" style="color:#ffffff;font-size:20px;font-weight:700;padding:0;">{{total}}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Envío -->
+          <tr>
+            <td style="padding:8px 40px 4px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="color:#7a7a7a;font-size:12px;padding:6px 0;border-bottom:1px solid #1c1c1c;">Método de envío</td>
+                  <td align="right" style="color:#e6e6e6;font-size:13px;padding:6px 0;border-bottom:1px solid #1c1c1c;">{{shipping_method}}</td>
+                </tr>
+                <tr>
+                  <td style="color:#7a7a7a;font-size:12px;padding:6px 0;border-bottom:1px solid #1c1c1c;">Dirección</td>
+                  <td align="right" style="color:#e6e6e6;font-size:13px;padding:6px 0;border-bottom:1px solid #1c1c1c;">{{shipping_address}}</td>
+                </tr>
+                {{#if tracking}}
+                <tr>
+                  <td style="color:#7a7a7a;font-size:12px;padding:6px 0;">Seguimiento</td>
+                  <td align="right" style="color:#D4AF37;font-size:13px;font-weight:700;padding:6px 0;">{{tracking}}</td>
+                </tr>
+                {{/if}}
+              </table>
+            </td>
+          </tr>
+
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:28px 40px 36px;">
+              <a href="https://la-boutique-de-la-elegancia.web.app" style="display:inline-block;background:#D4AF37;color:#1a1308;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 34px;border-radius:8px;">
+                Ver la tienda
+              </a>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="background:#0a0a0a;padding:24px;border-top:1px solid #1f1f1f;">
+              <p style="color:#8a7740;font-family:Georgia,serif;font-size:14px;letter-spacing:1px;margin:0 0 6px;">La Boutique de la Elegancia</p>
+              <p style="color:#555555;font-size:11px;margin:0;">Gracias por elegirnos 💛</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
