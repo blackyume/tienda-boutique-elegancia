@@ -4,6 +4,7 @@ import { useStore } from '../../context/StoreContext';
 import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { analyzeProductImage } from '../../utils/vision';
 import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
+import { generateShippingLabel } from '../../utils/shippingLabel';
 
 const HISTORY_KEY = 'lau_copilot_v3';
 const MAX_STEPS = 5;
@@ -21,6 +22,7 @@ const WELCOME = {
         '\n• Contarte cuánto vendiste: hoy, esta semana, este mes o en total.' +
         '\n\n📦 PEDIDOS' +
         '\n• Mostrarte los pedidos (todos o por estado) y los que están pendientes de enviar.' +
+        '\n• Generarte la ETIQUETA DE ENVÍO en PDF (remitente + destinatario) para imprimir y pegar al paquete.' +
         '\n• Marcarlos como enviados (con código de seguimiento), entregados o cancelados.' +
         '\n\n🎟️ CUPONES' +
         '\n• Crear cupones (% o monto fijo, con tope de usos, compra mínima y vencimiento), listarlos y eliminarlos.' +
@@ -72,6 +74,7 @@ const COMMAND_GUIDE = [
     {
         icon: '📦', title: 'Pedidos', items: [
             '¿Qué pedidos tengo pendientes de enviar?',
+            'Generá la etiqueta de envío del pedido ORD-123456',
             'Marcá el pedido ORD-123456 como enviado con seguimiento 7798XXXXXXXX',
             'Marcá el pedido ORD-123456 como entregado',
             'Cancelá el pedido ORD-123456',
@@ -251,6 +254,14 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 if (!['pending', 'shipped', 'delivered', 'cancelled', 'approved'].includes(st)) return `Estado inválido: ${A.status}.`;
                 await updateOrderStatus(o.id, st, A.tracking ? { trackingNumber: String(A.tracking) } : {});
                 return `Pedido ${o.id} → ${st}${A.tracking ? ` (tracking ${A.tracking})` : ''}.`;
+            }
+            case 'generate_label': {
+                const o = orders.find(x => String(x.id).toLowerCase() === String(A.orderId).toLowerCase());
+                if (!o) return 'No encontré ese pedido. Decime el N° (ej: ORD-123456).';
+                const r = siteConfig?.remitente || {};
+                await generateShippingLabel(o, r);
+                const faltan = (!r.address || !r.cp) ? ' (Tip: completá la dirección y CP del remitente en Admin → Configuración → Envíos para que la etiqueta salga completa.)' : '';
+                return `Etiqueta del pedido ${o.id} generada y descargada en PDF. Imprimila y pegala al paquete.${faltan}`;
             }
             case 'set_sale': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';

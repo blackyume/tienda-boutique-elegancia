@@ -14,6 +14,7 @@ export const TOOLS = [
     { name: 'query_customers', sensitive: false, desc: 'Top clientes por gasto. args: {top?}' },
     { name: 'query_coupons', sensitive: false, desc: 'Listar cupones. args: {}' },
     { name: 'query_reviews', sensitive: false, desc: 'Listar reseñas. args: {onlyPending?(bool), productId?}' },
+    { name: 'generate_label', sensitive: false, desc: 'Generar y descargar la ETIQUETA DE ENVÍO en PDF de un pedido (remitente + destinatario + datos del pedido) para imprimir y pegar al paquete. args: {orderId}. Usala cuando el dueño te pida "la etiqueta", "etiqueta del correo" o "imprimir el envío" de un pedido.' },
     { name: 'quote_price', sensitive: false, desc: 'Calcular el PRECIO DE VENTA a partir del costo, cubriendo la comisión de Mercado Pago y el margen deseado. args: {cost(costo de la prenda), packaging?(0), shipping?(0), margin?(50, en %), commission?(6, % comisión MP)}. Devuelve precio sugerido + ganancia neta. Usalo SIEMPRE que el usuario te dé un COSTO o "me costó X" en vez de un precio final.' },
     // --- ESCRITURA SUAVE (auto) ---
     { name: 'create_category', sensitive: false, desc: 'Crear categoría. args: {name}' },

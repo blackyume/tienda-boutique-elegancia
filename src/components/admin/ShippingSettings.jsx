@@ -1,16 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
-import { Truck, Save, RefreshCw, Plus, Trash2, Store } from 'lucide-react';
+import { Truck, Save, RefreshCw, Plus, Trash2, Store, MapPin } from 'lucide-react';
 
 export const ShippingSettings = () => {
-    const { shippingRates, updateShippingRates, addToast } = useStore();
+    const { shippingRates, updateShippingRates, addToast, siteConfig, updateSiteConfig } = useStore();
     const [localRates, setLocalRates] = useState(shippingRates || {});
     const [isSaving, setIsSaving] = useState(false);
+    const [remitente, setRemitente] = useState(siteConfig?.remitente || { name: 'La Boutique de la Elegancia', address: '', cp: '', city: 'Rafaela', province: 'Santa Fe', phone: '' });
+    const [savingRem, setSavingRem] = useState(false);
 
     useEffect(() => {
         setLocalRates(shippingRates || {});
     }, [shippingRates]);
+
+    useEffect(() => {
+        if (siteConfig?.remitente) setRemitente(r => ({ ...r, ...siteConfig.remitente }));
+    }, [siteConfig?.remitente]);
+
+    const saveRemitente = async () => {
+        setSavingRem(true);
+        try {
+            await updateSiteConfig({ remitente });
+        } catch (e) { console.error(e); addToast('Error al guardar el remitente', 'error'); }
+        setSavingRem(false);
+    };
+    const remChange = (field, value) => setRemitente(prev => ({ ...prev, [field]: value }));
 
     const handleChange = (key, field, value) => {
         setLocalRates(prev => ({
@@ -130,6 +145,28 @@ export const ShippingSettings = () => {
                     {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                     Guardar
                 </Button>
+            </div>
+
+            {/* Datos del remitente — para las etiquetas de envío que genera Lau */}
+            <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <h4 className="font-bold mb-1 flex items-center gap-2 text-slate-800 dark:text-white">
+                    <MapPin className="w-5 h-5 text-[#D4AF37]" /> Datos del remitente
+                </h4>
+                <p className="text-[11px] text-slate-400 mb-4">Tus datos como vendedor. Aparecen en la etiqueta de envío (la que genera Lau para pegar al paquete).</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input value={remitente.name || ''} onChange={(e) => remChange('name', e.target.value)} placeholder="Nombre / Tienda" className="p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors md:col-span-2" />
+                    <input value={remitente.address || ''} onChange={(e) => remChange('address', e.target.value)} placeholder="Calle y número" className="p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors md:col-span-2" />
+                    <input value={remitente.cp || ''} onChange={(e) => remChange('cp', e.target.value)} placeholder="Código postal" className="p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors" />
+                    <input value={remitente.phone || ''} onChange={(e) => remChange('phone', e.target.value)} placeholder="Teléfono" className="p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors" />
+                    <input value={remitente.city || ''} onChange={(e) => remChange('city', e.target.value)} placeholder="Ciudad" className="p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors" />
+                    <input value={remitente.province || ''} onChange={(e) => remChange('province', e.target.value)} placeholder="Provincia" className="p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors" />
+                </div>
+                <div className="mt-4 flex justify-end">
+                    <Button onClick={saveRemitente} disabled={savingRem} className="bg-slate-800 dark:bg-white dark:text-slate-900 text-white">
+                        {savingRem ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                        Guardar remitente
+                    </Button>
+                </div>
             </div>
         </div>
     );
