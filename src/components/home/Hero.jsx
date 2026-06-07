@@ -162,7 +162,7 @@ export const Hero = () => {
                 <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-2 animate-fadeIn opacity-0 [animation-delay:750ms]">
                     <span className="flex items-center gap-2 text-2xs text-white/35 tracking-wide">
                         <Truck className="w-3.5 h-3.5 text-cielo-gold/50" strokeWidth={1.5} />
-                        Envio 24-72h
+                        Envíos a todo el país
                     </span>
                     <span className="w-px h-3 bg-white/10" />
                     <span className="flex items-center gap-2 text-2xs text-white/35 tracking-wide">
