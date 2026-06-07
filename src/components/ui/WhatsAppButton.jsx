@@ -62,23 +62,23 @@ export const WhatsAppButton = () => {
             {/* Botón */}
             <div className="relative">
                 {/* Anillo dorado sutil */}
-                <span className="absolute -inset-1 rounded-full border border-[#D4AF37]/25 animate-pulse" />
-                {/* Halo verde suave para afirmar el canal */}
-                <span className="absolute inset-0 rounded-full bg-[#25D366]/30 blur-lg opacity-70 group-hover:opacity-90 transition-opacity" />
+                <span className="absolute -inset-1 rounded-full border border-[#D4AF37]/40 animate-pulse" />
+                {/* Halo dorado suave */}
+                <span className="absolute inset-0 rounded-full bg-[#D4AF37]/30 blur-lg opacity-70 group-hover:opacity-90 transition-opacity" />
 
-                <div className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_30px_-10px_rgba(37,211,102,0.6)] transition-transform duration-300 group-hover:scale-[1.06] active:scale-95 overflow-hidden"
+                <div className="relative w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-[1.06] active:scale-95 overflow-hidden"
                     style={{
-                        background: 'linear-gradient(145deg, #2ED66F 0%, #1FA851 100%)',
-                        boxShadow: '0 8px 24px -6px rgba(37,211,102,0.55), inset 0 1px 0 rgba(255,255,255,0.25)'
+                        background: 'linear-gradient(145deg, #FCF6BA 0%, #D4AF37 45%, #B8932E 100%)',
+                        boxShadow: '0 8px 24px -6px rgba(212,175,55,0.55), inset 0 1px 0 rgba(255,255,255,0.35)'
                     }}
                 >
                     {/* Brillo superior */}
-                    <span className="absolute top-0 left-0 right-0 h-1/2 bg-white/15 rounded-t-full" />
-                    <WhatsAppIcon className="relative w-7 h-7 text-white" />
+                    <span className="absolute top-0 left-0 right-0 h-1/2 bg-white/20 rounded-t-full" />
+                    <WhatsAppIcon className="relative w-7 h-7 text-[#0A0A0A]" />
                 </div>
 
-                {/* Punto de notificación dorado (estético) */}
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#D4AF37] border-2 border-white shadow" />
+                {/* Punto de notificación (estético) */}
+                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#0A0A0A] border-2 border-[#D4AF37] shadow" />
             </div>
         </a>
     );
