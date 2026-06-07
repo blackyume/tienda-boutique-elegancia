@@ -76,9 +76,6 @@ export const WhatsAppButton = () => {
                     <span className="absolute top-0 left-0 right-0 h-1/2 bg-white/20 rounded-t-full" />
                     <WhatsAppIcon className="relative w-7 h-7 text-[#0A0A0A]" />
                 </div>
-
-                {/* Punto de notificación (estético) */}
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#0A0A0A] border-2 border-[#D4AF37] shadow" />
             </div>
         </a>
     );
