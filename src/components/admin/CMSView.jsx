@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
 import { useConfirm } from '../ui/ConfirmDialog';
@@ -223,6 +223,15 @@ export const CMSView = () => {
         addToast("Categoría agregada", "success");
     };
 
+    // El toast "Cambios guardados" se debouncea: al escribir/arrastrar un slider
+    // se guarda en cada cambio, pero el aviso aparece UNA sola vez cuando parás
+    // (antes saltaba un toast por cada tecla).
+    const savedToastTimer = useRef(null);
+    const notifySaved = () => {
+        if (savedToastTimer.current) clearTimeout(savedToastTimer.current);
+        savedToastTimer.current = setTimeout(() => addToast("Cambios guardados", "success"), 900);
+    };
+
     // --- GENERIC UPDATE HANDLER WITH TOAST ---
     const updateSection = async (section, key, value, silent = false) => {
         const newData = { ...siteConfig };
@@ -233,7 +242,7 @@ export const CMSView = () => {
         }
 
         await updateSiteConfig(newData);
-        if (!silent) addToast("Cambios guardados", "success");
+        if (!silent) notifySaved();
     };
 
     // --- VALIDATED UPDATE FOR LINKS ---
