@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db, auth } from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { buildReferralCode } from '../utils/referral';
 import { isAdminEmail } from '../utils/admins';
 
@@ -76,27 +76,55 @@ export const useAuth = ({ user, wishlist, setWishlist, addToast }) => {
     }
   };
 
-  const loginWithGoogle = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+  // Crea el doc del usuario si no existe (lo usan tanto popup como redirect).
+  const ensureUserDoc = async (user) => {
+    if (!user) return;
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (!userDoc.exists()) {
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        name: user.displayName,
+        role: 'customer',
+        createdAt: Date.now()
+      });
+    }
+  };
 
-      // Check if user exists in DB, if not create as customer
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (!userDoc.exists()) {
-        await setDoc(doc(db, "users", user.uid), {
-          email: user.email,
-          name: user.displayName,
-          role: 'customer',
-          createdAt: Date.now()
-        });
+  // Al volver de un login por redirección (fallback cuando el popup está
+  // bloqueado), retomamos la sesión y creamos el doc si hace falta.
+  useEffect(() => {
+    getRedirectResult(auth).then(async (result) => {
+      if (result?.user) {
+        await ensureUserDoc(result.user);
+        addToast("Sesión iniciada con Google", "success");
       }
+    }).catch((err) => {
+      if (err?.code && err.code !== 'auth/no-current-user') console.warn('[auth] redirect result:', err.code);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      await ensureUserDoc(result.user);
       addToast("Sesión iniciada con Google", "success");
       return true;
     } catch (error) {
+      // Si el navegador bloquea el popup (preview, algunos celulares, etc.),
+      // caemos a login por redirección, que siempre funciona.
+      if (['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/operation-not-supported-in-this-environment'].includes(error?.code)) {
+        try {
+          await signInWithRedirect(auth, provider);
+          return true; // navega afuera; el resultado lo toma el useEffect al volver
+        } catch (redirErr) {
+          console.error("Google Redirect Error:", redirErr);
+          addToast(`Error Google: ${redirErr.code || redirErr.message}`, "error");
+          return false;
+        }
+      }
       console.error("Google Login Error:", error);
-      // Show specific error code to help debugging
       addToast(`Error Google: ${error.code || error.message}`, "error");
       return false;
     }
