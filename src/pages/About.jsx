@@ -2,9 +2,13 @@ import React from 'react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { Award, Heart, Truck, ShieldCheck, Instagram, MapPin } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
 
 export const About = () => {
     const navigate = useNavigate();
+    const { siteConfig } = useStore();
+    const instagramUrl = siteConfig?.social?.instagram || 'https://instagram.com/laboutique.elegancia';
+    const instagramHandle = '@' + (instagramUrl.replace(/\/+$/, '').split('/').pop() || 'laboutique.elegancia');
 
     return (
         <div className="pt-24 pb-0 animate-fadeIn bg-white dark:bg-slate-950 font-sans overflow-x-hidden">
@@ -42,7 +46,7 @@ export const About = () => {
                         </p>
                         <div className="pt-4 flex gap-4">
                             <div className="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-900 rounded-xl w-32 border border-slate-100 dark:border-slate-800">
-                                <span className="text-3xl font-bold text-[#D4AF37] font-cinzel">5+</span>
+                                <span className="text-3xl font-bold text-[#D4AF37] font-cinzel">8+</span>
                                 <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider mt-1">Años de Exp.</span>
                             </div>
                             <div className="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-900 rounded-xl w-32 border border-slate-100 dark:border-slate-800">
@@ -145,10 +149,10 @@ export const About = () => {
                                 <div className="p-2 bg-white/10 rounded-full"><MapPin className="w-5 h-5 text-[#D4AF37]" /></div>
                                 <span className="font-light">Envíos desde Rafaela, Argentina</span>
                             </div>
-                            <div className="flex items-center gap-4 text-slate-300">
+                            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-slate-300 hover:text-white transition-colors">
                                 <div className="p-2 bg-white/10 rounded-full"><Instagram className="w-5 h-5 text-[#D4AF37]" /></div>
-                                <span className="font-light">@laboutique.elegancia</span>
-                            </div>
+                                <span className="font-light">{instagramHandle}</span>
+                            </a>
                         </div>
 
                         <Button onClick={() => navigate('/')} className="bg-[#D4AF37] hover:bg-white hover:text-black text-white px-8 py-4 rounded-none font-bold tracking-[0.2em] w-fit transition-all duration-300">

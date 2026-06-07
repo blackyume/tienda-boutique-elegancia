@@ -1,7 +1,11 @@
 import React, { useLayoutEffect } from 'react';
+import { useStore } from '../context/StoreContext';
 
 export const TermsConditions = () => {
     useLayoutEffect(() => { window.scrollTo(0, 0); }, []);
+    const { siteConfig } = useStore();
+    const email = siteConfig?.contact?.email || 'laboutiquedelaeleganciaoficial@gmail.com';
+    const whatsapp = siteConfig?.contact?.whatsapp;
 
     return (
         <div className="bg-white dark:bg-[#0A0A0A] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
@@ -13,7 +17,7 @@ export const TermsConditions = () => {
                     <section>
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">1. Ámbito de Aplicación</h2>
                         <p className="leading-relaxed">
-                            Los presentes Términos y Condiciones regulan el uso del sitio web **La Boutique de la Elegancia** y la compra de productos a través del mismo. Al acceder y utilizar este sitio, el usuario acepta someterse a estas condiciones sin reservas.
+                            Los presentes Términos y Condiciones regulan el uso del sitio web <strong>La Boutique de la Elegancia</strong> y la compra de productos a través del mismo. Al acceder y utilizar este sitio, el usuario acepta someterse a estas condiciones sin reservas.
                         </p>
                     </section>
 
@@ -27,14 +31,14 @@ export const TermsConditions = () => {
                     <section>
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">3. Precios y Pagos</h2>
                         <p className="leading-relaxed">
-                            Los precios están expresados en Pesos Argentinos (ARS). Nos reservamos el derecho de modificar los precios en cualquier momento, respetando siempre las compras ya confirmadas. Los pagos se procesan a través de plataformas seguras de terceros, y no almacenamos información completa de tarjetas de crédito.
+                            Los precios están expresados en Pesos Argentinos (ARS). Nos reservamos el derecho de modificar los precios en cualquier momento, respetando siempre las compras ya confirmadas. Los pagos se procesan de forma segura a través de <strong>Mercado Pago</strong>; no almacenamos los datos completos de tu tarjeta en nuestros servidores.
                         </p>
                     </section>
 
                     <section>
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">4. Envíos y Entregas</h2>
                         <p className="leading-relaxed">
-                            Los plazos de entrega indicados son estimativos. La Boutique de la Elegancia no se hace responsable por demoras imputables a la empresa de logística. El riesgo de los productos se transfiere al cliente en el momento de la entrega.
+                            Realizamos envíos a todo el país a través de <strong>Correo Argentino</strong>, en la modalidad a domicilio o retiro en sucursal según elija el cliente al finalizar la compra. Los plazos de entrega indicados son estimativos y comienzan a contar desde el despacho del paquete. La Boutique de la Elegancia no se hace responsable por demoras imputables a la empresa de logística. El riesgo de los productos se transfiere al cliente en el momento de la entrega.
                         </p>
                     </section>
 
@@ -62,15 +66,17 @@ export const TermsConditions = () => {
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">6. Propiedad Intelectual</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">7. Propiedad Intelectual</h2>
                         <p className="leading-relaxed">
                             Todo el contenido de este sitio (imágenes, textos, logotipos, diseño) es propiedad exclusiva de La Boutique de la Elegancia y está protegido por las leyes de propiedad intelectual internacionales. Queda prohibida su reproducción sin autorización expresa.
                         </p>
                     </section>
 
-                    <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 mt-12">
-                        <p className="text-sm text-center font-medium">
-                            ¿Dudas? Contáctanos a nuestro equipo de atención al cliente para asistencia personalizada.
+                    <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 mt-12 text-center">
+                        <p className="text-sm font-medium mb-2">¿Dudas? Escribinos y te ayudamos:</p>
+                        <p className="text-sm">
+                            <a href={`mailto:${email}`} className="text-[#D4AF37] hover:underline">{email}</a>
+                            {whatsapp && <> &nbsp;·&nbsp; <a href={`https://wa.me/${String(whatsapp).replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37] hover:underline">WhatsApp</a></>}
                         </p>
                     </div>
                 </div>
