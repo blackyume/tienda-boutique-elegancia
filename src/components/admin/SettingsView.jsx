@@ -309,7 +309,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                         <div className={cardCls + ' border-l-4 border-l-purple-500'}>
                             <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bot className="w-5 h-5 text-purple-500" /> Inteligencia Artificial</h3>
                             <div className="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-900/30 mb-4">
-                                <p className="text-sm text-purple-800 dark:text-purple-300"><strong>Motor:</strong> Cerebras (texto · Laurina y copy). <strong>Visión:</strong> Gemini primario, NVIDIA NIM como fallback. El asistente del cliente usa Gemini.</p>
+                                <p className="text-sm text-purple-800 dark:text-purple-300"><strong>Motor:</strong> Cerebras (texto · Lau y copy). <strong>Visión:</strong> Gemini primario, NVIDIA NIM como fallback. El asistente del cliente usa Gemini.</p>
                             </div>
 
                             <div className="bg-gradient-to-br from-[#D4AF37]/10 to-transparent p-4 rounded-xl border border-[#D4AF37]/30 mb-4">
@@ -324,7 +324,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
 
                             <p className="text-xs font-bold uppercase text-slate-400 mb-2">Gemini · Visión + Fallback</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label className={labelCls}>Llaves Administrador (Laurina, copy, visión)</label><textarea id="aiAdminKeys" defaultValue={aiConfig?.adminKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
+                                <div><label className={labelCls}>Llaves Administrador (Lau, copy, visión)</label><textarea id="aiAdminKeys" defaultValue={aiConfig?.adminKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
                                 <div><label className={labelCls}>Llaves Cliente (Elegancia IA)</label><textarea id="aiCustomerKeys" defaultValue={aiConfig?.customerKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
                             </div>
                             <div className="bg-gradient-to-br from-emerald-500/10 to-transparent p-4 rounded-xl border border-emerald-500/30 mt-4">

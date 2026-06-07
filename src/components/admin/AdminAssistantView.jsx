@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Paperclip, X, ShieldCheck, Loader2, Bot, User, AlertTriangle, Check } from 'lucide-react';
+import { Send, Sparkles, Paperclip, X, Loader2, User, AlertTriangle, Check, Trash2 } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { analyzeProductImage } from '../../utils/vision';
@@ -7,7 +7,7 @@ import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/
 
 const HISTORY_KEY = 'laurina_copilot_v1';
 const MAX_STEPS = 5;
-const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Laurina, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (mandame la foto y, si querés, el COSTO y te calculo el precio cubriendo la comisión de Mercado Pago + tu margen), precios y ofertas, cupones, destacar en la home, gestionar pedidos (marcar enviados/entregados), moderar reseñas, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
+const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Lau, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (mandame la foto y, si querés, el COSTO y te calculo el precio cubriendo la comisión de Mercado Pago + tu margen), precios y ofertas, cupones, destacar en la home, gestionar pedidos (marcar enviados/entregados), moderar reseñas, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
 
 const toArr = (v) => Array.isArray(v) ? v.map(String).map(s => s.trim()).filter(Boolean)
     : (typeof v === 'string' ? v.split(/[,/]+/).map(s => s.trim()).filter(Boolean) : []);
@@ -56,7 +56,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     useEffect(() => { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(messages.slice(-60))); } catch { /* noop */ } }, [messages]);
     useEffect(() => { listRef.current?.scrollTo(0, listRef.current.scrollHeight); }, [messages, loading, confirm]);
 
-    // Parte del día: al abrir Laurina (una vez por día) resume ventas, pedidos
+    // Parte del día: al abrir Lau (una vez por día) resume ventas, pedidos
     // por enviar y stock que se está agotando. Cero configuración.
     useEffect(() => {
         try {
@@ -411,96 +411,138 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         'Destacá en la home los 4 productos más nuevos',
     ];
 
+    const clearChat = () => {
+        if (loading) return;
+        setMessages([WELCOME]);
+        try { localStorage.removeItem(HISTORY_KEY); } catch { /* noop */ }
+    };
+
     return (
-        <div className="fixed inset-0 z-[60] bg-cielo-dark/95 backdrop-blur-sm flex flex-col">
-            <div className="flex items-center justify-between px-5 h-16 border-b border-white/10 shrink-0">
-                <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-cielo-dark" />
+        <div className="fixed inset-0 z-[60] flex flex-col bg-[#0A0A0A]/95 backdrop-blur-md">
+            {/* glow ambiental dorado */}
+            <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[60rem] max-w-full h-64 bg-[#D4AF37]/10 blur-[120px] rounded-full" />
+
+            {/* HEADER */}
+            <div className="relative shrink-0 border-b border-white/10 bg-white/[0.03] backdrop-blur-xl">
+                <div className="max-w-3xl mx-auto flex items-center justify-between px-5 h-[72px]">
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#B38728] flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)]">
+                                <Sparkles className="w-5 h-5 text-[#0A0A0A]" />
+                            </div>
+                            <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#0A0A0A] ${aiConfigured ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                        </div>
+                        <div>
+                            <h2 className="text-white font-cinzel tracking-[0.25em] text-lg leading-none">LAU</h2>
+                            <p className="text-[11px] text-white/40 mt-1.5">{aiConfigured ? 'Copiloto · en línea' : 'IA no configurada'}</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-white font-cinzel tracking-widest text-sm">LAURINA · COPILOTO</h2>
-                        <p className="text-[11px] text-white/40">{aiConfigured ? 'Cerebras + Gemini · ejecuta acciones reales' : 'IA no configurada'}</p>
+                    <div className="flex items-center gap-1">
+                        <button onClick={clearChat} disabled={loading} title="Limpiar chat" className="p-2.5 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-30">
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={onClose} title="Cerrar" className="p-2.5 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"><X className="w-5 h-5" /></button>
                     </div>
                 </div>
-                <button onClick={onClose} className="text-white/50 hover:text-white p-2"><X className="w-5 h-5" /></button>
             </div>
 
-            <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4 max-w-3xl w-full mx-auto">
-                {messages.map((m, i) => (
-                    <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        {m.role !== 'user' && (
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${m.role === 'system' ? 'bg-white/10' : 'bg-gradient-to-br from-[#BF953F] to-[#FCF6BA]'}`}>
-                                {m.role === 'system' ? <ShieldCheck className="w-4 h-4 text-white/60" /> : <Bot className="w-4 h-4 text-cielo-dark" />}
+            <div ref={listRef} className="relative flex-1 overflow-y-auto scrollbar-gold">
+                <div className="max-w-3xl w-full mx-auto px-4 py-6 space-y-4">
+                    {messages.map((m, i) => (
+                        <div key={i} className={`flex gap-2.5 animate-fadeIn ${m.role === 'user' ? 'justify-end' : m.role === 'system' ? 'justify-center' : 'justify-start'}`}>
+                            {m.role === 'ai' && (
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_14px_rgba(212,175,55,0.3)]">
+                                    <Sparkles className="w-4 h-4 text-[#0A0A0A]" />
+                                </div>
+                            )}
+                            {m.role === 'system' ? (
+                                <div className="max-w-[88%] flex items-start gap-2 rounded-xl px-3.5 py-2 bg-white/[0.04] border border-white/10 text-white/55 text-xs font-mono whitespace-pre-wrap">
+                                    <Check className="w-3.5 h-3.5 mt-0.5 text-emerald-400/70 shrink-0" />
+                                    <span>{m.text}</span>
+                                </div>
+                            ) : (
+                                <div className={`rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg max-w-[82%] ${m.role === 'user' ? 'bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] font-medium rounded-br-md' : 'bg-white/[0.08] text-white border border-white/10 rounded-bl-md'}`}>
+                                    {m.img && <img src={m.img} alt="" className="rounded-lg mb-2 max-h-44 border border-white/10" />}
+                                    {m.text}
+                                </div>
+                            )}
+                            {m.role === 'user' && (
+                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5"><User className="w-4 h-4 text-white/60" /></div>
+                            )}
+                        </div>
+                    ))}
+
+                    {confirm && (
+                        <div className="animate-fadeIn rounded-2xl p-4 bg-amber-500/[0.08] border border-amber-500/30 max-w-[92%] shadow-lg">
+                            <div className="flex items-center gap-2 text-amber-300 text-sm font-semibold mb-3">
+                                <AlertTriangle className="w-4 h-4" /> Confirmá esta acción
                             </div>
-                        )}
-                        <div className={`rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap max-w-[80%] ${m.role === 'user' ? 'bg-gradient-to-br from-[#BF953F] to-[#B38728] text-cielo-dark font-medium' : m.role === 'system' ? 'bg-white/5 text-white/60 text-xs font-mono border border-white/10' : 'bg-white/10 text-white'}`}>
-                            {m.img && <img src={m.img} alt="" className="rounded-lg mb-2 max-h-40" />}
-                            {m.text}
-                        </div>
-                        {m.role === 'user' && <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center shrink-0"><User className="w-4 h-4 text-white/60" /></div>}
-                    </div>
-                ))}
-
-                {confirm && (
-                    <div className="bg-amber-500/10 border border-amber-500/40 rounded-2xl p-4 max-w-[90%]">
-                        <div className="flex items-center gap-2 text-amber-300 text-sm font-semibold mb-3">
-                            <AlertTriangle className="w-4 h-4" /> Confirmá esta acción
-                        </div>
-                        <ul className="space-y-1.5 mb-4">
-                            {confirm.actions.map((a, i) => (
-                                <li key={i} className="text-white/85 text-sm flex gap-2"><span className="text-amber-400">›</span>{actionLabel(a)}</li>
-                            ))}
-                        </ul>
-                        <div className="flex gap-2">
-                            <button onClick={() => resolveConfirm(true)} className="flex items-center gap-1.5 bg-gradient-to-r from-[#BF953F] to-[#B38728] text-cielo-dark text-sm font-bold px-4 py-2 rounded-lg hover:opacity-90">
-                                <Check className="w-4 h-4" /> Confirmar
-                            </button>
-                            <button onClick={() => resolveConfirm(false)} className="text-white/60 hover:text-white text-sm px-4 py-2 rounded-lg border border-white/15">Cancelar</button>
-                        </div>
-                    </div>
-                )}
-
-                {loading && (
-                    <div className="flex gap-3 items-center text-white/50 text-sm">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] flex items-center justify-center"><Bot className="w-4 h-4 text-cielo-dark" /></div>
-                        <Loader2 className="w-4 h-4 animate-spin" /> {busyMsg || 'Trabajando…'}
-                    </div>
-                )}
-
-                {messages.length <= 1 && !loading && (
-                    <div className="flex flex-wrap gap-2 pt-2">
-                        {SUGGESTIONS.map(s => (
-                            <button key={s} onClick={() => setInput(s)} className="text-xs text-white/60 border border-white/15 rounded-full px-3 py-1.5 hover:border-[#BF953F]/60 hover:text-white">{s}</button>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            <div className="border-t border-white/10 p-4 shrink-0">
-                <div className="max-w-3xl mx-auto">
-                    {preview && (
-                        <div className="relative inline-block mb-2">
-                            <img src={preview} alt="" className="h-20 rounded-lg border border-white/15" />
-                            <button onClick={() => { setFile(null); setPreview(null); }} className="absolute -top-2 -right-2 bg-cielo-dark border border-white/20 rounded-full p-0.5"><X className="w-3.5 h-3.5 text-white/70" /></button>
+                            <ul className="space-y-2 mb-4">
+                                {confirm.actions.map((a, i) => (
+                                    <li key={i} className="text-white/85 text-sm flex gap-2 bg-white/[0.04] rounded-lg px-3 py-2"><span className="text-amber-400 shrink-0">›</span>{actionLabel(a)}</li>
+                                ))}
+                            </ul>
+                            <div className="flex gap-2">
+                                <button onClick={() => resolveConfirm(true)} className="flex items-center gap-1.5 bg-gradient-to-r from-[#D4AF37] to-[#B38728] text-[#0A0A0A] text-sm font-bold px-5 py-2.5 rounded-xl hover:brightness-110 transition">
+                                    <Check className="w-4 h-4" /> Confirmar
+                                </button>
+                                <button onClick={() => resolveConfirm(false)} className="text-white/60 hover:text-white text-sm px-5 py-2.5 rounded-xl border border-white/15 hover:bg-white/5 transition">Cancelar</button>
+                            </div>
                         </div>
                     )}
-                    <div className="flex items-end gap-2">
+
+                    {loading && (
+                        <div className="flex gap-2.5 items-end animate-fadeIn">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] flex items-center justify-center shrink-0"><Sparkles className="w-4 h-4 text-[#0A0A0A]" /></div>
+                            <div className="bg-white/[0.08] border border-white/10 rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2.5">
+                                <span className="flex gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce [animation-delay:-0.3s]" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce [animation-delay:-0.15s]" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce" />
+                                </span>
+                                <span className="text-white/50 text-xs">{busyMsg || 'Lau está pensando…'}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {messages.length <= 1 && !loading && (
+                        <div className="pt-4">
+                            <p className="text-[11px] uppercase tracking-[0.2em] text-white/30 mb-3 text-center">Probá pedirle</p>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                                {SUGGESTIONS.map(s => (
+                                    <button key={s} onClick={() => setInput(s)} className="text-xs text-white/70 bg-white/[0.04] border border-white/10 rounded-full px-3.5 py-2 hover:border-[#D4AF37]/50 hover:text-white hover:bg-white/[0.07] transition-all">{s}</button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="relative shrink-0 border-t border-white/10 bg-white/[0.03] backdrop-blur-xl p-4">
+                <div className="max-w-3xl mx-auto">
+                    {preview && (
+                        <div className="relative inline-block mb-2.5">
+                            <img src={preview} alt="" className="h-20 rounded-xl border border-white/15" />
+                            <button onClick={() => { setFile(null); setPreview(null); }} className="absolute -top-2 -right-2 bg-[#0A0A0A] border border-white/20 rounded-full p-1 hover:bg-white/10 transition-colors"><X className="w-3.5 h-3.5 text-white/70" /></button>
+                        </div>
+                    )}
+                    <div className="flex items-end gap-1 bg-white/[0.06] border border-white/15 rounded-2xl pl-1.5 pr-1.5 py-1.5 transition-colors focus-within:border-[#D4AF37]/60 focus-within:bg-white/[0.08]">
                         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick} />
-                        <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-3 text-white/50 hover:text-[#BF953F] disabled:opacity-40" title="Adjuntar foto de prenda"><Paperclip className="w-5 h-5" /></button>
+                        <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#D4AF37] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Adjuntar foto de prenda"><Paperclip className="w-5 h-5" /></button>
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                             rows={1}
-                            placeholder="Pedile algo a Laurina… (Enter para enviar)"
+                            placeholder="Escribile a Lau…"
                             disabled={loading}
-                            className="flex-1 resize-none bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#BF953F]/60 max-h-32"
+                            className="flex-1 resize-none bg-transparent border-0 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-0 max-h-32"
                         />
-                        <button onClick={handleSend} disabled={loading || (!input.trim() && !file)} className="p-3 rounded-xl bg-gradient-to-br from-[#BF953F] to-[#B38728] text-cielo-dark disabled:opacity-40 hover:opacity-90">
+                        <button onClick={handleSend} disabled={loading || (!input.trim() && !file)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                         </button>
                     </div>
+                    <p className="text-[10px] text-white/25 text-center mt-2.5">Lau ejecuta acciones reales · lo sensible te lo confirma antes</p>
                 </div>
             </div>
         </div>

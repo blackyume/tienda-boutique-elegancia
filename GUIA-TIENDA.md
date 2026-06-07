@@ -1,18 +1,18 @@
 # 🛍️ Guía de La Boutique de la Elegancia
 
-Manual para manejar la tienda **hablándole a Laurina** (la copiloto de IA del panel admin) y para dejarla lista para vender.
+Manual para manejar la tienda **hablándole a Lau** (la copiloto de IA del panel admin) y para dejarla lista para vender.
 
-> **Idea central:** casi todo lo administrás escribiéndole a Laurina en lenguaje natural, como si le hablaras a una empleada. Ella ejecuta de verdad. Lo delicado te pide un "OK" antes.
+> **Idea central:** casi todo lo administrás escribiéndole a Lau en lenguaje natural, como si le hablaras a una empleada. Ella ejecuta de verdad. Lo delicado te pide un "OK" antes.
 
 ---
 
-## 1. Dónde está Laurina
-Panel Admin → menú lateral → **"Asistente Laurina"**.
+## 1. Dónde está Lau
+Panel Admin → menú lateral → **"Asistente Lau"**.
 Necesitás estar logueada como admin. Lo sensible (borrar, precios, publicar, etc.) te lo confirma antes de hacerlo.
 
 ---
 
-## 2. Todo lo que Laurina puede hacer (con ejemplos)
+## 2. Todo lo que Lau puede hacer (con ejemplos)
 
 ### 📸 Cargar y publicar productos
 - *"Cargá este vestido"* (adjuntando la foto) → detecta la prenda, sugiere descripción y precio.
@@ -59,7 +59,7 @@ Fórmula (la misma que el Simulador de Costos):
 
 Así, después de pagar el costo y la comisión de Mercado Pago, te queda **limpio** el margen que pediste.
 
-- **Comisión de MP por defecto: 6%.** ⚠️ Confirmá tu % real (depende de tu cuenta y de cuándo cobrás: al instante es más caro, a 30 días más barato). Si es otro, decíselo a Laurina: *"la comisión es 5%"*.
+- **Comisión de MP por defecto: 6%.** ⚠️ Confirmá tu % real (depende de tu cuenta y de cuándo cobrás: al instante es más caro, a 30 días más barato). Si es otro, decíselo a Lau: *"la comisión es 5%"*.
 - **Margen por defecto: 50%.**
 - Si le pasás packaging o envío, también los suma: *"me costó $8000, packaging $500"*.
 
@@ -68,7 +68,7 @@ Así, después de pagar el costo y la comisión de Mercado Pago, te queda **limp
 ---
 
 ## 4. Para lanzar la tienda — checklist
-1. ☐ **Subir productos** (con nombre, precio, foto y **stock mayor a 0**). Lo más fácil: pedíselo a Laurina con la foto.
+1. ☐ **Subir productos** (con nombre, precio, foto y **stock mayor a 0**). Lo más fácil: pedíselo a Lau con la foto.
 2. ☐ **(Opcional) Crear categorías** para ordenar: *"creá las categorías Vestidos, Blusas, Pantalones"*. Sin categorías igual se venden (aparecen en "Ver Todo").
 3. ☐ **Hacer una compra de prueba** vos misma, de punta a punta, para confirmar que Mercado Pago cobra.
 4. ☐ **Sacar el modo mantenimiento.**
@@ -100,7 +100,7 @@ Así, después de pagar el costo y la comisión de Mercado Pago, te queda **limp
 - 🐛 Bugs arreglados: pago no falsificable, cupón se redime al aprobar el pago, estados de pedido unificados, botón del login admin visible, zoom de fotos en producto.
 - 🔒 Proxy de IA server-side (no expone claves), comparaciones timing-safe.
 - 💳 **Pagos arreglados** (eran 4 bugs encadenados: cron de Vercel, routing, service account y el SDK viejo de Mercado Pago). Backend de Vercel revivido y andando.
-- 🤖 **Laurina** ampliada: pedidos, reseñas, ofertas, y **cálculo de precio con comisión MP + margen**.
+- 🤖 **Lau** ampliada: pedidos, reseñas, ofertas, y **cálculo de precio con comisión MP + margen**.
 
 ---
 
