@@ -5,9 +5,48 @@ import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { analyzeProductImage } from '../../utils/vision';
 import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
 
-const HISTORY_KEY = 'lau_copilot_v2';
+const HISTORY_KEY = 'lau_copilot_v3';
 const MAX_STEPS = 5;
-const WELCOME = { role: 'ai', text: '¡Hola! 👋 Soy Lau, tu copiloto. Manejá la tienda hablándome como a una empleada — yo ejecuto:\n\n📸 Cargo productos (mandame la foto y te calculo el precio con comisión de MP + tu margen)\n💰 Precios, ofertas y cupones\n📦 Pedidos: marcar enviados / entregados\n⭐ Reseñas  ·  🏠 destacar en la home\n📊 Consultame ventas, stock o clientes\n\nLo importante siempre te lo confirmo antes de hacerlo. ¿Por dónde arrancamos?' };
+const WELCOME = {
+    role: 'ai', text:
+        '¡Hola! 👋 Soy Lau, tu copiloto de IA. Manejás toda la tienda hablándome en lenguaje natural, como a una empleada — y yo ejecuto las acciones de verdad (lo importante siempre te lo confirmo antes). Esto es TODO lo que puedo hacer por vos:\n' +
+        '\n📸 PRODUCTOS' +
+        '\n• Crear y publicar productos: mandame la foto y detecto la prenda, los colores y la categoría, te sugiero la descripción, y si me pasás el costo te calculo el precio de venta ya cubriendo la comisión de Mercado Pago + tu margen.' +
+        '\n• Editar nombre, descripción, categoría, colores y talles.' +
+        '\n• Generar descripción y palabras clave (SEO) automáticamente.' +
+        '\n• Poner/sacar ofertas (precio tachado por %), y cambiar precios de a uno o masivo por categoría.' +
+        '\n• Cambiar stock, mostrar/ocultar, eliminar, y poner etiquetas (Nuevo, En oferta, Destacado…).' +
+        '\n\n💰 PRECIOS Y VENTAS' +
+        '\n• Calcular el precio a partir del costo (comisión MP + margen) y decirte la ganancia neta.' +
+        '\n• Contarte cuánto vendiste: hoy, esta semana, este mes o en total.' +
+        '\n\n📦 PEDIDOS' +
+        '\n• Mostrarte los pedidos (todos o por estado) y los que están pendientes de enviar.' +
+        '\n• Marcarlos como enviados (con código de seguimiento), entregados o cancelados.' +
+        '\n\n🎟️ CUPONES' +
+        '\n• Crear cupones (% o monto fijo, con tope de usos, compra mínima y vencimiento), listarlos y eliminarlos.' +
+        '\n\n⭐ RESEÑAS' +
+        '\n• Mostrarte las reseñas (todas o las pendientes) y aprobarlas o rechazarlas.' +
+        '\n\n🏠 HOME Y CATEGORÍAS' +
+        '\n• Destacar productos en la portada, editar los textos del hero, el banner de anuncios y la sección editorial, y crear categorías.' +
+        '\n\n👥 CLIENTES Y 📊 DATOS' +
+        '\n• Tus mejores clientes por gasto, productos con poco stock, qué se vende más… preguntame lo que quieras.' +
+        '\n\n🔧 TIENDA' +
+        '\n• Prender o apagar el modo mantenimiento.' +
+        '\n\n━━━━━━━━━━━━━━━━' +
+        '\n💡 CÓMO CARGAR UN PRODUCTO (paso a paso)' +
+        '\n1) Tocá el clip 📎 acá abajo y adjuntá la FOTO de la prenda (una foto clara y bien iluminada vende mucho más).' +
+        '\n2) Escribime los datos en un mensaje. Ejemplo:\n   "Vestido de fiesta, talles S M L, colores rojo y negro, stock 12, me costó $8000 y quiero 50% de margen".' +
+        '\n3) Miro la foto, completo lo que pueda (tipo de prenda, colores, descripción), calculo el PRECIO de venta ya con la comisión de Mercado Pago + tu margen, y te muestro todo para que lo revises.' +
+        '\n4) Confirmás y lo publico en la tienda. ✅ (o lo dejo como borrador si me decís).' +
+        '\n\n📋 Qué datos me podés dar:' +
+        '\n• Nombre y categoría' +
+        '\n• Talles (S M L XL…) y colores' +
+        '\n• STOCK = la cantidad de unidades que tenés' +
+        '\n• PRECIO directo, O el COSTO + margen y yo te calculo el precio final' +
+        '\nLo que no me digas, lo dejo razonable o te pregunto. Nada se publica sin que vos confirmes.' +
+        '\n👉 Si manejás stock por cada talle/color por separado, yo cargo el stock total y después lo ajustás por variante en el editor del producto.' +
+        '\n\n¿Arrancamos? Mandame la primera foto. 📸'
+};
 
 const toArr = (v) => Array.isArray(v) ? v.map(String).map(s => s.trim()).filter(Boolean)
     : (typeof v === 'string' ? v.split(/[,/]+/).map(s => s.trim()).filter(Boolean) : []);
