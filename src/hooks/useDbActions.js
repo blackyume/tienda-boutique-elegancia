@@ -3,6 +3,69 @@ import { db } from '../lib/firebase';
 import { collection, addDoc, updateDoc, deleteDoc, doc, setDoc, increment } from 'firebase/firestore';
 import imageCompression from 'browser-image-compression';
 
+// Email transaccional al cliente vía EmailJS (credenciales en Admin → Configuración).
+// type: 'confirmed' (pedido recibido) | 'shipped' (pedido enviado).
+// Lanza error si EmailJS no está configurado; el caller decide si lo silencia.
+const sendCustomerEmail = async (siteConfig, order, opts = {}) => {
+  const type = opts.type || 'confirmed';
+  const ej = siteConfig?.emailjs || {};
+  const SERVICE_ID = ej.serviceId || '';
+  const PUBLIC_KEY = ej.publicKey || '';
+  const TEMPLATE_ID = type === 'shipped'
+    ? (ej.shippedTemplateId || ej.templateId || '')
+    : (ej.templateId || '');
+
+  if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+    throw new Error('EmailJS no configurado. Completá las credenciales en Admin → Configuración.');
+  }
+
+  const c = order.customer || {};
+  const toEmail = c.email || order.email;
+  if (!toEmail) throw new Error('El pedido no tiene email del cliente.');
+
+  const itemsSummary = (order.items || [])
+    .map(i => `${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity}`)
+    .join(', ') || 'Sin items';
+  const address = [c.calle, c.altura, c.piso, c.ciudad, c.cp].filter(Boolean).join(' ');
+  const subjectMap = {
+    confirmed: `Recibimos tu pedido ${order.id || ''} 🛍️`,
+    shipped: `¡Tu pedido ${order.id || ''} va en camino! 🚚`,
+  };
+  const messageMap = {
+    confirmed: '¡Gracias por tu compra! Ya estamos preparando tu pedido con todo el cariño. Te avisamos por este medio cuando salga.',
+    shipped: 'Tu pedido fue despachado y está en camino. ¡Pronto lo vas a tener en tus manos!',
+  };
+
+  const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: SERVICE_ID,
+      template_id: TEMPLATE_ID,
+      user_id: PUBLIC_KEY,
+      template_params: {
+        to_name: c.nombre || 'Cliente',
+        to_email: toEmail,
+        order_id: order.id || '',
+        total: typeof order.total === 'number' ? `$${order.total.toLocaleString('es-AR')}` : (order.total || ''),
+        items_summary: itemsSummary,
+        shipping_method: order.shippingName || order.shipping || 'No especificado',
+        shipping_address: address || 'Retiro en persona',
+        tracking: opts.tracking || order.tracking || '',
+        email_type: type,
+        subject: subjectMap[type] || 'Actualización de tu pedido',
+        status_label: type === 'shipped' ? 'Pedido enviado' : 'Pedido recibido',
+        message: opts.message || messageMap[type] || '',
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`EmailJS ${res.status}: ${text}`);
+  }
+};
+
 // Todas las acciones de escritura a Firestore (CRUD productos, órdenes,
 // cupones, proveedores, integraciones MP/EmailJS, etc.) extraídas de
 // StoreContext. Lógica idéntica; recibe estado/closures por parámetro.
@@ -122,6 +185,14 @@ export const useDbActions = ({
         }
       }
       await updateDoc(doc(db, "orders", orderId), { status, ...extraData });
+
+      // Email automático al cliente cuando el pedido se marca como ENVIADO.
+      // No bloquea ni rompe el cambio de estado si EmailJS no está configurado.
+      if (status === 'shipped' && order) {
+        sendCustomerEmail(siteConfig, { ...order, ...extraData }, { type: 'shipped', tracking: extraData.tracking })
+          .then(() => addToast('📧 Email de envío enviado al cliente', 'success'))
+          .catch((e) => console.warn('No se pudo enviar email de envío:', e.message));
+      }
     },
     addCategory: async (category) => {
       if (!isAdmin) return;
@@ -312,51 +383,8 @@ export const useDbActions = ({
       }
     },
 
-    sendOrderEmail: async (order) => {
-      // Get credentials from siteConfig (editable from admin)
-      const SERVICE_ID = siteConfig.emailjs?.serviceId || "";
-      const TEMPLATE_ID = siteConfig.emailjs?.templateId || "";
-      const PUBLIC_KEY = siteConfig.emailjs?.publicKey || "";
-
-      if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-        console.warn("EmailJS no configurado. Configura las credenciales en Admin → Configuración.");
-        throw new Error("EmailJS no configurado. Ve a Admin → Configuración para agregar tus credenciales.");
-      }
-
-      try {
-        const data = {
-          service_id: SERVICE_ID,
-          template_id: TEMPLATE_ID,
-          user_id: PUBLIC_KEY,
-          template_params: {
-            to_name: order.customer?.nombre || 'Cliente',
-            to_email: order.customer?.email,
-            order_id: order.id,
-            total: order.total,
-            items_summary: order.items?.map(i => `${i.name} (${i.size || 'N/A'}) x${i.quantity}`).join(', ') || 'Sin items',
-            shipping_method: order.shipping || 'No especificado'
-          }
-        };
-
-        console.log("Enviando email con data:", data);
-
-        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("EmailJS Error Response:", errorText);
-          throw new Error(`EmailJS Error: ${errorText}`);
-        }
-
-        console.log("Email enviado con éxito");
-      } catch (error) {
-        console.error("Error enviando email:", error);
-        throw error; // Re-throw para que el caller pueda manejarlo
-      }
+    sendOrderEmail: async (order, opts = {}) => {
+      return sendCustomerEmail(siteConfig, order, { type: 'confirmed', ...opts });
     },
 
     // --- ABANDONED CART REMINDER ---

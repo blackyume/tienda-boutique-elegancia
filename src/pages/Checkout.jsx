@@ -10,7 +10,7 @@ import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandon
 import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
 
 export const Checkout = () => {
-    const { cart, cartTotal, createOrder, addToast, user, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons } = useStore();
+    const { cart, cartTotal, createOrder, addToast, user, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '' });
@@ -222,7 +222,8 @@ export const Checkout = () => {
                 customer: { ...formData, userId: user.uid, email: formData.email },
                 items: cart,
                 shipping: shippingMethod,
-                shippingCost: shippingOptions[shippingMethod].cost,
+                shippingName: selectedShipping.name || shippingMethod,
+                shippingCost: selectedShipping.cost || 0,
                 coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null,
                 referral: appliedReferral ? { code: appliedReferral.code, ownerUid: appliedReferral.ownerUid, discount: referralDiscount } : null,
                 paymentMethod: 'whatsapp'
@@ -230,6 +231,8 @@ export const Checkout = () => {
 
             trackBeginCheckout(cart, finalTotal);
             await createOrder(newOrder);
+            // Email de confirmación al cliente (no rompe el flujo si EmailJS no está configurado)
+            await sendOrderEmail(newOrder).catch(() => {});
             // El cupón se redime cuando el pedido se confirma (admin marca el
             // pedido de WhatsApp como pagado/enviado), no al crearlo — así no se
             // quema un uso si el cliente nunca concreta la compra.
@@ -265,7 +268,8 @@ export const Checkout = () => {
                 customer: { ...formData, userId: user.uid, email: formData.email },
                 items: cart,
                 shipping: shippingMethod,
-                shippingCost: shippingOptions[shippingMethod].cost,
+                shippingName: selectedShipping.name || shippingMethod,
+                shippingCost: selectedShipping.cost || 0,
                 coupon: appliedCoupon ? { code: appliedCoupon.code, discount: couponDiscount } : null,
                 referral: appliedReferral ? { code: appliedReferral.code, ownerUid: appliedReferral.ownerUid, discount: referralDiscount } : null
             };
@@ -276,6 +280,8 @@ export const Checkout = () => {
             // 1. Crear Orden en Firebase (Persistencia)
             await createOrder(newOrder);
             markAbandonedCartRecovered(formData.email, newOrder.id).catch(() => {});
+            // Email "recibimos tu pedido" (no bloquea si EmailJS no está configurado)
+            await sendOrderEmail(newOrder).catch(() => {});
 
             // El cupón se redime server-side en el webhook de MP cuando el pago
             // se aprueba (idempotente). No lo incrementamos acá para no quemar un
