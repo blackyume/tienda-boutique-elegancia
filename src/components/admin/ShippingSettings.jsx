@@ -5,11 +5,11 @@ import { Truck, Save, RefreshCw } from 'lucide-react';
 
 export const ShippingSettings = () => {
     const { shippingRates, updateShippingRates, addToast } = useStore();
-    const [localRates, setLocalRates] = useState(shippingRates);
+    const [localRates, setLocalRates] = useState(shippingRates || {});
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        setLocalRates(shippingRates);
+        setLocalRates(shippingRates || {});
     }, [shippingRates]);
 
     const handleChange = (key, field, value) => {

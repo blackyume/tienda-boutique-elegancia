@@ -76,7 +76,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
             body: tableRows,
             startY: 35,
             theme: 'grid',
-            headStyles: { fillColor: [193, 154, 107], textColor: 255 },
+            headStyles: { fillColor: [212, 175, 55], textColor: 255 },
             alternateRowStyles: { fillColor: [245, 242, 235] },
             styles: { fontSize: 9 }
         });
@@ -159,7 +159,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                 </div>
 
                                 <div className="flex gap-3">
-                                    <Button onClick={handleSave} className="flex-1 bg-white !text-slate-900 hover:bg-slate-200 font-bold">
+                                    <Button onClick={handleSave} className="flex-1 !bg-white !text-slate-900 hover:!bg-slate-200 font-bold">
                                         <Save className="w-4 h-4 mr-2" /> Guardar en Historial
                                     </Button>
                                     {onSaveToProduct && (
@@ -305,7 +305,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                             <tr key={p.id} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                                 <td className="p-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
+                                                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
                                                             {p.image ? <img src={p.image} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-300 text-[8px]">IMG</div>}
                                                         </div>
                                                         <div>
@@ -324,7 +324,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                                 <td className="p-4 text-right font-mono font-bold text-slate-800 dark:text-white">{formatMoney(p.price)}</td>
                                                 <td className="p-4 text-right font-mono text-green-600 dark:text-green-400 font-bold">+{formatMoney(prodNet)}</td>
                                                 <td className="p-4 text-right font-bold text-xs">
-                                                    <span className={`px - 2 py - 1 rounded - lg ${prodMargin < 30 ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'} `}>
+                                                    <span className={`px-2 py-1 rounded-lg ${prodMargin < 30 ? 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'}`}>
                                                         {prodMargin.toFixed(1)}%
                                                     </span>
                                                 </td>

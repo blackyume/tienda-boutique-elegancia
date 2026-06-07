@@ -449,7 +449,7 @@ export const CouponsView = () => {
                                 <Button
                                     type="button"
                                     onClick={() => { setIsModalOpen(false); resetForm(); }}
-                                    className="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 py-3 rounded-xl font-bold transition-colors"
+                                    className="flex-1 !bg-slate-100 dark:!bg-slate-700 !text-slate-700 dark:!text-slate-200 hover:!bg-slate-200 dark:hover:!bg-slate-600 py-3 rounded-xl font-bold transition-colors"
                                 >
                                     Cancelar
                                 </Button>

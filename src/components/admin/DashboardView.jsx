@@ -490,9 +490,9 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                         </div>
 
                                         <div className="pl-4">
-                                            <p className="text-xs font-medium text-slate-600 dark:text-slate-300">{order.customer.email}</p>
+                                            <p className="text-xs font-medium text-slate-600 dark:text-slate-300">{order.customer?.email || 'Cliente'}</p>
                                             <p className="text-[10px] text-slate-400 mt-0.5">
-                                                {order.items.length} items • <span className="text-slate-600 dark:text-slate-300 font-bold">{formatMoney(order.total)}</span>
+                                                {(order.items?.length || 0)} items • <span className="text-slate-600 dark:text-slate-300 font-bold">{formatMoney(order.total)}</span>
                                             </p>
                                         </div>
                                     </div>

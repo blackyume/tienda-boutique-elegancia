@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { formatMoney } from '../../utils/helpers';
 import { KanbanBoard } from './KanbanBoard';
 import { EmptyState } from '../ui/EmptyState';
-import { usePrompt } from '../ui/ConfirmDialog';
+import { usePrompt, useConfirm } from '../ui/ConfirmDialog';
 import { LayoutList, KanbanSquare, PackageOpen } from 'lucide-react';
 import { usePagination, Pagination } from '../ui/Pagination';
 import { getStatusLabel, getStatusClasses, isFulfillable } from '../../utils/orderStatus';
 
 export const OrdersView = ({ orders, updateOrderStatus }) => {
     const askPrompt = usePrompt();
+    const confirm = useConfirm();
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'board'
     const [filter, setFilter] = useState('all');
 
@@ -109,9 +110,18 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                                                 Marcar Entregado
                                             </button>
                                         )}
-                                        <button className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:border-red-200 transition-colors" title="Cancelar Pedido (Próximamente)">
-                                            <span className="text-xs font-bold">CANCELAR</span>
-                                        </button>
+                                        {!['cancelled', 'delivered', 'refunded'].includes(o.status) && (
+                                            <button
+                                                onClick={async () => {
+                                                    const ok = await confirm({ title: 'Cancelar pedido', message: `¿Seguro que querés cancelar el pedido #${String(o.id || '').slice(-6)}?`, confirmText: 'Sí, cancelar', danger: true });
+                                                    if (ok) updateOrderStatus(o.id, 'cancelled');
+                                                }}
+                                                className="p-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 hover:text-red-500 hover:border-red-300 dark:hover:border-red-800 transition-colors"
+                                                title="Cancelar pedido"
+                                            >
+                                                <span className="text-xs font-bold">CANCELAR</span>
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>

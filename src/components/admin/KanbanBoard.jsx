@@ -96,7 +96,7 @@ export const KanbanBoard = ({ orders, updateOrderStatus }) => {
                                         {getStatusLabel(order.status)}
                                     </span>
 
-                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1 group-hover:text-[#D4AF37] transition-colors">{order.customer.nombre} {order.customer.apellido}</h4>
+                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1 group-hover:text-[#D4AF37] transition-colors">{order.customer?.nombre || 'Cliente'} {order.customer?.apellido || ''}</h4>
 
                                     <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
                                         <Package className="w-3 h-3" /> {order.items.length} items

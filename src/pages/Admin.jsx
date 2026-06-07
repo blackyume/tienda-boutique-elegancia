@@ -638,7 +638,7 @@ export const Admin = () => {
 
                         <style>{`
                 .input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; outline: none; transition: all 0.2s; font-size: 0.875rem; }
-                .input:focus { border-color: #D4AF37; box-shadow: 0 0 0 2px rgba(193,154,107,0.1); }
+                .input:focus { border-color: #D4AF37; box-shadow: 0 0 0 2px rgba(212,175,55,0.1); }
                 .dark .input { background: #121212; border-color: #334155; color: white; }
                 .dark .input:focus { border-color: #D4AF37; }
                 /* Hide spin buttons */

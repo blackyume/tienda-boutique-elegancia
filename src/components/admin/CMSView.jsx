@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
+import { useConfirm } from '../ui/ConfirmDialog';
 import { Tag, Image as ImageIcon, Trash2, UploadCloud, Plus, X, Monitor, Megaphone, Layout, Share2, ToggleLeft, ToggleRight, Gift, Link as LinkIcon, Quote, Target, Clock } from 'lucide-react';
 
 const ImageUploader = ({ currentImage, onUpload, label, className = "" }) => {
@@ -190,6 +191,7 @@ const AnnouncementEditor = ({ text, enabled, onSaveText, onToggle }) => {
 
 export const CMSView = () => {
     const { categories, addCategory, deleteCategory, siteConfig, updateSiteConfig, addToast, cloudinaryConfig, updateCloudinaryConfig, inventory } = useStore();
+    const confirm = useConfirm();
     const [activeTab, setActiveTab] = useState('home'); // home | promo | categories | config
     const [activeSubTab, setActiveSubTab] = useState('hero');
 
@@ -386,7 +388,7 @@ export const CMSView = () => {
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold uppercase text-slate-500">Imagen de Fondo</label>
                                         <ImageUploader
-                                            currentImage={null}
+                                            currentImage={siteConfig.hero?.image}
                                             onUpload={(url) => updateSection('hero', 'image', url)}
                                             label="Cambiar Imagen"
                                             className="w-full h-32"
@@ -552,7 +554,7 @@ export const CMSView = () => {
                                         <span className="text-white font-bold text-lg leading-tight shadow-black drop-shadow-md">{cat.name}</span>
                                     </div>
                                     <button
-                                        onClick={() => deleteCategory(cat.id)}
+                                        onClick={async () => { if (await confirm({ title: 'Eliminar categoría', message: `¿Eliminar la categoría "${cat.name}"? Los productos no se borran, pero dejan de aparecer agrupados.`, confirmText: 'Eliminar', danger: true })) deleteCategory(cat.id); }}
                                         className="absolute top-2 right-2 p-2 bg-white/90 text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white hover:scale-105 shadow-sm"
                                         title="Eliminar Categoría"
                                     >

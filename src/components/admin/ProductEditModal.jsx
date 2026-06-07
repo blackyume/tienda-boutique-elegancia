@@ -625,15 +625,15 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                         <div className="flex items-center gap-3">
                                             <div className="flex-1">
                                                 <label className="text-[10px] text-slate-400 block mb-1">Costo Total del Bulto</label>
-                                                <input type="number" placeholder="0" value={calcEnvioTotal} onChange={(e) => updateShippingFromCalc(e.target.value, calcEnvioCant)} className="w-full p-2 border rounded-lg bg-white dark:bg-black outline-none focus:border-[#D4AF37] text-center font-bold" />
+                                                <input type="number" placeholder="0" value={calcEnvioTotal} onChange={(e) => updateShippingFromCalc(e.target.value, calcEnvioCant)} className="w-full p-2 border rounded-lg bg-white dark:bg-[#121212] outline-none focus:border-[#D4AF37] text-center font-bold" />
                                             </div>
                                             <span className="text-slate-300 text-xl font-light">/</span>
                                             <div className="w-24">
                                                 <label className="text-[10px] text-slate-400 block mb-1">Unidades</label>
-                                                <input type="number" placeholder="0" value={calcEnvioCant} onChange={(e) => updateShippingFromCalc(calcEnvioTotal, e.target.value)} className="w-full p-2 border rounded-lg bg-white dark:bg-black outline-none focus:border-[#D4AF37] text-center font-bold" />
+                                                <input type="number" placeholder="0" value={calcEnvioCant} onChange={(e) => updateShippingFromCalc(calcEnvioTotal, e.target.value)} className="w-full p-2 border rounded-lg bg-white dark:bg-[#121212] outline-none focus:border-[#D4AF37] text-center font-bold" />
                                             </div>
                                             <span className="text-slate-300 text-xl font-light">=</span>
-                                            <div className="flex-1 bg-white dark:bg-black border border-emerald-100 dark:border-emerald-900/30 p-2 rounded-lg text-center">
+                                            <div className="flex-1 bg-white dark:bg-[#121212] border border-emerald-100 dark:border-emerald-900/30 p-2 rounded-lg text-center">
                                                 <span className="block text-emerald-600 dark:text-emerald-400 font-black text-lg">{formatMoney(currentProduct.shippingCost)}</span>
                                                 <span className="block text-[9px] text-emerald-600/60 uppercase font-bold">Costo x Prenda</span>
                                             </div>

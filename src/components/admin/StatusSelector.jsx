@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../../context/StoreContext';
 import { Package, XCircle, Clock } from 'lucide-react';
+import { getTotalStock } from '../../utils/variants';
 
 const OPTIONS = [
-    { value: 'available', label: 'En Stock', icon: Package, color: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200', dot: 'bg-emerald-500' },
-    { value: 'out_of_stock', label: 'Sin Stock', icon: XCircle, color: 'text-red-600 bg-red-50 hover:bg-red-100 border-red-200', dot: 'bg-red-500' },
-    { value: 'pending', label: 'Pendiente', icon: Clock, color: 'text-orange-600 bg-orange-50 hover:bg-orange-100 border-orange-200', dot: 'bg-orange-500' }
+    { value: 'available', label: 'En Stock', icon: Package, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 border-emerald-200 dark:border-emerald-900/50', dot: 'bg-emerald-500' },
+    { value: 'out_of_stock', label: 'Sin Stock', icon: XCircle, color: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border-red-200 dark:border-red-900/50', dot: 'bg-red-500' },
+    { value: 'pending', label: 'Pendiente', icon: Clock, color: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 border-orange-200 dark:border-orange-900/50', dot: 'bg-orange-500' }
 ];
 
 export const StatusSelector = ({ product }) => {
@@ -15,7 +16,7 @@ export const StatusSelector = ({ product }) => {
     const [pos, setPos] = useState({ top: 0, left: 0 });
     const btnRef = useRef(null);
 
-    const currentStatus = product.status || (product.stock > 0 ? 'available' : 'out_of_stock');
+    const currentStatus = product.status || (getTotalStock(product) > 0 ? 'available' : 'out_of_stock');
     const current = OPTIONS.find(o => o.value === currentStatus) || OPTIONS[0];
 
     const place = useCallback(() => {
