@@ -1,6 +1,6 @@
 import { LogoSVG } from './LogoSVG';
 import { AuthModal } from '../auth/AuthModal';
-import { User, Menu, ChevronDown, Search, ShieldCheck, ShoppingBag, X, LogOut, Heart, Package } from 'lucide-react';
+import { User, Menu, ChevronDown, Search, ShieldCheck, ShoppingBag, X, LogOut, Heart, Package, ArrowRight } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { useState, useEffect, useRef } from 'react';
@@ -294,7 +294,25 @@ export const Navbar = ({ onOpenCart }) => {
             <div className={`fixed inset-0 z-[60] bg-[#0A0A0A]/95 backdrop-blur-2xl transition-all duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                 <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-6 right-6 p-4 text-white hover:rotate-90 transition-transform duration-500"><X className="w-8 h-8" /></button>
                 <div className="flex flex-col items-center justify-center h-full gap-8">
-                    <h2 className="text-3xl font-cinzel text-cielo-gold mb-8">MENÚ</h2>
+                    <h2 className="text-3xl font-cinzel text-cielo-gold mb-2">MENÚ</h2>
+
+                    {/* BUSCADOR MOBILE */}
+                    <form
+                        onSubmit={(e) => { e.preventDefault(); const q = search.trim(); if (q) { navigate(`/shop?q=${encodeURIComponent(q)}`); setIsMobileMenuOpen(false); setSearch(''); } }}
+                        className="w-full max-w-xs px-6 mb-2"
+                    >
+                        <div className="flex items-center gap-2 border border-white/15 rounded-full px-4 py-3 bg-white/5 focus-within:border-cielo-gold/50 transition-colors">
+                            <Search className="w-4 h-4 text-white/40 shrink-0" />
+                            <input
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Buscar prendas..."
+                                className="flex-1 min-w-0 bg-transparent border-0 outline-none text-sm text-white placeholder-white/30"
+                            />
+                            <button type="submit" className="text-cielo-gold shrink-0 hover:scale-110 transition-transform" aria-label="Buscar"><ArrowRight className="w-5 h-5" /></button>
+                        </div>
+                    </form>
+
                     {categories.map((cat, i) => (
                         <button
                             key={cat.id}
