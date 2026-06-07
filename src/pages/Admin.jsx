@@ -230,6 +230,41 @@ export const Admin = () => {
         setIsProductModalOpen(true);
     };
 
+    // Exportar todo el inventario a Excel (stock, precios, costos, ganancia…)
+    const exportInventory = async () => {
+        if (!inventory || inventory.length === 0) return addToast('No hay productos para exportar', 'error');
+        try {
+            const XLSX = await import('xlsx');
+            const rows = inventory.map(p => {
+                const stock = getTotalStock(p);
+                const price = Number(p.price) || 0;
+                const cost = Number(p.cost) || 0;
+                return {
+                    Producto: p.name || '',
+                    Categoría: p.category || '',
+                    'Precio venta': price,
+                    Costo: cost || '',
+                    'Ganancia x unidad': cost ? price - cost : '',
+                    Stock: stock,
+                    'Valor en stock': price * stock,
+                    Talles: Array.isArray(p.sizes) ? p.sizes.join(', ') : '',
+                    Colores: Array.isArray(p.colors) ? p.colors.join(', ') : '',
+                    Estado: p.active === false ? 'Borrador' : 'Publicado',
+                    ID: p.id,
+                };
+            });
+            const ws = XLSX.utils.json_to_sheet(rows);
+            ws['!cols'] = [{ wch: 30 }, { wch: 16 }, { wch: 12 }, { wch: 12 }, { wch: 16 }, { wch: 8 }, { wch: 14 }, { wch: 18 }, { wch: 18 }, { wch: 12 }, { wch: 14 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+            XLSX.writeFile(wb, `Inventario_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            addToast('Inventario exportado a Excel', 'success');
+        } catch (e) {
+            console.error(e);
+            addToast('Error al exportar el inventario', 'error');
+        }
+    };
+
     const paletteCommands = useMemo(() => {
         const cmds = [
             { id: 'act-new-product', label: 'Nuevo producto', group: 'Acción', icon: Tag, action: () => { setAdminTab('inventory'); openNewProduct(); } },
@@ -349,9 +384,14 @@ export const Admin = () => {
                                 <h1 className="text-3xl font-luxury font-bold dark:text-white text-slate-900 tracking-wider">Inventario Exclusivo</h1>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Gestiona tu colección premium.</p>
                             </div>
-                            <Button onClick={openNewProduct} className="bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
-                                + Nuevo Diseño
-                            </Button>
+                            <div className="flex items-center gap-3">
+                                <Button onClick={exportInventory} className="!bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-5 py-3 rounded-none text-xs uppercase tracking-[0.2em] hover:!border-[#D4AF37] hover:!text-[#D4AF37] transition-all">
+                                    ⤓ Exportar Excel
+                                </Button>
+                                <Button onClick={openNewProduct} className="bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
+                                    + Nuevo Diseño
+                                </Button>
+                            </div>
                         </div>
 
                         {/* STATS RAPIDAS */}
