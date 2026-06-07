@@ -107,46 +107,11 @@ export const Navbar = ({ onOpenCart }) => {
                         : 'w-full h-24 bg-gradient-to-b from-black/80 to-transparent border-none'
                     }
                 `}>
-                    {/* MOBILE MENU TRIGGER */}
-                    <button className="md:hidden p-2 text-white" onClick={() => setIsMobileMenuOpen(true)}>
-                        <Menu className="w-6 h-6" />
-                    </button>
-
-                    {/* LEFT SECTION: Logo Mark + Nav */}
-                    <div className="flex items-center gap-8">
-                        {/* LBE Monogram - CSS Text Version */}
-                        <Link to="/" className="relative group flex items-center justify-center">
-                            <div className="absolute inset-0 bg-cielo-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                            {/* Sparkles Container - Always On (Subtle) */}
-                            <div className="absolute inset-0 pointer-events-none">
-                                <svg className="absolute top-4 right-4 w-2.5 h-2.5 text-white animate-sparkle-subtle" style={{ animationDelay: '0ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                                <svg className="absolute top-5 left-5 w-2 h-2 text-cielo-gold animate-sparkle-subtle" style={{ animationDelay: '500ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                                <svg className="absolute bottom-5 right-6 w-1.5 h-1.5 text-white/80 animate-sparkle-subtle" style={{ animationDelay: '1000ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                                <svg className="absolute bottom-4 left-5 w-2 h-2 text-cielo-gold animate-sparkle-subtle" style={{ animationDelay: '1500ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                                <svg className="absolute top-1/2 right-4 w-1.5 h-1.5 text-cielo-gold/60 animate-sparkle-subtle" style={{ animationDelay: '2000ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            </div>
-
-                            {/* Sparkles Container - Hover Burst (Explosion) */}
-                            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                                <svg className="absolute top-4 right-5 w-3 h-3 text-cielo-gold group-hover:animate-sparkle-burst" style={{ animationDelay: '0ms' }} viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                                </svg>
-                                <svg className="absolute bottom-4 left-4 w-3 h-3 text-white group-hover:animate-sparkle-burst" style={{ animationDelay: '100ms' }} viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                                </svg>
-                                <svg className="absolute top-1/2 right-5 w-2 h-2 text-cielo-gold/80 group-hover:animate-sparkle-burst" style={{ animationDelay: '200ms' }} viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                                </svg>
-                                <svg className="absolute top-4 left-1/2 w-2 h-2 text-white/80 group-hover:animate-sparkle-burst" style={{ animationDelay: '300ms' }} viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                                </svg>
-                            </div>
-
-                            <LogoSVG to="/" width={scrolled ? 160 : 200} />
-                        </Link>
-
-                        {/* NAV LINKS (Desktop) */}
+                    {/* LEFT: hamburguesa (mobile) + navegación (desktop) */}
+                    <div className="flex items-center gap-6 z-10">
+                        <button className="md:hidden p-2 text-white" onClick={() => setIsMobileMenuOpen(true)}>
+                            <Menu className="w-6 h-6" />
+                        </button>
                         <div className={`hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.15em] transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-90'}`}>
                             <div className="relative group" onMouseEnter={() => setIsShopMenuOpen(true)} onMouseLeave={() => setIsShopMenuOpen(false)}>
                                 <button className="flex items-center gap-1 text-white hover:text-cielo-gold transition-colors py-4">
@@ -169,7 +134,27 @@ export const Navbar = ({ onOpenCart }) => {
                         </div>
                     </div>
 
-                    {/* CENTER: WORDMARK TITLE */}
+                    {/* CENTER: LOGO (centrado, layout de lujo) */}
+                    <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group flex items-center justify-center">
+                        <div className="absolute inset-0 bg-cielo-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                        {/* Sparkles - Always On (Subtle) */}
+                        <div className="absolute inset-0 pointer-events-none">
+                            <svg className="absolute top-2 right-6 w-2.5 h-2.5 text-white animate-sparkle-subtle" style={{ animationDelay: '0ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            <svg className="absolute top-3 left-6 w-2 h-2 text-cielo-gold animate-sparkle-subtle" style={{ animationDelay: '500ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            <svg className="absolute bottom-3 right-8 w-1.5 h-1.5 text-white/80 animate-sparkle-subtle" style={{ animationDelay: '1000ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            <svg className="absolute bottom-2 left-8 w-2 h-2 text-cielo-gold animate-sparkle-subtle" style={{ animationDelay: '1500ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                        </div>
+
+                        {/* Sparkles - Hover Burst */}
+                        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg className="absolute top-2 right-8 w-3 h-3 text-cielo-gold group-hover:animate-sparkle-burst" style={{ animationDelay: '0ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            <svg className="absolute bottom-2 left-6 w-3 h-3 text-white group-hover:animate-sparkle-burst" style={{ animationDelay: '100ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            <svg className="absolute top-1/2 right-7 w-2 h-2 text-cielo-gold/80 group-hover:animate-sparkle-burst" style={{ animationDelay: '200ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                        </div>
+
+                        <LogoSVG to="/" width={scrolled ? 150 : 200} />
+                    </Link>
 
 
                     {/* ICONS (RIGHT) */}
