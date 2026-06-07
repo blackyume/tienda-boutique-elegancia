@@ -14,7 +14,7 @@ export const Checkout = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '' });
-    const [shippingMethod, setShippingMethod] = useState('andreani');
+    const [shippingMethod, setShippingMethod] = useState('correo_domicilio');
     const [loading, setLoading] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -38,12 +38,17 @@ export const Checkout = () => {
     const [applyingReferral, setApplyingReferral] = useState(false);
 
     const shippingOptions = shippingRates || {
-        andreani: { name: 'Andreani a domicilio', cost: 5800, time: '2-4 días' },
-        oca: { name: 'OCA a domicilio', cost: 4900, time: '3-6 días' },
-        correo_argentino: { name: 'Correo Argentino a domicilio', cost: 3500, time: '5-7 días' },
-        sucursal: { name: 'Retiro en sucursal del correo', cost: 2500, time: '3-5 días', note: 'Lo enviamos a la sucursal de correo más cercana a tu domicilio para que lo retires. Te avisamos cuál cuando lo despachamos.' }
+        correo_domicilio: { name: 'Correo Argentino a domicilio', cost: 6000, time: '3-7 días hábiles' },
+        sucursal: { name: 'Correo Argentino · Retiro en sucursal', cost: 4500, time: '3-5 días hábiles', note: 'Lo enviamos a la sucursal de Correo Argentino más cercana a tu domicilio para que lo retires. Te avisamos cuál cuando lo despachamos.' }
     };
     const selectedShipping = shippingOptions[shippingMethod] || {};
+
+    // Si el método elegido no existe entre las opciones (cambió la config), uso el primero válido.
+    useEffect(() => {
+        const keys = Object.keys(shippingOptions);
+        if (keys.length && !shippingOptions[shippingMethod]) setShippingMethod(keys[0]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [shippingRates]);
 
     // Calculate Surcharge based on config
     const mpFeePercentage = paymentConfig?.mpFee ? parseFloat(paymentConfig.mpFee) : 0;
