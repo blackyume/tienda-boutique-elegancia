@@ -168,7 +168,7 @@ export const Footer = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="tu@email.com"
-                                    className="flex-1 bg-transparent px-4 py-3 text-sm text-white placeholder-white/20 outline-none"
+                                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white placeholder-white/20 outline-none"
                                 />
                                 <button
                                     onClick={() => email && setEmail('')}
