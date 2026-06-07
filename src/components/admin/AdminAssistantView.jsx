@@ -5,9 +5,9 @@ import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { analyzeProductImage } from '../../utils/vision';
 import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
 
-const HISTORY_KEY = 'laurina_copilot_v1';
+const HISTORY_KEY = 'lau_copilot_v2';
 const MAX_STEPS = 5;
-const WELCOME = { role: 'ai', text: 'Hola 👋 Soy Lau, tu copiloto. Pedime lo que necesites en lenguaje natural y lo hago: crear/publicar productos (mandame la foto y, si querés, el COSTO y te calculo el precio cubriendo la comisión de Mercado Pago + tu margen), precios y ofertas, cupones, destacar en la home, gestionar pedidos (marcar enviados/entregados), moderar reseñas, o consultarme ventas, stock y clientes. Lo sensible te lo confirmo antes.' };
+const WELCOME = { role: 'ai', text: '¡Hola! 👋 Soy Lau, tu copiloto. Manejá la tienda hablándome como a una empleada — yo ejecuto:\n\n📸 Cargo productos (mandame la foto y te calculo el precio con comisión de MP + tu margen)\n💰 Precios, ofertas y cupones\n📦 Pedidos: marcar enviados / entregados\n⭐ Reseñas  ·  🏠 destacar en la home\n📊 Consultame ventas, stock o clientes\n\nLo importante siempre te lo confirmo antes de hacerlo. ¿Por dónde arrancamos?' };
 
 const toArr = (v) => Array.isArray(v) ? v.map(String).map(s => s.trim()).filter(Boolean)
     : (typeof v === 'string' ? v.split(/[,/]+/).map(s => s.trim()).filter(Boolean) : []);
@@ -61,7 +61,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     useEffect(() => {
         try {
             const today = new Date().toDateString();
-            if (localStorage.getItem('laurina_briefing') === today) return;
+            if (localStorage.getItem('lau_briefing') === today) return;
             const ordersToday = (orders || []).filter(o => { try { return new Date(o.date).toDateString() === today; } catch { return false; } });
             const revToday = ordersToday.reduce((a, o) => a + (Number(o.total) || 0), 0);
             const threshold = parseInt(siteConfig?.sales?.scarcity?.threshold) || 5;
@@ -75,7 +75,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             if (out.length) lines.push(`• ⛔ SIN stock (reponer): ${out.slice(0, 6).map(p => p.name).join(', ')}${out.length > 6 ? '…' : ''}.`);
             if (low.length) lines.push(`• ⚠️ Poco stock: ${low.slice(0, 6).map(p => `${p.name} (${p.stock})`).join(', ')}${low.length > 6 ? '…' : ''}.`);
             lines.push('Pedime lo que necesites 💛');
-            localStorage.setItem('laurina_briefing', today);
+            localStorage.setItem('lau_briefing', today);
             setMessages(prev => [...prev, { role: 'ai', text: lines.join('\n') }]);
         } catch { /* noop */ }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -408,7 +408,10 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         'Cargá este producto, me costó $8000 y quiero 50% de margen',
         '¿Cuánto vendí esta semana?',
         '¿Qué pedidos tengo pendientes de enviar?',
+        '¿Qué productos tienen poco stock?',
+        'Creá un cupón VERANO15 de 15%',
         'Destacá en la home los 4 productos más nuevos',
+        'Aprobá las reseñas pendientes',
     ];
 
     const clearChat = () => {
