@@ -106,7 +106,8 @@ service cloud.firestore {
     // Solo admin lee/modera.
     match /wishlist_events/{id} {
       allow read: if isAdmin();
-      allow create: if true;
+      // Endurecido: solo eventos con acción válida (anti-spam de la colección).
+      allow create: if request.resource.data.action in ['add', 'remove'];
       allow update, delete: if isAdmin();
     }
 
@@ -123,7 +124,11 @@ service cloud.firestore {
     // Sólo admin lee/modera/borra.
     match /abandoned_carts/{id} {
       allow read: if isAdmin();
-      allow create, update: if true;
+      // Endurecido: requiere email (string acotado) e items (lista). Coincide con
+      // lo que escribe el cliente (utils/abandonedCart.js); bloquea docs basura.
+      allow create, update: if request.resource.data.email is string
+        && request.resource.data.email.size() <= 256
+        && request.resource.data.items is list;
       allow delete: if isAdmin();
     }
 

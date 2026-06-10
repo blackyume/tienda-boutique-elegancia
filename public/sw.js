@@ -5,7 +5,7 @@
 //   - Imágenes (Cloudinary, Unsplash, public/*): cache-first con expiración suave
 //   - Firestore/Firebase/API: network-only (NO cachear — datos sensibles/mutables)
 
-const SW_VERSION = 'v202606101528';
+const SW_VERSION = 'v202606101550';
 const SHELL_CACHE = `lbe-shell-${SW_VERSION}`;
 const ASSETS_CACHE = `lbe-assets-${SW_VERSION}`;
 const IMAGES_CACHE = `lbe-images-${SW_VERSION}`;
