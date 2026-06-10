@@ -7,53 +7,24 @@ import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/
 import { generateShippingLabel } from '../../utils/shippingLabel';
 import { getTotalStock } from '../../utils/variants';
 
-const HISTORY_KEY = 'lau_copilot_v3';
+const HISTORY_KEY = 'lau_copilot_v4';
 const MAX_STEPS = 5;
 const WELCOME = {
     role: 'ai', text:
-        '¡Hola! 👋 Soy Lau, tu copiloto de IA. Manejás toda la tienda hablándome en lenguaje natural, como a una empleada — y yo ejecuto las acciones de verdad (lo importante siempre te lo confirmo antes). Esto es TODO lo que puedo hacer por vos:\n' +
-        '\n📸 PRODUCTOS' +
-        '\n• Crear y publicar productos: mandame la foto y detecto la prenda, los colores y la categoría, te sugiero la descripción, y si me pasás el costo te calculo el precio de venta ya cubriendo la comisión de Mercado Pago + tu margen.' +
-        '\n• Editar nombre, descripción, categoría, colores y talles.' +
-        '\n• Generar descripción y palabras clave (SEO) automáticamente.' +
-        '\n• Poner/sacar ofertas (precio tachado por %), y cambiar precios de a uno o masivo por categoría.' +
-        '\n• Cambiar stock, mostrar/ocultar, eliminar, y poner etiquetas (Nuevo, En oferta, Destacado…).' +
-        '\n\n💰 PRECIOS Y VENTAS' +
-        '\n• Calcular el precio a partir del costo (comisión MP + margen) y decirte la ganancia neta.' +
-        '\n• Contarte cuánto vendiste: hoy, esta semana, este mes o en total.' +
-        '\n• Decirte la GANANCIA NETA real (lo que te queda): ingresos − costo de los productos − comisión de Mercado Pago. Ej: "¿cuánto gané esta semana?".' +
-        '\n• Registrar ventas que hagas POR FUERA de la web (en persona, WhatsApp, Instagram): descuento el stock y las sumo a tus ventas. Ej: "vendí 2 vestidos rojos talle M a $50000 en persona".' +
-        '\n• Sumar o restar stock cuando repongas o corrijas mercadería. Ej: "me llegaron 10 carteras, sumalas".' +
-        '\n• Registrar GASTOS del negocio (mercadería, packaging, publicidad…) para que se resten de la ganancia. Ej: "gasté $80000 en tela".' +
-        '\n\n📦 PEDIDOS' +
-        '\n• Mostrarte los pedidos (todos o por estado) y los que están pendientes de enviar.' +
-        '\n• Generarte la ETIQUETA DE ENVÍO en PDF (remitente + destinatario) para imprimir y pegar al paquete.' +
-        '\n• Marcarlos como enviados (con código de seguimiento), entregados o cancelados.' +
-        '\n\n🎟️ CUPONES' +
-        '\n• Crear cupones (% o monto fijo, con tope de usos, compra mínima y vencimiento), listarlos y eliminarlos.' +
-        '\n\n⭐ RESEÑAS' +
-        '\n• Mostrarte las reseñas (todas o las pendientes) y aprobarlas o rechazarlas.' +
-        '\n\n🏠 HOME Y CATEGORÍAS' +
-        '\n• Destacar productos en la portada, editar los textos del hero, el banner de anuncios y la sección editorial, y crear categorías.' +
-        '\n\n👥 CLIENTES Y 📊 DATOS' +
-        '\n• Tus mejores clientes por gasto, productos con poco stock, qué se vende más… preguntame lo que quieras.' +
-        '\n\n🔧 TIENDA' +
-        '\n• Prender o apagar el modo mantenimiento.' +
-        '\n\n━━━━━━━━━━━━━━━━' +
-        '\n💡 CÓMO CARGAR PRODUCTOS (paso a paso)' +
-        '\n1) Tocá el clip 📎 y adjuntá la FOTO de la prenda. ¡Podés mandar VARIAS fotos juntas para cargar muchos productos de una! (fotos claras y bien iluminadas venden más).' +
-        '\n2) Escribime el nombre/los datos. Ejemplo: "Vestido Aurora, talles S M L, colores rojo y negro, stock 12".' +
-        '\n3) Te voy a PREGUNTAR qué querés hacer con cada prenda: publicarla en la tienda, guardarla como borrador en el inventario, o registrar una venta.' +
-        '\n4) Me decís y lo hago. Si me das el costo, te calculo el precio con la comisión de Mercado Pago + tu margen. Lo importante siempre te lo confirmo antes. ✅' +
-        '\n\n📋 Qué datos me podés dar:' +
-        '\n• Nombre y categoría' +
-        '\n• Talles (S M L XL…) y colores' +
-        '\n• STOCK = la cantidad de unidades que tenés' +
-        '\n• PRECIO directo, O el COSTO + margen y yo te calculo el precio final' +
-        '\nLo que no me digas, lo dejo razonable o te pregunto. Nada se publica sin que vos confirmes.' +
-        '\n👉 Si manejás stock por cada talle/color por separado, yo cargo el stock total y después lo ajustás por variante en el editor del producto.' +
-        '\n\n¿Arrancamos? Mandame la primera foto. 📸'
+        '¡Hola! 👋 Soy Lau, tu copiloto. Manejás toda la tienda hablándome como a una empleada — y yo ejecuto las acciones de verdad (lo importante siempre te lo confirmo antes).\n\n' +
+        'Para cargar productos, tocá el clip 📎 y mandame la foto (podés varias juntas) con el nombre. Para todo lo demás, pedímelo en tus palabras.\n\n' +
+        'Tocá 📖 Guía arriba para ver TODO con ejemplos. ¿Arrancamos?'
 };
+
+// Tarjetas de capacidades para el estado inicial (abren la Guía).
+const CAPS = [
+    { icon: '📸', label: 'Cargar productos' },
+    { icon: '💰', label: 'Precios y ofertas' },
+    { icon: '📦', label: 'Pedidos y envíos' },
+    { icon: '🛒', label: 'Ventas y stock' },
+    { icon: '💸', label: 'Gastos y ganancia' },
+    { icon: '🏠', label: 'Home, cupones, reseñas' },
+];
 
 const COMMAND_GUIDE = [
     {
@@ -876,12 +847,27 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     )}
 
                     {messages.length <= 1 && !loading && (
-                        <div className="pt-4">
-                            <p className="text-[11px] uppercase tracking-[0.2em] text-white/30 mb-3 text-center">Probá pedirle</p>
-                            <div className="flex flex-wrap gap-2 justify-center">
-                                {SUGGESTIONS.map(s => (
-                                    <button key={s} onClick={() => setInput(s)} className="text-xs text-white/70 bg-white/[0.04] border border-white/10 rounded-full px-3.5 py-2 hover:border-[#D4AF37]/50 hover:text-white hover:bg-white/[0.07] transition-all">{s}</button>
-                                ))}
+                        <div className="pt-2 space-y-7">
+                            {/* Tarjetas de capacidades */}
+                            <div>
+                                <p className="text-[11px] uppercase tracking-[0.2em] text-white/30 mb-3 text-center">Lo que puedo hacer</p>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                                    {CAPS.map(c => (
+                                        <button key={c.label} onClick={() => setShowGuide(true)} className="flex items-center gap-2.5 p-3 rounded-xl bg-white/[0.04] border border-white/10 hover:border-[#D4AF37]/40 hover:bg-white/[0.07] transition-all text-left group">
+                                            <span className="text-xl shrink-0">{c.icon}</span>
+                                            <span className="text-xs text-white/75 leading-tight group-hover:text-white transition-colors">{c.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Sugerencias rápidas */}
+                            <div>
+                                <p className="text-[11px] uppercase tracking-[0.2em] text-white/30 mb-3 text-center">Probá pedirle</p>
+                                <div className="flex flex-wrap gap-2 justify-center">
+                                    {SUGGESTIONS.map(s => (
+                                        <button key={s} onClick={() => setInput(s)} className="text-xs text-white/70 bg-white/[0.04] border border-white/10 rounded-full px-3.5 py-2 hover:border-[#D4AF37]/50 hover:text-white hover:bg-white/[0.07] transition-all">{s}</button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
