@@ -94,6 +94,8 @@ const COMMAND_GUIDE = [
             'Editá el título del hero',
             'Activá / desactivá el modo mantenimiento',
             'Creá la categoría "Abrigos"',
+            'Renombrá la categoría "Pantalones" a "Bottoms"',
+            'Eliminá la categoría "Abrigos"',
         ],
     },
     {
@@ -127,6 +129,8 @@ const actionLabel = (a) => {
         }
         case 'adjust_stock': return `Ajustar stock de ${A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
         case 'record_expense': return `Registrar gasto: ${A.concept || 'Gasto'} — $${(Number(A.amount) || 0).toLocaleString('es-AR')}${A.category ? ` (${A.category})` : ''}`;
+        case 'rename_category': return `Renombrar categoría "${A.from}" → "${A.to}" (y sus productos)`;
+        case 'delete_category': return `ELIMINAR categoría "${A.name}"`;
         case 'delete_expense': return `ELIMINAR gasto ${A.expenseId}`;
         case 'set_sale': return Number(A.percent) > 0 ? `Poner ${A.productId} en oferta −${A.percent}%` : `Quitar oferta de ${A.productId}`;
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
@@ -139,7 +143,7 @@ const actionLabel = (a) => {
 export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const {
         siteConfig, aiConfig, categories, coupons, reviews, isMaintenance, paymentConfig,
-        addProduct, updateProduct, deleteProduct, addCategory, addCoupon, deleteCoupon,
+        addProduct, updateProduct, deleteProduct, addCategory, deleteCategory, addCoupon, deleteCoupon,
         updateSiteConfig, toggleMaintenance, uploadImage, logAiAction,
         updateOrderStatus, approveReview, rejectReview, createOrder,
         expenses, addExpense, deleteExpense,
@@ -451,6 +455,30 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const name = String(A.name || '').trim(); if (!name) return 'Falta el nombre.';
                 await addCategory({ id: name.toLowerCase().replace(/\s+/g, '-'), name });
                 return `Categoría "${name}" creada.`;
+            }
+            case 'rename_category': {
+                const from = String(A.from || '').trim();
+                const to = String(A.to || '').trim();
+                if (!from || !to) return 'Decime la categoría actual y el nombre nuevo.';
+                const cat = (categories || []).find(c => (c.name || '').toLowerCase() === from.toLowerCase() || String(c.id) === from);
+                if (!cat) return `No encontré la categoría "${from}".`;
+                await addCategory({ id: cat.id, name: to });
+                // Migrar los productos que usaban el nombre viejo
+                let n = 0;
+                for (const p of inventory) {
+                    if ((p.category || '').toLowerCase() === (cat.name || '').toLowerCase()) {
+                        await updateProduct(p.id, { category: to }); n++;
+                    }
+                }
+                return `Categoría "${cat.name}" renombrada a "${to}".${n ? ` Actualicé ${n} producto(s).` : ''}`;
+            }
+            case 'delete_category': {
+                const key = String(A.name || '').trim();
+                const cat = (categories || []).find(c => (c.name || '').toLowerCase() === key.toLowerCase() || String(c.id) === key);
+                if (!cat) return `No encontré la categoría "${key}".`;
+                const orphans = (inventory || []).filter(p => (p.category || '').toLowerCase() === (cat.name || '').toLowerCase()).length;
+                await deleteCategory(cat.id);
+                return `Categoría "${cat.name}" eliminada.${orphans ? ` Ojo: ${orphans} producto(s) tenían esa categoría y quedaron sin categoría en el menú (reasignáles otra cuando quieras).` : ''}`;
             }
             case 'generate_copy': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';

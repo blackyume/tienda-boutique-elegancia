@@ -131,16 +131,19 @@ export const Navbar = ({ onOpenCart }) => {
                                     Shop <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
                                 </button>
 
-                                {/* MEGA MENU */}
-                                <div className={`absolute top-full left-0 mt-2 min-w-[200px] bg-[#0A0A0A]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 transition-all duration-300 origin-top-left ${isShopMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-                                    <button onClick={() => handleCategoryClick("Todos")} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">Ver Todo</button>
-                                    <div className="h-px bg-white/10 my-1"></div>
-                                    {categories.map(cat => (
-                                        <button key={cat.id} onClick={() => handleCategoryClick(cat.name)} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-cielo-gold hover:bg-white/5 rounded-lg transition-all flex items-center gap-2">
-                                            <div className="w-1 h-1 rounded-full bg-cielo-gold opacity-0 group-hover:opacity-100"></div>
-                                            {cat.name}
-                                        </button>
-                                    ))}
+                                {/* MEGA MENU — el pt-3 es un puente invisible para que no se cierre
+                                    al bajar el mouse del botón al menú (antes el mt-2 dejaba un hueco). */}
+                                <div className={`absolute top-full left-0 pt-3 transition-all duration-300 origin-top-left ${isShopMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+                                    <div className="min-w-[200px] bg-[#0A0A0A]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                                        <button onClick={() => handleCategoryClick("Todos")} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">Ver Todo</button>
+                                        <div className="h-px bg-white/10 my-1"></div>
+                                        {categories.map(cat => (
+                                            <button key={cat.id} onClick={() => handleCategoryClick(cat.name)} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-cielo-gold hover:bg-white/5 rounded-lg transition-all flex items-center gap-2">
+                                                <div className="w-1 h-1 rounded-full bg-cielo-gold opacity-0 group-hover:opacity-100"></div>
+                                                {cat.name}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                             <Link to="/about" className="text-white hover:text-cielo-gold transition-colors">Nosotros</Link>

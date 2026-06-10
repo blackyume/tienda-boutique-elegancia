@@ -20,6 +20,8 @@ export const TOOLS = [
     { name: 'quote_price', sensitive: false, desc: 'Calcular el PRECIO DE VENTA a partir del costo, cubriendo la comisión de Mercado Pago y el margen deseado. args: {cost(costo de la prenda), packaging?(0), shipping?(0), margin?(50, en %), commission?(6, % comisión MP)}. Devuelve precio sugerido + ganancia neta. Usalo SIEMPRE que el usuario te dé un COSTO o "me costó X" en vez de un precio final.' },
     // --- ESCRITURA SUAVE (auto) ---
     { name: 'create_category', sensitive: false, desc: 'Crear categoría. args: {name}' },
+    { name: 'rename_category', sensitive: true, desc: 'Renombrar una categoría. Actualiza también los productos que la usaban. args: {from (nombre actual), to (nombre nuevo)}.' },
+    { name: 'delete_category', sensitive: true, desc: 'Eliminar una categoría. args: {name}. Avisá si hay productos usándola.' },
     { name: 'generate_copy', sensitive: false, desc: 'Generar y guardar descripción + keywords SEO de un producto. args: {productId}' },
     { name: 'set_badges', sensitive: false, desc: 'Marcar etiquetas de un producto. args: {productId, badges:{isNew?,isOnSale?,isSeason?,isFeatured?,isExclusive?}}' },
     { name: 'update_product_fields', sensitive: false, desc: 'Editar campos no-precio. args: {productId, fields:{name?,description?,category?,colors?(array),sizes?(array)}}' },
