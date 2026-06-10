@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, updateDoc, deleteDoc, doc, setDoc, increment } from 'firebase/firestore';
 import imageCompression from 'browser-image-compression';
+import { deleteProductImages } from '../utils/cloudinaryDelete';
 
 // Email transaccional al cliente vía EmailJS (credenciales en Admin → Configuración).
 // type: 'confirmed' (pedido recibido) | 'shipped' (pedido enviado).
@@ -139,14 +140,14 @@ export const useDbActions = ({
     deleteProduct: async (id) => {
       if (!isAdmin) return;
       const productToDelete = inventory.find(p => String(p.id) === String(id));
-      if (productToDelete) {
-        // Try Cloudinary delete? Cloudinary deletes require API signature (backend).
-        // Front-end only delete is risky/complex. For now, we just delete products.
-        // Images will stay in Cloudinary (minor cost/orphan file issue)
-      }
       try {
         await deleteDoc(doc(db, "products", String(id)));
         addToast("Producto eliminado", "success");
+        // Limpieza de imágenes en Cloudinary (best-effort; requiere el endpoint
+        // server-side con CLOUDINARY_API_SECRET en Vercel — si no está, no pasa nada).
+        if (productToDelete) {
+          deleteProductImages(productToDelete, cloudinaryConfig?.cloudName).catch(() => {});
+        }
       } catch (e) {
         console.error(e);
         addToast("Error al eliminar producto", "error");
