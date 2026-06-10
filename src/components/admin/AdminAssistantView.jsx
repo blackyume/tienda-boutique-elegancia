@@ -40,11 +40,11 @@ const WELCOME = {
         '\n\n🔧 TIENDA' +
         '\n• Prender o apagar el modo mantenimiento.' +
         '\n\n━━━━━━━━━━━━━━━━' +
-        '\n💡 CÓMO CARGAR UN PRODUCTO (paso a paso)' +
-        '\n1) Tocá el clip 📎 acá abajo y adjuntá la FOTO de la prenda (una foto clara y bien iluminada vende mucho más).' +
-        '\n2) Escribime los datos en un mensaje. Ejemplo:\n   "Vestido de fiesta, talles S M L, colores rojo y negro, stock 12, me costó $8000 y quiero 50% de margen".' +
-        '\n3) Miro la foto, completo lo que pueda (tipo de prenda, colores, descripción), calculo el PRECIO de venta ya con la comisión de Mercado Pago + tu margen, y te muestro todo para que lo revises.' +
-        '\n4) Confirmás y lo publico en la tienda. ✅ (o lo dejo como borrador si me decís).' +
+        '\n💡 CÓMO CARGAR PRODUCTOS (paso a paso)' +
+        '\n1) Tocá el clip 📎 y adjuntá la FOTO de la prenda. ¡Podés mandar VARIAS fotos juntas para cargar muchos productos de una! (fotos claras y bien iluminadas venden más).' +
+        '\n2) Escribime el nombre/los datos. Ejemplo: "Vestido Aurora, talles S M L, colores rojo y negro, stock 12".' +
+        '\n3) Te voy a PREGUNTAR qué querés hacer con cada prenda: publicarla en la tienda, guardarla como borrador en el inventario, o registrar una venta.' +
+        '\n4) Me decís y lo hago. Si me das el costo, te calculo el precio con la comisión de Mercado Pago + tu margen. Lo importante siempre te lo confirmo antes. ✅' +
         '\n\n📋 Qué datos me podés dar:' +
         '\n• Nombre y categoría' +
         '\n• Talles (S M L XL…) y colores' +
@@ -182,8 +182,11 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const [showGuide, setShowGuide] = useState(false);
     const [loading, setLoading] = useState(false);
     const [busyMsg, setBusyMsg] = useState('');
-    const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState(null);
+    const [files, setFiles] = useState([]);
+    const [previews, setPreviews] = useState([]);
+    // Fotos ya subidas+analizadas, pendientes de decidir qué hacer (publicar/borrador/venta).
+    // Se mantienen entre mensajes para que el flujo guiado no pierda las URLs.
+    const pendingPhotosRef = useRef([]);
     const [confirm, setConfirm] = useState(null); // { actions, resolve }
     const listRef = useRef(null);
     const fileRef = useRef(null);
@@ -537,6 +540,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     active: visible,
                 };
                 const id = await addProduct(product);
+                // Quitar de las fotos pendientes la que se acaba de usar (flujo guiado)
+                if (img) pendingPhotosRef.current = pendingPhotosRef.current.filter(p => p.url !== img);
                 return id ? `Producto "${product.name}" ${visible ? 'PUBLICADO' : 'guardado como borrador'} (id ${id}).` : 'No se pudo crear (revisá Cloudinary/permisos).';
             }
             case 'set_price': {
@@ -655,38 +660,64 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
     const handleSend = async () => {
         const text = input.trim();
-        if ((!text && !file) || loading) return;
+        if ((!text && !files.length) || loading) return;
         if (!aiConfigured) { push({ role: 'system', text: 'Configurá una key de Cerebras (o Gemini) en Admin → Configuración para activarme.' }); return; }
 
         setInput('');
         setLoading(true);
+        const batch = files;
+        const batchPreviews = previews;
+        setFiles([]); setPreviews([]);
         const transcript = [];
         // reconstruir contexto breve desde el chat visible
         messages.filter(m => m.role === 'user' || m.role === 'ai').slice(-8).forEach(m => transcript.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }));
 
-        push({ role: 'user', text: text || '(imagen adjunta)', img: preview });
+        const nFotos = batch.length;
+        push({ role: 'user', text: text || (nFotos ? `(${nFotos} foto${nFotos > 1 ? 's' : ''} adjunta${nFotos > 1 ? 's' : ''})` : '(imagen adjunta)'), img: batchPreviews[0] });
 
         try {
-            if (file) {
-                setBusyMsg('Subiendo y analizando la foto…');
-                const url = await uploadImage(file);
-                if (!url) throw new Error('No se pudo subir la imagen (revisá Cloudinary en Configuración).');
-                const an = await analyzeProductImage(file, aiConfig, categories.map(c => c.name).filter(Boolean));
-                transcript.push({ role: 'system', content: `El usuario adjuntó la foto de una prenda. Imagen YA subida (usá esta URL en imageUrl): ${url}\nAnálisis automático de la imagen: ${JSON.stringify(an)}\nProponé create_product con esos datos (precio = suggestedPrice como sugerencia editable) salvo que el usuario pida otra cosa.` });
+            if (nFotos) {
+                setBusyMsg(nFotos > 1 ? `Subiendo y analizando ${nFotos} fotos…` : 'Subiendo y analizando la foto…');
+                const analyzed = [];
+                for (let i = 0; i < batch.length; i++) {
+                    const url = await uploadImage(batch[i]);
+                    if (!url) continue;
+                    let an = {};
+                    try { an = await analyzeProductImage(batch[i], aiConfig, categories.map(c => c.name).filter(Boolean)); } catch { /* el análisis es opcional */ }
+                    analyzed.push({ url, analysis: an });
+                }
+                if (!analyzed.length) throw new Error('No se pudieron subir/analizar las imágenes (revisá Cloudinary en Configuración).');
+                pendingPhotosRef.current = analyzed;
             }
-            transcript.push({ role: 'user', content: text || 'Publicá esta prenda.' });
+
+            // Inyectar las fotos pendientes (recién subidas o de un turno anterior) para
+            // que el flujo guiado no pierda las URLs entre pregunta y respuesta.
+            if (pendingPhotosRef.current.length) {
+                const items = pendingPhotosRef.current
+                    .map((p, i) => `${i + 1}) imageUrl: ${p.url}\n   análisis: ${JSON.stringify(p.analysis)}`)
+                    .join('\n');
+                transcript.push({
+                    role: 'system', content:
+                        `Hay ${pendingPhotosRef.current.length} prenda(s) con foto YA subida, esperando que el dueño decida qué hacer:\n${items}\n\n` +
+                        `FLUJO GUIADO: si el dueño TODAVÍA no aclaró qué hacer, PREGUNTÁLE en pocas palabras qué quiere con la(s) prenda(s) (o con todas): "publicarla(s) en la tienda", "guardarla(s) como borrador en el inventario", o "registrar una venta". ` +
+                        `Cuando lo aclare, ejecutá lo que corresponda para CADA prenda usando su imageUrl exacta: create_product con visible=true (publicar) o visible=false (borrador). Si te da el costo, calculá el precio con quote_price. Pedí de forma breve lo que falte (nombre, talles, stock, precio o costo). Si hay varias prendas, procesalas todas.`
+                });
+            }
+            transcript.push({ role: 'user', content: text || 'Tengo estas prendas.' });
             await agentLoop(transcript, { inventory, orders, categories, coupons, reviews, isMaintenance, siteConfig });
             logAiAction?.('copilot', text || '(imagen)', 'ok');
         } catch (e) {
             push({ role: 'system', text: `Error: ${e?.message || e}` });
         } finally {
-            setFile(null); setPreview(null); setLoading(false); setBusyMsg('');
+            setLoading(false); setBusyMsg('');
         }
     };
 
     const onPick = (e) => {
-        const f = e.target.files?.[0]; if (!f) return;
-        setFile(f); setPreview(URL.createObjectURL(f));
+        const picked = Array.from(e.target.files || []); if (!picked.length) return;
+        setFiles(prev => [...prev, ...picked].slice(0, 12));
+        setPreviews(prev => [...prev, ...picked.map(f => URL.createObjectURL(f))].slice(0, 12));
+        e.target.value = '';
     };
 
     const SUGGESTIONS = [
@@ -859,15 +890,20 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
             <div className="relative shrink-0 border-t border-white/10 bg-white/[0.03] backdrop-blur-xl p-4">
                 <div className="max-w-3xl mx-auto">
-                    {preview && (
-                        <div className="relative inline-block mb-2.5">
-                            <img src={preview} alt="" className="h-20 rounded-xl border border-white/15" />
-                            <button onClick={() => { setFile(null); setPreview(null); }} className="absolute -top-2 -right-2 bg-[#0A0A0A] border border-white/20 rounded-full p-1 hover:bg-white/10 transition-colors"><X className="w-3.5 h-3.5 text-white/70" /></button>
+                    {previews.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-2.5">
+                            {previews.map((src, i) => (
+                                <div key={i} className="relative inline-block">
+                                    <img src={src} alt="" className="h-20 w-20 object-cover rounded-xl border border-white/15" />
+                                    <button onClick={() => { setFiles(prev => prev.filter((_, j) => j !== i)); setPreviews(prev => prev.filter((_, j) => j !== i)); }} className="absolute -top-2 -right-2 bg-[#0A0A0A] border border-white/20 rounded-full p-1 hover:bg-white/10 transition-colors"><X className="w-3.5 h-3.5 text-white/70" /></button>
+                                </div>
+                            ))}
+                            {previews.length > 1 && <span className="self-end text-[10px] text-white/40 pb-1">{previews.length} fotos</span>}
                         </div>
                     )}
                     <div className="flex items-end gap-1 bg-white/[0.06] border border-white/15 rounded-2xl pl-1.5 pr-1.5 py-1.5 transition-colors focus-within:border-[#D4AF37]/60 focus-within:bg-white/[0.08]">
-                        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick} />
-                        <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#D4AF37] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Adjuntar foto de prenda"><Paperclip className="w-5 h-5" /></button>
+                        <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onPick} />
+                        <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#D4AF37] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Adjuntar fotos de prendas (podés varias a la vez)"><Paperclip className="w-5 h-5" /></button>
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
@@ -877,7 +913,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             disabled={loading}
                             className="flex-1 resize-none bg-transparent border-0 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-0 max-h-32"
                         />
-                        <button onClick={handleSend} disabled={loading || (!input.trim() && !file)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
+                        <button onClick={handleSend} disabled={loading || (!input.trim() && !files.length)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                         </button>
                     </div>
