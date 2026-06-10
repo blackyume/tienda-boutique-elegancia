@@ -50,13 +50,24 @@ export const parseJsonFromResponse = (text) => {
     if (!text) return null;
     const cleaned = text
         .replace(/```json\s*/gi, '')
-        .replace(/```\s*$/g, '')
+        .replace(/```/g, '')
         .trim();
     const first = cleaned.indexOf('{');
     const last = cleaned.lastIndexOf('}');
     if (first === -1 || last === -1 || last <= first) return null;
+    const body = cleaned.slice(first, last + 1);
+    // 1) Intento directo
     try {
-        return JSON.parse(cleaned.slice(first, last + 1));
+        return JSON.parse(body);
+    } catch { /* probamos reparar */ }
+    // 2) Reparaciones tolerantes (comillas tipográficas y comas finales) — el
+    // modelo a veces devuelve JSON casi-válido y no queremos morir por una coma.
+    try {
+        const repaired = body
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'")
+            .replace(/,\s*([}\]])/g, '$1');
+        return JSON.parse(repaired);
     } catch {
         return null;
     }

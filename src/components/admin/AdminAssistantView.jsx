@@ -596,7 +596,18 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             setBusyMsg('Pensando…');
             const prompt = buildPrompt({ snapshot: buildSnapshot(snapshotCtx), transcript: transcript.slice(-24) });
             const raw = await generateText(prompt, aiConfig, { scope: 'admin' });
-            const plan = parsePlan(raw);
+            let plan = parsePlan(raw);
+            // Auto-recuperación: si el modelo no devolvió nada interpretable,
+            // reintentá UNA vez exigiendo JSON estricto antes de darte por vencida.
+            if (!plan.actions.length && plan.reply === 'No entendí bien, ¿me lo repetís?') {
+                setBusyMsg('Reintentando…');
+                const raw2 = await generateText(
+                    prompt + '\n\nIMPORTANTE: respondé SOLO con el objeto JSON {"reply":"...","actions":[...],"done":true|false}. Sin texto fuera del JSON. Si falta algún dato, pedilo en "reply".',
+                    aiConfig, { scope: 'admin' }
+                );
+                const plan2 = parsePlan(raw2);
+                if (plan2.actions.length || plan2.reply !== 'No entendí bien, ¿me lo repetís?') plan = plan2;
+            }
             transcript.push({ role: 'assistant', content: JSON.stringify({ reply: plan.reply, actions: plan.actions, done: plan.done }) });
             if (plan.reply) push({ role: 'ai', text: plan.reply });
 

@@ -89,6 +89,9 @@ Reglas:
 - Precios: SIEMPRE en pesos argentinos (ARS), número entero. Si el usuario no da precio para un producto nuevo, proponé uno razonable y aclaralo en "reply".
 - CÁLCULO DE PRECIO: si el usuario te da el COSTO ("me costó X", "lo pagué X") en vez de un precio de venta, usá primero quote_price para obtener el precio que cubre la comisión de Mercado Pago + el margen, decile el precio sugerido y la ganancia neta, y recién después creá el producto (create_product) con ESE precio. Si no aclara la comisión de MP usá 6% por defecto y aclaralo; si no aclara margen usá 50%. Packaging/envío sólo si los menciona.
 - FOTOS DE PRENDAS (flujo guiado): cuando el usuario adjunta una o VARIAS fotos, recibís en el contexto la URL ya subida + el análisis de cada una. NO publiques de una: si el usuario todavía no aclaró qué quiere hacer, PREGUNTÁLE breve qué hace con la(s) prenda(s) — publicarla(s) en la tienda, guardarla(s) como borrador en el inventario, o registrar una venta. Cuando lo aclare, ejecutá para CADA prenda usando su imageUrl exacta (create_product visible=true para publicar, visible=false para borrador). Si hay varias fotos, procesá TODAS (una acción create_product por prenda). Pedí breve lo que falte (nombre, talles, stock, precio o costo); si te dan el costo usá quote_price.
+- ENTENDÉ LENGUAJE NATURAL Y DESPROLIJO: el dueño escribe rápido, con typos, todo junto y sin estructura. Interpretá su INTENCIÓN, no pidas que reformule. Ejemplos de interpretación: "publicalo" / "subilo" / "ponelo" = create_product con visible=true; "guardalo" / "borrador" = create_product visible=false; "tengo 5" / "hay 5" / "5 productos" / "quedan 5" = stock 5; "todos blancos" / "es blanco" = color blanco; "generá/hacé una descripción" o "ponele una buena descripción" = escribí vos una buena descripción en el campo description; "me costó X" = costo (usá quote_price); números sueltos tras hablar de precio = precio.
+- NUNCA respondas vacío ni con "no entendí". Si algo es confuso o se contradice (ej: dice un color y después otro), tomá lo más reciente o asumí lo más razonable y AVISÁ qué asumiste, o preguntá UNA sola cosa puntual y breve. Siempre devolvé un "reply" útil.
+- Si en un mismo mensaje el dueño te da la intención + datos + un pedido extra (ej: "publicalo, stock 5, y generá la descripción"), hacé TODO junto en una sola respuesta (create_product con esos datos y la descripción ya escrita).
 - Si falta info crítica y no la podés inferir razonablemente, preguntá (actions vacío, done:true).
 - VENTAS POR FUERA DE LA WEB: si el dueño te dice que vendió algo en persona, por WhatsApp o Instagram ("vendí 2 vestidos a $50000", "se vendió una cartera por insta"), usá record_sale: descuenta el stock y la cuenta en las ventas/estadísticas. Si el producto tiene variantes (talle/color), preguntá talle y color antes. Para SOLO reponer o corregir stock sin venta (ej: "me llegaron 10", "sumá 5 al stock", "corregí el stock a tal número") usá adjust_stock (o set_stock si te dan el número final).
 - GASTOS: si el dueño dice que gastó plata en algo del negocio ("compré tela por $80000", "pagué $20000 de publicidad", "gasté en packaging"), usá record_expense para registrarlo; eso se resta de la ganancia neta. Para ver los gastos usá query_expenses.
@@ -121,8 +124,17 @@ export const parsePlan = (raw) => {
         .filter(a => a && typeof a.tool === 'string')
         .map(a => ({ tool: a.tool, args: (a.args && typeof a.args === 'object') ? a.args : {} }))
         .filter(a => isKnownTool(a.tool));
+    let reply = String(p.reply || '').trim();
+    // Si no hubo JSON parseable pero el modelo respondió en prosa, usá esa prosa
+    // como respuesta en vez de fallar con "No entendí bien".
+    if (!reply && !actions.length) {
+        const prose = String(raw || '').replace(/```[a-z]*\s*/gi, '').replace(/```/g, '').trim();
+        if (prose && !prose.startsWith('{') && !prose.startsWith('[') && prose.length > 1) {
+            reply = prose.slice(0, 1500);
+        }
+    }
     return {
-        reply: String(p.reply || '').trim() || (actions.length ? 'Listo.' : 'No entendí bien, ¿me lo repetís?'),
+        reply: reply || (actions.length ? 'Listo.' : 'No entendí bien, ¿me lo repetís?'),
         actions,
         done: p.done === undefined ? actions.length === 0 : Boolean(p.done),
     };
