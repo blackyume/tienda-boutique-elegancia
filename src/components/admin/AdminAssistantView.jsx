@@ -21,6 +21,7 @@ const WELCOME = {
         '\n\n💰 PRECIOS Y VENTAS' +
         '\n• Calcular el precio a partir del costo (comisión MP + margen) y decirte la ganancia neta.' +
         '\n• Contarte cuánto vendiste: hoy, esta semana, este mes o en total.' +
+        '\n• Decirte la GANANCIA NETA real (lo que te queda): ingresos − costo de los productos − comisión de Mercado Pago. Ej: "¿cuánto gané esta semana?".' +
         '\n• Registrar ventas que hagas POR FUERA de la web (en persona, WhatsApp, Instagram): descuento el stock y las sumo a tus ventas. Ej: "vendí 2 vestidos rojos talle M a $50000 en persona".' +
         '\n• Sumar o restar stock cuando repongas o corrijas mercadería. Ej: "me llegaron 10 carteras, sumalas".' +
         '\n\n📦 PEDIDOS' +
@@ -70,7 +71,8 @@ const COMMAND_GUIDE = [
         icon: '💰', title: 'Precios y ventas', items: [
             '¿A cuánto lo vendo si me costó $12000 y quiero 60% de margen?',
             '¿Cuánto vendí hoy?',
-            '¿Cuánto vendí esta semana / este mes?',
+            '¿Cuánta ganancia neta hice esta semana?',
+            '¿Cuánto me quedó limpio este mes?',
             '¿Cuál es mi producto más vendido?',
         ],
     },
@@ -348,6 +350,39 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 await updateProduct(p.id, sp.patch);
                 const variante = (size || color) ? ` (${[size, color].filter(Boolean).join(' / ')})` : '';
                 return `Stock de "${p.name}"${variante} ${delta > 0 ? '+' : ''}${delta} → ahora ${sp.nuevo} unidad(es). (Sin registrar venta.)`;
+            }
+            case 'query_profit': {
+                const range = A.range || 'today';
+                const now = Date.now();
+                const span = range === '7d' ? 7 : range === '30d' ? 30 : range === 'all' ? null : 0;
+                const today = new Date().toDateString();
+                const paid = new Set(['approved', 'paid', 'shipped', 'delivered']);
+                const list = (orders || []).filter(o => {
+                    if (!paid.has(o.status) && !o.manual) return false;
+                    if (range === 'all') return true;
+                    if (range === 'today') { try { return new Date(o.date).toDateString() === today; } catch { return false; } }
+                    return new Date(o.date).getTime() >= now - span * 864e5;
+                });
+                if (!list.length) return `No hay ventas registradas en ese período (${range}). La ganancia neta es $0.`;
+                let revenue = 0, cost = 0, fees = 0, sinCosto = 0;
+                for (const o of list) {
+                    revenue += Number(o.total) || 0;
+                    for (const it of (o.items || [])) {
+                        const prod = inventory.find(p => String(p.id) === String(it.id));
+                        const c = Number(prod?.cost) || 0;
+                        if (!c) sinCosto++;
+                        cost += c * (Number(it.quantity) || 1);
+                    }
+                    if (o.mpFeeAmount != null) fees += Number(o.mpFeeAmount) || 0;
+                    else if (!o.manual) {
+                        const pct = Number(paymentConfig?.realMpFeePercent || paymentConfig?.mpFee) || 0;
+                        fees += (Number(o.total) || 0) * pct / 100;
+                    }
+                }
+                const net = revenue - cost - fees;
+                const fmt = (n) => `$${Math.round(n).toLocaleString('es-AR')}`;
+                const aviso = sinCosto ? ` Ojo: ${sinCosto} ítem(s) sin costo cargado, así que la ganancia real podría ser menor.` : '';
+                return `Ganancia neta (${range}): ${fmt(net)} sobre ${list.length} venta(s).\nIngresos ${fmt(revenue)} − Costo de productos ${fmt(cost)} − Comisión MP ${fmt(fees)} = ${fmt(net)}.${aviso}`;
             }
             case 'set_sale': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
