@@ -312,6 +312,12 @@ export const ProductDetail = () => {
                                         );
                                     })}
                                 </div>
+                                {product.colors.length > 1 && (
+                                    <p className="mt-3 text-[11px] tracking-wide text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                                        <span className="text-cielo-gold/70 text-[8px]">◆</span>
+                                        Imagen de referencia · elegí tu color acá.
+                                    </p>
+                                )}
                             </div>
                         )}
 
