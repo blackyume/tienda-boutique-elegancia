@@ -11,7 +11,8 @@ export const TOOLS = [
     { name: 'get_product', sensitive: false, desc: 'Detalle de un producto. args: {idOrName}' },
     { name: 'query_orders', sensitive: false, desc: 'Listar órdenes. args: {status?, sinceDays?, limit?}' },
     { name: 'query_sales', sensitive: false, desc: 'Resumen de ventas (facturación). args: {range: "today"|"7d"|"30d"|"all"}' },
-    { name: 'query_profit', sensitive: false, desc: 'Calcular la GANANCIA NETA real (lo que te queda en el bolsillo) en un período: ingresos − costo de los productos vendidos − comisión de Mercado Pago. args: {range:"today"|"7d"|"30d"|"all"}. Usala cuando pregunten "cuánto gané", "ganancia neta", "cuánto me quedó limpio".' },
+    { name: 'query_profit', sensitive: false, desc: 'Calcular la GANANCIA NETA real (lo que te queda en el bolsillo) en un período: ingresos − costo de los productos vendidos − comisión de Mercado Pago − gastos cargados. args: {range:"today"|"7d"|"30d"|"all"}. Usala cuando pregunten "cuánto gané", "ganancia neta", "cuánto me quedó limpio".' },
+    { name: 'query_expenses', sensitive: false, desc: 'Listar/sumar los GASTOS cargados en un período (compra de mercadería, packaging, publicidad, etc.). args: {range:"today"|"7d"|"30d"|"all"}.' },
     { name: 'query_customers', sensitive: false, desc: 'Top clientes por gasto. args: {top?}' },
     { name: 'query_coupons', sensitive: false, desc: 'Listar cupones. args: {}' },
     { name: 'query_reviews', sensitive: false, desc: 'Listar reseñas. args: {onlyPending?(bool), productId?}' },
@@ -33,6 +34,8 @@ export const TOOLS = [
     { name: 'set_order_status', sensitive: true, desc: 'Cambiar el estado de un pedido. args: {orderId, status:"pending"|"shipped"|"delivered"|"cancelled", tracking?}' },
     { name: 'record_sale', sensitive: true, desc: 'Registrar una VENTA hecha POR FUERA de la tienda (en persona, WhatsApp, Instagram, local). Descuenta el stock del producto y la suma a las ventas/estadísticas (queda como pedido pagado). args: {productId, quantity?(default 1), unitPrice?(precio por unidad), amount?(monto total cobrado), size?, color?, channel?("whatsapp"|"instagram"|"local"|"otro"), customer?(nombre opcional)}. Si el dueño dice "vendí X a $Y" usá amount=Y. Si el producto tiene variantes (talle/color), PEDÍ talle y color antes de registrar.' },
     { name: 'adjust_stock', sensitive: true, desc: 'Sumar o restar unidades al stock de un producto (reposición de mercadería o corrección), SIN registrar venta. args: {productId, delta(número: + para sumar, - para restar), size?, color?}. Ej: "me llegaron 10 carteras" -> delta 10. Para productos con variantes pedí talle y color.' },
+    { name: 'record_expense', sensitive: true, desc: 'Registrar un GASTO del negocio (compra de mercadería, packaging, publicidad, envíos, etc.) para que se reste de la ganancia neta. args: {amount(monto), concept(qué fue), category?("mercaderia"|"packaging"|"publicidad"|"envios"|"servicios"|"otros")}. Ej: "gasté $80000 en tela" -> amount 80000, concept "tela", category "mercaderia".' },
+    { name: 'delete_expense', sensitive: true, desc: 'Eliminar un gasto cargado. args: {expenseId}' },
     { name: 'bulk_price', sensitive: true, desc: 'Cambio masivo de precio. args: {category?(o "all"), percent, direction:"up"|"down"}' },
     { name: 'toggle_visible', sensitive: true, desc: 'Mostrar/ocultar producto. args: {productId, visible(bool)}' },
     { name: 'delete_product', sensitive: true, desc: 'Eliminar producto. args: {productId}' },
@@ -88,6 +91,7 @@ Reglas:
 - Si el usuario adjuntó una imagen vas a recibir su análisis en el contexto; usalo para crear el producto (create_product) con datos completos y buena descripción.
 - Si falta info crítica y no la podés inferir razonablemente, preguntá (actions vacío, done:true).
 - VENTAS POR FUERA DE LA WEB: si el dueño te dice que vendió algo en persona, por WhatsApp o Instagram ("vendí 2 vestidos a $50000", "se vendió una cartera por insta"), usá record_sale: descuenta el stock y la cuenta en las ventas/estadísticas. Si el producto tiene variantes (talle/color), preguntá talle y color antes. Para SOLO reponer o corregir stock sin venta (ej: "me llegaron 10", "sumá 5 al stock", "corregí el stock a tal número") usá adjust_stock (o set_stock si te dan el número final).
+- GASTOS: si el dueño dice que gastó plata en algo del negocio ("compré tela por $80000", "pagué $20000 de publicidad", "gasté en packaging"), usá record_expense para registrarlo; eso se resta de la ganancia neta. Para ver los gastos usá query_expenses.
 - Sé proactiva pero no destructiva: nunca borres ni hagas cambios masivos sin que lo haya pedido.
 - "armar/mejorar la home" = usar update_home (textos) y feature_products/set_badges (curaduría). No podés tocar el diseño/código, sí el contenido.`;
 

@@ -19,7 +19,7 @@ export const useFirestoreSubscriptions = ({
     setAiConfig, setIsMaintenance, setCoupons, setReviews, setShippingProvinces,
     setLoading, setOrders, setSimulations, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
-    setAbandonedCarts, setActiveSessions
+    setAbandonedCarts, setActiveSessions, setExpenses
 }) => {
     // --- Suscripciones públicas / globales ---
     useEffect(() => {
@@ -154,10 +154,15 @@ export const useFirestoreSubscriptions = ({
             subs.push(onSnapshot(collection(db, 'active_sessions'), (snap) => {
                 setActiveSessions(snap.docs.map(d => ({ ...d.data(), id: d.id })));
             }, quietSnap('active_sessions')));
+
+            subs.push(onSnapshot(collection(db, 'expenses'), (snap) => {
+                setExpenses(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => (b.date || 0) - (a.date || 0)));
+            }, quietSnap('expenses')));
         } else {
             setSimulations([]); setSuppliers([]); setAiHistory([]);
             setScheduledPromotions([]); setWishlistEvents([]);
             setVisitStatsHourly([]); setAbandonedCarts([]); setActiveSessions([]);
+            setExpenses([]);
 
             if (user) {
                 subs.push(onSnapshot(

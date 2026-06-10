@@ -33,6 +33,7 @@ const AdminAssistantView = lazyNamed(() => import('../components/admin/AdminAssi
 const CouponsView = lazyNamed(() => import('../components/admin/CouponsView'), 'CouponsView');
 const SalesView = lazyNamed(() => import('../components/admin/SalesView'), 'SalesView');
 const SuppliersView = lazyNamed(() => import('../components/admin/SuppliersView'), 'SuppliersView');
+const ExpensesView = lazyNamed(() => import('../components/admin/ExpensesView'), 'ExpensesView');
 const AbandonedCartsView = lazyNamed(() => import('../components/admin/AbandonedCartsView'), 'AbandonedCartsView');
 const ReviewsView = lazyNamed(() => import('../components/admin/ReviewsView'), 'ReviewsView');
 
@@ -47,7 +48,7 @@ const TAB_LABELS = {
     dashboard: 'Dashboard', inventory: 'Inventario', orders: 'Pedidos', customers: 'Clientes',
     sales: 'Ventas', assistant: 'Asistente Lau', cms: 'CMS / Diseño', coupons: 'Cupones',
     suppliers: 'Proveedores', abandoned: 'Carritos Abandonados', reviews: 'Reseñas',
-    calculator: 'Historial de Costos', settings: 'Configuración'
+    calculator: 'Historial de Costos', expenses: 'Gastos', settings: 'Configuración'
 };
 
 export const Admin = () => {
@@ -448,6 +449,7 @@ export const Admin = () => {
                     <SidebarItem icon={ShoppingCartIcon} label="Carritos Abandonados" active={adminTab === 'abandoned'} onClick={() => setAdminTab('abandoned')} count={(abandonedCarts || []).filter(c => !c.recovered).length} />
                     <SidebarItem icon={CheckIcon} label="Reseñas" active={adminTab === 'reviews'} onClick={() => setAdminTab('reviews')} count={(reviews || []).filter(r => !r.approved).length} />
                     <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
+                    <SidebarItem icon={Wallet} label="Gastos" active={adminTab === 'expenses'} onClick={() => setAdminTab('expenses')} />
                     <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
 
                     <div className="my-6 border-t border-slate-100 dark:border-slate-800"></div>
@@ -768,6 +770,7 @@ export const Admin = () => {
                 {adminTab === 'cms' && <CMSView />}
                 {adminTab === 'coupons' && <CouponsView />}
                 {adminTab === 'suppliers' && <SuppliersView />}
+                {adminTab === 'expenses' && <ExpensesView />}
                 {adminTab === 'abandoned' && <AbandonedCartsView />}
                 {adminTab === 'reviews' && <ReviewsView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}

@@ -58,6 +58,10 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    match /expenses/{id} {
+      allow read, write: if isAdmin();
+    }
+
     // --- ORDERS ---
     // Usuarios pueden crear sus propias órdenes y leer las propias.
     // Admin puede leer/editar/eliminar todas.

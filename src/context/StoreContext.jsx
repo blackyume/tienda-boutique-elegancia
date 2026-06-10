@@ -102,6 +102,7 @@ export const StoreProvider = ({ children }) => {
   const [wishlistEvents, setWishlistEvents] = useState([]);
   const [abandonedCarts, setAbandonedCarts] = useState([]);
   const [activeSessions, setActiveSessions] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [visitStatsHourly, setVisitStatsHourly] = useState([]);
 
@@ -152,7 +153,7 @@ export const StoreProvider = ({ children }) => {
     setAiConfig, setIsMaintenance, setCoupons, setReviews, setShippingProvinces,
     setLoading, setOrders, setSimulations, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
-    setAbandonedCarts, setActiveSessions
+    setAbandonedCarts, setActiveSessions, setExpenses
   });
 
   // --- THEME (dark-only: el diseño de la web es oscuro por decisión) ---
@@ -278,7 +279,7 @@ export const StoreProvider = ({ children }) => {
       categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
-      abandonedCarts, activeSessions, reviews, visitStatsHourly,
+      abandonedCarts, activeSessions, reviews, visitStatsHourly, expenses,
       shippingProvinces, setShippingProvinces,
       ...dbActions
     }}>

@@ -238,6 +238,35 @@ export const useDbActions = ({
       const simData = { ...simulation, createdAt: Date.now(), userId: user?.uid };
       await addDoc(collection(db, 'simulations'), simData);
     },
+
+    // --- GASTOS (compra de mercadería, packaging, publicidad, etc.) ---
+    addExpense: async (expense) => {
+      if (!isAdmin) return;
+      try {
+        const ref = await addDoc(collection(db, 'expenses'), {
+          amount: Number(expense.amount) || 0,
+          concept: String(expense.concept || 'Gasto'),
+          category: String(expense.category || 'otros'),
+          date: expense.date || Date.now(),
+          createdAt: Date.now(),
+        });
+        addToast('Gasto registrado', 'success');
+        return ref.id;
+      } catch (e) {
+        console.error('Error añadiendo gasto:', e);
+        addToast('Error al registrar el gasto', 'error');
+      }
+    },
+    deleteExpense: async (id) => {
+      if (!isAdmin) return;
+      try {
+        await deleteDoc(doc(db, 'expenses', String(id)));
+        addToast('Gasto eliminado', 'success');
+      } catch (e) {
+        console.error('Error eliminando gasto:', e);
+        addToast('Error al eliminar el gasto', 'error');
+      }
+    },
     deleteSimulation: async (id) => {
       await deleteDoc(doc(db, 'simulations', id));
     },

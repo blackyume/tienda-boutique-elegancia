@@ -24,6 +24,7 @@ const WELCOME = {
         '\n• Decirte la GANANCIA NETA real (lo que te queda): ingresos − costo de los productos − comisión de Mercado Pago. Ej: "¿cuánto gané esta semana?".' +
         '\n• Registrar ventas que hagas POR FUERA de la web (en persona, WhatsApp, Instagram): descuento el stock y las sumo a tus ventas. Ej: "vendí 2 vestidos rojos talle M a $50000 en persona".' +
         '\n• Sumar o restar stock cuando repongas o corrijas mercadería. Ej: "me llegaron 10 carteras, sumalas".' +
+        '\n• Registrar GASTOS del negocio (mercadería, packaging, publicidad…) para que se resten de la ganancia. Ej: "gasté $80000 en tela".' +
         '\n\n📦 PEDIDOS' +
         '\n• Mostrarte los pedidos (todos o por estado) y los que están pendientes de enviar.' +
         '\n• Generarte la ETIQUETA DE ENVÍO en PDF (remitente + destinatario) para imprimir y pegar al paquete.' +
@@ -82,6 +83,14 @@ const COMMAND_GUIDE = [
             'Registrá una venta de 1 cartera negra por Instagram a $30000',
             'Me llegaron 10 unidades del vestido Aurora, sumalas al stock',
             'Restá 3 al stock del blazer talle S beige',
+        ],
+    },
+    {
+        icon: '💸', title: 'Gastos y rentabilidad', items: [
+            'Gasté $80000 en tela',
+            'Registrá un gasto de $20000 en publicidad',
+            'Mostrame los gastos de este mes',
+            '¿Cuánta ganancia neta me quedó este mes?',
         ],
     },
     {
@@ -146,6 +155,8 @@ const actionLabel = (a) => {
             return `Registrar venta externa: ${q}× ${A.productId}${v ? ` (${v})` : ''}${tot ? ` por $${tot.toLocaleString('es-AR')}` : ''} — descuenta stock`;
         }
         case 'adjust_stock': return `Ajustar stock de ${A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
+        case 'record_expense': return `Registrar gasto: ${A.concept || 'Gasto'} — $${(Number(A.amount) || 0).toLocaleString('es-AR')}${A.category ? ` (${A.category})` : ''}`;
+        case 'delete_expense': return `ELIMINAR gasto ${A.expenseId}`;
         case 'set_sale': return Number(A.percent) > 0 ? `Poner ${A.productId} en oferta −${A.percent}%` : `Quitar oferta de ${A.productId}`;
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
@@ -160,6 +171,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         addProduct, updateProduct, deleteProduct, addCategory, addCoupon, deleteCoupon,
         updateSiteConfig, toggleMaintenance, uploadImage, logAiAction,
         updateOrderStatus, approveReview, rejectReview, createOrder,
+        expenses, addExpense, deleteExpense,
     } = useStore();
 
     const [messages, setMessages] = useState(() => {
@@ -379,10 +391,48 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         fees += (Number(o.total) || 0) * pct / 100;
                     }
                 }
-                const net = revenue - cost - fees;
+                // Gastos cargados en el mismo período
+                let gastos = 0;
+                for (const e of (expenses || [])) {
+                    const ed = Number(e.date) || 0;
+                    if (range === 'all') gastos += Number(e.amount) || 0;
+                    else if (range === 'today') { try { if (new Date(ed).toDateString() === today) gastos += Number(e.amount) || 0; } catch { /* noop */ } }
+                    else if (ed >= now - span * 864e5) gastos += Number(e.amount) || 0;
+                }
+                const net = revenue - cost - fees - gastos;
                 const fmt = (n) => `$${Math.round(n).toLocaleString('es-AR')}`;
                 const aviso = sinCosto ? ` Ojo: ${sinCosto} ítem(s) sin costo cargado, así que la ganancia real podría ser menor.` : '';
-                return `Ganancia neta (${range}): ${fmt(net)} sobre ${list.length} venta(s).\nIngresos ${fmt(revenue)} − Costo de productos ${fmt(cost)} − Comisión MP ${fmt(fees)} = ${fmt(net)}.${aviso}`;
+                const gLine = gastos ? ` − Gastos ${fmt(gastos)}` : '';
+                return `Ganancia neta (${range}): ${fmt(net)} sobre ${list.length} venta(s).\nIngresos ${fmt(revenue)} − Costo de productos ${fmt(cost)} − Comisión MP ${fmt(fees)}${gLine} = ${fmt(net)}.${aviso}`;
+            }
+            case 'record_expense': {
+                const amount = Number(A.amount) || 0;
+                if (amount <= 0) return 'Decime el monto del gasto (ej: "gasté $80000 en tela").';
+                const concept = A.concept ? String(A.concept) : 'Gasto';
+                const category = A.category ? String(A.category) : 'otros';
+                const id = await addExpense({ amount, concept, category, date: Date.now() });
+                return id ? `Gasto registrado: ${concept} — $${amount.toLocaleString('es-AR')} (${category}). Se va a restar de tu ganancia neta.` : 'No se pudo registrar el gasto.';
+            }
+            case 'query_expenses': {
+                const range = A.range || '30d';
+                const now = Date.now();
+                const span = range === '7d' ? 7 : range === 'today' ? 0 : range === 'all' ? null : 30;
+                const today = new Date().toDateString();
+                const list = (expenses || []).filter(e => {
+                    const ed = Number(e.date) || 0;
+                    if (range === 'all') return true;
+                    if (range === 'today') { try { return new Date(ed).toDateString() === today; } catch { return false; } }
+                    return ed >= now - span * 864e5;
+                });
+                if (!list.length) return `No hay gastos cargados en ese período (${range}).`;
+                const total = list.reduce((a, e) => a + (Number(e.amount) || 0), 0);
+                const lines = list.slice(0, 15).map(e => `• ${e.concept || 'Gasto'} — $${(Number(e.amount) || 0).toLocaleString('es-AR')} (${e.category || 'otros'})${e.id ? ` [id ${e.id}]` : ''}`).join('\n');
+                return `Gastos (${range}): $${total.toLocaleString('es-AR')} en ${list.length} ítem(s).\n${lines}`;
+            }
+            case 'delete_expense': {
+                if (!A.expenseId) return 'Falta el id del gasto.';
+                await deleteExpense(A.expenseId);
+                return `Gasto ${A.expenseId} eliminado.`;
             }
             case 'set_sale': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
