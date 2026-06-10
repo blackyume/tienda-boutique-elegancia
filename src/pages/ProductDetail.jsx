@@ -428,19 +428,15 @@ export const ProductDetail = () => {
                     </div>
 
                     <div className="space-y-2 mt-6">
-                        <Accordion title="Descripción & Detalles" defaultOpen={true}>
-                            <p className="mb-4">
-                                {product.description ||
-                                    'Prenda confeccionada con los más altos estándares de calidad. Diseño atemporal que fusiona elegancia clásica con texturas modernas.'}
-                            </p>
-                            {product.details && (
+                        {product.details && (
+                            <Accordion title="Detalles del producto" defaultOpen={true}>
                                 <ul className="list-disc pl-4 space-y-1">
                                     {product.details.split('\n').filter(Boolean).map((d, i) => (
                                         <li key={i}>{d}</li>
                                     ))}
                                 </ul>
-                            )}
-                        </Accordion>
+                            </Accordion>
+                        )}
                         <Accordion title="Envíos & Entregas">
                             Realizamos envíos a todo el país a través de Correo Argentino.
                             <br />
