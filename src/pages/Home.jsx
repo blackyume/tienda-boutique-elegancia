@@ -38,10 +38,24 @@ export const Home = () => {
         [inventory]
     );
 
-    // Categorías válidas (con imagen) para el grid
+    // Categorías para el grid. Si la categoría no tiene imagen propia, usa la
+    // foto de un producto de esa categoría como portada (así la sección premium
+    // aparece sola, sin tener que asignar imágenes a mano).
     const validCategories = useMemo(
-        () => (categories || []).filter(c => c && c.name && c.image),
-        [categories]
+        () => (categories || [])
+            .filter(c => c && c.name)
+            .map(c => {
+                if (c.image) return c;
+                const prod = (inventory || []).find(p =>
+                    p.active !== false &&
+                    (p.category || '').toLowerCase() === (c.name || '').toLowerCase() &&
+                    (p.image || p.media?.[0]?.url)
+                );
+                const cover = prod ? (prod.image || prod.media?.[0]?.url) : null;
+                return cover ? { ...c, image: cover } : null;
+            })
+            .filter(Boolean),
+        [categories, inventory]
     );
 
     return (
