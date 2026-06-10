@@ -5,7 +5,7 @@ import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { analyzeProductImage } from '../../utils/vision';
 import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
 import { generateShippingLabel } from '../../utils/shippingLabel';
-import { getTotalStock } from '../../utils/variants';
+import { getTotalStock, getVariantStock } from '../../utils/variants';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const MAX_STEPS = 5;
@@ -522,11 +522,22 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             }
             case 'set_stock': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
-                if (Array.isArray(p.variants) && p.variants.length) {
-                    return `"${p.name}" maneja stock por VARIANTES (talle/color), así que un único número no aplica. Editá el stock por variante desde el editor del producto. (No cambié nada para no romper el stock real.)`;
+                const value = Math.max(0, Number(A.stock) || 0);
+                const size = A.size ? String(A.size) : '';
+                const color = A.color ? String(A.color) : '';
+                const hasVar = Array.isArray(p.variants)
+                    ? p.variants.length > 0
+                    : (p.variants && typeof p.variants === 'object' && Object.keys(p.variants).length > 0);
+                if (hasVar) {
+                    if (!size && !color) return `"${p.name}" maneja stock por talle/color. Decime el talle y color (ej: "talle 5 color Chocolate") y lo seteo.`;
+                    const cur = getVariantStock(p, size, color);
+                    const sp = buildStockPatch(p, size, color, value - cur);
+                    if (sp.error) return sp.error;
+                    await updateProduct(p.id, sp.patch);
+                    return `Stock de "${p.name}" (${[size, color].filter(Boolean).join(' / ')}) → ${value}. Total ahora: ${sp.nuevo}.`;
                 }
-                await updateProduct(p.id, { stock: Number(A.stock) || 0 });
-                return `Stock de "${p.name}" → ${Number(A.stock) || 0}.`;
+                await updateProduct(p.id, { stock: value });
+                return `Stock de "${p.name}" → ${value}.`;
             }
             case 'bulk_price': {
                 const pct = Number(A.percent) || 0;
