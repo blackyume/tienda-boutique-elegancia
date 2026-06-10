@@ -5,6 +5,7 @@ import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { analyzeProductImage } from '../../utils/vision';
 import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
 import { generateShippingLabel } from '../../utils/shippingLabel';
+import { getTotalStock } from '../../utils/variants';
 
 const HISTORY_KEY = 'lau_copilot_v3';
 const MAX_STEPS = 5;
@@ -20,6 +21,8 @@ const WELCOME = {
         '\n\n💰 PRECIOS Y VENTAS' +
         '\n• Calcular el precio a partir del costo (comisión MP + margen) y decirte la ganancia neta.' +
         '\n• Contarte cuánto vendiste: hoy, esta semana, este mes o en total.' +
+        '\n• Registrar ventas que hagas POR FUERA de la web (en persona, WhatsApp, Instagram): descuento el stock y las sumo a tus ventas. Ej: "vendí 2 vestidos rojos talle M a $50000 en persona".' +
+        '\n• Sumar o restar stock cuando repongas o corrijas mercadería. Ej: "me llegaron 10 carteras, sumalas".' +
         '\n\n📦 PEDIDOS' +
         '\n• Mostrarte los pedidos (todos o por estado) y los que están pendientes de enviar.' +
         '\n• Generarte la ETIQUETA DE ENVÍO en PDF (remitente + destinatario) para imprimir y pegar al paquete.' +
@@ -69,6 +72,14 @@ const COMMAND_GUIDE = [
             '¿Cuánto vendí hoy?',
             '¿Cuánto vendí esta semana / este mes?',
             '¿Cuál es mi producto más vendido?',
+        ],
+    },
+    {
+        icon: '🛒', title: 'Ventas externas y stock', items: [
+            'Vendí 2 vestidos rojos talle M a $50000 en persona',
+            'Registrá una venta de 1 cartera negra por Instagram a $30000',
+            'Me llegaron 10 unidades del vestido Aurora, sumalas al stock',
+            'Restá 3 al stock del blazer talle S beige',
         ],
     },
     {
@@ -126,6 +137,13 @@ const actionLabel = (a) => {
         case 'delete_product': return `ELIMINAR producto ${A.productId}`;
         case 'delete_coupon': return `ELIMINAR cupón ${A.couponId}`;
         case 'set_order_status': return `Pedido ${A.orderId} → ${A.status}${A.tracking ? ` (tracking ${A.tracking})` : ''}`;
+        case 'record_sale': {
+            const q = Number(A.quantity) || 1;
+            const v = [A.size, A.color].filter(Boolean).join('/');
+            const tot = A.amount != null ? Number(A.amount) : (A.unitPrice != null ? Number(A.unitPrice) * q : 0);
+            return `Registrar venta externa: ${q}× ${A.productId}${v ? ` (${v})` : ''}${tot ? ` por $${tot.toLocaleString('es-AR')}` : ''} — descuenta stock`;
+        }
+        case 'adjust_stock': return `Ajustar stock de ${A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
         case 'set_sale': return Number(A.percent) > 0 ? `Poner ${A.productId} en oferta −${A.percent}%` : `Quitar oferta de ${A.productId}`;
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
@@ -139,7 +157,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         siteConfig, aiConfig, categories, coupons, reviews, isMaintenance, paymentConfig,
         addProduct, updateProduct, deleteProduct, addCategory, addCoupon, deleteCoupon,
         updateSiteConfig, toggleMaintenance, uploadImage, logAiAction,
-        updateOrderStatus, approveReview, rejectReview,
+        updateOrderStatus, approveReview, rejectReview, createOrder,
     } = useStore();
 
     const [messages, setMessages] = useState(() => {
@@ -195,6 +213,33 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             || inventory.find(p => (p.name || '').toLowerCase().includes(s));
     };
     const pCompact = (p) => `#${p.id} "${p.name}" $${p.price ?? '?'} stock:${p.stock ?? (p.variants?.length ? 'variantes' : 0)} cat:${p.category || '-'} ${p.active === false ? '[BORRADOR]' : '[visible]'}`;
+
+    // Construye el patch para sumar/restar stock (delta negativo descuenta).
+    // Soporta stock simple y variantes (array u objeto talle::color).
+    const buildStockPatch = (p, size, color, delta) => {
+        const hasVar = Array.isArray(p.variants)
+            ? p.variants.length > 0
+            : (p.variants && typeof p.variants === 'object' && Object.keys(p.variants).length > 0);
+        if (hasVar) {
+            if (!size && !color) return { error: `"${p.name}" maneja stock por talle/color. Decime el talle y color (ej: "talle M rojo").` };
+            if (Array.isArray(p.variants)) {
+                let found = false;
+                const variants = p.variants.map(v => {
+                    if (v.size === size && v.color === color) { found = true; return { ...v, stock: Math.max(0, (Number(v.stock) || 0) + delta) }; }
+                    return v;
+                });
+                if (!found) return { error: `No encontré la variante ${[size, color].filter(Boolean).join(' / ')} en "${p.name}".` };
+                const nuevo = getTotalStock({ ...p, variants });
+                return { patch: { variants }, nuevo };
+            }
+            const key = `${size}::${color}`;
+            const cur = Number(p.variants[key]) || 0;
+            const variants = { ...p.variants, [key]: Math.max(0, cur + delta) };
+            return { patch: { variants }, nuevo: getTotalStock({ ...p, variants }) };
+        }
+        const nuevo = Math.max(0, (Number(p.stock) || 0) + delta);
+        return { patch: { stock: nuevo }, nuevo };
+    };
 
     // --- EJECUTORES DE HERRAMIENTAS ---
     const exec = async (tool, A) => {
@@ -261,6 +306,48 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 await generateShippingLabel(o, r);
                 const faltan = (!r.address || !r.cp) ? ' (Tip: completá la dirección y CP del remitente en Admin → Configuración → Envíos para que la etiqueta salga completa.)' : '';
                 return `Etiqueta del pedido ${o.id} generada y descargada en PDF. Imprimila y pegala al paquete.${faltan}`;
+            }
+            case 'record_sale': {
+                const p = findProduct(A.productId); if (!p) return 'No encontré ese producto.';
+                const qty = Math.max(1, Number(A.quantity) || 1);
+                const size = A.size ? String(A.size) : '';
+                const color = A.color ? String(A.color) : '';
+                // Descontar stock (variante-aware)
+                const sp = buildStockPatch(p, size, color, -qty);
+                if (sp.error) return sp.error;
+                // Precio / total
+                const unit = A.unitPrice != null ? Number(A.unitPrice)
+                    : (A.amount != null ? Number(A.amount) / qty : (Number(p.price) || 0));
+                const total = A.amount != null ? Number(A.amount) : Math.round(unit * qty);
+                await updateProduct(p.id, sp.patch);
+                const orderId = `MAN-${String(Date.now()).slice(-6)}`;
+                const channel = A.channel ? String(A.channel) : 'externa';
+                await createOrder({
+                    id: orderId,
+                    date: new Date().toISOString(),
+                    status: 'approved',
+                    total,
+                    manual: true,
+                    channel,
+                    paymentMethod: channel,
+                    stockApplied: true,
+                    customer: { nombre: A.customer ? String(A.customer) : 'Venta externa', email: '' },
+                    items: [{ id: p.id, name: p.name, price: Math.round(unit), quantity: qty, size, color, category: p.category || '' }],
+                });
+                const variante = (size || color) ? ` (${[size, color].filter(Boolean).join(' / ')})` : '';
+                return `✅ Venta registrada: ${qty}× "${p.name}"${variante} por $${total.toLocaleString('es-AR')} (${channel}). Stock descontado → quedan ${sp.nuevo}. Quedó como pedido ${orderId} y ya cuenta en tus ventas.`;
+            }
+            case 'adjust_stock': {
+                const p = findProduct(A.productId); if (!p) return 'No encontré ese producto.';
+                const delta = Math.trunc(Number(A.delta) || 0);
+                if (!delta) return 'Decime cuántas unidades sumar (ej: "sumá 10") o restar (ej: "restá 3").';
+                const size = A.size ? String(A.size) : '';
+                const color = A.color ? String(A.color) : '';
+                const sp = buildStockPatch(p, size, color, delta);
+                if (sp.error) return sp.error;
+                await updateProduct(p.id, sp.patch);
+                const variante = (size || color) ? ` (${[size, color].filter(Boolean).join(' / ')})` : '';
+                return `Stock de "${p.name}"${variante} ${delta > 0 ? '+' : ''}${delta} → ahora ${sp.nuevo} unidad(es). (Sin registrar venta.)`;
             }
             case 'set_sale': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';

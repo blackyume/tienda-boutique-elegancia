@@ -30,6 +30,8 @@ export const TOOLS = [
     { name: 'set_stock', sensitive: true, desc: 'Cambiar stock TOTAL de un producto SIN variantes. Para productos con variantes (talle/color) avisá que el stock se edita por variante en el editor. args: {productId, stock}' },
     { name: 'set_sale', sensitive: true, desc: 'Poner/quitar oferta a un producto (baja el precio y muestra el anterior tachado). args: {productId, percent (0 para quitar la oferta)}' },
     { name: 'set_order_status', sensitive: true, desc: 'Cambiar el estado de un pedido. args: {orderId, status:"pending"|"shipped"|"delivered"|"cancelled", tracking?}' },
+    { name: 'record_sale', sensitive: true, desc: 'Registrar una VENTA hecha POR FUERA de la tienda (en persona, WhatsApp, Instagram, local). Descuenta el stock del producto y la suma a las ventas/estadísticas (queda como pedido pagado). args: {productId, quantity?(default 1), unitPrice?(precio por unidad), amount?(monto total cobrado), size?, color?, channel?("whatsapp"|"instagram"|"local"|"otro"), customer?(nombre opcional)}. Si el dueño dice "vendí X a $Y" usá amount=Y. Si el producto tiene variantes (talle/color), PEDÍ talle y color antes de registrar.' },
+    { name: 'adjust_stock', sensitive: true, desc: 'Sumar o restar unidades al stock de un producto (reposición de mercadería o corrección), SIN registrar venta. args: {productId, delta(número: + para sumar, - para restar), size?, color?}. Ej: "me llegaron 10 carteras" -> delta 10. Para productos con variantes pedí talle y color.' },
     { name: 'bulk_price', sensitive: true, desc: 'Cambio masivo de precio. args: {category?(o "all"), percent, direction:"up"|"down"}' },
     { name: 'toggle_visible', sensitive: true, desc: 'Mostrar/ocultar producto. args: {productId, visible(bool)}' },
     { name: 'delete_product', sensitive: true, desc: 'Eliminar producto. args: {productId}' },
@@ -84,6 +86,7 @@ Reglas:
 - CÁLCULO DE PRECIO: si el usuario te da el COSTO ("me costó X", "lo pagué X") en vez de un precio de venta, usá primero quote_price para obtener el precio que cubre la comisión de Mercado Pago + el margen, decile el precio sugerido y la ganancia neta, y recién después creá el producto (create_product) con ESE precio. Si no aclara la comisión de MP usá 6% por defecto y aclaralo; si no aclara margen usá 50%. Packaging/envío sólo si los menciona.
 - Si el usuario adjuntó una imagen vas a recibir su análisis en el contexto; usalo para crear el producto (create_product) con datos completos y buena descripción.
 - Si falta info crítica y no la podés inferir razonablemente, preguntá (actions vacío, done:true).
+- VENTAS POR FUERA DE LA WEB: si el dueño te dice que vendió algo en persona, por WhatsApp o Instagram ("vendí 2 vestidos a $50000", "se vendió una cartera por insta"), usá record_sale: descuenta el stock y la cuenta en las ventas/estadísticas. Si el producto tiene variantes (talle/color), preguntá talle y color antes. Para SOLO reponer o corregir stock sin venta (ej: "me llegaron 10", "sumá 5 al stock", "corregí el stock a tal número") usá adjust_stock (o set_stock si te dan el número final).
 - Sé proactiva pero no destructiva: nunca borres ni hagas cambios masivos sin que lo haya pedido.
 - "armar/mejorar la home" = usar update_home (textos) y feature_products/set_badges (curaduría). No podés tocar el diseño/código, sí el contenido.`;
 
