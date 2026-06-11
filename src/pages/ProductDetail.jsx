@@ -289,7 +289,8 @@ export const ProductDetail = () => {
                                 </span>
                                 <div className="flex flex-wrap gap-3">
                                     {product.colors.map((c) => {
-                                        const available = isColorAvailable(product, c);
+                                        // Si ya eligió un talle, mostrar disponible solo si ESE talle+color tiene stock.
+                                        const available = selectedSize ? getVariantStock(product, selectedSize, c) > 0 : isColorAvailable(product, c);
                                         const selected = selectedColor === c;
                                         return (
                                             <button
@@ -337,7 +338,8 @@ export const ProductDetail = () => {
                                 </div>
                                 <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
                                     {product.sizes.map((s) => {
-                                        const available = isSizeAvailable(product, s);
+                                        // Si ya eligió un color, mostrar disponible solo si ESE talle+color tiene stock.
+                                        const available = selectedColor ? getVariantStock(product, s, selectedColor) > 0 : isSizeAvailable(product, s);
                                         const selected = selectedSize === s;
                                         return (
                                             <button

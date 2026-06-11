@@ -542,7 +542,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             }
             case 'create_product': {
                 const visible = A.visible !== false;
-                const img = A.imageUrl || '';
+                // Soporta una sola foto (imageUrl) o varias del mismo producto (imageUrls -> galería)
+                const imgs = (Array.isArray(A.imageUrls) ? A.imageUrls : [A.imageUrl]).map(u => String(u || '').trim()).filter(Boolean);
+                const img = imgs[0] || '';
                 const product = {
                     name: String(A.name || 'Producto'),
                     price: Number(A.price) || 0,
@@ -552,14 +554,16 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     sizes: toArr(A.sizes),
                     description: String(A.description || ''),
                     image: img,
-                    media: img ? [{ type: 'image', url: img }] : [],
+                    images: imgs,
+                    media: imgs.map(u => ({ type: 'image', url: u })),
                     badges: { isNew: true },
                     active: visible,
                 };
                 const id = await addProduct(product);
-                // Quitar de las fotos pendientes la que se acaba de usar (flujo guiado)
-                if (img) pendingPhotosRef.current = pendingPhotosRef.current.filter(p => p.url !== img);
-                return id ? `Producto "${product.name}" ${visible ? 'PUBLICADO' : 'guardado como borrador'} (id ${id}).` : 'No se pudo crear (revisá Cloudinary/permisos).';
+                // Quitar de las fotos pendientes las que se acaban de usar (flujo guiado)
+                if (imgs.length) pendingPhotosRef.current = pendingPhotosRef.current.filter(p => !imgs.includes(p.url));
+                const galeria = imgs.length > 1 ? ` con ${imgs.length} fotos` : '';
+                return id ? `Producto "${product.name}"${galeria} ${visible ? 'PUBLICADO' : 'guardado como borrador'} (id ${id}).` : 'No se pudo crear (revisá Cloudinary/permisos).';
             }
             case 'set_price': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
