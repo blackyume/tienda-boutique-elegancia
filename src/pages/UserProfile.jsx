@@ -10,7 +10,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 export const UserProfile = () => {
-    const { user, orders, logout, addToast } = useStore();
+    const { user, orders, logout, addToast, inventory } = useStore();
     const navigate = useNavigate();
 
     const [userData, setUserData] = useState(null);
@@ -160,17 +160,22 @@ export const UserProfile = () => {
 
                                     {/* Items List */}
                                     <div className="space-y-4">
-                                        {order.items.map((item, idx) => (
+                                        {order.items.map((item, idx) => {
+                                            const img = (inventory || []).find(p => String(p.id) === String(item.id))?.image || item.image || '';
+                                            return (
                                             <div key={idx} className="flex items-center gap-4">
-                                                <div className="w-16 h-16 rounded-lg bg-slate-100 shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
-                                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                                <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                                                    {img
+                                                        ? <img src={img} alt={item.name} loading="lazy" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                                                        : <Package className="w-6 h-6 text-slate-300 dark:text-slate-600" />}
                                                 </div>
                                                 <div className="flex-1">
                                                     <p className="font-bold text-sm text-slate-800 dark:text-white">{item.name}</p>
                                                     <p className="text-xs text-slate-500">{item.quantity} x {formatMoney(item.price)} {item.size && `• Talle: ${item.size}`}</p>
                                                 </div>
                                             </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
