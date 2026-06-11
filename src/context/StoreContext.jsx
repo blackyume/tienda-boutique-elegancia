@@ -61,7 +61,7 @@ export const StoreProvider = ({ children }) => {
       image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80"
     },
     social: {
-      instagram: "https://instagram.com",
+      instagram: "https://www.instagram.com/laboutiquedelaeleganciaoficial/",
       youtube: "",
       tiktok: ""
     },

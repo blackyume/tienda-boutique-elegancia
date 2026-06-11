@@ -7,7 +7,7 @@ export const Contact = () => {
     const { siteConfig } = useStore();
     const whatsapp = String(siteConfig?.contact?.whatsapp || '5493492216487').replace(/\D/g, '');
     const email = siteConfig?.contact?.email || 'laboutiquedelaeleganciaoficial@gmail.com';
-    const instagramUrl = siteConfig?.social?.instagram || 'https://instagram.com/laboutique.elegancia';
+    const instagramUrl = siteConfig?.social?.instagram || 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
 
     const [nombre, setNombre] = useState('');
     const [mensaje, setMensaje] = useState('');

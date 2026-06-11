@@ -7,8 +7,8 @@ import { useStore } from '../context/StoreContext';
 export const About = () => {
     const navigate = useNavigate();
     const { siteConfig } = useStore();
-    const instagramUrl = siteConfig?.social?.instagram || 'https://instagram.com/laboutique.elegancia';
-    const instagramHandle = '@' + (instagramUrl.replace(/\/+$/, '').split('/').pop() || 'laboutique.elegancia');
+    const instagramUrl = siteConfig?.social?.instagram || 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
+    const instagramHandle = '@' + (instagramUrl.replace(/\/+$/, '').split('/').pop() || 'laboutiquedelaeleganciaoficial');
 
     return (
         <div className="pt-24 pb-0 animate-fadeIn bg-white dark:bg-slate-950 font-sans overflow-x-hidden">

@@ -5,7 +5,7 @@ import { SectionHeader } from './SectionHeader';
 
 export const InstagramFeed = () => {
     const { siteConfig, inventory } = useStore();
-    const instagramUrl = siteConfig?.social?.instagram || 'https://instagram.com';
+    const instagramUrl = siteConfig?.social?.instagram || 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
 
     // Fotos reales del catálogo (no stock genérico) — honesto y premium.
     const feedImages = (inventory || [])
