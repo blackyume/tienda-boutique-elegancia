@@ -16,6 +16,7 @@ import { PromoPopup } from './components/ui/PromoPopup';
 import { PushOptIn } from './components/ui/PushOptIn';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
+import { hasAdminAI } from './utils/ai';
 import React, { useLayoutEffect, useEffect, Suspense, lazy } from 'react';
 import { startPresence } from './utils/presence';
 
@@ -159,7 +160,11 @@ const RouteFallback = () => (
 
 const ShopAssistantWrapper = () => {
   const location = useLocation();
+  const { aiConfig } = useStore();
   if (location.pathname.startsWith('/admin')) return null;
+  // Oculto hasta que la IA esté configurada (key de Cerebras/Gemini). Apenas se
+  // configure, el chat "Elegancia IA" reaparece solo.
+  if (!hasAdminAI(aiConfig)) return null;
   return <ShopAssistant />;
 };
 
