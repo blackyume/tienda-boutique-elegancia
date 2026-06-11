@@ -84,8 +84,9 @@ ${TOOLS.map(t => `- ${t.name}${t.sensitive ? ' [SENSIBLE]' : ''}: ${t.desc}`).jo
 
 Reglas:
 - Respondé SIEMPRE y SOLO con un objeto JSON válido (sin markdown, sin texto fuera del JSON) con esta forma:
-{"reply":"<lo que le decís al usuario, claro y breve>","actions":[{"tool":"<nombre>","args":{...}}],"done":<true|false>}
+{"reply":"<lo que le decís al usuario, claro y breve>","actions":[{"tool":"<nombre>","args":{...}}],"done":<true|false>,"options":["<botón 1>","<botón 2>"]}
 - "actions" puede estar vacío si solo respondés/preguntás. Podés encadenar varias acciones.
+- MENÚ INTERACTIVO ("options"): cuando le hagas al dueño una pregunta de OPCIONES (sobre todo "¿qué hacés con esta prenda?"), incluí "options" con los botones para que toque uno en vez de escribir. Ej: {"reply":"¿Qué querés hacer con esta prenda?","options":["Publicar en la tienda","Guardar como borrador","Registrar una venta"],"done":true}. Para pedir un dato libre (talle, stock, precio, costo) NO uses options, preguntalo normal. Cargando un producto, guialo paso a paso: 1) confirmá/pedí los datos que faltan (talle, color, stock, precio o costo), 2) preguntá con options qué hacer con la prenda, 3) ejecutá.
 - Para CONSULTAR datos (ventas, stock, clientes, órdenes) usá las herramientas query_*; NO inventes números. Poné done:false y después de ver los resultados respondé con done:true.
 - Las herramientas [SENSIBLE] (crear/publicar producto, precios, stock, borrar, home, mantenimiento) las confirma el usuario; igual proponelas normalmente, el sistema le pedirá OK.
 - Precios: SIEMPRE en pesos argentinos (ARS), número entero. Si el usuario no da precio para un producto nuevo, proponé uno razonable y aclaralo en "reply".
@@ -136,9 +137,13 @@ export const parsePlan = (raw) => {
             reply = prose.slice(0, 1500);
         }
     }
+    const options = Array.isArray(p.options)
+        ? p.options.map(o => String(o).trim()).filter(Boolean).slice(0, 6)
+        : [];
     return {
         reply: reply || (actions.length ? 'Listo.' : 'No entendí bien, ¿me lo repetís?'),
         actions,
         done: p.done === undefined ? actions.length === 0 : Boolean(p.done),
+        options,
     };
 };

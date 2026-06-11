@@ -648,7 +648,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 if (plan2.actions.length || plan2.reply !== 'No entendí bien, ¿me lo repetís?') plan = plan2;
             }
             transcript.push({ role: 'assistant', content: JSON.stringify({ reply: plan.reply, actions: plan.actions, done: plan.done }) });
-            if (plan.reply) push({ role: 'ai', text: plan.reply });
+            if (plan.reply) push({ role: 'ai', text: plan.reply, options: plan.options });
 
             if (!plan.actions.length) { if (plan.done) return; else { transcript.push({ role: 'tool', content: '(sin acciones)' }); continue; } }
 
@@ -679,8 +679,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         push({ role: 'system', text: 'Llegué al límite de pasos. Si quedó algo a medias, pedímelo de nuevo más puntual.' });
     };
 
-    const handleSend = async () => {
-        const text = input.trim();
+    const handleSend = async (overrideText) => {
+        const text = (typeof overrideText === 'string' ? overrideText : input).trim();
         if ((!text && !files.length) || loading) return;
         if (!aiConfigured) { push({ role: 'system', text: 'Configurá una key de Cerebras (o Gemini) en Admin → Configuración para activarme.' }); return; }
 
@@ -851,8 +851,28 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                     <Check className="w-3.5 h-3.5 mt-0.5 text-emerald-400/70 shrink-0" />
                                     <span>{m.text}</span>
                                 </div>
+                            ) : m.role === 'ai' ? (
+                                <div className="flex flex-col items-start gap-2.5 max-w-[82%]">
+                                    <div className="rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg bg-white/[0.08] text-white border border-white/10 rounded-bl-md">
+                                        {m.img && <img src={m.img} alt="" className="rounded-lg mb-2 max-h-44 border border-white/10" />}
+                                        {m.text}
+                                    </div>
+                                    {Array.isArray(m.options) && m.options.length > 0 && i === messages.length - 1 && !loading && !confirm && (
+                                        <div className="flex flex-wrap gap-2">
+                                            {m.options.map(opt => (
+                                                <button
+                                                    key={opt}
+                                                    onClick={() => handleSend(opt)}
+                                                    className="text-xs font-bold text-[#0A0A0A] bg-gradient-to-br from-[#D4AF37] to-[#B38728] rounded-full px-4 py-2 hover:brightness-110 active:scale-95 transition shadow-md"
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             ) : (
-                                <div className={`rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg max-w-[82%] ${m.role === 'user' ? 'bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] font-medium rounded-br-md' : 'bg-white/[0.08] text-white border border-white/10 rounded-bl-md'}`}>
+                                <div className="rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg max-w-[82%] bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] font-medium rounded-br-md">
                                     {m.img && <img src={m.img} alt="" className="rounded-lg mb-2 max-h-44 border border-white/10" />}
                                     {m.text}
                                 </div>
@@ -949,7 +969,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             disabled={loading}
                             className="flex-1 resize-none bg-transparent border-0 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-0 max-h-32"
                         />
-                        <button onClick={handleSend} disabled={loading || (!input.trim() && !files.length)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
+                        <button onClick={() => handleSend()} disabled={loading || (!input.trim() && !files.length)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#0A0A0A] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                         </button>
                     </div>
