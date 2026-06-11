@@ -178,7 +178,7 @@ export const Admin = () => {
             price: item.price,
             total: item.price * item.quantity,
             profit: profit * item.quantity,
-            image: item.image
+            image: item.image || product.image || product.media?.[0]?.url || ''
         };
     })).reverse(), [orders, inventory]);
 
