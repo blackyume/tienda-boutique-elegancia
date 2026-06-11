@@ -13,6 +13,7 @@ export const TOOLS = [
     { name: 'query_sales', sensitive: false, desc: 'Resumen de ventas (facturación). args: {range: "today"|"7d"|"30d"|"all"}' },
     { name: 'query_profit', sensitive: false, desc: 'Calcular la GANANCIA NETA real (lo que te queda en el bolsillo) en un período: ingresos − costo de los productos vendidos − comisión de Mercado Pago − gastos cargados. args: {range:"today"|"7d"|"30d"|"all"}. Usala cuando pregunten "cuánto gané", "ganancia neta", "cuánto me quedó limpio".' },
     { name: 'query_expenses', sensitive: false, desc: 'Listar/sumar los GASTOS cargados en un período (compra de mercadería, packaging, publicidad, etc.). args: {range:"today"|"7d"|"30d"|"all"}.' },
+    { name: 'query_mp_fee', sensitive: false, desc: 'Decir cuánto es la comisión actual de Mercado Pago que usás para calcular precios (la REAL medida de las ventas, o el estimado si todavía no hubo ventas). args: {}.' },
     { name: 'query_customers', sensitive: false, desc: 'Top clientes por gasto. args: {top?}' },
     { name: 'query_coupons', sensitive: false, desc: 'Listar cupones. args: {}' },
     { name: 'query_reviews', sensitive: false, desc: 'Listar reseñas. args: {onlyPending?(bool), productId?}' },

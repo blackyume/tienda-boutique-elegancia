@@ -256,7 +256,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const pack = Number(A.packaging) || 0;
                 const ship = Number(A.shipping) || 0;
                 const margin = A.margin != null ? Number(A.margin) : 50;
-                const defaultFee = Number(paymentConfig?.realMpFeePercent) || 6;
+                const defaultFee = Number(paymentConfig?.realMpFeePercent) || Number(paymentConfig?.mpFee) || 6;
                 const commission = A.commission != null ? Number(A.commission) : defaultFee;
                 const totalCost = cost + pack + ship;
                 const denom = 1 - (margin + commission) / 100;
@@ -266,6 +266,13 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const commissionAmount = Math.round(price * commission / 100);
                 const net = price - totalCost - commissionAmount;
                 return `Precio de venta sugerido: $${price.toLocaleString('es-AR')}. Desglose: costo $${totalCost.toLocaleString('es-AR')}${(pack || ship) ? ` (prenda $${cost.toLocaleString('es-AR')}${pack ? ' + packaging $' + pack.toLocaleString('es-AR') : ''}${ship ? ' + envío $' + ship.toLocaleString('es-AR') : ''})` : ''}, comisión MP ${commission}% = $${commissionAmount.toLocaleString('es-AR')}, margen ${margin}%. Ganás $${net.toLocaleString('es-AR')} netos por venta. Para publicarlo usá create_product con price ${price}.`;
+            }
+            case 'query_mp_fee': {
+                const real = Number(paymentConfig?.realMpFeePercent) || 0;
+                const manual = Number(paymentConfig?.mpFee) || 0;
+                if (real > 0) return `La comisión de Mercado Pago que uso es ${real}%, MEDIDA de tus ventas reales (se actualiza sola con cada venta aprobada — no tenés que fijarte nada). Es la que aplico al calcular precios.`;
+                if (manual > 0) return `Uso ${manual}% de comisión de MP (la que cargaste en Configuración). Apenas entren ventas por Mercado Pago, la mido sola de tu cuenta y la actualizo a la real.`;
+                return `Todavía no hubo ventas por Mercado Pago para medir tu comisión real, así que uso un estimado de 6%. En cuanto tengas una venta aprobada, la mido sola de tu cuenta y la empiezo a usar automáticamente (no tenés que mirar nada).`;
             }
             case 'query_reviews': {
                 let r = [...(reviews || [])];
