@@ -54,6 +54,7 @@ const COMMAND_GUIDE = [
             'Registrá una venta de 1 cartera negra por Instagram a $30000',
             'Me llegaron 10 unidades del vestido Aurora, sumalas al stock',
             'Restá 3 al stock del blazer talle S beige',
+            'Anulá la venta MAN-123456 (fue un error)',
         ],
     },
     {
@@ -128,6 +129,7 @@ const actionLabel = (a) => {
             return `Registrar venta externa: ${q}× ${A.productId}${v ? ` (${v})` : ''}${tot ? ` por $${tot.toLocaleString('es-AR')}` : ''} — descuenta stock`;
         }
         case 'adjust_stock': return `Ajustar stock de ${A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
+        case 'cancel_sale': return `ANULAR venta ${A.orderId} (repone el stock)`;
         case 'record_expense': return `Registrar gasto: ${A.concept || 'Gasto'} — $${(Number(A.amount) || 0).toLocaleString('es-AR')}${A.category ? ` (${A.category})` : ''}`;
         case 'rename_category': return `Renombrar categoría "${A.from}" → "${A.to}" (y sus productos)`;
         case 'delete_category': return `ELIMINAR categoría "${A.name}"`;
@@ -145,7 +147,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         siteConfig, aiConfig, categories, coupons, reviews, isMaintenance, paymentConfig,
         addProduct, updateProduct, deleteProduct, addCategory, deleteCategory, addCoupon, deleteCoupon,
         updateSiteConfig, toggleMaintenance, uploadImage, logAiAction,
-        updateOrderStatus, approveReview, rejectReview, createOrder,
+        updateOrderStatus, approveReview, rejectReview, createOrder, deleteOrder,
         expenses, addExpense, deleteExpense,
     } = useStore();
 
@@ -340,6 +342,22 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 await updateProduct(p.id, sp.patch);
                 const variante = (size || color) ? ` (${[size, color].filter(Boolean).join(' / ')})` : '';
                 return `Stock de "${p.name}"${variante} ${delta > 0 ? '+' : ''}${delta} → ahora ${sp.nuevo} unidad(es). (Sin registrar venta.)`;
+            }
+            case 'cancel_sale': {
+                const o = orders.find(x => String(x.id).toLowerCase() === String(A.orderId).toLowerCase());
+                if (!o) return 'No encontré esa venta/pedido. Decime el N° (ej: MAN-123456).';
+                let restored = 0;
+                // Reponer stock SOLO si la venta lo había descontado (evita inflar el stock).
+                if (o.stockApplied) {
+                    for (const it of (o.items || [])) {
+                        const prod = inventory.find(p => String(p.id) === String(it.id));
+                        if (!prod) continue;
+                        const sp = buildStockPatch(prod, it.size ? String(it.size) : '', it.color ? String(it.color) : '', Number(it.quantity) || 0);
+                        if (sp.patch) { await updateProduct(prod.id, sp.patch); restored++; }
+                    }
+                }
+                await deleteOrder(o.id);
+                return `Venta ${o.id} anulada y borrada de tus números.${restored ? ` Repuse el stock de ${restored} producto(s).` : ' (No había stock descontado para reponer.)'}`;
             }
             case 'query_profit': {
                 const range = A.range || 'today';

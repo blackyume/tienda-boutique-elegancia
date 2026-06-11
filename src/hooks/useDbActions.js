@@ -165,6 +165,16 @@ export const useDbActions = ({
         throw e;
       }
     },
+    deleteOrder: async (id) => {
+      if (!isAdmin) return;
+      try {
+        await deleteDoc(doc(db, "orders", String(id)));
+      } catch (e) {
+        console.error("Error eliminando orden:", e);
+        addToast("Error al eliminar la venta", "error");
+        throw e;
+      }
+    },
     updateOrderStatus: async (id, status, extraData = {}) => {
       if (!isAdmin) return;
       const orderId = String(id);
