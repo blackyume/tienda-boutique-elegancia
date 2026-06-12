@@ -259,13 +259,15 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const defaultFee = Number(paymentConfig?.realMpFeePercent) || Number(paymentConfig?.mpFee) || 6;
                 const commission = A.commission != null ? Number(A.commission) : defaultFee;
                 const totalCost = cost + pack + ship;
-                const denom = 1 - (margin + commission) / 100;
-                if (denom <= 0) return `El margen (${margin}%) + comisión (${commission}%) suman 100% o más, no se puede calcular. Bajá el margen.`;
-                // Redondeado hacia arriba al múltiplo de 100 (precio lindo para la tienda).
-                const price = Math.ceil((totalCost / denom) / 100) * 100;
+                const feeFactor = 1 - commission / 100;
+                if (feeFactor <= 0) return `La comisión de MP (${commission}%) es 100% o más, revisá ese dato.`;
+                // Margen = markup SOBRE el costo (lo que querés ganar sobre lo que te costó),
+                // ajustado para que ESE margen te quede LIMPIO después de la comisión de MP.
+                // precio = costo × (1 + margen%) / (1 − comisión%). Redondeo al múltiplo de 100.
+                const price = Math.ceil((totalCost * (1 + margin / 100) / feeFactor) / 100) * 100;
                 const commissionAmount = Math.round(price * commission / 100);
                 const net = price - totalCost - commissionAmount;
-                return `Precio de venta sugerido: $${price.toLocaleString('es-AR')}. Desglose: costo $${totalCost.toLocaleString('es-AR')}${(pack || ship) ? ` (prenda $${cost.toLocaleString('es-AR')}${pack ? ' + packaging $' + pack.toLocaleString('es-AR') : ''}${ship ? ' + envío $' + ship.toLocaleString('es-AR') : ''})` : ''}, comisión MP ${commission}% = $${commissionAmount.toLocaleString('es-AR')}, margen ${margin}%. Ganás $${net.toLocaleString('es-AR')} netos por venta. Para publicarlo usá create_product con price ${price}.`;
+                return `Precio de venta sugerido: $${price.toLocaleString('es-AR')}. Desglose: costo $${totalCost.toLocaleString('es-AR')}${(pack || ship) ? ` (prenda $${cost.toLocaleString('es-AR')}${pack ? ' + packaging $' + pack.toLocaleString('es-AR') : ''}${ship ? ' + envío $' + ship.toLocaleString('es-AR') : ''})` : ''}, comisión MP ${commission}% = $${commissionAmount.toLocaleString('es-AR')}. Con un margen del ${margin}% sobre el costo, ganás $${net.toLocaleString('es-AR')} netos por venta (después de MP). Para publicarlo usá create_product con price ${price}.`;
             }
             case 'query_mp_fee': {
                 const real = Number(paymentConfig?.realMpFeePercent) || 0;
