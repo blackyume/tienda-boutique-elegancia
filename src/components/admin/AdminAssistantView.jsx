@@ -793,7 +793,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
             {/* HEADER */}
             <div className="relative shrink-0 border-b border-white/10 bg-white/[0.03] backdrop-blur-xl">
-                <div className="max-w-3xl mx-auto flex items-center justify-between px-5 h-[72px]">
+                <div className="max-w-3xl mx-auto flex items-center justify-between px-5 h-[72px] [@media(max-height:780px)]:h-14">
                     <div className="flex items-center gap-3">
                         <div className="relative">
                             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#B38728] flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)]">
@@ -821,7 +821,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             {showGuide && (
                 <div className="absolute inset-0 z-[70] bg-[#0A0A0A]/97 backdrop-blur-xl flex flex-col animate-fadeIn">
                     <div className="shrink-0 border-b border-white/10 bg-white/[0.03]">
-                        <div className="max-w-3xl mx-auto flex items-center justify-between px-5 h-[72px]">
+                        <div className="max-w-3xl mx-auto flex items-center justify-between px-5 h-[72px] [@media(max-height:780px)]:h-14">
                             <div className="flex items-center gap-2.5">
                                 <BookOpen className="w-5 h-5 text-[#D4AF37]" />
                                 <div>
@@ -867,7 +867,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             )}
 
             <div ref={listRef} className="relative flex-1 overflow-y-auto scrollbar-gold">
-                <div className="max-w-3xl w-full mx-auto px-4 py-6 space-y-4">
+                <div className="max-w-3xl w-full mx-auto px-4 py-6 [@media(max-height:780px)]:py-3 space-y-4">
                     {messages.map((m, i) => (
                         <div key={i} className={`flex gap-2.5 animate-fadeIn ${m.role === 'user' ? 'justify-end' : m.role === 'system' ? 'justify-center' : 'justify-start'}`}>
                             {m.role === 'ai' && (
@@ -946,7 +946,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     )}
 
                     {messages.length <= 1 && !loading && (
-                        <div className="pt-2 space-y-7">
+                        <div className="pt-2 space-y-7 [@media(max-height:780px)]:space-y-4">
                             {/* Tarjetas de capacidades */}
                             <div>
                                 <p className="text-[11px] uppercase tracking-[0.2em] text-white/30 mb-3 text-center">Lo que puedo hacer</p>
@@ -973,7 +973,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 </div>
             </div>
 
-            <div className="relative shrink-0 border-t border-white/10 bg-white/[0.03] backdrop-blur-xl p-4">
+            <div className="relative shrink-0 border-t border-white/10 bg-white/[0.03] backdrop-blur-xl p-4 [@media(max-height:780px)]:p-2.5">
                 <div className="max-w-3xl mx-auto">
                     {previews.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-2.5">
