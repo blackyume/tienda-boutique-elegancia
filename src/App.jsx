@@ -16,6 +16,7 @@ import { PromoPopup } from './components/ui/PromoPopup';
 import { PushOptIn } from './components/ui/PushOptIn';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
+import { AdminLauFab } from './components/admin/AdminLauFab';
 import React, { useLayoutEffect, useEffect, Suspense, lazy } from 'react';
 import { startPresence } from './utils/presence';
 
@@ -108,6 +109,8 @@ const AppContent = () => {
       {location.pathname !== '/admin' && <PushOptIn />}
       {/* Elegancia IA Chat Widget */}
       <ShopAssistantWrapper />
+      {/* Asistente Lau flotante — solo para el admin */}
+      <AdminLauFab />
       <div className={`flex-grow ${location.pathname !== '/' && location.pathname !== '/shop' && !location.pathname.startsWith('/admin') ? 'pt-28' : ''}`}>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
