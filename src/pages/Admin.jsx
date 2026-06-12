@@ -166,7 +166,9 @@ export const Admin = () => {
     const salesMetrics = orders.reduce((acc, o) => { acc.totalRevenue += o.total; acc.count += 1; return acc; }, { totalRevenue: 0, count: 0 });
 
     const salesLog = useMemo(() => orders.flatMap(order => order.items.map(item => {
-        const product = inventory.find(p => p.id === item.id) || item;
+        const product = inventory.find(p => String(p.id) === String(item.id))
+            || inventory.find(p => (p.name || '').trim().toLowerCase() === (item.name || '').trim().toLowerCase())
+            || item;
         const cost = (Number(product.cost) || 0) + (Number(product.shippingCost) || 0) + (Number(product.packagingCost) || 0);
         const fee = item.price * ((Number(product.feePercent) || 0) / 100);
         const profit = item.price - cost - fee;
@@ -182,7 +184,7 @@ export const Admin = () => {
             price: item.price,
             total: item.price * item.quantity,
             profit: profit * item.quantity,
-            image: item.image || product.image || product.media?.[0]?.url || ''
+            image: product.image || product.media?.[0]?.url || item.image || ''
         };
     })).reverse(), [orders, inventory]);
 
