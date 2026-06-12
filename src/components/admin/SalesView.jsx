@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Calendar, TrendingUp, Package } from 'lucide-react';
+import { Search, Calendar, TrendingUp, Package, Download } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
 
 // Miniatura con fallback: si no hay imagen o se rompe (ej: producto borrado),
@@ -39,6 +39,28 @@ export const SalesView = ({ salesLog }) => {
     const totalVendido = useMemo(() => filtered.reduce((a, s) => a + (Number(s.total) || 0), 0), [filtered]);
     const totalGanancia = useMemo(() => filtered.reduce((a, s) => a + (Number(s.profit) || 0), 0), [filtered]);
 
+    const exportSales = async () => {
+        if (!filtered.length) return;
+        const XLSX = await import('xlsx');
+        const rows = filtered.map(s => ({
+            'N° Pedido': s.orderId || '',
+            Producto: s.productName || '',
+            Talle: s.size || '',
+            Color: s.color || '',
+            Cantidad: s.quantity || 0,
+            'Precio unit.': Number(s.price) || 0,
+            Total: Number(s.total) || 0,
+            Ganancia: Number(s.profit) || 0,
+            Fecha: s.date ? new Date(s.date).toLocaleDateString('es-AR') : '',
+            Canal: s.channel || '',
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws['!cols'] = [{ wch: 14 }, { wch: 32 }, { wch: 8 }, { wch: 14 }, { wch: 9 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 16 }];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Ventas');
+        XLSX.writeFile(wb, `Ventas_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    };
+
     return (
         <div className="max-w-6xl mx-auto p-6 lg:p-8">
             <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
@@ -61,6 +83,13 @@ export const SalesView = ({ salesLog }) => {
                             <option value="30">Últimos 30 días</option>
                         </select>
                     </div>
+                    <button
+                        onClick={exportSales}
+                        disabled={!filtered.length}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#B8932E] text-white text-xs font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <Download className="w-4 h-4" /> Excel
+                    </button>
                 </div>
             </div>
 
