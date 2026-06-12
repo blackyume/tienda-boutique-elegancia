@@ -679,7 +679,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             transcript.push({ role: 'assistant', content: JSON.stringify({ reply: plan.reply, actions: plan.actions, done: plan.done }) });
             if (plan.reply) push({ role: 'ai', text: plan.reply, options: plan.options });
 
-            if (!plan.actions.length) { if (plan.done) return; else { transcript.push({ role: 'tool', content: '(sin acciones)' }); continue; } }
+            // Sin acciones = respondió o te hizo una pregunta. Paramos y esperamos tu
+            // respuesta (antes seguía el loop y repetía el mismo mensaje hasta el límite).
+            if (!plan.actions.length) return;
 
             const sensitive = plan.actions.filter(a => isSensitive(a.tool));
             const auto = plan.actions.filter(a => !isSensitive(a.tool));
