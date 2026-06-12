@@ -333,7 +333,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     paymentMethod: channel,
                     stockApplied: true,
                     customer: { nombre: A.customer ? String(A.customer) : 'Venta externa', email: '' },
-                    items: [{ id: p.id, name: p.name, price: Math.round(unit), quantity: qty, size, color, category: p.category || '', image: p.image || p.media?.[0]?.url || '' }],
+                    items: [{ id: p.id, name: p.name, price: Math.round(unit), quantity: qty, size, color, category: p.category || '', image: p.image || p.media?.[0]?.url || '', cost: Number(p.cost) || 0 }],
                 });
                 const variante = (size || color) ? ` (${[size, color].filter(Boolean).join(' / ')})` : '';
                 return `✅ Venta registrada: ${qty}× "${p.name}"${variante} por $${total.toLocaleString('es-AR')} (${channel}). Stock descontado → quedan ${sp.nuevo}. Quedó como pedido ${orderId} y ya cuenta en tus ventas.`;
