@@ -1,6 +1,20 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Calendar, TrendingUp } from 'lucide-react';
+import { Search, Calendar, TrendingUp, Package } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
+
+// Miniatura con fallback: si no hay imagen o se rompe (ej: producto borrado),
+// muestra un placeholder prolijo en vez de un cuadro vacío.
+const SaleThumb = ({ src, name }) => {
+    const [err, setErr] = useState(false);
+    if (!src || err) {
+        return (
+            <div className="w-12 h-14 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0 flex items-center justify-center">
+                <Package className="w-5 h-5 text-slate-300 dark:text-slate-600" />
+            </div>
+        );
+    }
+    return <img src={src} alt={name} loading="lazy" onError={() => setErr(true)} className="w-12 h-14 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shrink-0" />;
+};
 
 export const SalesView = ({ salesLog }) => {
     const [search, setSearch] = useState('');
@@ -78,9 +92,7 @@ export const SalesView = ({ salesLog }) => {
                         <tbody>{filtered.map((s, i) => <tr key={i} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
                             <td className="p-4">
                                 <div className="flex items-center gap-3">
-                                    {s.image
-                                        ? <img src={s.image} alt="" loading="lazy" className="w-12 h-14 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shrink-0" />
-                                        : <div className="w-12 h-14 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0" />}
+                                    <SaleThumb src={s.image} name={s.productName} />
                                     <div className="min-w-0">
                                         <p className="font-medium text-slate-800 dark:text-white truncate">{s.productName}</p>
                                         {(s.size || s.color) && (
