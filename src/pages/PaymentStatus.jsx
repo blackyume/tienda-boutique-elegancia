@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, UserPlus } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { Button } from '../components/ui/Button';
 import { trackPurchase } from '../utils/analytics';
@@ -13,8 +13,9 @@ export const PaymentStatus = () => {
     // única fuente de verdad. No escribimos status desde acá: los query params
     // de la URL de retorno son falsificables y, si los escribiéramos, alguien
     // podría marcar su propio pedido como "pagado" sin pagar.
-    const { orders, cart, clearCart } = useStore();
+    const { orders, cart, clearCart, user, linkGuestWithGoogle } = useStore();
     const trackedRef = useRef(false);
+    const [linked, setLinked] = useState(false);
 
     const status = searchParams.get('status'); // success, failure, pending
     const external_reference = searchParams.get('external_reference'); // Order ID
@@ -55,6 +56,26 @@ export const PaymentStatus = () => {
                         </div>
                         <h1 className="text-4xl font-serif mb-4">¡Pago Exitoso!</h1>
                         <p className="text-slate-500 dark:text-slate-400 mb-8">Tu pedido <strong>#{external_reference}</strong> ha sido confirmado.</p>
+
+                        {/* Ofrecimiento OPCIONAL de crear cuenta (solo si compró como invitado) */}
+                        {user?.isAnonymous && !linked && (
+                            <div className="mb-6 rounded-2xl border border-cielo-gold/30 bg-cielo-gold/[0.06] p-5 text-left">
+                                <p className="flex items-center gap-2 font-bold text-slate-900 dark:text-white mb-1">
+                                    <UserPlus className="w-4 h-4 text-cielo-gold" /> ¿Creás tu cuenta?
+                                </p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                                    Opcional. Guardás este pedido y seguís su envío desde tu perfil.
+                                </p>
+                                <button
+                                    onClick={async () => { const ok = await linkGuestWithGoogle(); if (ok) setLinked(true); }}
+                                    className="w-full py-2.5 rounded-lg text-sm font-bold text-black transition-all"
+                                    style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
+                                >
+                                    Crear cuenta con Google
+                                </button>
+                            </div>
+                        )}
+
                         <Button onClick={() => navigate('/profile')} className="w-full">Ver Mis Pedidos</Button>
                     </>
                 ) : status === 'failure' ? (

@@ -181,7 +181,7 @@ export const StoreProvider = ({ children }) => {
   } = useCart({ cart, setCart, wishlist, setWishlist, inventory, addToast });
 
   // --- AUTH (extraído a hook dedicado) ---
-  const { isAdmin, login, loginWithGoogle, register, logout } = useAuth({
+  const { isAdmin, login, loginWithGoogle, register, logout, loginAnonymously, linkGuestWithGoogle } = useAuth({
     user, wishlist, setWishlist, addToast
   });
 
@@ -275,7 +275,7 @@ export const StoreProvider = ({ children }) => {
   return (
     <StoreContext.Provider value={{
       inventory, cart, setCart, addToCart, updateCartQty, removeFromCart, clearCart, cartTotal, cartCount,
-      orders, wishlist, setWishlist, toggleWishlist, isInWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout,
+      orders, wishlist, setWishlist, toggleWishlist, isInWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout, loginAnonymously, linkGuestWithGoogle,
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
       categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,

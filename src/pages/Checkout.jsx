@@ -11,7 +11,7 @@ import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral'
 import { BrandStrip } from '../components/ui/BrandBadges';
 
 export const Checkout = () => {
-    const { cart, cartTotal, createOrder, addToast, user, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
+    const { cart, cartTotal, createOrder, addToast, user, loginAnonymously, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '' });
@@ -208,14 +208,25 @@ export const Checkout = () => {
         ].join('\n');
     };
 
+    // Devuelve el comprador: el usuario logueado, o una sesión de INVITADO
+    // (login anónimo) para que pueda comprar sin registrarse. Si el login anónimo
+    // no está habilitado en Firebase, cae al modal de login como respaldo.
+    const ensureBuyer = async () => {
+        if (user) return user;
+        const guest = await loginAnonymously();
+        if (!guest) { setIsAuthModalOpen(true); return null; }
+        return guest;
+    };
+
     const handleWhatsappCheckout = async () => {
-        if (!user) return setIsAuthModalOpen(true);
         if (!formData.nombre || !formData.email || !formData.dni) {
             return addToast("Completá nombre, email y DNI antes de continuar", "error");
         }
         if (cart.length === 0) return;
 
         setLoading(true);
+        const buyer = await ensureBuyer();
+        if (!buyer) { setLoading(false); return; }
         try {
             const orderId = `ORD-${Math.floor(Math.random() * 900000) + 100000}`;
             const newOrder = {
@@ -223,7 +234,7 @@ export const Checkout = () => {
                 date: new Date().toISOString(),
                 status: 'pending_wa',
                 total: finalTotal,
-                customer: { ...formData, userId: user.uid, email: formData.email },
+                customer: { ...formData, userId: buyer.uid, email: formData.email },
                 items: cart,
                 shipping: shippingMethod,
                 shippingName: selectedShipping.name || shippingMethod,
@@ -254,14 +265,11 @@ export const Checkout = () => {
 
     const handleCheckout = async (e) => {
         e.preventDefault();
-        if (!user) {
-            setIsAuthModalOpen(true);
-            return;
-        }
-
         if (!formData.nombre || !formData.email || !formData.dni) return addToast("Completa los datos obligatorios", "error");
 
         setLoading(true);
+        const buyer = await ensureBuyer();
+        if (!buyer) { setLoading(false); return; }
 
         try {
             const newOrder = {
@@ -269,7 +277,7 @@ export const Checkout = () => {
                 date: new Date().toISOString(),
                 status: 'pending_payment', // Inicialmente pendiente
                 total: finalTotal,
-                customer: { ...formData, userId: user.uid, email: formData.email },
+                customer: { ...formData, userId: buyer.uid, email: formData.email },
                 items: cart,
                 shipping: shippingMethod,
                 shippingName: selectedShipping.name || shippingMethod,
@@ -326,31 +334,12 @@ export const Checkout = () => {
         </div>
     );
 
-    // Gated Content for Non-Auth Users
-    if (!user) {
-        return (
-            <div className="min-h-screen pt-32 pb-20 bg-white dark:bg-[#0A0A0A] font-sans flex flex-col items-center justify-center max-w-md mx-auto px-6 text-center transition-colors">
-                <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-                <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-8">
-                    <Lock className="w-8 h-8 text-cielo-gold" />
-                </div>
-                <h2 className="text-4xl font-cinzel text-slate-900 dark:text-white mb-4">Finalizar Compra</h2>
-                <p className="text-slate-500 dark:text-slate-400 mb-8 font-montserrat leading-relaxed">Para proteger tu seguridad y asegurar el seguimiento de tu pedido, necesitamos que ingreses a tu cuenta.</p>
-                <div className="flex flex-col gap-4 w-full">
-                    <button
-                        onClick={() => setIsAuthModalOpen(true)}
-                        className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] transition-all"
-                    >
-                        Ingresar o Registrarme
-                    </button>
-                    <button onClick={() => navigate('/')} className="text-slate-400 text-sm hover:text-slate-600 dark:hover:text-slate-300 mt-4">Volver al Shop</button>
-                </div>
-            </div>
-        );
-    }
+    // Compra como INVITADO: ya no se exige registro para comprar. El formulario
+    // se muestra a todos; la sesión de invitado (anónima) se crea al confirmar.
 
     return (
         <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#0A0A0A] font-sans text-slate-900 dark:text-white transition-colors">
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
             <div className="max-w-[1400px] mx-auto px-4 lg:px-12 grid lg:grid-cols-12 gap-12 lg:gap-20">
 
                 {/* --- IZQUIERDA: FORMULARIO --- */}
@@ -362,6 +351,16 @@ export const Checkout = () => {
                     </div>
 
                     <h1 className="text-4xl md:text-5xl font-cinzel text-slate-900 dark:text-white">Checkout</h1>
+
+                    {/* Comprás como invitado — registro NO requerido. Login opcional para quien vuelve. */}
+                    {!user && (
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Comprás como invitado, sin crear cuenta.{' '}
+                            <button type="button" onClick={() => setIsAuthModalOpen(true)} className="font-bold text-cielo-gold hover:underline">
+                                ¿Ya tenés cuenta? Iniciá sesión
+                            </button>
+                        </p>
+                    )}
 
                     <form id="checkout-form" onSubmit={handleCheckout} className="space-y-10">
                         {/* Datos Personales */}
