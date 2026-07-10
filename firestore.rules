@@ -148,6 +148,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // --- NEWSLETTER SUBSCRIBERS ---
+    // Cualquiera se suscribe (crea/actualiza su email); sólo admin lee/borra.
+    match /newsletter_subscribers/{id} {
+      allow read: if isAdmin();
+      allow create, update: if request.resource.data.email is string
+        && request.resource.data.email.size() <= 256;
+      allow delete: if isAdmin();
+    }
+
     // --- PUSH SUBSCRIPTIONS (FCM) ---
     // Cualquiera registra su token; sólo admin lee/elimina agregados.
     match /push_subscriptions/{id} {

@@ -35,15 +35,15 @@ export const analyzeProductImage = async (file, aiConfig, categories = []) => {
     const prompt = `
 Sos especialista en catálogo de moda femenina premium (Argentina). Mirá la prenda de la foto y devolvé EXCLUSIVAMENTE un JSON válido (sin markdown, sin texto alrededor):
 {
-  "name": "Nombre comercial atractivo y corto (max 6 palabras), español rioplatense",
+  "garmentType": "Tipo de prenda que SE VE en la foto, literal y descriptivo, ej 'Vestido midi floral' o 'Top de encaje'. NO inventes un nombre comercial de fantasía.",
   "category": "Una de estas si encaja, sino la más cercana: ${catList}",
   "colors": ["colores visibles, capitalizados"],
   "sizes": ["talles sugeridos típicos para esta prenda, ej S, M, L"],
-  "description": "2-3 oraciones elegantes sobre corte, tela aparente y ocasión ideal. Sin clichés, sin emojis, no inventar materiales exactos.",
+  "description": "2-3 oraciones elegantes sobre corte y ocasión ideal, SOLO en base a lo que se ve. Sin clichés, sin emojis, NO inventar materiales ni datos que no se vean.",
   "suggestedPrice": número entero en pesos argentinos (ARS) acorde a una boutique premium, sólo el número,
   "badges": { "isNew": true }
 }
-Reglas: todo en español neutro/rioplatense, sin emojis. El precio es una SUGERENCIA orientativa. No incluyas nada fuera del JSON.`.trim();
+Reglas: todo en español neutro/rioplatense, sin emojis. "garmentType" es solo una PISTA descriptiva, NO el nombre final del producto (ese lo pone el dueño). El precio es una SUGERENCIA orientativa. No inventes nada que no se vea. No incluyas nada fuera del JSON.`.trim();
 
     let lastErr = null;
     for (const key of keys) {
@@ -59,7 +59,7 @@ Reglas: todo en español neutro/rioplatense, sin emojis. El precio es una SUGERE
                 const parsed = parseJsonFromResponse(text);
                 if (!parsed) { lastErr = new Error('Respuesta de visión no parseable'); continue; }
                 return {
-                    name: String(parsed.name || '').trim(),
+                    garmentType: String(parsed.garmentType || parsed.name || '').trim(),
                     category: String(parsed.category || '').trim(),
                     colors: Array.isArray(parsed.colors) ? parsed.colors.map(String).filter(Boolean) : [],
                     sizes: Array.isArray(parsed.sizes) ? parsed.sizes.map(String).filter(Boolean) : [],

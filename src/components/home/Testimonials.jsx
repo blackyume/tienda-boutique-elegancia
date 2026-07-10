@@ -8,7 +8,7 @@ const FALLBACK = [
     {
         name: 'Sofía G.',
         location: 'Buenos Aires',
-        text: 'La calidad es impresionante. Los colores y el corte son idénticos a las fotos, y la atención por WhatsApp fue excelente.',
+        text: 'La calidad es impresionante. Los colores y el corte son idénticos a las fotos, y la atención por Instagram fue excelente.',
         rating: 5,
     },
     {
@@ -40,7 +40,7 @@ export const Testimonials = () => {
     }, [list.length]);
 
     return (
-        <section className="relative py-24 md:py-32 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
+        <section className="relative py-20 md:py-28 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
             <Reveal className="max-w-5xl mx-auto relative z-10">
                 <SectionHeader
                     eyebrow="La voz de nuestras clientas"

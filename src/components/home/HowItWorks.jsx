@@ -25,7 +25,7 @@ const steps = [
 
 export const HowItWorks = () => {
     return (
-        <section className="relative py-24 md:py-32 px-6 bg-[#0A0A0A] overflow-hidden">
+        <section className="relative py-20 md:py-28 px-6 bg-[#0A0A0A] overflow-hidden">
             <div className="max-w-6xl mx-auto relative z-10">
                 <SectionHeader
                     eyebrow="La experiencia LBE"

@@ -48,7 +48,7 @@ export const CountdownBanner = () => {
     const secs = Math.floor((diff % 60000) / 1000);
 
     const title = next.p?.title || next.p?.name || 'Próxima promoción';
-    const desc = next.p?.description || 'Acceso anticipado para subscriptoras. No te lo pierdas.';
+    const desc = next.p?.description || 'Acceso anticipado para suscriptoras. No te lo pierdas.';
 
     return (
         <section className="relative py-16 px-4 bg-[#0A0A0A] overflow-hidden">

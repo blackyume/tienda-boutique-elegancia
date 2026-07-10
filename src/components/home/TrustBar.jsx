@@ -1,11 +1,11 @@
 import React from 'react';
-import { Truck, CreditCard, ShieldCheck, MessageCircle } from 'lucide-react';
+import { Truck, CreditCard, ShieldCheck, Instagram } from 'lucide-react';
 
 const items = [
     { Icon: Truck, title: 'Envíos a todo el país', desc: 'Con Correo Argentino' },
     { Icon: CreditCard, title: 'Pago en cuotas', desc: 'Con Mercado Pago' },
     { Icon: ShieldCheck, title: 'Compra protegida', desc: 'Pago 100% seguro' },
-    { Icon: MessageCircle, title: 'Asesoria personalizada', desc: 'Via WhatsApp' },
+    { Icon: Instagram, title: 'Asesoría personalizada', desc: 'Por Instagram' },
 ];
 
 export const TrustBar = () => (

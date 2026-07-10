@@ -34,9 +34,14 @@ const tryProxy = async (prompt, scope) => {
 };
 
 // scope: 'admin' (cerebro interno) | 'customer' (asistente de la tienda)
-export const generateText = async (prompt, aiConfig, { scope = 'admin' } = {}) => {
+// system: prompt de sistema separado (mejora el seguimiento de instrucciones)
+// temperature: 0 = determinista (acciones/JSON), alto = creativo (texto)
+export const generateText = async (prompt, aiConfig, { scope = 'admin', system, temperature } = {}) => {
+    // Para el proxy y Gemini combinamos system + prompt en un solo texto.
+    const combined = system ? `${system}\n\n${prompt}` : prompt;
+
     // 1. Proxy server-side (camino seguro: las keys viven sólo en Vercel).
-    const viaProxy = await tryProxy(prompt, scope);
+    const viaProxy = await tryProxy(combined, scope);
     if (viaProxy) return viaProxy;
 
     // 2. Fallback client-side (modo actual, hasta configurar las env vars).
@@ -46,13 +51,15 @@ export const generateText = async (prompt, aiConfig, { scope = 'admin' } = {}) =
             return await generateWithCerebras(prompt, {
                 keys: cerebrasKey,
                 model: aiConfig?.cerebrasModel || undefined,
+                system,
+                temperature,
             });
         } catch (err) {
             console.warn('[ai] Cerebras falló, fallback a Gemini:', err?.message);
         }
     }
     const keys = scope === 'customer' ? aiConfig?.customerKeys : aiConfig?.adminKeys;
-    return generateWithGemini(prompt, { keys });
+    return generateWithGemini(combined, { keys });
 };
 
 // ¿Hay algún proveedor de IA configurado para uso admin?
@@ -96,4 +103,29 @@ Reglas:
         bullets: Array.isArray(parsed.bullets) ? parsed.bullets.map(String).filter(Boolean).slice(0, 6) : [],
         keywords: Array.isArray(parsed.keywords) ? parsed.keywords.map(String).filter(Boolean).slice(0, 8) : [],
     };
+};
+
+// Descripción CORTA con grounding: usa solo los datos reales (nombre, categoría,
+// colores, talles) + lo que el dueño contó de la prenda. No inventa telas ni
+// detalles que no le hayan dicho. Devuelve texto plano listo para usar.
+export const generateGroundedDescription = async ({ name, category, colors = [], sizes = [], details = '' }, aiConfig) => {
+    const facts = [
+        name && `Nombre: ${name}`,
+        category && `Categoría: ${category}`,
+        colors.length && `Colores: ${colors.join(', ')}`,
+        sizes.length && `Talles: ${sizes.join(', ')}`,
+        details && `Lo que contó el dueño sobre la prenda: ${details}`,
+    ].filter(Boolean).join('\n');
+
+    const system = 'Sos redactor de e-commerce de moda femenina premium en Argentina. Escribís descripciones cortas, elegantes y cálidas en español rioplatense neutro, sin emojis ni marketing exagerado.';
+    const prompt = `Escribí una descripción de producto de 2 a 3 oraciones, elegante y atractiva, usando ÚNICAMENTE los datos reales de abajo.
+REGLA CLAVE (estricta): NO inventes telas, materiales, medidas ni composición. Si en los datos NO aparece la tela/composición, está PROHIBIDO mencionar de qué material es — ni siquiera adivinarlo o sugerirlo. Hablá del corte, el color y la ocasión/estilo de forma general, sin afirmar nada sobre el material.
+
+DATOS REALES:
+${facts}
+
+Devolvé SOLO el texto de la descripción (sin comillas, sin título, sin markdown).`;
+
+    const raw = await generateText(prompt, aiConfig, { scope: 'admin', system, temperature: 0.6 });
+    return String(raw || '').trim().replace(/^["'`]+|["'`]+$/g, '').slice(0, 600);
 };

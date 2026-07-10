@@ -53,7 +53,7 @@ const TAB_LABELS = {
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion } = useStore();
     const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -84,6 +84,33 @@ export const Admin = () => {
             }
         }
     }, []);
+
+    // Scheduler de ofertas programadas: cuando el admin está abierto, revisa cada
+    // minuto si alguna oferta programada ya venció y la aplica (como oferta, con el
+    // precio anterior tachado), después borra el registro. Reversible con "quitá la oferta".
+    useEffect(() => {
+        if (!isAdmin) return;
+        const run = async () => {
+            const due = (scheduledPromotions || []).filter(p => !p.executed && p.type === 'bulk_discount' && p.startsAt && Number(p.startsAt) <= Date.now());
+            for (const promo of due) {
+                try {
+                    const disc = Math.abs(Number(promo.discount) || 0);
+                    const cat = (promo.category || '').toLowerCase();
+                    const targets = (inventory || []).filter(p => !cat || (p.category || '').toLowerCase() === cat);
+                    for (const p of targets) {
+                        const base = Number(p.compareAtPrice) > Number(p.price) ? Number(p.compareAtPrice) : Number(p.price);
+                        if (!base) continue;
+                        await updateProduct(p.id, { price: Math.round(base * (1 - disc / 100)), compareAtPrice: base, badges: { ...(p.badges || {}), isOnSale: true } });
+                    }
+                    await deleteScheduledPromotion(promo.id);
+                    addToast(`🗓️ Oferta "${promo.name || `−${disc}%`}" activada (${targets.length} producto/s)`, 'success');
+                } catch (e) { console.error('scheduler promo', e); }
+            }
+        };
+        run();
+        const t = setInterval(run, 60000);
+        return () => clearInterval(t);
+    }, [isAdmin, scheduledPromotions, inventory]);
 
     // Notify when new order arrives
     useEffect(() => {

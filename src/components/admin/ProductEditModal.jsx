@@ -25,6 +25,8 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
     const [currentProduct, setCurrentProduct] = useState(() => initialProduct || {});
     const [tab, setTab] = useState('info');
     const [tempColor, setTempColor] = useState('');
+    const [tempHex, setTempHex] = useState('#C9A04E');
+    const [tempHexTouched, setTempHexTouched] = useState(false);
     const [tempSize, setTempSize] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
@@ -214,11 +216,23 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
     };
 
     const handleAddColor = () => {
-        if (!tempColor) return;
-        setCurrentProduct({ ...currentProduct, colors: [...(currentProduct.colors || []), tempColor] });
-        setTempColor('');
+        const v = tempColor.trim();
+        if (!v) return;
+        setCurrentProduct({
+            ...currentProduct,
+            colors: [...(currentProduct.colors || []), v],
+            // Solo guarda override si ajustó el tono a mano; si no, el motor lo resuelve solo.
+            ...(tempHexTouched ? { colorHex: { ...(currentProduct.colorHex || {}), [v]: tempHex } } : {}),
+        });
+        setTempColor(''); setTempHexTouched(false);
     };
-    const removeColor = (index) => setCurrentProduct({ ...currentProduct, colors: currentProduct.colors.filter((_, i) => i !== index) });
+    const removeColor = (index) => {
+        const c = currentProduct.colors[index];
+        const { [c]: _omit, ...restHex } = currentProduct.colorHex || {};
+        setCurrentProduct({ ...currentProduct, colors: currentProduct.colors.filter((_, i) => i !== index), colorHex: restHex });
+    };
+    // Cambia el tono guardado de un color ya cargado.
+    const setColorTone = (name, hex) => setCurrentProduct({ ...currentProduct, colorHex: { ...(currentProduct.colorHex || {}), [name]: hex } });
     const handleAddSize = () => {
         if (!tempSize) return;
         setCurrentProduct({ ...currentProduct, sizes: [...(currentProduct.sizes || []), tempSize] });
@@ -381,6 +395,13 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                                 {currentProduct.seoKeywords}
                                             </p>
                                         )}
+                                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-3 block">Composición / tela <span className="text-slate-400 normal-case font-normal">(opcional — dejá vacío si no la sabés)</span></label>
+                                        <input
+                                            value={currentProduct.material || ''}
+                                            onChange={e => setCurrentProduct({ ...currentProduct, material: e.target.value })}
+                                            className="input text-sm mt-1"
+                                            placeholder="Ej: Algodón 95%, Elastano 5%"
+                                        />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <InputGroup label="Categoría">
@@ -422,36 +443,35 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                             <div className="relative flex-1">
                                                 <input
                                                     value={tempColor}
-                                                    onChange={e => setTempColor(e.target.value)}
+                                                    onChange={e => { setTempColor(e.target.value); setTempHexTouched(false); const g = getColorHex(e.target.value.trim()); if (/^#[0-9a-fA-F]{6}$/.test(g)) setTempHex(g); }}
                                                     onKeyDown={e => e.key === 'Enter' && handleAddColor()}
                                                     className="input"
                                                     placeholder="Ej: Rojo, Negro, Nude..."
                                                 />
-                                                {tempColor && (
-                                                    <div
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-slate-200 shadow-sm transition-colors duration-300"
-                                                        style={{ backgroundColor: getColorHex(tempColor) }}
-                                                    />
-                                                )}
                                             </div>
+                                            <label className="relative w-[42px] shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer flex items-center justify-center" title="Elegí el tono exacto">
+                                                <span className="w-5 h-5 rounded-full border border-slate-200 shadow-sm" style={{ background: tempHex }} />
+                                                <input type="color" value={tempHex} onChange={e => { setTempHex(e.target.value); setTempHexTouched(true); }} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                            </label>
                                             <Button onClick={handleAddColor} className="bg-slate-800 text-white px-3 py-0 rounded-lg h-[42px]">+</Button>
                                         </div>
                                         <div className="flex flex-wrap gap-2">
                                             {(currentProduct.colors || []).map((c, i) => (
                                                 <div key={`${c}-${i}`} className="relative group/color">
-                                                    <div
-                                                        className="w-8 h-8 rounded-full border border-slate-200 shadow-sm cursor-help relative"
-                                                        style={{ backgroundColor: getColorHex(c) }}
-                                                        title={c}
+                                                    <label
+                                                        className="block w-8 h-8 rounded-full border border-slate-200 shadow-sm cursor-pointer relative"
+                                                        style={{ background: getColorHex(c, currentProduct.colorHex) }}
+                                                        title={`${c} · clic para ajustar el tono`}
                                                     >
-                                                        <button
-                                                            onClick={() => removeColor(i)}
-                                                            aria-label={`Quitar color ${c}`}
-                                                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover/color:opacity-100 transition-opacity shadow-sm"
-                                                        >
-                                                            <X className="w-2.5 h-2.5" />
-                                                        </button>
-                                                    </div>
+                                                        <input type="color" value={getColorHex(c, currentProduct.colorHex).startsWith('#') ? getColorHex(c, currentProduct.colorHex) : '#cccccc'} onChange={e => setColorTone(c, e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                                    </label>
+                                                    <button
+                                                        onClick={() => removeColor(i)}
+                                                        aria-label={`Quitar color ${c}`}
+                                                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover/color:opacity-100 transition-opacity shadow-sm z-20"
+                                                    >
+                                                        <X className="w-2.5 h-2.5" />
+                                                    </button>
                                                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover/color:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                                                         {c}
                                                         <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800"></div>
@@ -544,7 +564,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                                         </td>
                                                         <td className="py-2">
                                                             <div className="flex items-center gap-2">
-                                                                <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: getColorHex(variant.color) }}></div>
+                                                                <div className="w-4 h-4 rounded-full border" style={{ background: getColorHex(variant.color, currentProduct.colorHex) }}></div>
                                                                 <span className="text-xs">{variant.color}</span>
                                                             </div>
                                                         </td>

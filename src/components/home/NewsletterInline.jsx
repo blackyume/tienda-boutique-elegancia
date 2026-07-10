@@ -2,23 +2,22 @@ import React, { useState } from 'react';
 import { Mail, Check, ArrowRight } from 'lucide-react';
 import { Reveal } from '../ui/Reveal';
 import { SectionHeader } from './SectionHeader';
+import { subscribeNewsletter } from '../../utils/newsletter';
 
 export const NewsletterInline = () => {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState('idle');
 
-    const submit = (e) => {
+    const submit = async (e) => {
         e.preventDefault();
         if (!email || status === 'loading') return;
         setStatus('loading');
-        setTimeout(() => {
-            localStorage.setItem('lbe_newsletter_subscribed', 'true');
-            setStatus('success');
-        }, 1000);
+        const ok = await subscribeNewsletter(email, 'home_inline');
+        setStatus(ok ? 'success' : 'idle');
     };
 
     return (
-        <section className="relative py-24 md:py-32 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
+        <section className="relative py-20 md:py-28 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.05),transparent_60%)] pointer-events-none" />
             <Reveal className="relative max-w-3xl mx-auto text-center">
                 <SectionHeader

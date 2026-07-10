@@ -17,11 +17,16 @@ const parseKeys = (raw) => {
     return String(raw).split(/[,\n]+/).map((k) => k.trim()).filter(Boolean);
 };
 
-export const generateWithCerebras = async (prompt, { keys, model, models } = {}) => {
+export const generateWithCerebras = async (prompt, { keys, model, models, system, temperature } = {}) => {
     const list = Array.isArray(keys) ? keys : parseKeys(keys);
     if (list.length === 0) throw new Error('Sin API key de Cerebras configurada en el Admin');
 
     const modelsToTry = model ? [model, ...DEFAULT_MODELS] : (models || DEFAULT_MODELS);
+    // Mensaje de sistema propio (no apretar todo en el user) → el modelo sigue
+    // mucho mejor las instrucciones y usa toda su capacidad de razonamiento.
+    const messages = system
+        ? [{ role: 'system', content: system }, { role: 'user', content: prompt }]
+        : [{ role: 'user', content: prompt }];
 
     let lastErr = null;
     for (const key of list) {
@@ -35,9 +40,11 @@ export const generateWithCerebras = async (prompt, { keys, model, models } = {})
                     },
                     body: JSON.stringify({
                         model: modelName,
-                        messages: [{ role: 'user', content: prompt }],
-                        temperature: 0.6,
-                        max_tokens: 2500,
+                        messages,
+                        // Temperatura baja por defecto para tareas de acción/JSON
+                        // (determinista, menos alucinación). Se puede subir para texto creativo.
+                        temperature: typeof temperature === 'number' ? temperature : 0.6,
+                        max_tokens: 3500,
                     }),
                 });
                 if (!res.ok) {

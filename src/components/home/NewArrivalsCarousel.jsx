@@ -65,7 +65,7 @@ const ArrivalCard = ({ product, onQuickView }) => {
                         <div className="flex -space-x-1">
                             {(product.colors || []).slice(0, 4).map(c => (
                                 <span key={c} className="w-3 h-3 rounded-full border border-white/30 shadow-sm"
-                                    style={{ backgroundColor: getColorHex(c) }} />
+                                    style={{ background: getColorHex(c, product.colorHex) }} />
                             ))}
                         </div>
                     )}

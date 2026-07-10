@@ -107,7 +107,7 @@ export const Hero = () => {
                 <div className="flex items-center gap-3 mb-8 animate-fadeIn">
                     <span className="h-px w-12 bg-cielo-gold/60" />
                     <span className="text-2xs uppercase tracking-[0.45em] font-semibold text-cielo-gold/80">
-                        Coleccion 2026 - Edicion de autor
+                        Colección 2026 · Edición de autor
                     </span>
                 </div>
 
@@ -152,7 +152,7 @@ export const Hero = () => {
                             className="group inline-flex items-center gap-2 text-white/50 hover:text-white text-2xs uppercase tracking-[0.3em] font-semibold transition-colors"
                         >
                             <span className="relative">
-                                Ver coleccion
+                                Ver colección
                                 <span className="absolute -bottom-0.5 left-0 w-0 group-hover:w-full h-px bg-cielo-gold transition-all duration-500" />
                             </span>
                         </button>

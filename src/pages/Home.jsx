@@ -76,19 +76,8 @@ export const Home = () => {
                 <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
             </Suspense>
 
-            {/* Editorial como pausa de marca */}
-            <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
-                <div id="editorial">
-                    {siteConfig?.showEditorial !== false && <Editorial />}
-                </div>
-            </Suspense>
-
-            <Suspense fallback={<div className="h-[600px] bg-[#0A0A0A]" />}>
-                <ShopTheLook />
-            </Suspense>
-
-            {/* Categorías — solo renderiza si hay categorías válidas */}
-            {validCategories.length > 0 && <section id="categories" className="py-24 md:py-32 px-6 bg-[#0A0A0A] relative">
+            {/* Categorías — caminos de compra arriba, junto al producto */}
+            {validCategories.length > 0 && <section id="categories" className="py-20 md:py-28 px-6 bg-[#0A0A0A] relative">
                 <Reveal className="max-w-[1400px] mx-auto">
                     <div className="flex justify-between items-end mb-12">
                         <SectionHeader align="left" eyebrow="Categorías" title="Curaduría exclusiva" />
@@ -100,7 +89,7 @@ export const Home = () => {
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[280px] md:auto-rows-[500px]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[240px] md:auto-rows-[420px]">
                         {validCategories.map((cat, index) => (
                             <Link
                                 key={cat.id}
@@ -135,8 +124,8 @@ export const Home = () => {
                 </Reveal>
             </section>}
 
-            {/* New Arrivals */}
-            <section className="py-24 md:py-32 px-6 bg-[#0A0A0A]">
+            {/* New Arrivals — más producto arriba */}
+            <section className="py-20 md:py-28 px-6 bg-[#0A0A0A]">
                 <div className="max-w-[1400px] mx-auto">
                     <Suspense fallback={<div className="h-[400px]" />}>
                         <NewArrivalsCarousel
@@ -147,10 +136,23 @@ export const Home = () => {
                 </div>
             </section>
 
+            {/* Urgencia: cuenta regresiva del próximo drop/promo (si hay una programada) */}
             <Suspense fallback={<div className="h-[200px] bg-[#0A0A0A]" />}>
                 <CountdownBanner />
             </Suspense>
 
+            {/* Editorial — pausa de marca después del producto */}
+            <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
+                <div id="editorial">
+                    {siteConfig?.showEditorial !== false && <Editorial />}
+                </div>
+            </Suspense>
+
+            <Suspense fallback={<div className="h-[600px] bg-[#0A0A0A]" />}>
+                <ShopTheLook />
+            </Suspense>
+
+            {/* Prueba social */}
             <Suspense fallback={<div className="h-[400px] bg-[#0A0A0A]" />}>
                 <Testimonials />
             </Suspense>

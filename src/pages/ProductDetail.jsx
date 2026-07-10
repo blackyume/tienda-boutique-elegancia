@@ -279,6 +279,12 @@ export const ProductDetail = () => {
                         </p>
                     )}
 
+                    {product.material && (
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 -mt-2">
+                            <span className="font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Composición:</span> {product.material}
+                        </p>
+                    )}
+
                     <div className="space-y-6 border-t border-slate-100 dark:border-slate-800 pt-6">
                         {/* Colores */}
                         {product.colors?.length > 0 && (
@@ -304,7 +310,7 @@ export const ProductDetail = () => {
                                                 <span className="absolute inset-0 rounded-full border border-slate-200 dark:border-slate-700" />
                                                 <span
                                                     className={`w-7 h-7 rounded-full shadow-sm ${selected ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0A0A0A] ring-slate-900 dark:ring-white' : ''}`}
-                                                    style={{ backgroundColor: getColorHex(c) }}
+                                                    style={{ background: getColorHex(c, product.colorHex) }}
                                                 />
                                                 {!available && (
                                                     <span className="absolute w-full h-[2px] bg-slate-400 rotate-45 rounded-full" />

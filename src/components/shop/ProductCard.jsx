@@ -60,7 +60,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 tabIndex={0}
                 role="button"
                 aria-haspopup="dialog"
-                aria-label={`Vista rapida de ${product.name}`}
+                aria-label={`Vista rápida de ${product.name}`}
             >
                 {/* Imagen */}
                 <div className="relative aspect-[3/4] overflow-hidden bg-[#080808]">
@@ -102,7 +102,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                         )}
                         {!outOfStock && lowStock && (
                             <span className="bg-white/10 backdrop-blur text-cielo-gold border border-cielo-gold/30 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
-                                Ultimas unidades
+                                Últimas unidades
                             </span>
                         )}
                     </div>
@@ -163,7 +163,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                                     key={c}
                                     title={c}
                                     className="w-2.5 h-2.5 rounded-full border border-white/20"
-                                    style={{ backgroundColor: getColorHex(c) }}
+                                    style={{ background: getColorHex(c, product.colorHex) }}
                                 />
                             ))}
                             {(product.colors?.length || 0) > colors.length && (

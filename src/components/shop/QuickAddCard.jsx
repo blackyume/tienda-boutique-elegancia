@@ -79,7 +79,7 @@ export const QuickAddCard = ({ product, onQuickView }) => {
                     {(product.colors || []).length > 0 && (
                         <div className="flex -space-x-1 pl-3 border-l border-slate-200 dark:border-white/10 ml-3">
                             {(product.colors || []).slice(0, 3).map(c => (
-                                <div key={c} className="w-3 h-3 rounded-full border border-white dark:border-slate-800 shadow-sm" style={{ backgroundColor: getColorHex(c) }} title={c} />
+                                <div key={c} className="w-3 h-3 rounded-full border border-white dark:border-slate-800 shadow-sm" style={{ background: getColorHex(c, product.colorHex) }} title={c} />
                             ))}
                             {(product.colors || []).length > 3 && (
                                 <span className="text-[9px] text-slate-400 ml-1">+{product.colors.length - 3}</span>

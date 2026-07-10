@@ -40,6 +40,11 @@ export const Shop = () => {
         () => Array.from(new Set(inventory.flatMap((p) => p.colors || []))),
         [inventory]
     );
+    // Tonos exactos elegidos por el dueño (mezcla de todos los productos) para los swatches del filtro.
+    const colorHexMap = useMemo(
+        () => inventory.reduce((acc, p) => Object.assign(acc, p.colorHex || {}), {}),
+        [inventory]
+    );
     const maxPrice = useMemo(
         () => Math.max(0, ...inventory.map((p) => Number(p.price) || 0)),
         [inventory]
@@ -207,7 +212,7 @@ export const Shop = () => {
                                             onClick={() => toggleIn(colors, c, setColors)}
                                             title={c}
                                             className={`w-7 h-7 rounded-full border transition-all ${colors.has(c) ? 'ring-2 ring-cielo-gold ring-offset-2 dark:ring-offset-[#0A0A0A] scale-110' : 'border-slate-200 dark:border-slate-700 hover:scale-105'}`}
-                                            style={{ backgroundColor: getColorHex(c) }}
+                                            style={{ background: getColorHex(c, colorHexMap) }}
                                             aria-label={c}
                                             aria-pressed={colors.has(c)}
                                         />
@@ -414,7 +419,7 @@ export const Shop = () => {
                                         onClick={() => toggleIn(colors, c, setColors)}
                                         title={c}
                                         className={`w-8 h-8 rounded-full border ${colors.has(c) ? 'ring-2 ring-cielo-gold ring-offset-2 dark:ring-offset-[#0A0A0A]' : 'border-slate-200 dark:border-slate-700'}`}
-                                        style={{ backgroundColor: getColorHex(c) }}
+                                        style={{ background: getColorHex(c, colorHexMap) }}
                                         aria-label={c}
                                     />
                                 ))}

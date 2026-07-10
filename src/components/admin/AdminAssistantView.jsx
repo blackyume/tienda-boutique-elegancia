@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Paperclip, X, Loader2, User, AlertTriangle, Check, Trash2, BookOpen } from 'lucide-react';
+import { Send, Sparkles, Paperclip, X, Loader2, User, AlertTriangle, Check, Trash2, BookOpen, PackagePlus } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { ProductWizard } from './ProductWizard';
 import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
-import { analyzeProductImage } from '../../utils/vision';
-import { isSensitive, buildSnapshot, buildPrompt, parsePlan } from '../../utils/aiCopilot';
+import { isSensitive, buildSnapshot, buildAgentMessages, parsePlan } from '../../utils/aiCopilot';
 import { generateShippingLabel } from '../../utils/shippingLabel';
 import { getTotalStock, getVariantStock } from '../../utils/variants';
 
@@ -12,7 +12,7 @@ const MAX_STEPS = 5;
 const WELCOME = {
     role: 'ai', text:
         '¡Hola! 👋 Soy Lau, tu copiloto. Manejás toda la tienda hablándome como a una empleada — y yo ejecuto las acciones de verdad (lo importante siempre te lo confirmo antes).\n\n' +
-        'Para cargar productos, tocá el clip 📎 y mandame la foto (podés varias juntas) con el nombre. Para todo lo demás, pedímelo en tus palabras.\n\n' +
+        'Para cargar un producto, tocá el botón dorado "Cargar producto (paso a paso)" abajo: te lleva con botones por nombre, color, talle, stock y precio, sin vueltas. Para todo lo demás, pedímelo en tus palabras.\n\n' +
         'Tocá 📖 Guía arriba para ver TODO con ejemplos. ¿Arrancamos?'
 };
 
@@ -26,90 +26,145 @@ const CAPS = [
     { icon: '🏠', label: 'Home, cupones, reseñas' },
 ];
 
+// Pasos ilustrados para cargar un producto (el wizard). Bien simple y visual.
+const LOAD_STEPS = [
+    { emoji: '🟡', title: 'Tocá el botón dorado', text: 'Abajo de todo dice "Cargar producto (paso a paso)". Tocalo.' },
+    { emoji: '📷', title: 'Foto (si querés)', text: 'Subí una o varias fotos de la prenda. O seguí sin foto, no pasa nada.' },
+    { emoji: '✏️', title: 'Nombre', text: 'Escribí cómo se llama la prenda. Ej: "Vestido Lino Blanco".' },
+    { emoji: '🎨', title: 'Color y talle', text: 'Tocá los colores y talles que tenga. Podés elegir varios.' },
+    { emoji: '🔢', title: 'Stock', text: 'Tocá cuántas unidades tenés (1, 2, 3, 5, 10… o escribí otra).' },
+    { emoji: '💵', title: 'Precio', text: '"Tengo el precio" o "Calcular del costo". Si das el costo, te dice a cuánto venderlo ganando.' },
+    { emoji: '✅', title: 'Listo', text: 'Te muestra todo para revisar. Tocás "Publicar" y ya está en la tienda.' },
+];
+
 const COMMAND_GUIDE = [
     {
-        icon: '📸', title: 'Productos', items: [
-            'Cargá este producto, me costó $8000 y quiero 50% de margen',
-            'Cambiá el precio del vestido rojo a $25000',
-            'Poné en oferta -20% toda la categoría Vestidos',
-            'Subí un 15% los precios de la categoría Carteras',
-            'Cambiá el stock del producto X a 20',
-            'Ocultá / mostrá el producto X',
-            'Generá descripción y palabras clave del producto X',
-            'Eliminá el producto X',
+        icon: '💰', title: 'Saber a cuánto vender', color: 'precio',
+        sub: 'Le decís lo que te costó y cuánto querés ganar.',
+        items: [
+            'Me costó $8000 y quiero ganar 50%, ¿a cuánto lo vendo?',
+            '¿A cuánto vendo algo que me salió $12000 con 60% de ganancia?',
         ],
     },
     {
-        icon: '💰', title: 'Precios y ventas', items: [
-            '¿A cuánto lo vendo si me costó $12000 y quiero 60% de margen?',
-            '¿Cuánto vendí hoy?',
-            '¿Cuánta ganancia neta hice esta semana?',
-            '¿Cuánto me quedó limpio este mes?',
-            '¿Cuál es mi producto más vendido?',
+        icon: '✏️', title: 'Cambiar un producto', color: 'editar',
+        sub: 'Editás algo que ya está cargado, sin volver a hacerlo.',
+        items: [
+            'Cambiá el precio del Vestido Rojo a $25000',
+            'Editá el Blazer Negro: stock 12 y sacale el talle XL',
+            'Ponele al Top Blanco la descripción "ideal para verano"',
+            'Cambiá el stock del Vestido Aurora a 20',
+            'Ocultá el Vestido Rojo (que no se vea en la tienda)',
         ],
     },
     {
-        icon: '🛒', title: 'Ventas externas y stock', items: [
-            'Vendí 2 vestidos rojos talle M a $50000 en persona',
-            'Registrá una venta de 1 cartera negra por Instagram a $30000',
-            'Me llegaron 10 unidades del vestido Aurora, sumalas al stock',
-            'Restá 3 al stock del blazer talle S beige',
+        icon: '🛒', title: 'Anotar una venta de afuera', color: 'venta',
+        sub: 'Vendiste por WhatsApp, Insta o en persona. Se lo decís y descuenta el stock.',
+        items: [
+            'Vendí 2 Vestidos Rojos talle M a $50000 en persona',
+            'Se vendió 1 Cartera Negra por Instagram a $30000',
             'Anulá la venta MAN-123456 (fue un error)',
         ],
     },
     {
-        icon: '💸', title: 'Gastos y rentabilidad', items: [
+        icon: '📦', title: 'Reponer stock', color: 'stock',
+        sub: 'Te llegó mercadería nueva.',
+        items: [
+            'Me llegaron 10 Vestidos Aurora, sumalos al stock',
+            'Restá 3 al stock del Blazer talle S beige',
+        ],
+    },
+    {
+        icon: '🏷️', title: 'Hacer ofertas', color: 'oferta',
+        sub: 'Bajás precios con un descuento. Queda el precio viejo tachado.',
+        items: [
+            'Poné 20% off toda la tienda',
+            'Hacé 15% de descuento en la categoría Vestidos',
+            'Programá 25% off para el sábado',
+            'Quitá la oferta del Vestido Rojo',
+        ],
+    },
+    {
+        icon: '💸', title: 'Plata: gastos y ganancia', color: 'plata',
+        sub: 'Anotás lo que gastás y te dice cuánto ganaste de verdad.',
+        items: [
             'Gasté $80000 en tela',
             'Registrá un gasto de $20000 en publicidad',
-            'Mostrame los gastos de este mes',
-            '¿Cuánta ganancia neta me quedó este mes?',
+            '¿Cuánto vendí hoy?',
+            '¿Cuánto me quedó limpio este mes?',
         ],
     },
     {
-        icon: '📦', title: 'Pedidos', items: [
-            '¿Qué pedidos tengo pendientes de enviar?',
-            'Generá la etiqueta de envío del pedido ORD-123456',
-            'Marcá el pedido ORD-123456 como enviado con seguimiento 7798XXXXXXXX',
-            'Marcá el pedido ORD-123456 como entregado',
-            'Cancelá el pedido ORD-123456',
+        icon: '📊', title: 'Resumen y consejos', color: 'resumen',
+        sub: 'Te cuenta cómo va el negocio y qué te conviene hacer.',
+        items: [
+            'Hacé un resumen del negocio',
+            '¿Cómo va la tienda este mes?',
+            '¿Qué me conviene reponer?',
+            'Dame consejos para vender más',
         ],
     },
     {
-        icon: '🎟️', title: 'Cupones', items: [
-            'Creá un cupón VERANO15 de 15% que venza el 31/12',
-            'Creá un cupón BIENVENIDA de $5000 con compra mínima $30000',
-            'Mostrame los cupones activos',
-            'Eliminá el cupón VERANO15',
+        icon: '📮', title: 'Pedidos y envíos', color: 'pedido',
+        sub: 'Los pedidos que entran por la web.',
+        items: [
+            '¿Qué pedidos tengo para enviar?',
+            'Hacé la etiqueta de envío del pedido ORD-123456',
+            'Marcá el pedido ORD-123456 como enviado',
         ],
     },
     {
-        icon: '⭐', title: 'Reseñas', items: [
+        icon: '🏠', title: 'Cambiar la home y categorías', color: 'home',
+        sub: 'Los textos de la página de inicio y las categorías.',
+        items: [
+            'Quiero cambiar la home',
+            'Cambiá el anuncio de arriba a "Envío gratis desde $50000"',
+            'Destacá en la home los 4 productos más nuevos',
+            'Creá la categoría "Abrigos"',
+        ],
+    },
+    {
+        icon: '🎟️', title: 'Cupones y reseñas', color: 'extra',
+        sub: 'Códigos de descuento y opiniones de clientas.',
+        items: [
+            'Creá un cupón VERANO15 de 15%',
             'Mostrame las reseñas pendientes',
             'Aprobá todas las reseñas pendientes',
-        ],
-    },
-    {
-        icon: '🏠', title: 'Home y tienda', items: [
-            'Destacá en la home los 4 productos más nuevos',
-            'Cambiá el banner de anuncios a "Envío gratis desde $50000"',
-            'Editá el título del hero',
-            'Activá / desactivá el modo mantenimiento',
-            'Creá la categoría "Abrigos"',
-            'Renombrá la categoría "Pantalones" a "Bottoms"',
-            'Eliminá la categoría "Abrigos"',
-        ],
-    },
-    {
-        icon: '👥', title: 'Clientes y datos', items: [
-            '¿Quiénes son mis mejores clientes?',
-            '¿Qué productos tienen poco stock?',
-            '¿Qué se vende más?',
         ],
     },
 ];
 
 const toArr = (v) => Array.isArray(v) ? v.map(String).map(s => s.trim()).filter(Boolean)
     : (typeof v === 'string' ? v.split(/[,/]+/).map(s => s.trim()).filter(Boolean) : []);
+
+// Interpreta fechas simples en español para programar ofertas. Devuelve timestamp
+// (ms) o null si no se entiende. Soporta: ahora, mañana, en N horas/días, día de
+// la semana (próxima ocurrencia), "el finde"=sábado. Hora opcional "HH" o "HH:MM".
+const DOW = { domingo: 0, lunes: 1, martes: 2, miercoles: 3, 'miércoles': 3, jueves: 4, viernes: 5, sabado: 6, 'sábado': 6 };
+const parseWhen = (raw) => {
+    const s = String(raw || '').toLowerCase().trim();
+    if (!s || /\b(ahora|ya|hoy)\b/.test(s)) return Date.now();
+    const hm = s.match(/(\d{1,2})(?::(\d{2}))?\s*(hs|h|horas?)?/);
+    let hour = 10, min = 0;
+    const timeMatch = s.match(/\b(\d{1,2}):(\d{2})\b/) || s.match(/\ba?\s*las?\s*(\d{1,2})\b/);
+    if (timeMatch) { hour = Math.min(23, parseInt(timeMatch[1])); min = timeMatch[2] ? parseInt(timeMatch[2]) : 0; }
+    const setTime = (d) => { d.setHours(hour, min, 0, 0); return d.getTime(); };
+    const enHoras = s.match(/en\s+(\d{1,3})\s*(hs|h|horas?)/);
+    if (enHoras) return Date.now() + parseInt(enHoras[1]) * 36e5;
+    const enDias = s.match(/en\s+(\d{1,3})\s*(d|dias?|días?)/);
+    if (enDias) { const d = new Date(); d.setDate(d.getDate() + parseInt(enDias[1])); return setTime(d); }
+    if (/\bmañana\b/.test(s) || /\bmanana\b/.test(s)) { const d = new Date(); d.setDate(d.getDate() + 1); return setTime(d); }
+    const targetDow = /\bfinde?\b/.test(s) ? 6 : Object.keys(DOW).find(k => s.includes(k)) != null ? DOW[Object.keys(DOW).find(k => s.includes(k))] : null;
+    if (targetDow != null) {
+        const d = new Date();
+        let add = (targetDow - d.getDay() + 7) % 7;
+        if (add === 0) add = 7; // próxima ocurrencia, no hoy
+        d.setDate(d.getDate() + add);
+        return setTime(d);
+    }
+    if (hm && /\bhoy\b/.test(s)) { const d = new Date(); return setTime(d); }
+    return null;
+};
 
 const actionLabel = (a) => {
     const A = a.args || {};
@@ -135,6 +190,8 @@ const actionLabel = (a) => {
         case 'delete_category': return `ELIMINAR categoría "${A.name}"`;
         case 'delete_expense': return `ELIMINAR gasto ${A.expenseId}`;
         case 'set_sale': return Number(A.percent) > 0 ? `Poner ${A.productId} en oferta −${A.percent}%` : `Quitar oferta de ${A.productId}`;
+        case 'edit_product': return `Editar "${A.productId}": ${Object.entries(A.fields || {}).map(([k, v]) => `${k} ${k === 'price' ? '$' + Number(v).toLocaleString('es-AR') : (Array.isArray(v) ? v.join('/') : v)}`).join(', ') || '(sin cambios)'}`;
+        case 'schedule_promotion': return `Oferta −${A.discount}% ${A.category && !['all', 'todo', 'todos'].includes(String(A.category).toLowerCase()) ? `en ${A.category}` : 'toda la tienda'} · ${A.when || 'ahora'}`;
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
         case 'toggle_maintenance': return `Mantenimiento → ${A.on ? 'ACTIVAR' : 'desactivar'}`;
@@ -148,7 +205,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         addProduct, updateProduct, deleteProduct, addCategory, deleteCategory, addCoupon, deleteCoupon,
         updateSiteConfig, toggleMaintenance, uploadImage, logAiAction,
         updateOrderStatus, approveReview, rejectReview, createOrder, deleteOrder,
-        expenses, addExpense, deleteExpense,
+        expenses, addExpense, deleteExpense, addScheduledPromotion,
     } = useStore();
 
     const [messages, setMessages] = useState(() => {
@@ -165,6 +222,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     // Se mantienen entre mensajes para que el flujo guiado no pierda las URLs.
     const pendingPhotosRef = useRef([]);
     const [confirm, setConfirm] = useState(null); // { actions, resolve }
+    const [wizardOpen, setWizardOpen] = useState(false); // wizard determinístico de carga
     const listRef = useRef(null);
     const fileRef = useRef(null);
     const confirmResolver = useRef(null);
@@ -451,6 +509,96 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 await updateProduct(p.id, { price: newPrice, compareAtPrice: original, badges: { ...(p.badges || {}), isOnSale: true } });
                 return `"${p.name}" −${pct}% → $${newPrice.toLocaleString('es-AR')} (antes $${original.toLocaleString('es-AR')}).`;
             }
+            case 'edit_product': {
+                const p = findProduct(A.productId); if (!p) return 'No encontré ese producto.';
+                const f = A.fields || {};
+                const patch = {};
+                if (f.name != null) patch.name = String(f.name);
+                if (f.price != null) patch.price = Math.max(0, Number(f.price) || 0);
+                if (f.category != null) patch.category = String(f.category);
+                if (f.colors != null) patch.colors = toArr(f.colors);
+                if (f.sizes != null) patch.sizes = toArr(f.sizes);
+                if (f.description != null) patch.description = String(f.description);
+                let stockNota = '';
+                if (f.stock != null) {
+                    const hasVar = Array.isArray(p.variants) ? p.variants.length > 0 : (p.variants && typeof p.variants === 'object' && Object.keys(p.variants).length > 0);
+                    if (hasVar) stockNota = ' (el stock no lo toqué: este producto maneja stock por talle/color, decime "poné N del talle X color Y").';
+                    else patch.stock = Math.max(0, Number(f.stock) || 0);
+                }
+                if (!Object.keys(patch).length) return `No cambié nada${stockNota ? '.' + stockNota : ' (decime qué editar: precio, stock, nombre, colores, talles, categoría o descripción).'}`;
+                await updateProduct(p.id, patch);
+                const resumen = Object.entries(patch).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join('/') : (k === 'price' ? '$' + Number(v).toLocaleString('es-AR') : v)}`).join(', ');
+                return `"${p.name}" actualizado → ${resumen}.${stockNota}`;
+            }
+            case 'business_summary': {
+                const range = A.range || '30d';
+                const now = Date.now();
+                const span = range === 'today' ? 0 : range === '7d' ? 7 : range === 'all' ? null : 30;
+                const today = new Date().toDateString();
+                const paid = new Set(['approved', 'paid', 'shipped', 'delivered', 'pending']);
+                const list = (orders || []).filter(o => {
+                    if (!paid.has(o.status) && !o.manual) return false;
+                    if (range === 'all') return true;
+                    if (range === 'today') { try { return new Date(o.date).toDateString() === today; } catch { return false; } }
+                    return new Date(o.date).getTime() >= now - span * 864e5;
+                });
+                let revenue = 0, cost = 0, fees = 0; const counts = {};
+                for (const o of list) {
+                    revenue += Number(o.total) || 0;
+                    for (const it of (o.items || [])) {
+                        const prod = inventory.find(pp => String(pp.id) === String(it.id));
+                        cost += (Number(prod?.cost) || 0) * (Number(it.quantity) || 1);
+                        const key = it.name || prod?.name || 'Producto';
+                        counts[key] = (counts[key] || 0) + (Number(it.quantity) || 1);
+                    }
+                    if (!o.manual) { const pct = Number(paymentConfig?.realMpFeePercent || paymentConfig?.mpFee) || 0; fees += (Number(o.total) || 0) * pct / 100; }
+                }
+                let gastos = 0;
+                for (const e of (expenses || [])) {
+                    const ed = Number(e.date) || 0;
+                    if (range === 'all') gastos += Number(e.amount) || 0;
+                    else if (range === 'today') { try { if (new Date(ed).toDateString() === today) gastos += Number(e.amount) || 0; } catch { /* noop */ } }
+                    else if (ed >= now - span * 864e5) gastos += Number(e.amount) || 0;
+                }
+                const net = revenue - cost - fees - gastos;
+                const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                const out = (inventory || []).filter(p => !(p.variants?.length) && Number(p.stock) === 0 && p.active !== false);
+                const low = (inventory || []).filter(p => !(p.variants?.length) && Number(p.stock) > 0 && Number(p.stock) <= 5);
+                const drafts = (inventory || []).filter(p => p.active === false);
+                const fmt = (n) => `$${Math.round(n).toLocaleString('es-AR')}`;
+                const L = [`RESUMEN (${range}):`];
+                L.push(`• Ventas: ${list.length} · Facturado ${fmt(revenue)} · Ganancia neta ${fmt(net)}.`);
+                L.push(top.length ? `• Más vendidos: ${top.map(([n, q]) => `${n} (${q})`).join(', ')}.` : '• Todavía sin ventas en el período.');
+                if (out.length) L.push(`• ⛔ SIN stock (reponer ya): ${out.slice(0, 8).map(p => p.name).join(', ')}.`);
+                if (low.length) L.push(`• ⚠️ Poco stock: ${low.slice(0, 8).map(p => `${p.name} (${p.stock})`).join(', ')}.`);
+                if (drafts.length) L.push(`• 📝 ${drafts.length} en borrador sin publicar.`);
+                L.push('CONSEJOS: priorizá reponer lo agotado/más vendido, destacá en la home lo que más sale, y publicá los borradores que estén listos.');
+                return L.join('\n');
+            }
+            case 'schedule_promotion': {
+                const discount = Math.abs(Number(A.discount) || 0);
+                if (!discount) return 'Decime el % de descuento (ej: "20% off").';
+                const catRaw = String(A.category || '').trim().toLowerCase();
+                const allCats = !catRaw || ['all', 'todo', 'todos', 'toda', 'tienda', 'la tienda'].includes(catRaw);
+                const targets = (inventory || []).filter(p => allCats || (p.category || '').toLowerCase() === catRaw);
+                if (!targets.length) return `No encontré productos${allCats ? '' : ` en la categoría "${A.category}"`}.`;
+                const ts = parseWhen(A.when);
+                const ahora = ts != null && ts <= Date.now() + 60000;
+                if (ahora) {
+                    let n = 0;
+                    for (const p of targets) {
+                        const base = Number(p.compareAtPrice) > Number(p.price) ? Number(p.compareAtPrice) : Number(p.price);
+                        if (!base) continue;
+                        await updateProduct(p.id, { price: Math.round(base * (1 - discount / 100)), compareAtPrice: base, badges: { ...(p.badges || {}), isOnSale: true } });
+                        n++;
+                    }
+                    return `✅ Oferta de −${discount}% aplicada YA a ${n} producto(s)${allCats ? ' de toda la tienda' : ` de "${A.category}"`}. El precio anterior queda tachado. Para sacarla decime "quitá la oferta de ...".`;
+                }
+                const name = A.name ? String(A.name) : `Oferta ${discount}% ${allCats ? 'tienda' : A.category}`;
+                await addScheduledPromotion({ name, type: 'bulk_discount', category: allCats ? '' : String(A.category), discount, whenText: String(A.when || ''), startsAt: ts || null });
+                const cuando = ts ? new Date(ts).toLocaleString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : `"${A.when}"`;
+                return `🗓️ Oferta "${name}" (−${discount}%) programada para ${cuando}. Se aplica sola cuando llegue el momento (necesitás tener la tienda/admin abierta cerca de esa hora).${ts ? '' : ' Ojo: no pude entender bien la fecha, igual la dejé anotada para que la actives vos.'}`;
+            }
             case 'query_orders': {
                 let r = [...orders];
                 if (A.status) r = r.filter(o => o.status === A.status);
@@ -480,6 +628,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 return coupons.length ? coupons.map(c => `${c.code} · ${c.type === 'fixed' ? '$' + (c.value ?? c.discount) : (c.value ?? c.discount) + '%'} · ${c.active === false ? 'inactivo' : 'activo'} · usos ${c.usedCount || 0}`).join('\n') : 'Sin cupones.';
             case 'create_category': {
                 const name = String(A.name || '').trim(); if (!name) return 'Falta el nombre.';
+                const exists = (categories || []).some(c => (c.name || '').toLowerCase() === name.toLowerCase());
+                if (exists) return `La categoría "${name}" ya existía (no la dupliqué).`;
                 await addCategory({ id: name.toLowerCase().replace(/\s+/g, '-'), name });
                 return `Categoría "${name}" creada.`;
             }
@@ -664,16 +814,16 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const agentLoop = async (transcript, snapshotCtx) => {
         for (let step = 0; step < MAX_STEPS; step++) {
             setBusyMsg('Pensando…');
-            const prompt = buildPrompt({ snapshot: buildSnapshot(snapshotCtx), transcript: transcript.slice(-24) });
-            const raw = await generateText(prompt, aiConfig, { scope: 'admin' });
+            const { system, user } = buildAgentMessages({ snapshot: buildSnapshot(snapshotCtx), transcript: transcript.slice(-60) });
+            const raw = await generateText(user, aiConfig, { scope: 'admin', system, temperature: 0.3 });
             let plan = parsePlan(raw);
             // Auto-recuperación: si el modelo no devolvió nada interpretable,
             // reintentá UNA vez exigiendo JSON estricto antes de darte por vencida.
             if (!plan.actions.length && plan.reply === 'No entendí bien, ¿me lo repetís?') {
                 setBusyMsg('Reintentando…');
                 const raw2 = await generateText(
-                    prompt + '\n\nIMPORTANTE: respondé SOLO con el objeto JSON {"reply":"...","actions":[...],"done":true|false}. Sin texto fuera del JSON. Si falta algún dato, pedilo en "reply".',
-                    aiConfig, { scope: 'admin' }
+                    user + '\n\nIMPORTANTE: respondé SOLO con el objeto JSON {"reply":"...","actions":[...],"done":true|false}. Sin texto fuera del JSON. Si falta algún dato, pedilo en "reply".',
+                    aiConfig, { scope: 'admin', system, temperature: 0.2 }
                 );
                 const plan2 = parsePlan(raw2);
                 if (plan2.actions.length || plan2.reply !== 'No entendí bien, ¿me lo repetís?') plan = plan2;
@@ -705,9 +855,13 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             transcript.push({ role: 'tool', content: results.join('\n') });
             push({ role: 'system', text: results.join('\n') });
 
-            // si solo hubo lectura, dejá que el modelo responda con los datos
+            // CLAVE para no repetir: si hubo cualquier ESCRITURA, frenamos y esperamos
+            // al usuario (la respuesta ya le dijo qué pasó o le hizo la próxima pregunta).
+            // Solo seguimos el loop cuando fueron PURAS lecturas (query_*/get_product),
+            // así el modelo puede contestar con esos datos. Antes, con done:false el loop
+            // re-ejecutaba la misma acción (ej: creaba la categoría 3 veces).
             const onlyReads = plan.actions.every(a => a.tool.startsWith('query_') || a.tool === 'get_product');
-            if (plan.done && !onlyReads) return;
+            if (!onlyReads) return;
         }
         push({ role: 'system', text: 'Llegué al límite de pasos. Si quedó algo a medias, pedímelo de nuevo más puntual.' });
     };
@@ -723,24 +877,25 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         const batchPreviews = previews;
         setFiles([]); setPreviews([]);
         const transcript = [];
-        // reconstruir contexto breve desde el chat visible
-        messages.filter(m => m.role === 'user' || m.role === 'ai').slice(-8).forEach(m => transcript.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }));
+        // Reconstruir contexto desde el chat visible. Ventana AMPLIA (40) para que un
+        // wizard largo (nombre, categoría, varios colores y talles, stock, precio) NO
+        // pierda los datos del principio y vuelva a preguntarlos en loop.
+        messages.filter(m => m.role === 'user' || m.role === 'ai').slice(-40).forEach(m => transcript.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }));
 
         const nFotos = batch.length;
         push({ role: 'user', text: text || (nFotos ? `(${nFotos} foto${nFotos > 1 ? 's' : ''} adjunta${nFotos > 1 ? 's' : ''})` : '(imagen adjunta)'), img: batchPreviews[0] });
 
         try {
             if (nFotos) {
-                setBusyMsg(nFotos > 1 ? `Subiendo y analizando ${nFotos} fotos…` : 'Subiendo y analizando la foto…');
+                setBusyMsg(nFotos > 1 ? `Subiendo ${nFotos} fotos…` : 'Subiendo la foto…');
                 const analyzed = [];
                 for (let i = 0; i < batch.length; i++) {
                     const url = await uploadImage(batch[i]);
                     if (!url) continue;
-                    let an = {};
-                    try { an = await analyzeProductImage(batch[i], aiConfig, categories.map(c => c.name).filter(Boolean)); } catch { /* el análisis es opcional */ }
-                    analyzed.push({ url, analysis: an });
+                    // El dueño da TODOS los datos a mano: no auto-detectamos nada.
+                    analyzed.push({ url });
                 }
-                if (!analyzed.length) throw new Error('No se pudieron subir/analizar las imágenes (revisá Cloudinary en Configuración).');
+                if (!analyzed.length) throw new Error('No se pudieron subir las imágenes (revisá Cloudinary en Configuración).');
                 pendingPhotosRef.current = analyzed;
             }
 
@@ -748,13 +903,14 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             // que el flujo guiado no pierda las URLs entre pregunta y respuesta.
             if (pendingPhotosRef.current.length) {
                 const items = pendingPhotosRef.current
-                    .map((p, i) => `${i + 1}) imageUrl: ${p.url}\n   análisis: ${JSON.stringify(p.analysis)}`)
+                    .map((p, i) => `${i + 1}) imageUrl: ${p.url}`)
                     .join('\n');
                 transcript.push({
                     role: 'system', content:
-                        `Hay ${pendingPhotosRef.current.length} prenda(s) con foto YA subida, esperando que el dueño decida qué hacer:\n${items}\n\n` +
-                        `FLUJO GUIADO: si el dueño TODAVÍA no aclaró qué hacer, PREGUNTÁLE en pocas palabras qué quiere con la(s) prenda(s) (o con todas): "publicarla(s) en la tienda", "guardarla(s) como borrador en el inventario", o "registrar una venta". ` +
-                        `Cuando lo aclare, ejecutá lo que corresponda para CADA prenda usando su imageUrl exacta: create_product con visible=true (publicar) o visible=false (borrador). Si te da el costo, calculá el precio con quote_price. Pedí de forma breve lo que falte (nombre, talles, stock, precio o costo). Si hay varias prendas, procesalas todas.`
+                        `Hay ${pendingPhotosRef.current.length} foto(s) de prenda YA subida(s), esperando que el dueño cargue los datos:\n${items}\n\n` +
+                        `IMPORTANTE: NO sabés qué prenda es, ni el nombre, ni el color, ni nada — NO lo adivines ni lo deduzcas de la imagen. El dueño te va a dictar TODOS los datos (nombre, color, talle, stock, precio/costo). Pedíselos de a uno, con menús de botones cuando se pueda. ` +
+                        `EMPEZÁ preguntando el NOMBRE de la prenda (eso va en texto). Después seguí el wizard pidiendo color, talle, stock y precio/costo con menús. ` +
+                        `Cuando tengas todo, preguntá qué hacer (Publicar / Borrador / Registrar venta) y ejecutá create_product (visible=true publicar, false borrador) usando la imageUrl exacta. Si te da el costo, calculá con quote_price. Si hay varias fotos, procesalas todas.`
                 });
             }
             transcript.push({ role: 'user', content: text || 'Tengo estas prendas.' });
@@ -792,6 +948,19 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[60] flex flex-col bg-[#0A0A0A]/95 backdrop-blur-md">
+            {/* Wizard determinístico de carga de producto (no usa IA: cero loops) */}
+            {wizardOpen && (
+                <ProductWizard
+                    categories={categories}
+                    uploadImage={uploadImage}
+                    addProduct={addProduct}
+                    addCategory={addCategory}
+                    paymentConfig={paymentConfig}
+                    aiConfig={aiConfig}
+                    onClose={() => setWizardOpen(false)}
+                    onDone={(r) => { if (r === 'reset') { setWizardOpen(false); setTimeout(() => setWizardOpen(true), 50); } }}
+                />
+            )}
             {/* glow ambiental dorado */}
             <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[60rem] max-w-full h-64 bg-[#D4AF37]/10 blur-[120px] rounded-full" />
 
@@ -837,32 +1006,64 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto scrollbar-gold">
-                        <div className="max-w-3xl mx-auto px-4 py-6 space-y-7">
-                            <p className="text-white/50 text-sm leading-relaxed">
-                                Le hablás <span className="text-[#D4AF37] font-semibold">como a una empleada</span>, en tus palabras. No hace falta que escribas exacto: estos son ejemplos para que veas todo lo que podés pedirle. Lo importante (publicar, eliminar, cambiar precios) <span className="text-white/80">siempre te lo confirma antes</span>.
+                        <div className="max-w-3xl mx-auto px-4 py-6 space-y-8">
+                            <p className="text-white/55 text-sm leading-relaxed">
+                                Hablale a Lau <span className="text-[#D4AF37] font-semibold">como a una empleada</span>, con tus palabras. No tenés que escribir exacto. Acá abajo está <span className="text-white/80">todo lo que podés hacer</span>, bien fácil. Tocá cualquier ejemplo y se escribe solo. Lo importante (publicar, borrar, precios) <span className="text-white/80">siempre te pregunta antes</span>.
                             </p>
-                            {COMMAND_GUIDE.map((cat) => (
-                                <div key={cat.title}>
-                                    <h3 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
-                                        <span className="text-lg">{cat.icon}</span> {cat.title}
-                                    </h3>
-                                    <div className="flex flex-col gap-2">
-                                        {cat.items.map((cmd) => (
-                                            <button
-                                                key={cmd}
-                                                onClick={() => { setInput(cmd); setShowGuide(false); }}
-                                                className="text-left text-sm text-white/75 bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 hover:border-[#D4AF37]/50 hover:text-white hover:bg-white/[0.07] transition-all flex items-center gap-2.5 group"
-                                            >
-                                                <span className="text-[#D4AF37]/60 group-hover:text-[#D4AF37] transition-colors">›</span>
-                                                <span>{cmd}</span>
-                                            </button>
-                                        ))}
-                                    </div>
+
+                            {/* CÓMO CARGAR UN PRODUCTO — visual, paso a paso */}
+                            <div className="rounded-2xl border border-[#D4AF37]/25 bg-gradient-to-b from-[#D4AF37]/[0.08] to-transparent p-5">
+                                <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2"><span className="text-xl">🛍️</span> Cargar un producto (lo más fácil)</h3>
+                                <p className="text-white/50 text-xs mb-4">Seguí estos pasitos. Lau te lleva de la mano, vos solo tocás botones.</p>
+                                <div className="flex flex-col gap-2.5">
+                                    {LOAD_STEPS.map((s, i) => (
+                                        <div key={i} className="flex items-center gap-3 bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5">
+                                            <div className="w-8 h-8 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/40 flex items-center justify-center shrink-0 text-sm font-black text-[#D4AF37]">{i + 1}</div>
+                                            <span className="text-xl shrink-0">{s.emoji}</span>
+                                            <div className="min-w-0">
+                                                <p className="text-white text-sm font-semibold leading-tight">{s.title}</p>
+                                                <p className="text-white/50 text-xs leading-snug">{s.text}</p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                                <button
+                                    onClick={() => { setShowGuide(false); setWizardOpen(true); }}
+                                    className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#0A0A0A] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition"
+                                >
+                                    <PackagePlus className="w-4 h-4" /> Probar ahora
+                                </button>
+                            </div>
+
+                            {/* PEDIRLE COSAS A LA IA — por temas */}
+                            <div>
+                                <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2"><span className="text-xl">💬</span> Pedirle cosas a Lau</h3>
+                                <p className="text-white/50 text-xs mb-4">Tocá un ejemplo para mandárselo. Son solo ejemplos: podés decírselo a tu manera.</p>
+                                <div className="space-y-6">
+                                    {COMMAND_GUIDE.map((cat) => (
+                                        <div key={cat.title}>
+                                            <h4 className="text-white font-semibold text-sm flex items-center gap-2"><span className="text-lg">{cat.icon}</span> {cat.title}</h4>
+                                            {cat.sub && <p className="text-white/40 text-xs mb-2.5 ml-7">{cat.sub}</p>}
+                                            <div className="flex flex-col gap-2">
+                                                {cat.items.map((cmd) => (
+                                                    <button
+                                                        key={cmd}
+                                                        onClick={() => { setInput(cmd); setShowGuide(false); }}
+                                                        className="text-left text-sm text-white/75 bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 hover:border-[#D4AF37]/50 hover:text-white hover:bg-white/[0.07] transition-all flex items-center gap-2.5 group"
+                                                    >
+                                                        <span className="text-[#D4AF37]/60 group-hover:text-[#D4AF37] transition-colors">›</span>
+                                                        <span>{cmd}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="rounded-2xl p-4 bg-[#D4AF37]/[0.06] border border-[#D4AF37]/20">
                                 <p className="text-white/70 text-sm leading-relaxed">
-                                    💡 <span className="text-white font-semibold">Tip:</span> para cargar un producto, tocá el clip 📎 y adjuntá la foto de la prenda. Lau detecta la prenda, los colores y te calcula el precio con la comisión de Mercado Pago + tu margen.
+                                    💡 <span className="text-white font-semibold">Acordate:</span> para <span className="text-white">cargar</span> una prenda usá el botón dorado de abajo. Para <span className="text-white">todo lo demás</span> (precios, ventas, ofertas, resúmenes), escribile o tocá un ejemplo de acá arriba.
                                 </p>
                             </div>
                         </div>
@@ -990,9 +1191,15 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             {previews.length > 1 && <span className="self-end text-[10px] text-white/40 pb-1">{previews.length} fotos</span>}
                         </div>
                     )}
+                    <button
+                        onClick={() => setWizardOpen(true)}
+                        className="w-full mb-2.5 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#0A0A0A] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition shadow-[0_0_18px_rgba(212,175,55,0.35)]"
+                    >
+                        <PackagePlus className="w-4 h-4" /> Cargar producto (paso a paso)
+                    </button>
                     <div className="flex items-end gap-1 bg-white/[0.06] border border-white/15 rounded-2xl pl-1.5 pr-1.5 py-1.5 transition-colors focus-within:border-[#D4AF37]/60 focus-within:bg-white/[0.08]">
                         <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onPick} />
-                        <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#D4AF37] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Adjuntar fotos de prendas (podés varias a la vez)"><Paperclip className="w-5 h-5" /></button>
+                        <button onClick={() => setWizardOpen(true)} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#D4AF37] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Cargar producto paso a paso"><Paperclip className="w-5 h-5" /></button>
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}

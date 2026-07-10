@@ -28,7 +28,7 @@ export const InstagramFeed = () => {
     const handle = getHandle(instagramUrl);
 
     return (
-        <div className="py-24 md:py-32 bg-[#0A0A0A] border-t border-white/5">
+        <div className="py-20 md:py-28 bg-[#0A0A0A] border-t border-white/5">
             <div className="max-w-[1400px] mx-auto px-6">
                 <SectionHeader
                     eyebrow={<span className="inline-flex items-center gap-2"><Instagram className="w-3.5 h-3.5" /> Seguinos en Instagram</span>}

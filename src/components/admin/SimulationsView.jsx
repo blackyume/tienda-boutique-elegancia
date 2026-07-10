@@ -338,7 +338,7 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                                         </div>
                                                         <div>
                                                             <div className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                                                                {p.colors && p.colors.length > 0 && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: getColorHex(p.colors[0]) }} />}
+                                                                {p.colors && p.colors.length > 0 && <span className="w-2 h-2 rounded-full" style={{ background: getColorHex(p.colors[0]) }} />}
                                                                 {p.name}
                                                             </div>
                                                             <div className="text-[10px] text-slate-500 uppercase">{p.category}</div>

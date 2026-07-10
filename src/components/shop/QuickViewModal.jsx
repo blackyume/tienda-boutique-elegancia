@@ -188,7 +188,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                                             onClick={() => setSelectedColor(color)}
                                             disabled={!available}
                                             className={`w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm transition-transform hover:scale-110 flex items-center justify-center relative ${selectedColor === color ? 'ring-2 ring-offset-2 ring-slate-900 dark:ring-white scale-110' : ''} ${!available ? 'opacity-40 cursor-not-allowed' : ''}`}
-                                            style={{ backgroundColor: getColorHex(color) }}
+                                            style={{ background: getColorHex(color, product.colorHex) }}
                                             title={available ? color : `${color} (sin stock)`}
                                         >
                                             {selectedColor === color && <Check className={`w-4 h-4 ${color.toLowerCase() === 'blanco' ? 'text-black' : 'text-white'}`} />}

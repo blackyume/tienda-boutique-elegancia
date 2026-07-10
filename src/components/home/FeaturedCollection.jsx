@@ -59,7 +59,7 @@ const HeroCard = ({ item, onQuickView }) => (
                 {item.colors?.length > 0 && (
                     <div className="flex -space-x-1.5 ml-auto">
                         {item.colors.slice(0, 5).map(c => (
-                            <span key={c} className="w-3.5 h-3.5 rounded-full border border-white/40 shadow-sm" style={{ backgroundColor: getColorHex(c) }} />
+                            <span key={c} className="w-3.5 h-3.5 rounded-full border border-white/40 shadow-sm" style={{ background: getColorHex(c, item.colorHex) }} />
                         ))}
                     </div>
                 )}
@@ -118,7 +118,7 @@ const SmallCard = ({ item, onQuickView }) => (
                 {item.colors?.length > 0 && (
                     <div className="flex -space-x-1">
                         {item.colors.slice(0, 4).map(c => (
-                            <span key={c} className="w-3 h-3 rounded-full border border-white/30" style={{ backgroundColor: getColorHex(c) }} />
+                            <span key={c} className="w-3 h-3 rounded-full border border-white/30" style={{ background: getColorHex(c, item.colorHex) }} />
                         ))}
                     </div>
                 )}

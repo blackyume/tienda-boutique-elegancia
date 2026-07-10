@@ -61,14 +61,19 @@ export const isVariantInStock = (product, size, color) =>
 export const isSizeAvailable = (product, size) => {
     if (!product) return false;
     if (!hasVariantMap(product)) return getTotalStock(product) > 0;
-    return (product.colors || []).some((c) => getVariantStock(product, size, c) > 0);
+    const colors = product.colors || [];
+    // Producto con variantes por talle pero SIN colores: chequear la clave `size::`.
+    if (!colors.length) return getVariantStock(product, size, '') > 0;
+    return colors.some((c) => getVariantStock(product, size, c) > 0);
 };
 
 // ¿Un color está disponible en al menos una talla?
 export const isColorAvailable = (product, color) => {
     if (!product) return false;
     if (!hasVariantMap(product)) return getTotalStock(product) > 0;
-    return (product.sizes || []).some((s) => getVariantStock(product, s, color) > 0);
+    const sizes = product.sizes || [];
+    if (!sizes.length) return getVariantStock(product, '', color) > 0;
+    return sizes.some((s) => getVariantStock(product, s, color) > 0);
 };
 
 // Stock disponible luego de restar lo que el usuario ya tiene en el carrito.

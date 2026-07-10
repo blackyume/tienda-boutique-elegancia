@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Mail, Check } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useStore } from '../../context/StoreContext';
+import { subscribeNewsletter } from '../../utils/newsletter';
 
 export const NewsletterPopup = () => {
     const { siteConfig } = useStore();
@@ -30,18 +31,18 @@ export const NewsletterPopup = () => {
         localStorage.setItem('lbe_newsletter_seen', 'true');
     };
 
-    const handleSubscribe = (e) => {
+    const handleSubscribe = async (e) => {
         e.preventDefault();
         if (!email) return;
 
         setStatus('loading');
-        setTimeout(() => {
+        const ok = await subscribeNewsletter(email, 'popup');
+        if (ok) {
             setStatus('success');
-            localStorage.setItem('lbe_newsletter_subscribed', 'true');
-            setTimeout(() => {
-                setIsOpen(false);
-            }, 3000);
-        }, 1500);
+            setTimeout(() => setIsOpen(false), 3000);
+        } else {
+            setStatus('idle');
+        }
     };
 
     if (!isOpen || !config.active) return null;

@@ -1,17 +1,14 @@
 import { LogoSVGFooter } from './LogoSVG';
 import React, { useState } from 'react';
-import { Instagram, Youtube, ArrowRight, Mail, MessageCircle } from 'lucide-react';
+import { Instagram, ArrowRight, Mail, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { RegretModal } from './RegretModal';
 import { BrandStrip } from '../ui/BrandBadges';
+import { subscribeNewsletter } from '../../utils/newsletter';
 
-
-const TikTokIcon = ({ className }) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" />
-    </svg>
-);
+// Cuenta oficial de Instagram (default si no hay nada cargado en config).
+const OFFICIAL_IG = 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
 
 const FooterHeading = ({ children }) => (
     <h4 className="font-cinzel text-2xs uppercase tracking-[0.35em] text-cielo-gold/80 mb-6 flex items-center gap-3">
@@ -35,6 +32,15 @@ export const Footer = () => {
     const { setIsSizeGuideOpen, siteConfig } = useStore();
     const [isRegretOpen, setIsRegretOpen] = useState(false);
     const [email, setEmail] = useState('');
+    const [subStatus, setSubStatus] = useState('idle');
+
+    const submitFooterEmail = async () => {
+        if (!email || subStatus === 'loading') return;
+        setSubStatus('loading');
+        const ok = await subscribeNewsletter(email, 'footer');
+        if (ok) { setEmail(''); setSubStatus('success'); }
+        else setSubStatus('idle');
+    };
 
     return (
         <footer className="bg-cielo-dark text-white border-t border-white/[0.05] mt-auto">
@@ -55,24 +61,14 @@ export const Footer = () => {
                             hecha con intenci&oacute;n desde Rafaela para el mundo.
                         </p>
                         <div className="flex gap-3">
-                            {siteConfig?.social?.instagram && (
-                                <SocialBtn href={siteConfig.social.instagram}>
-                                    <Instagram className="w-4 h-4" />
-                                </SocialBtn>
-                            )}
-                            {siteConfig?.social?.youtube && (
-                                <SocialBtn href={siteConfig.social.youtube}>
-                                    <Youtube className="w-4 h-4" />
-                                </SocialBtn>
-                            )}
-                            {siteConfig?.social?.tiktok && (
-                                <SocialBtn href={siteConfig.social.tiktok}>
-                                    <TikTokIcon className="w-4 h-4" />
-                                </SocialBtn>
-                            )}
-                            {siteConfig?.contact?.whatsapp && (
-                                <SocialBtn href={`https://wa.me/${siteConfig.contact.whatsapp}`}>
-                                    <MessageCircle className="w-4 h-4" />
+                            {/* Instagram: siempre visible, apunta a la cuenta oficial */}
+                            <SocialBtn href={siteConfig?.social?.instagram || OFFICIAL_IG}>
+                                <Instagram className="w-4 h-4" />
+                            </SocialBtn>
+                            {/* Telegram: aparece cuando se carga el usuario en config. WhatsApp retirado. */}
+                            {(siteConfig?.social?.telegram || siteConfig?.telegram) && (
+                                <SocialBtn href={`https://t.me/${String(siteConfig?.social?.telegram || siteConfig?.telegram).replace(/^@/, '').replace(/^t\.me\//, '')}`}>
+                                    <Send className="w-4 h-4" />
                                 </SocialBtn>
                             )}
                         </div>
@@ -186,33 +182,41 @@ export const Footer = () => {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') submitFooterEmail(); }}
                                     placeholder="tu@email.com"
                                     className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white placeholder-white/20 outline-none"
                                 />
                                 <button
-                                    onClick={() => email && setEmail('')}
-                                    className="px-4 py-3 text-white/40 hover:text-cielo-gold transition-colors"
+                                    onClick={submitFooterEmail}
+                                    disabled={subStatus === 'loading'}
+                                    className="px-4 py-3 text-white/40 hover:text-cielo-gold transition-colors disabled:opacity-50"
                                     aria-label="Suscribirse"
                                 >
                                     <ArrowRight className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
-                        <p className="text-2xs text-white/20 mt-3 tracking-wide">Sin spam. Cancelar cuando quieras.</p>
+                        <p className="text-2xs mt-3 tracking-wide">
+                            {subStatus === 'success'
+                                ? <span className="text-cielo-gold">¡Listo! Vas a recibir las novedades. 💛</span>
+                                : <span className="text-white/20">Sin spam. Cancelar cuando quieras.</span>}
+                        </p>
 
                         {/* Contact */}
                         <div className="mt-8 space-y-3">
-                            <a
-                                href="https://wa.me/5493492216487"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-3 text-sm text-white/35 hover:text-white transition-colors group"
-                            >
-                                <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-green-400/40 flex items-center justify-center group-hover:text-green-400 transition-all">
-                                    <MessageCircle className="w-3.5 h-3.5" />
-                                </span>
-                                WhatsApp
-                            </a>
+                            {(siteConfig?.social?.telegram || siteConfig?.telegram) && (
+                                <a
+                                    href={`https://t.me/${String(siteConfig?.social?.telegram || siteConfig?.telegram).replace(/^@/, '').replace(/^t\.me\//, '')}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-3 text-sm text-white/35 hover:text-white transition-colors group"
+                                >
+                                    <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-sky-400/40 flex items-center justify-center group-hover:text-sky-400 transition-all">
+                                        <Send className="w-3.5 h-3.5" />
+                                    </span>
+                                    Telegram
+                                </a>
+                            )}
                             <a
                                 href={`mailto:${siteConfig?.contact?.email || 'hola@laboutique.com.ar'}`}
                                 className="flex items-center gap-3 text-sm text-white/35 hover:text-white transition-colors group"
