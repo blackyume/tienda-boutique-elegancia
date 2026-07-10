@@ -11,7 +11,7 @@ import {
     Image as ImageIcon, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
     Check as CheckIcon, Lock, Settings, Blocks, Bot, Ticket, Building2,
-    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen
+    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen, Mail
 } from 'lucide-react';
 import { StatusSelector } from '../components/admin/StatusSelector';
 import { usePagination, Pagination } from '../components/ui/Pagination';
@@ -36,6 +36,7 @@ const SuppliersView = lazyNamed(() => import('../components/admin/SuppliersView'
 const ExpensesView = lazyNamed(() => import('../components/admin/ExpensesView'), 'ExpensesView');
 const AbandonedCartsView = lazyNamed(() => import('../components/admin/AbandonedCartsView'), 'AbandonedCartsView');
 const ReviewsView = lazyNamed(() => import('../components/admin/ReviewsView'), 'ReviewsView');
+const SubscribersView = lazyNamed(() => import('../components/admin/SubscribersView'), 'SubscribersView');
 
 const TabLoader = () => (
     <div className="flex items-center justify-center py-32">
@@ -48,12 +49,12 @@ const TAB_LABELS = {
     dashboard: 'Dashboard', inventory: 'Inventario', orders: 'Pedidos', customers: 'Clientes',
     sales: 'Ventas', assistant: 'Asistente Lau', cms: 'CMS / Diseño', coupons: 'Cupones',
     suppliers: 'Proveedores', abandoned: 'Carritos Abandonados', reviews: 'Reseñas',
-    calculator: 'Historial de Costos', expenses: 'Gastos', settings: 'Configuración'
+    calculator: 'Historial de Costos', expenses: 'Gastos', subscribers: 'Suscriptores', settings: 'Configuración'
 };
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers } = useStore();
     const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -481,6 +482,7 @@ export const Admin = () => {
                     <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
                     <SidebarItem icon={ShoppingCartIcon} label="Carritos Abandonados" active={adminTab === 'abandoned'} onClick={() => setAdminTab('abandoned')} count={(abandonedCarts || []).filter(c => !c.recovered).length} />
                     <SidebarItem icon={CheckIcon} label="Reseñas" active={adminTab === 'reviews'} onClick={() => setAdminTab('reviews')} count={(reviews || []).filter(r => !r.approved).length} />
+                    <SidebarItem icon={Mail} label="Suscriptores" active={adminTab === 'subscribers'} onClick={() => setAdminTab('subscribers')} count={(newsletterSubscribers || []).length} />
                     <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
                     <SidebarItem icon={Wallet} label="Gastos" active={adminTab === 'expenses'} onClick={() => setAdminTab('expenses')} />
                     <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
@@ -806,6 +808,7 @@ export const Admin = () => {
                 {adminTab === 'expenses' && <ExpensesView />}
                 {adminTab === 'abandoned' && <AbandonedCartsView />}
                 {adminTab === 'reviews' && <ReviewsView />}
+                {adminTab === 'subscribers' && <SubscribersView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
                 </Suspense>
             </main >

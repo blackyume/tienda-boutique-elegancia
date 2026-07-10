@@ -19,7 +19,7 @@ export const useFirestoreSubscriptions = ({
     setAiConfig, setIsMaintenance, setCoupons, setReviews, setShippingProvinces,
     setLoading, setOrders, setSimulations, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
-    setAbandonedCarts, setActiveSessions, setExpenses
+    setAbandonedCarts, setActiveSessions, setExpenses, setNewsletterSubscribers
 }) => {
     // --- Suscripciones públicas / globales ---
     useEffect(() => {
@@ -158,11 +158,19 @@ export const useFirestoreSubscriptions = ({
             subs.push(onSnapshot(collection(db, 'expenses'), (snap) => {
                 setExpenses(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => (b.date || 0) - (a.date || 0)));
             }, quietSnap('expenses')));
+
+            subs.push(onSnapshot(collection(db, 'newsletter_subscribers'), (snap) => {
+                setNewsletterSubscribers(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => {
+                    const at = a.createdAt?.toMillis?.() || 0;
+                    const bt = b.createdAt?.toMillis?.() || 0;
+                    return bt - at;
+                }));
+            }, quietSnap('newsletter_subscribers')));
         } else {
             setSimulations([]); setSuppliers([]); setAiHistory([]);
             setScheduledPromotions([]); setWishlistEvents([]);
             setVisitStatsHourly([]); setAbandonedCarts([]); setActiveSessions([]);
-            setExpenses([]);
+            setExpenses([]); setNewsletterSubscribers([]);
 
             if (user) {
                 subs.push(onSnapshot(
