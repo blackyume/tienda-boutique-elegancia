@@ -25,6 +25,7 @@ const lazyNamed = (factory, name) => lazy(() => factory().then(m => ({ default: 
 const SimulationsView = lazyNamed(() => import('../components/admin/SimulationsView'), 'SimulationsView');
 const CMSView = lazyNamed(() => import('../components/admin/CMSView'), 'CMSView');
 const ProductEditModal = lazyNamed(() => import('../components/admin/ProductEditModal'), 'ProductEditModal');
+const ImportarInventarioModal = lazyNamed(() => import('../components/admin/ImportarInventarioModal'), 'ImportarInventarioModal');
 const DashboardView = lazyNamed(() => import('../components/admin/DashboardView'), 'DashboardView');
 const SettingsView = lazyNamed(() => import('../components/admin/SettingsView'), 'SettingsView');
 const OrdersView = lazyNamed(() => import('../components/admin/OrdersView'), 'OrdersView');
@@ -59,6 +60,7 @@ export const Admin = () => {
     const [adminTab, setAdminTab] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [isImportOpen, setIsImportOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
 
     // --- FILTERS & SEARCH STATE ---
@@ -530,6 +532,9 @@ export const Admin = () => {
                                 <Button onClick={exportInventory} className="!bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-5 py-3 rounded-none text-xs uppercase tracking-[0.2em] hover:!border-[#D4AF37] hover:!text-[#D4AF37] transition-all">
                                     ⤓ Exportar Excel
                                 </Button>
+                                <Button onClick={() => setIsImportOpen(true)} className="!bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-5 py-3 rounded-none text-xs uppercase tracking-[0.2em] hover:!border-[#D4AF37] hover:!text-[#D4AF37] transition-all">
+                                    ⤴ Importar Excel
+                                </Button>
                                 <Button onClick={openNewProduct} className="bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
                                     + Nuevo Diseño
                                 </Button>
@@ -817,6 +822,13 @@ export const Admin = () => {
             {isProductModalOpen && currentProduct && (
                 <Suspense fallback={null}>
                     <ProductEditModal initialProduct={currentProduct} onClose={() => setIsProductModalOpen(false)} />
+                </Suspense>
+            )}
+
+            {/* IMPORTAR INVENTARIO DESDE EXCEL */}
+            {isImportOpen && (
+                <Suspense fallback={null}>
+                    <ImportarInventarioModal onClose={() => setIsImportOpen(false)} />
                 </Suspense>
             )}
 

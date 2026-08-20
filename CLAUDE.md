@@ -17,7 +17,7 @@ E-commerce de moda femenina premium en Argentina. Solo-dev, iteración rápida.
 ```bash
 npm run dev               # Vite dev server
 npm run build             # prebuild genera sitemap + shopping-feed → vite build
-npm test                  # vitest run (38 tests, excluye e2e/)
+npm test                  # vitest run (84 tests, excluye e2e/)
 npm run e2e               # playwright (apunta a prod por default)
 npm run e2e:install       # bajar Chromium para playwright
 npm run lint
@@ -102,7 +102,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Testing
 
-- **Vitest unit tests** en `tests/`. 38 tests sobre `variants`, `lowStock`, `gemini.parseJsonFromResponse`. Excluye `e2e/`.
+- **Vitest unit tests** en `tests/`. 84 tests sobre `variants`, `lowStock`, `gemini.parseJsonFromResponse`, `marcoFoto` e `importarInventario`. Excluye `e2e/`.
 - **Playwright e2e** en `e2e/`. 6 smoke tests apuntando a prod (override con `BASE_URL=http://localhost:4173`).
 - **GitHub Actions** corre tests + build en push/PR a master (`.github/workflows/ci.yml`).
 

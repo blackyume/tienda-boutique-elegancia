@@ -101,7 +101,7 @@ export const useDbActions = ({
       await setDoc(doc(db, "config", "ai_settings"), config, { merge: true });
       addToast("Configuración de Inteligencia Artificial guardada", "success");
     },
-    addProduct: async (product) => {
+    addProduct: async (product, { silencioso = false } = {}) => {
       if (!isAdmin) return;
       try {
         if (typeof product.price === 'string') product.price = Number(product.price);
@@ -112,21 +112,22 @@ export const useDbActions = ({
           views: 0, // Initialize views
           createdAt: Date.now()
         });
-        addToast("Producto creado exitosamente", "success");
+        if (!silencioso) addToast("Producto creado exitosamente", "success");
         return docRef.id;
       } catch (e) {
         console.error(e);
-        addToast("Error al crear producto", "error");
+        if (!silencioso) addToast("Error al crear producto", "error");
+        if (silencioso) throw e;
       }
     },
-    updateProduct: async (id, updates) => {
+    updateProduct: async (id, updates, { silencioso = false } = {}) => {
       if (!isAdmin) return;
       try {
         await updateDoc(doc(db, "products", String(id)), updates);
-        addToast("Producto actualizado", "success");
+        if (!silencioso) addToast("Producto actualizado", "success");
       } catch (e) {
         console.error(e);
-        addToast("Error al actualizar producto", "error");
+        if (!silencioso) addToast("Error al actualizar producto", "error");
         throw e;
       }
     },
