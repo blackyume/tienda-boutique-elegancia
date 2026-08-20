@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const SectionHeader = ({ eyebrow, title, subtitle, align = 'center', className = '' }) => {
+export const SectionHeader = ({ eyebrow, title, subtitle, align = 'center', className = '', titleClassName = 'text-4xl md:text-5xl lg:text-6xl' }) => {
     const centered = align === 'center';
     return (
         <div className={`${centered ? 'text-center mx-auto' : 'text-left'} ${className}`}>
@@ -13,7 +13,7 @@ export const SectionHeader = ({ eyebrow, title, subtitle, align = 'center', clas
                     <span className="h-px w-8 bg-cielo-gold/50 flex-shrink-0" />
                 </div>
             )}
-            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
+            <h2 className={`font-serif leading-tight text-white ${titleClassName}`}>
                 {title}
             </h2>
             {subtitle && (

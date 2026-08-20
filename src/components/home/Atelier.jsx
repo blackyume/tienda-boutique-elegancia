@@ -8,7 +8,7 @@ const PILLARS = [
 ];
 
 export const Atelier = () => (
-    <section className="relative py-14 md:py-20 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
+    <section className="relative py-14 md:py-20 px-6 bg-tierra-950 border-y border-white/[0.05] overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(193,154,107,0.05),transparent_60%)] pointer-events-none" />
 
         <Reveal className="relative max-w-5xl mx-auto text-center">

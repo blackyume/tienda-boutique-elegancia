@@ -38,6 +38,7 @@ export const InstagramFeed = () => {
                 <SectionHeader
                     eyebrow={<span className="inline-flex items-center gap-2"><Instagram className="w-3.5 h-3.5" /> Seguinos en Instagram</span>}
                     title={handle}
+                    titleClassName="text-2xl md:text-3xl lg:text-4xl break-all sm:break-normal"
                     subtitle="Tocá cualquier prenda para verla, y seguinos para las novedades"
                     className="mb-12"
                 />

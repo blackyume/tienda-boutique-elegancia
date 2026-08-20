@@ -22,7 +22,7 @@ const SocialBtn = ({ href, children }) => (
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-cielo-gold hover:border-cielo-gold/50 transition-all duration-300"
+        className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/55 hover:text-cielo-gold hover:border-cielo-gold/50 transition-all duration-300"
     >
         {children}
     </a>
@@ -55,7 +55,7 @@ export const Footer = () => {
                     {/* Brand — 3 cols */}
                     <div className="md:col-span-3">
                         <LogoSVGFooter width={240} className="mb-6 opacity-95" />
-                        <p className="text-white/40 text-sm font-light leading-relaxed mb-8 max-w-xs">
+                        <p className="text-white/55 text-sm font-light leading-relaxed mb-8 max-w-xs">
                             Moda atemporal dise&ntilde;ada para la mujer moderna.
                             Cada pieza cuenta una historia de lujo silencioso,
                             hecha con intenci&oacute;n desde Rafaela para el mundo.
@@ -84,7 +84,7 @@ export const Footer = () => {
                                 { to: '/about', label: 'Quiénes Somos' },
                             ].map(({ to, label }) => (
                                 <li key={label}>
-                                    <Link to={to} className="text-sm text-white/40 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
+                                    <Link to={to} className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
                                         <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                         <span>{label}</span>
                                     </Link>
@@ -108,7 +108,7 @@ export const Footer = () => {
                                     {to ? (
                                         <Link
                                             to={to}
-                                            className="text-sm text-white/40 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -116,7 +116,7 @@ export const Footer = () => {
                                     ) : (
                                         <button
                                             onClick={action}
-                                            className="text-sm text-white/40 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group text-left"
+                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group text-left"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             {label}
@@ -140,7 +140,7 @@ export const Footer = () => {
                                     {to ? (
                                         <Link
                                             to={to}
-                                            className="text-sm text-white/40 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -150,7 +150,7 @@ export const Footer = () => {
                                             href={href}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-sm text-white/40 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -161,7 +161,7 @@ export const Footer = () => {
                             <li>
                                 <button
                                     onClick={() => setIsRegretOpen(true)}
-                                    className="text-sm text-white/40 hover:text-rose-400 transition-colors duration-200 flex items-center gap-2 group text-left"
+                                    className="text-sm text-white/55 hover:text-rose-400 transition-colors duration-200 flex items-center gap-2 group text-left"
                                 >
                                     <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-rose-400/60 transition-all duration-300" />
                                     Bot&oacute;n Arrepentimiento
@@ -173,7 +173,7 @@ export const Footer = () => {
                     {/* Newsletter — 3 cols */}
                     <div className="md:col-span-3">
                         <FooterHeading>Newsletter</FooterHeading>
-                        <p className="text-sm text-white/35 font-light mb-5 leading-relaxed">
+                        <p className="text-sm text-white/55 font-light mb-5 leading-relaxed">
                             Novedades, lanzamientos y acceso prioritario a nuevas colecciones.
                         </p>
                         <div className="relative">
@@ -189,7 +189,7 @@ export const Footer = () => {
                                 <button
                                     onClick={submitFooterEmail}
                                     disabled={subStatus === 'loading'}
-                                    className="px-4 py-3 text-white/40 hover:text-cielo-gold transition-colors disabled:opacity-50"
+                                    className="px-4 py-3 text-white/55 hover:text-cielo-gold transition-colors disabled:opacity-50"
                                     aria-label="Suscribirse"
                                 >
                                     <ArrowRight className="w-4 h-4" />
@@ -199,7 +199,7 @@ export const Footer = () => {
                         <p className="text-2xs mt-3 tracking-wide">
                             {subStatus === 'success'
                                 ? <span className="text-cielo-gold">¡Listo! Vas a recibir las novedades. 💛</span>
-                                : <span className="text-white/20">Sin spam. Cancelar cuando quieras.</span>}
+                                : <span className="text-white/50">Sin spam. Cancelar cuando quieras.</span>}
                         </p>
 
                         {/* Contact */}
@@ -209,7 +209,7 @@ export const Footer = () => {
                                     href={`https://t.me/${String(siteConfig?.social?.telegram || siteConfig?.telegram).replace(/^@/, '').replace(/^t\.me\//, '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-3 text-sm text-white/35 hover:text-white transition-colors group"
+                                    className="flex items-center gap-3 text-sm text-white/55 hover:text-white transition-colors group"
                                 >
                                     <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-sky-400/40 flex items-center justify-center group-hover:text-sky-400 transition-all">
                                         <Send className="w-3.5 h-3.5" />
@@ -219,7 +219,7 @@ export const Footer = () => {
                             )}
                             <a
                                 href={`mailto:${siteConfig?.contact?.email || 'hola@laboutique.com.ar'}`}
-                                className="flex items-center gap-3 text-sm text-white/35 hover:text-white transition-colors group"
+                                className="flex items-center gap-3 text-sm text-white/55 hover:text-white transition-colors group"
                             >
                                 <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-blue-400/40 flex items-center justify-center group-hover:text-blue-400 transition-all">
                                     <Mail className="w-3.5 h-3.5" />
@@ -235,16 +235,16 @@ export const Footer = () => {
 
                 {/* Medios de pago y envío */}
                 <div className="flex flex-col items-center gap-3 mb-10">
-                    <span className="text-2xs uppercase tracking-[0.25em] text-white/30">Medios de pago y envío</span>
+                    <span className="text-2xs uppercase tracking-[0.25em] text-white/50">Medios de pago y envío</span>
                     <BrandStrip />
                 </div>
 
                 {/* Bottom bar */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <span className="text-2xs text-white/20 tracking-[0.2em] uppercase">
+                    <span className="text-2xs text-white/50 tracking-[0.2em] uppercase">
                         &copy; 2026 La Boutique de la Elegancia &nbsp;&middot;&nbsp; Todos los derechos reservados
                     </span>
-                    <span className="text-2xs text-white/15 tracking-[0.25em] uppercase">
+                    <span className="text-2xs text-white/50 tracking-[0.25em] uppercase">
                         Moda femenina &nbsp;&middot;&nbsp; Hecho en Argentina
                     </span>
                 </div>
