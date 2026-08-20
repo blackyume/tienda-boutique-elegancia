@@ -17,7 +17,7 @@ E-commerce de moda femenina premium en Argentina. Solo-dev, iteración rápida.
 ```bash
 npm run dev               # Vite dev server
 npm run build             # prebuild genera sitemap + shopping-feed → vite build
-npm test                  # vitest run (84 tests, excluye e2e/)
+npm test                  # vitest run (90 tests, excluye e2e/)
 npm run e2e               # playwright (apunta a prod por default)
 npm run e2e:install       # bajar Chromium para playwright
 npm run lint
@@ -37,7 +37,10 @@ npx firebase-tools deploy --only firestore:rules
 - `e2e/` — Playwright smoke tests (apunta a producción).
 - `tests/` — Vitest unit tests (utils).
 - `firestore.rules` — admin whitelist por email, no por custom claims.
-- `scripts/` — generadores build-time (sitemap.xml, shopping feed.xml).
+- `scripts/` — generadores build-time (sitemap.xml, shopping feed.xml) + `armar-portada.py` (arma las 3 versiones de una portada de hero desde una foto vertical de modelo).
+- `src/utils/portadas.js` — arma la lista de portadas del hero (CMS `hero.slides` → si no hay, las de la casa). Lógica pura, testeada.
+- `src/components/home/PortadaCarrusel.jsx` — `usePortadas` + `CapaPortadas` + `PuntosPortada`. **Va partido a propósito**: ver "Home" abajo.
+- `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV.
 
 ## Modelo de datos
 
@@ -92,6 +95,25 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 - `0 */2 * * *` → `/api/cron/abandoned-reminder` (cada 2h, escanea abandoned_carts y manda recordatorio)
 
+## Home — identidad visual (lo que no se toca sin leer)
+
+- **Paleta:** la tierra sale medida de una foto del campo del dueño (`#312721`) mezclada con el dorado y el negro de la marca. **No usar `#050505` ni negros puros** en secciones de la home: entre bloques de tierra se lee como parche.
+- **Textura de fondo:** `public/tierra-tile.webp`, 768×768, **cosida sin espejo** (mosaico de parches con ventana coseno sobre un toro). Espejar es lo que dibuja "mariposas" al repetirse. Si se regenera, el tamaño de la baldosa está fijado en dos lugares de `src/index.css` (`background-size`) y tiene que coincidir.
+- **Contraste:** sobre la tierra, blanco al 40% da 3,61:1 y **no llega a AA**. El piso para texto chico es **50–55%**. En el pie viven los links obligatorios (Defensa al Consumidor, Botón de Arrepentimiento) — no bajarlos.
+- **Carrusel del hero:** fundido cruzado de 1,6 s cada 7 s. Tres cuidados que no son opcionales:
+  1. 🔴 **Los puntitos van FUERA de la capa con parallax.** Esa capa lleva `transform`, que abre su propio contexto de apilamiento: un `z-index` alto adentro no sube por encima de los velos oscuros del hero. Por eso el componente está partido en hook + 2 piezas.
+  2. **La primera portada es el LCP** — se precarga y va `eager`; las demás entran al DOM recién en `requestIdleCallback`.
+  3. No rota con la pestaña oculta ni con `prefers-reduced-motion`.
+- **Portadas nuevas:** `python scripts/armar-portada.py "C:/ruta/foto.jpeg" portada-modelo-3`, y después sumarlas desde Admin → Contenido → Hero (editor de portadas: agregar, ordenar, quitar).
+- ⚠️ **Medir un antes/después en el navegador exige bloquear el service worker** (`newContext({ serviceWorkers: 'block' })`), si no la PWA sirve la copia cacheada y las dos capturas salen idénticas.
+
+### Pendiente acordado con el dueño
+
+- **La transición del carrusel puede ser más natural** — hoy es fundido cruzado + ken-burns por portada. Queda para otro día; el dueño lo aprobó como está.
+- **Normalizar las fotos de producto al subir** (los fondos amarillos no son el mismo amarillo entre foto y foto).
+- **La tira de Instagram repite las mismas 6 fotos del catálogo** que ya se ven más arriba.
+- Las fichas de categoría siguen con prenda apoyada; el salto es pasarlas a prenda **puesta**, cuando estén las modelos.
+
 ## Estilo de código
 
 - **Español en código y comentarios** cuando aplica (funciones en inglés, comentarios y strings UI en español).
@@ -102,14 +124,15 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Testing
 
-- **Vitest unit tests** en `tests/`. 84 tests sobre `variants`, `lowStock`, `gemini.parseJsonFromResponse`, `marcoFoto` e `importarInventario`. Excluye `e2e/`.
+- **Vitest unit tests** en `tests/`. 90 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `importarInventario` (con round-trip real de `.xlsx`) y `portadas`. Excluye `e2e/`.
 - **Playwright e2e** en `e2e/`. 6 smoke tests apuntando a prod (override con `BASE_URL=http://localhost:4173`).
 - **GitHub Actions** corre tests + build en push/PR a master (`.github/workflows/ci.yml`).
 
 ## Features clave (qué viene listo)
 
 - **PWA + offline.html** + UpdatePrompt con SW versioning.
-- **Hero + parallax** con LCP optimizado (parallax difere 800ms, noise SVG vía rIC).
+- **Hero + parallax + carrusel de portadas** con LCP optimizado (parallax difere 800ms, noise SVG vía rIC).
+- **Importar inventario desde Excel/CSV** (Admin → ⤴ Importar Excel) — planifica antes de escribir.
 - **Reviews con fotos + moderación** — solo usuarios que compraron + admin aprueba.
 - **Filtros Shop** — categoría, talle, color, rango precio (min+max), stock.
 - **Búsqueda autocompletada** en Navbar (top-6 productos).
