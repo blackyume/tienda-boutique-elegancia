@@ -67,23 +67,39 @@ export const Hero = () => {
     // pesaba 300 KB y el teléfono se la bajaba entera aunque recorte los
     // costados; así son 39 KB en escritorio y 11 KB en el celular.
     const esPortadaPropia = heroImage === PORTADA_PROPIA;
-    const webpSrcSet = '/portada-coleccion-sm.webp 1100w, /portada-coleccion.webp 2000w';
+    // Art direction, no solo resolucion: la foto de modelo es vertical (2:3).
+    // La apaisada de escritorio se arma extendiendo el dorado a los costados;
+    // en el telefono, donde la pantalla YA es vertical, va la foto casi entera.
+    // Con un srcSet por ancho el telefono elegia la apaisada (390px x DPR 3 =
+    // 1170 > 760) y se comia a la modelo.
+    const PORTADA_ESCRITORIO = '/portada-modelo.webp';
+    const PORTADA_TELEFONO = '/portada-modelo-sm.webp';
+    const MEDIA_TELEFONO = '(max-width: 767px)';
+    const MEDIA_ESCRITORIO = '(min-width: 768px)';
 
     return (
         <section className="relative min-h-screen flex items-end justify-center overflow-hidden bg-cielo-dark">
             {heroSrc && (
                 <Helmet>
-                    {esPortadaPropia
-                        ? <link rel="preload" as="image" imageSrcSet={webpSrcSet} imageSizes="100vw" fetchPriority="high" />
-                        : <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />}
+                    {esPortadaPropia ? (
+                        <link rel="preload" as="image" href={PORTADA_TELEFONO} media={MEDIA_TELEFONO} fetchPriority="high" />
+                    ) : (
+                        <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />
+                    )}
+                    {esPortadaPropia && (
+                        <link rel="preload" as="image" href={PORTADA_ESCRITORIO} media={MEDIA_ESCRITORIO} fetchPriority="high" />
+                    )}
                 </Helmet>
             )}
 
-            <div ref={layerRef} className="absolute inset-0 z-0 will-change-transform">
+            <div ref={layerRef} className="absolute inset-0 z-0 will-change-transform sin-textura">
                 {heroSrc && (
                     <picture>
                         {esPortadaPropia && (
-                            <source type="image/webp" srcSet={webpSrcSet} sizes="100vw" />
+                            <>
+                                <source media={MEDIA_TELEFONO} type="image/webp" srcSet={PORTADA_TELEFONO} />
+                                <source media={MEDIA_ESCRITORIO} type="image/webp" srcSet={PORTADA_ESCRITORIO} />
+                            </>
                         )}
                         <img
                             src={heroSrc}

@@ -191,7 +191,7 @@ export const ProductDetail = () => {
                 {/* Galería */}
                 <div>
                     <div
-                        className={`${marcoFoto} bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group`}
+                        className={`${marcoFoto} bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group sin-textura`}
                         onClick={() => setLightbox(true)}
                     >
                         <img

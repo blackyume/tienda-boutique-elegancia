@@ -55,7 +55,9 @@ body {
     /* Tierra medida del corral (H22 S20). El degradé es MUY sutil -- da
        profundidad de pagina sin que se lea como una textura. */
     background-color: #312721;
-    background-image: linear-gradient(180deg, #2A211C 0%, #312721 40%, #362B24 100%);
+    background-image: url('/tierra-tile.webp'),
+        linear-gradient(180deg, #2A211C 0%, #312721 40%, #362B24 100%);
+    background-size: 940px 940px, cover;
     background-attachment: fixed;
     color: white;
 }
@@ -285,42 +287,17 @@ img {
 }
 
 
-/* ===== TEXTURA DE TIERRA ==================================================
-   El dueño quiere que la tierra SE VEA, no un color plano -- pero sin usar la
-   foto del campo. Se genera con feTurbulence: dos capas SVG inline (~1,2 KB
-   en total, cero pedidos de red, cero imagenes que bajar).
-
-     · grano fino  -> los poros de la tierra seca (baseFrequency .85)
-     · manchas     -> la irregularidad del suelo pisado (baseFrequency .015)
-
-   Va por ENCIMA de las secciones porque casi todas tienen su propio fondo
-   opaco y taparian una textura puesta en el body. `soft-light` la funde con
-   el color en vez de ensuciarlo, y z-30 la deja por debajo de los modales
-   (z-50+) para no texturar un cuadro de dialogo.
-   ========================================================================= */
-
-body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 30;
-    pointer-events: none;
-    mix-blend-mode: soft-light;
-    opacity: 1;
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.15'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.58'/%3E%3C/svg%3E"),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.25'/%3E%3C/filter%3E%3Crect width='700' height='700' filter='url(%23m)' opacity='0.68'/%3E%3C/svg%3E");
-    background-size: 220px 220px, 700px 700px;
+/* La tierra NO va como velo por encima: iba a oscurecer las fotos de las
+   prendas y ningun z-index lo arregla de forma confiable. Va como FONDO REAL
+   de las secciones -- que son las que tienen color opaco propio y taparian la
+   del body. Asi la textura se ve donde tiene que verse y jamas toca una foto
+   de producto. */
+.bg-cielo-dark,
+[class*="bg-[#312721]"] {
+    background-image: url('/tierra-tile.webp');
+    background-size: 940px 940px;
 }
 
-/* En pantallas chicas el grano fino se ve el doble de denso (DPR 2-3) y
-   ensucia el texto: se agranda el patron y se baja la intensidad. */
-@media (max-width: 640px) {
-    body::after {
-        opacity: .72;
-        background-size: 300px 300px, 700px 700px;
-    }
-}
 
 /* La tierra tambien entra en las superficies con relieve, mas marcada:
    una card es una placa de tierra, no un vidrio. */
@@ -340,3 +317,5 @@ body::after {
 
 /* La foto del producto NO se textura: es la prenda que la clienta compra. */
 .relieve img, .relieve-alto img { position: relative; z-index: 1; }
+
+
