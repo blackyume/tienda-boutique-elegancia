@@ -55,9 +55,12 @@ module.exports = {
                     '0%': { opacity: '0', transform: 'scale(.95)' },
                     '100%': { opacity: '1', transform: 'scale(1)' },
                 },
+                // Zoom suave. Antes iba de 1.08 a 1.18 y se comía casi un cuarto
+                // del encuadre: cualquier composición de portada terminaba con
+                // las prendas de los costados cortadas.
                 kenburns: {
-                    '0%': { transform: 'scale(1.08) translate3d(0,0,0)' },
-                    '100%': { transform: 'scale(1.18) translate3d(-1.5%, -1.5%, 0)' },
+                    '0%': { transform: 'scale(1.02) translate3d(0,0,0)' },
+                    '100%': { transform: 'scale(1.07) translate3d(-0.8%, -0.8%, 0)' },
                 },
             },
             animation: {

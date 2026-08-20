@@ -313,12 +313,6 @@ export const CMSView = () => {
                                         {siteConfig.showMarquee ? <ToggleRight /> : <ToggleLeft />}
                                     </button>
                                 </div>
-                                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                    <span className="text-sm font-bold dark:text-white">Editorial</span>
-                                    <button onClick={() => updateSection('root', 'showEditorial', !siteConfig.showEditorial)} className={`text-2xl transition-colors ${siteConfig.showEditorial ? 'text-green-500' : 'text-slate-300'}`}>
-                                        {siteConfig.showEditorial ? <ToggleRight /> : <ToggleLeft />}
-                                    </button>
-                                </div>
                             </div>
                         </section>
 
@@ -704,11 +698,11 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
 
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                        <label className="text-xs font-bold uppercase text-slate-500 block">Imagen editorial</label>
+                        <label className="text-xs font-bold uppercase text-slate-500 block">Imagen del look</label>
                         <ImageUploader
                             currentImage={shopTheLook.image}
                             onUpload={(url) => saveNested('shopTheLook', { image: url })}
-                            label="Subir editorial"
+                            label="Subir imagen del look"
                         />
                         <input
                             type="text"
@@ -718,7 +712,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                             className="w-full bg-transparent text-xs py-2 border-b border-slate-300 dark:border-slate-700 focus:border-[#D4AF37] outline-none dark:text-slate-300"
                         />
                         <p className="text-[11px] text-slate-500 leading-relaxed">
-                            Si no subís imagen, se usa la imagen del Editorial como fallback.
+                            Sin imagen y sin puntos, la sección no se muestra en la home.
                             Cada punto (x, y) usa coordenadas en porcentaje 0–100 sobre la imagen.
                         </p>
                     </div>

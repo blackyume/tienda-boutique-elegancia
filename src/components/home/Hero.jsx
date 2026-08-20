@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, Truck, CreditCard, ShieldCheck } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
-import { optimizeImage } from '../../utils/helpers';
+import { optimizeImage, resolveHeroImage, PORTADA_PROPIA } from '../../utils/helpers';
 
 export const Hero = () => {
     const { siteConfig } = useStore();
@@ -42,10 +42,13 @@ export const Hero = () => {
         };
     }, []);
 
-    const heroImage = typeof siteConfig?.hero === 'string' ? siteConfig.hero : siteConfig?.hero?.image;
+    const heroImage = resolveHeroImage(siteConfig);
     const title = siteConfig?.hero?.title || 'LA BOUTIQUE';
     const subtitle = siteConfig?.hero?.subtitle || 'de la Elegancia';
-    const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'Piezas curadas que duran temporadas, no semanas.';
+    // El anterior ("Piezas curadas que duran temporadas, no semanas") repetía
+    // casi palabra por palabra el titular de la sección El Atelier. El hero
+    // habla de la clienta; la filosofía de marca ya se cuenta más abajo.
+    const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'Lo que te ponés cuando querés que se note.';
     const buttonText = siteConfig?.hero?.buttonText || 'Explorar Shop';
     const buttonLink = siteConfig?.hero?.buttonLink || 'shop';
 
@@ -59,24 +62,38 @@ export const Hero = () => {
 
     const heroSrc = heroImage ? optimizeImage(heroImage, 1800) : null;
 
+    // La portada propia viene además en WebP y en una versión chica: es el
+    // elemento más pesado de la home y el que marca el LCP. En JPG a 2400px
+    // pesaba 300 KB y el teléfono se la bajaba entera aunque recorte los
+    // costados; así son 39 KB en escritorio y 11 KB en el celular.
+    const esPortadaPropia = heroImage === PORTADA_PROPIA;
+    const webpSrcSet = '/portada-coleccion-sm.webp 1100w, /portada-coleccion.webp 2000w';
+
     return (
         <section className="relative min-h-screen flex items-end justify-center overflow-hidden bg-cielo-dark">
             {heroSrc && (
                 <Helmet>
-                    <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />
+                    {esPortadaPropia
+                        ? <link rel="preload" as="image" imageSrcSet={webpSrcSet} imageSizes="100vw" fetchPriority="high" />
+                        : <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />}
                 </Helmet>
             )}
 
             <div ref={layerRef} className="absolute inset-0 z-0 will-change-transform">
                 {heroSrc && (
-                    <img
-                        src={heroSrc}
-                        alt=""
-                        aria-hidden="true"
-                        fetchPriority="high"
-                        decoding="async"
-                        className="w-full h-full object-cover object-top opacity-[0.80] animate-kenburns motion-reduce:animate-none motion-reduce:scale-110"
-                    />
+                    <picture>
+                        {esPortadaPropia && (
+                            <source type="image/webp" srcSet={webpSrcSet} sizes="100vw" />
+                        )}
+                        <img
+                            src={heroSrc}
+                            alt=""
+                            aria-hidden="true"
+                            fetchPriority="high"
+                            decoding="async"
+                            className="w-full h-full object-cover object-center opacity-95 animate-kenburns motion-reduce:animate-none motion-reduce:scale-110"
+                        />
+                    </picture>
                 )}
             </div>
 
@@ -89,6 +106,21 @@ export const Hero = () => {
                         rgba(2,6,23,0.10) 50%,
                         rgba(2,6,23,0.60) 75%,
                         rgba(2,6,23,0.97) 100%
+                    )`
+                }}
+            />
+
+            {/* Velo lateral: la columna de texto arranca sobre fondo oscuro sí o sí.
+                Sin esto el volante dorado queda dorado-sobre-dorado e ilegible
+                cuando la foto del CMS es clara. */}
+            <div
+                className="absolute inset-0 z-[1] pointer-events-none"
+                style={{
+                    background: `linear-gradient(100deg,
+                        rgba(2,6,23,0.85) 0%,
+                        rgba(2,6,23,0.55) 32%,
+                        rgba(2,6,23,0.12) 58%,
+                        rgba(2,6,23,0) 75%
                     )`
                 }}
             />
@@ -106,21 +138,21 @@ export const Hero = () => {
 
                 <div className="flex items-center gap-3 mb-8 animate-fadeIn">
                     <span className="h-px w-12 bg-cielo-gold/60" />
-                    <span className="text-2xs uppercase tracking-[0.45em] font-semibold text-cielo-gold/80">
+                    <span className="text-2xs uppercase tracking-[0.25em] md:tracking-[0.45em] font-semibold text-cielo-gold">
                         Colección 2026 · Edición de autor
                     </span>
                 </div>
 
                 <h1
-                    className="font-cinzel font-bold leading-[0.88] tracking-tight text-white animate-slideUp"
-                    style={{ fontSize: 'clamp(3.5rem, 10vw, 9rem)' }}
+                    className="font-cinzel font-bold leading-[0.88] tracking-tight text-white animate-slideUp max-w-3xl"
+                    style={{ fontSize: 'clamp(2.75rem, 7vw, 6rem)' }}
                 >
                     {title}
                 </h1>
 
                 <p
                     className="font-serif italic font-light text-white/75 mt-3 animate-fadeIn opacity-0 [animation-delay:300ms]"
-                    style={{ fontSize: 'clamp(1.5rem, 4vw, 3.5rem)' }}
+                    style={{ fontSize: 'clamp(1.25rem, 3vw, 2.5rem)' }}
                 >
                     {subtitle}
                 </p>
@@ -131,12 +163,12 @@ export const Hero = () => {
                     <span className="h-px w-8 bg-cielo-gold/20" />
                 </div>
 
-                <div className="mt-8 flex flex-col md:flex-row md:items-end gap-8 md:gap-16 animate-fadeIn opacity-0 [animation-delay:550ms]">
-                    <p className="text-sm md:text-base text-white/60 max-w-sm font-light leading-relaxed">
+                <div className="mt-8 flex flex-col items-start gap-7 animate-fadeIn opacity-0 [animation-delay:550ms]">
+                    <p className="text-sm md:text-base text-white/60 max-w-md font-light leading-relaxed">
                         {tagline}
                     </p>
 
-                    <div className="flex items-center gap-5 shrink-0">
+                    <div className="flex flex-wrap items-center gap-5">
                         <Link
                             to="/shop"
                             onClick={primaryAction}
@@ -148,7 +180,7 @@ export const Hero = () => {
                             <span className="absolute inset-0 bg-white/40 translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700" />
                         </Link>
                         <button
-                            onClick={() => document.getElementById('editorial')?.scrollIntoView({ behavior: 'smooth' })}
+                            onClick={() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' })}
                             className="group inline-flex items-center gap-2 text-white/50 hover:text-white text-2xs uppercase tracking-[0.3em] font-semibold transition-colors"
                         >
                             <span className="relative">

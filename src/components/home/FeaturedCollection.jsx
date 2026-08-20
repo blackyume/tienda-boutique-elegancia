@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { ArrowRight, Eye } from 'lucide-react';
@@ -10,14 +10,14 @@ const HeroCard = ({ item, onQuickView }) => (
         onClick={() => onQuickView?.(item)}
         role="button"
         aria-label={`Vista rápida de ${item.name}`}
-        className="group relative overflow-hidden cursor-pointer h-full min-h-[500px] md:min-h-[680px]"
+        className="group relative overflow-hidden cursor-pointer aspect-[4/5]"
         style={{ background: '#080808' }}
     >
         <img
-            src={optimizeImage(item.image, 1000)}
+            src={optimizeImage(item.image, 1200)}
             alt={item.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-[2s] ease-out group-hover:scale-[1.05]"
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[2s] ease-out group-hover:scale-[1.05]"
         />
 
         {/* Gold border flash on hover */}
@@ -94,10 +94,10 @@ const SmallCard = ({ item, onQuickView }) => (
         style={{ background: '#080808' }}
     >
         <img
-            src={optimizeImage(item.image, 600)}
+            src={optimizeImage(item.image, 700)}
             alt={item.name}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-[1.8s] ease-out group-hover:scale-[1.06]"
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1.8s] ease-out group-hover:scale-[1.06]"
         />
 
         <span className="absolute inset-0 z-10 pointer-events-none border border-cielo-gold/0 group-hover:border-cielo-gold/25 transition-all duration-700" />
@@ -110,11 +110,11 @@ const SmallCard = ({ item, onQuickView }) => (
             <Eye className="w-3.5 h-3.5" />
         </button>
 
-        <div className="absolute inset-x-0 bottom-0 z-20 p-5">
-            <p className="text-[9px] uppercase tracking-[0.35em] text-cielo-gold/60 mb-1.5 font-semibold">{item.category}</p>
-            <h3 className="font-serif text-lg text-white leading-snug mb-2 line-clamp-2">{item.name}</h3>
+        <div className="absolute inset-x-0 bottom-0 z-20 p-3 md:p-5">
+            <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] md:tracking-[0.35em] text-cielo-gold/70 mb-1 md:mb-1.5 font-semibold">{item.category}</p>
+            <h3 className="font-serif text-sm md:text-lg text-white leading-snug mb-1.5 md:mb-2 line-clamp-2">{item.name}</h3>
             <div className="flex items-center justify-between">
-                <span className="text-base text-white/90 font-light">{formatMoney(item.price)}</span>
+                <span className="text-sm md:text-base text-white/90 font-light">{formatMoney(item.price)}</span>
                 {item.colors?.length > 0 && (
                     <div className="flex -space-x-1">
                         {item.colors.slice(0, 4).map(c => (
@@ -139,13 +139,25 @@ const SmallCard = ({ item, onQuickView }) => (
 
 export const FeaturedCollection = ({ onQuickView }) => {
     const { inventory } = useStore();
-    const featured = (inventory || []).filter(p => p.active !== false).slice(0, 5);
+
+    // El alta de producto tiene un botón "destacar en home" que guarda
+    // badges.isFeatured, pero esta sección lo ignoraba y mostraba los primeros
+    // cinco del inventario: marcar un producto como destacado no hacía nada.
+    // Ahora mandan los marcados, y se completa con el resto para que la sección
+    // nunca quede a medio armar.
+    const featured = useMemo(() => {
+        const activos = (inventory || []).filter(p => p.active !== false);
+        const marcados = activos.filter(p => p.badges?.isFeatured);
+        const resto = activos.filter(p => !p.badges?.isFeatured);
+        return [...marcados, ...resto].slice(0, 5);
+    }, [inventory]);
+
     if (featured.length === 0) return null;
 
     const [hero, second, third, fourth, fifth] = featured;
 
     return (
-        <section className="py-20 md:py-28 px-4 md:px-6 bg-[#0A0A0A] relative overflow-hidden">
+        <section className="py-14 md:py-20 px-4 md:px-6 bg-[#0A0A0A] relative overflow-hidden">
 
             {/* Faint background texture */}
             <div className="absolute inset-0 opacity-[0.015] pointer-events-none"
@@ -177,37 +189,18 @@ export const FeaturedCollection = ({ onQuickView }) => {
                     </Link>
                 </div>
 
-                {/* Grid layout — 5 productos */}
+                {/* Grid — destacado grande + 2x2 al costado. Todos los marcos en
+                    4:5: el catálogo es 100% cuadrado (1280x1280) y este es el
+                    recorte más alto que no le come la prenda. */}
                 {featured.length >= 3 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
-                        {/* Hero grande - 7 cols */}
-                        <div className="md:col-span-7 md:row-span-2">
-                            <HeroCard item={hero} onQuickView={onQuickView} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 md:items-start">
+                        <HeroCard item={hero} onQuickView={onQuickView} />
+
+                        <div className="grid grid-cols-2 gap-3 md:gap-4">
+                            {[second, third, fourth, fifth].filter(Boolean).map(p => (
+                                <SmallCard key={p.id} item={p} onQuickView={onQuickView} />
+                            ))}
                         </div>
-
-                        {/* 2 pequeños apilados - 5 cols */}
-                        {second && (
-                            <div className="md:col-span-5">
-                                <SmallCard item={second} onQuickView={onQuickView} />
-                            </div>
-                        )}
-                        {third && (
-                            <div className="md:col-span-5">
-                                <SmallCard item={third} onQuickView={onQuickView} />
-                            </div>
-                        )}
-
-                        {/* Fila inferior - 2 tarjetas */}
-                        {fourth && (
-                            <div className="md:col-span-6">
-                                <SmallCard item={fourth} onQuickView={onQuickView} />
-                            </div>
-                        )}
-                        {fifth && (
-                            <div className="md:col-span-6">
-                                <SmallCard item={fifth} onQuickView={onQuickView} />
-                            </div>
-                        )}
                     </div>
                 ) : (
                     <div className="grid md:grid-cols-2 gap-4">

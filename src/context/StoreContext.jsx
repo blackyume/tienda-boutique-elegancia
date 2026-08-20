@@ -38,16 +38,7 @@ export const StoreProvider = ({ children }) => {
       buttonText: "Explorar Shop",
       buttonLink: "shop"
     },
-    editorial: {
-      image: "https://images.unsplash.com/photo-1485230946287-65775ce5ad96?q=80&w=2070&auto=format&fit=crop",
-      title: "Arte & Arquitectura",
-      subtitle: "The Vision 2026",
-      text: "Nuestra nueva colección explora la intersección entre la moda de alta costura y las líneas estructurales del mañana. Cada pieza es un manifiesto de elegancia atemporal.",
-      quote: "La elegancia es la única belleza que no se marchita.",
-      quoteAuthor: "Audrey Hepburn"
-    },
     showMarquee: true,
-    showEditorial: true,
     marquee: "La Boutique de la Elegancia • Collection 2026 • World Class Fashion • Future Luxury • Nueva Temporada",
     announcement: {
       text: "Compra Segura | Envíos a todo el País | Nueva Colección 2026",
@@ -138,7 +129,6 @@ export const StoreProvider = ({ children }) => {
 
   // --- UI STATE ---
   const [isMaintenance, setIsMaintenance] = useState(false);
-  const [globalFilter, setGlobalFilter] = useState({ category: "Todos", search: "" });
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
@@ -277,7 +267,7 @@ export const StoreProvider = ({ children }) => {
       inventory, cart, setCart, addToCart, updateCartQty, removeFromCart, clearCart, cartTotal, cartCount,
       orders, wishlist, setWishlist, toggleWishlist, isInWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout, loginAnonymously, linkGuestWithGoogle,
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
-      categories, siteConfig, cloudinaryConfig, aiConfig, globalFilter, setGlobalFilter, loading, simulations, shippingRates, systemConfig,
+      categories, siteConfig, cloudinaryConfig, aiConfig, loading, simulations, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
       abandonedCarts, activeSessions, reviews, visitStatsHourly, expenses, newsletterSubscribers,

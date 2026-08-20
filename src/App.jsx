@@ -17,26 +17,27 @@ import { PushOptIn } from './components/ui/PushOptIn';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
 import { AdminLauFab } from './components/admin/AdminLauFab';
-import React, { useLayoutEffect, useEffect, Suspense, lazy } from 'react';
+import React, { useLayoutEffect, useEffect, Suspense } from 'react';
 import { startPresence } from './utils/presence';
+import { lazyConReintento } from './utils/lazyConReintento';
 
 // Lazy-loaded routes (code-splitting to shrink initial bundle)
-const Shop = lazy(() => import('./pages/Shop').then(m => ({ default: m.Shop })));
-const ProductDetail = lazy(() => import('./pages/ProductDetail').then(m => ({ default: m.ProductDetail })));
-const About = lazy(() => import('./pages/About').then(m => ({ default: m.About })));
-const Checkout = lazy(() => import('./pages/Checkout').then(m => ({ default: m.Checkout })));
-const PaymentStatus = lazy(() => import('./pages/PaymentStatus').then(m => ({ default: m.PaymentStatus })));
-const Admin = lazy(() => import('./pages/Admin').then(m => ({ default: m.Admin })));
-const Tracking = lazy(() => import('./pages/Tracking').then(m => ({ default: m.Tracking })));
-const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
-const TermsConditions = lazy(() => import('./pages/TermsConditions').then(m => ({ default: m.TermsConditions })));
-const Wishlist = lazy(() => import('./pages/Wishlist').then(m => ({ default: m.Wishlist })));
-const UserProfile = lazy(() => import('./pages/UserProfile').then(m => ({ default: m.UserProfile })));
-const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
-const Success = lazy(() => import('./pages/Success').then(m => ({ default: m.Success })));
-const FAQ = lazy(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
-const Shipping = lazy(() => import('./pages/Shipping').then(m => ({ default: m.Shipping })));
-const Contact = lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
+const Shop = lazyConReintento(() => import('./pages/Shop').then(m => ({ default: m.Shop })));
+const ProductDetail = lazyConReintento(() => import('./pages/ProductDetail').then(m => ({ default: m.ProductDetail })));
+const About = lazyConReintento(() => import('./pages/About').then(m => ({ default: m.About })));
+const Checkout = lazyConReintento(() => import('./pages/Checkout').then(m => ({ default: m.Checkout })));
+const PaymentStatus = lazyConReintento(() => import('./pages/PaymentStatus').then(m => ({ default: m.PaymentStatus })));
+const Admin = lazyConReintento(() => import('./pages/Admin').then(m => ({ default: m.Admin })));
+const Tracking = lazyConReintento(() => import('./pages/Tracking').then(m => ({ default: m.Tracking })));
+const PrivacyPolicy = lazyConReintento(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
+const TermsConditions = lazyConReintento(() => import('./pages/TermsConditions').then(m => ({ default: m.TermsConditions })));
+const Wishlist = lazyConReintento(() => import('./pages/Wishlist').then(m => ({ default: m.Wishlist })));
+const UserProfile = lazyConReintento(() => import('./pages/UserProfile').then(m => ({ default: m.UserProfile })));
+const NotFound = lazyConReintento(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
+const Success = lazyConReintento(() => import('./pages/Success').then(m => ({ default: m.Success })));
+const FAQ = lazyConReintento(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
+const Shipping = lazyConReintento(() => import('./pages/Shipping').then(m => ({ default: m.Shipping })));
+const Contact = lazyConReintento(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
 
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();

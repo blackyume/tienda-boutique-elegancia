@@ -1,46 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Quote, Star } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { Reveal } from '../ui/Reveal';
 import { SectionHeader } from './SectionHeader';
 
-const FALLBACK = [
-    {
-        name: 'Sofía G.',
-        location: 'Buenos Aires',
-        text: 'La calidad es impresionante. Los colores y el corte son idénticos a las fotos, y la atención por Instagram fue excelente.',
-        rating: 5,
-    },
-    {
-        name: 'Martina P.',
-        location: 'Córdoba',
-        text: 'Llegó perfectamente embalado. Ya me compré tres vestidos y siempre una experiencia premium.',
-        rating: 5,
-    },
-    {
-        name: 'Camila R.',
-        location: 'Rosario',
-        text: 'Los talles son reales y la tela se siente de primera. El proceso de cambio fue muy simple. Repetiré sin dudas.',
-        rating: 5,
-    },
-];
-
+// Sin testimonios inventados: o son reseñas reales de gente que compró, o la
+// sección no se muestra. Poner opiniones falsas bajo el título "Experiencias
+// reales" engaña a la clienta y no se sostiene si alguna pregunta.
 export const Testimonials = () => {
-    const { siteConfig } = useStore();
-    const configured = siteConfig?.testimonials;
-    const list = Array.isArray(configured) && configured.length ? configured.slice(0, 3) : FALLBACK;
+    const { siteConfig, reviews, inventory } = useStore();
+
+    const list = useMemo(() => {
+        // 1) Testimonios cargados a mano por la dueña desde el CMS (reales).
+        const configured = siteConfig?.testimonials;
+        if (Array.isArray(configured) && configured.length) return configured.slice(0, 3);
+
+        // 2) Reseñas aprobadas de clientas que efectivamente compraron.
+        return (reviews || [])
+            .filter(r => r.approved && r.text)
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+            .slice(0, 3)
+            .map(r => ({
+                name: r.userName || 'Cliente',
+                location: inventory?.find(p => String(p.id) === String(r.productId))?.name || '',
+                text: r.text,
+                rating: r.rating || 5,
+            }));
+    }, [siteConfig, reviews, inventory]);
 
     const [active, setActive] = useState(0);
 
     useEffect(() => {
+        if (list.length < 2) return;
         const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
         if (reduced) return;
         const id = setInterval(() => setActive((a) => (a + 1) % list.length), 6500);
         return () => clearInterval(id);
     }, [list.length]);
 
+    // 3) Todavía no hay ninguna reseña real -> no se muestra nada.
+    if (!list.length) return null;
+
     return (
-        <section className="relative py-20 md:py-28 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
+        <section className="relative py-14 md:py-20 px-6 bg-[#050505] border-y border-white/[0.05] overflow-hidden">
             <Reveal className="max-w-5xl mx-auto relative z-10">
                 <SectionHeader
                     eyebrow="La voz de nuestras clientas"
@@ -48,7 +50,7 @@ export const Testimonials = () => {
                     className="mb-14"
                 />
 
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className={`grid gap-6 ${list.length === 1 ? 'max-w-xl mx-auto' : list.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
                     {list.map((t, i) => (
                         <article
                             key={i}
@@ -66,7 +68,9 @@ export const Testimonials = () => {
                             <p className="text-sm text-slate-300 font-light leading-relaxed mb-5 italic">"{t.text}"</p>
                             <div className="pt-4 border-t border-white/5">
                                 <p className="text-sm text-white font-serif">{t.name}</p>
-                                <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">{t.location}</p>
+                                {t.location && (
+                                    <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">{t.location}</p>
+                                )}
                             </div>
                             <div className={`absolute inset-x-6 -bottom-[1px] h-px bg-gradient-to-r from-transparent via-cielo-gold/60 to-transparent transition-opacity duration-700 ${active === i ? 'opacity-100' : 'opacity-0'}`} />
                         </article>

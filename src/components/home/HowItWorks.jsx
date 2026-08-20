@@ -1,31 +1,38 @@
 import React from 'react';
-import { Search, CreditCard, Package } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, CreditCard, Package, ArrowRight } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 
+// Cada paso lleva a donde se hace lo que promete. Antes eran tres tarjetas
+// lindas y muertas: decían "filtrá por categoría, talle y color" o "seguimiento
+// desde tu cuenta" y no se podía ir a ningún lado desde ahí.
 const steps = [
     {
-        number: '01',
         icon: Search,
         title: 'Curaduría',
         desc: 'Cada pieza está elegida a mano, no por catálogo. Filtrá por categoría, talle y color y encontrá lo tuyo.',
+        to: '/shop',
+        cta: 'Explorar el shop',
     },
     {
-        number: '02',
         icon: CreditCard,
         title: 'Pago protegido',
         desc: 'Tarjeta, débito o Mercado Pago con cuotas. Datos siempre cifrados, compra sin sobresaltos.',
+        to: '/faq',
+        cta: 'Cómo se paga',
     },
     {
-        number: '03',
         icon: Package,
         title: 'En tu puerta',
         desc: 'Envíos a todo el país con seguimiento en tiempo real desde tu cuenta. Empaque cuidado, como un regalo.',
+        to: '/envios',
+        cta: 'Envíos y tiempos',
     },
 ];
 
 export const HowItWorks = () => {
     return (
-        <section className="relative py-20 md:py-28 px-6 bg-[#0A0A0A] overflow-hidden">
+        <section className="relative py-14 md:py-20 px-6 bg-[#0A0A0A] overflow-hidden">
             <div className="max-w-6xl mx-auto relative z-10">
                 <SectionHeader
                     eyebrow="La experiencia LBE"
@@ -42,7 +49,11 @@ export const HowItWorks = () => {
                     {steps.map((step, idx) => {
                         const Icon = step.icon;
                         return (
-                            <div key={idx} className="group relative flex flex-col items-center text-center">
+                            <Link
+                                key={idx}
+                                to={step.to}
+                                className="group relative flex flex-col items-center text-center rounded-2xl p-4 -m-4 transition-colors hover:bg-white/[0.03] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cielo-gold/50"
+                            >
                                 {/* Number badge */}
                                 <div className="relative mb-6">
                                     {/* Outer ring */}
@@ -65,7 +76,11 @@ export const HowItWorks = () => {
                                 <p className="text-slate-400 text-sm font-light leading-relaxed max-w-xs mx-auto">
                                     {step.desc}
                                 </p>
-                            </div>
+                                <span className="mt-5 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-bold text-cielo-gold/80 group-hover:text-cielo-gold transition-colors">
+                                    {step.cta}
+                                    <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                                </span>
+                            </Link>
                         );
                     })}
                 </div>

@@ -6,6 +6,7 @@ import { LowStockPanel } from './LowStockPanel';
 import { OnboardingPanel } from './OnboardingPanel';
 import { getLiveVisitors } from '../../utils/presence';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
+import { OrdersNeedingReviewPanel } from './OrdersNeedingReviewPanel';
 // xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
 
 export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [] }) => {
@@ -208,6 +209,11 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] dark:invert"></div>
 
             <div className="max-w-7xl mx-auto p-6 lg:p-12 relative z-10 space-y-12 animate-fadeIn">
+                <OrdersNeedingReviewPanel
+                    orders={orders}
+                    onNavigateOrders={() => onNavigate('orders')}
+                />
+
                 {/* HEADER & STATUS */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>

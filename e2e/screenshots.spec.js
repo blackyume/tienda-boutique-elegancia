@@ -69,14 +69,17 @@ for (const [device, viewport] of [['desktop', DESKTOP], ['mobile', MOBILE]]) {
             await page.screenshot({ path: `${OUT}/home-${device}.png`, fullPage: true });
         });
 
-        test(`home editorial (${device})`, async ({ page }) => {
+        // Antes apuntaba a #editorial, la sección "Arte & Arquitectura" que se
+        // eliminó (imagen muerta y texto de plantilla). Ahora retrata las
+        // categorías, que es el camino de compra real de la home.
+        test(`home categorias (${device})`, async ({ page }) => {
             await page.goto('/', { waitUntil: 'domcontentloaded' });
             await settle(page);
-            const ed = page.locator('#editorial');
-            await ed.scrollIntoViewIfNeeded().catch(() => {});
+            const cats = page.locator('#categories');
+            await cats.scrollIntoViewIfNeeded().catch(() => {});
             await page.waitForTimeout(1500);
-            await ed.screenshot({ path: `${OUT}/editorial-${device}.png` }).catch(async () => {
-                await page.screenshot({ path: `${OUT}/editorial-${device}.png` });
+            await cats.screenshot({ path: `${OUT}/categorias-${device}.png` }).catch(async () => {
+                await page.screenshot({ path: `${OUT}/categorias-${device}.png` });
             });
         });
 

@@ -776,7 +776,6 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             case 'update_home': {
                 const cfg = {};
                 if (A.hero) cfg.hero = { ...(siteConfig.hero || {}), ...A.hero };
-                if (A.editorial) cfg.editorial = { ...(siteConfig.editorial || {}), ...A.editorial };
                 if (A.announcement) cfg.announcement = { ...(siteConfig.announcement || {}), ...A.announcement };
                 if (A.marquee !== undefined) cfg.marquee = String(A.marquee);
                 if (!Object.keys(cfg).length) return 'No había cambios para la home.';

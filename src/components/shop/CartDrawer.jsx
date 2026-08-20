@@ -68,7 +68,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                   <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
                      <ShoppingBag className="w-16 h-16 mb-6 text-white" />
                      <p className="text-white font-cinzel text-xl mb-2">Tu bolsa está vacía</p>
-                     <p className="text-slate-400 text-sm font-montserrat">Descubrí nuestra nueva colección.</p>
+                     <p className="text-slate-400 text-sm">Descubrí nuestra nueva colección.</p>
                   </div>
                ) : (
                   cart.map(item => {
@@ -85,11 +85,11 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                                  <h3 className="font-cinzel text-white text-lg leading-tight pr-4">{item.name}</h3>
                                  <button onClick={() => removeFromCart(item.key)} className="text-slate-500 hover:text-red-400 transition-colors p-1"><Trash2 className="w-4 h-4" /></button>
                               </div>
-                              <p className="text-xs font-bold font-montserrat text-slate-400 uppercase tracking-wider">{item.color} | {item.size}</p>
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{item.color} | {item.size}</p>
                            </div>
 
                            <div className="flex justify-between items-end">
-                              <span className="font-montserrat font-bold text-lg text-white">{formatMoney(item.price * item.quantity)}</span>
+                              <span className=" font-bold text-lg text-white">{formatMoney(item.price * item.quantity)}</span>
                               <div className="flex items-center gap-1 bg-white/5 rounded-lg border border-white/10">
                                  <button
                                     onClick={() => updateCartQty(item.key, item.quantity - 1)}
@@ -185,7 +185,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
 
                   {/* Total & Checkout */}
                   <div className="flex justify-between items-end mb-6">
-                     <span className="text-slate-400 font-montserrat text-sm uppercase tracking-widest">Total Estimado</span>
+                     <span className="text-slate-400 text-sm uppercase tracking-widest">Total Estimado</span>
                      <span className="font-cinzel text-3xl text-white">{formatMoney(cartTotal)}</span>
                   </div>
 

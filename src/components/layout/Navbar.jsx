@@ -6,7 +6,7 @@ import { useStore } from '../../context/StoreContext';
 import { useState, useEffect, useRef } from 'react';
 
 export const Navbar = ({ onOpenCart }) => {
-    const { cart, categories, setGlobalFilter, user, logout, isAdmin, siteConfig, inventory } = useStore();
+    const { cart, categories, user, logout, isAdmin, siteConfig, inventory } = useStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Search State
@@ -77,12 +77,14 @@ export const Navbar = ({ onOpenCart }) => {
         }
     };
 
+    // Shop lee la categoría del parámetro ?category= de la URL. Antes esto
+    // escribía un estado global que no leía nadie y mandaba a la home a buscar
+    // un #shop que no existe, así que elegir una categoría no filtraba nada.
     const handleCategoryClick = (catName) => {
-        setGlobalFilter({ category: catName, search: "" });
-        navigate('/');
+        const esTodo = !catName || catName === 'Todos';
+        navigate(esTodo ? '/shop' : `/shop?category=${encodeURIComponent(catName)}`);
         setIsMobileMenuOpen(false);
         setIsShopMenuOpen(false);
-        setTimeout(() => document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' }), 100);
     };
 
     return (
@@ -122,7 +124,7 @@ export const Navbar = ({ onOpenCart }) => {
                 `}>
                     {/* LEFT: hamburguesa (mobile) + navegación (desktop) */}
                     <div className="flex items-center gap-6 z-10">
-                        <button className="md:hidden p-2 text-white" onClick={() => setIsMobileMenuOpen(true)}>
+                        <button aria-label="Abrir menú" className="md:hidden p-2 text-white" onClick={() => setIsMobileMenuOpen(true)}>
                             <Menu className="w-6 h-6" />
                         </button>
                         <div className={`hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.15em] transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-90'}`}>
@@ -291,42 +293,96 @@ export const Navbar = ({ onOpenCart }) => {
                 </div>
             </div>
 
-            {/* MOBILE MENU (Full Screen Glass) */}
-            <div className={`fixed inset-0 z-[60] bg-[#0A0A0A]/95 backdrop-blur-2xl transition-all duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-6 right-6 p-4 text-white hover:rotate-90 transition-transform duration-500"><X className="w-8 h-8" /></button>
-                <div className="flex flex-col items-center justify-center h-full gap-8">
-                    <h2 className="text-3xl font-cinzel text-cielo-gold mb-2">MENÚ</h2>
+            {/* MENÚ MOBILE (pantalla completa)
+                Va con scroll propio y alineado arriba: con 8 categorías el
+                contenido pasa el alto de un teléfono y antes, al estar centrado
+                y sin overflow, se comía el título y los links del pie quedaban
+                fuera de la pantalla sin manera de llegar. */}
+            <div className={`fixed inset-0 z-[60] bg-[#0A0A0A]/95 backdrop-blur-2xl transition-opacity duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'}`}>
+                <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    aria-label="Cerrar menú"
+                    className="fixed top-5 right-5 z-[61] p-3 text-white bg-black/40 rounded-full backdrop-blur-sm hover:rotate-90 transition-transform duration-500"
+                >
+                    <X className="w-7 h-7" />
+                </button>
 
-                    {/* BUSCADOR MOBILE */}
-                    <form
-                        onSubmit={(e) => { e.preventDefault(); const q = search.trim(); if (q) { navigate(`/shop?q=${encodeURIComponent(q)}`); setIsMobileMenuOpen(false); setSearch(''); } }}
-                        className="w-full max-w-xs px-6 mb-2"
-                    >
-                        <div className="flex items-center gap-2 border border-white/15 rounded-full px-4 py-3 bg-white/5 focus-within:border-cielo-gold/50 transition-colors">
-                            <Search className="w-4 h-4 text-white/40 shrink-0" />
-                            <input
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Buscar prendas..."
-                                className="flex-1 min-w-0 bg-transparent border-0 outline-none text-sm text-white placeholder-white/30"
-                            />
-                            <button type="submit" className="text-cielo-gold shrink-0 hover:scale-110 transition-transform" aria-label="Buscar"><ArrowRight className="w-5 h-5" /></button>
-                        </div>
-                    </form>
+                <div className="h-full overflow-y-auto overscroll-contain">
+                    <div className="min-h-full flex flex-col items-center justify-center gap-6 px-6 py-20">
+                        <h2 className="text-2xl font-cinzel text-cielo-gold">MENÚ</h2>
 
-                    {categories.map((cat, i) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => handleCategoryClick(cat.name)}
-                            className="text-2xl font-serif text-white hover:text-cielo-gold hover:scale-110 transition-all duration-300"
-                            style={{ transitionDelay: `${i * 100}ms` }}
+                        {/* BUSCADOR MOBILE */}
+                        <form
+                            onSubmit={(e) => { e.preventDefault(); const q = search.trim(); if (q) { navigate(`/shop?q=${encodeURIComponent(q)}`); setIsMobileMenuOpen(false); setSearch(''); } }}
+                            className="w-full max-w-xs"
                         >
-                            {cat.name}
+                            <div className="flex items-center gap-2 border border-white/15 rounded-full px-4 py-3 bg-white/5 focus-within:border-cielo-gold/50 transition-colors">
+                                <Search className="w-4 h-4 text-white/40 shrink-0" />
+                                <input
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Buscar prendas..."
+                                    className="flex-1 min-w-0 bg-transparent border-0 outline-none text-sm text-white placeholder-white/30"
+                                />
+                                <button type="submit" className="text-cielo-gold shrink-0 hover:scale-110 transition-transform" aria-label="Buscar"><ArrowRight className="w-5 h-5" /></button>
+                            </div>
+                        </form>
+
+                        <button
+                            onClick={() => handleCategoryClick('Todos')}
+                            className="text-[11px] uppercase tracking-[0.3em] font-bold text-cielo-gold hover:text-white transition-colors"
+                        >
+                            Ver todo el shop
                         </button>
-                    ))}
-                    <div className="w-16 h-px bg-white/20 my-4"></div>
-                    <div className="flex flex-col items-center gap-4">
-                        <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-lg uppercase tracking-widest text-white/80 hover:text-cielo-gold transition-colors">Nosotros</Link>
+
+                        <div className="flex flex-col items-center gap-4">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => handleCategoryClick(cat.name)}
+                                    className="text-xl font-serif text-white hover:text-cielo-gold transition-colors duration-300 text-center leading-tight"
+                                >
+                                    {cat.name}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="w-16 h-px bg-white/20" />
+
+                        {/* Accesos de cuenta: en el teléfono el desplegable del
+                            usuario depende del hover, así que sin esto no había
+                            forma de llegar a pedidos ni a favoritos. */}
+                        <div className="flex items-center justify-center gap-6 text-[11px] uppercase tracking-widest text-white/80">
+                            {user ? (
+                                <>
+                                    <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-1.5 hover:text-cielo-gold transition-colors">
+                                        <Package className="w-5 h-5" /> Pedidos
+                                    </Link>
+                                    <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-1.5 hover:text-cielo-gold transition-colors">
+                                        <Heart className="w-5 h-5" /> Favoritos
+                                    </Link>
+                                    {isAdmin && (
+                                        <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-1.5 hover:text-cielo-gold transition-colors">
+                                            <ShieldCheck className="w-5 h-5" /> Admin
+                                        </Link>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => { setIsMobileMenuOpen(false); setIsAuthModalOpen(true); }}
+                                        className="flex flex-col items-center gap-1.5 hover:text-cielo-gold transition-colors"
+                                    >
+                                        <User className="w-5 h-5" /> Mi cuenta
+                                    </button>
+                                    <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-1.5 hover:text-cielo-gold transition-colors">
+                                        <Heart className="w-5 h-5" /> Favoritos
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+
+                        <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-white/80 hover:text-cielo-gold transition-colors">Nosotros</Link>
                         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs uppercase tracking-widest text-slate-400">
                             <Link to="/faq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Preguntas</Link>
                             <Link to="/envios" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Envíos</Link>
@@ -334,7 +390,6 @@ export const Navbar = ({ onOpenCart }) => {
                             <Link to="/contacto" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Contacto</Link>
                         </div>
                     </div>
-
                 </div>
             </div>
         </>

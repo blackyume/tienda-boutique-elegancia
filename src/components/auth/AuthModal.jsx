@@ -70,7 +70,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                         <h2 className="text-3xl font-cinzel text-slate-900 dark:text-white mb-2 tracking-wide">
                             {isLogin ? 'Bienvenido' : 'Crear Cuenta'}
                         </h2>
-                        <p className="font-montserrat text-slate-500 dark:text-slate-400 text-sm">
+                        <p className=" text-slate-500 dark:text-slate-400 text-sm">
                             {isLogin ? 'Accede a tu cuenta personal de lujo.' : 'Únete a la experiencia exclusiva.'}
                         </p>
                     </div>

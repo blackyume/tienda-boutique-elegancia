@@ -73,7 +73,7 @@ export const QuickAddCard = ({ product, onQuickView }) => {
                 )}
                 <h3 className="font-serif text-lg text-slate-900 dark:text-white mb-1.5 transition-opacity duration-300 group-hover:opacity-70">{product.name}</h3>
                 <div className="flex justify-center items-center gap-3 text-sm">
-                    <span className="font-medium font-montserrat text-slate-700 dark:text-slate-200">{formatMoney(product.price)}</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-200">{formatMoney(product.price)}</span>
 
                     {/* Color Dots */}
                     {(product.colors || []).length > 0 && (

@@ -432,7 +432,7 @@ export const Checkout = () => {
                                                 <span className={`text-xs uppercase tracking-widest font-bold ${shippingMethod === key ? 'text-white/60 dark:text-black/60' : 'text-slate-400'}`}>Llega en {option.time}</span>
                                             </div>
                                         </div>
-                                        <span className="font-montserrat font-bold text-lg">{Number(option.cost) > 0 ? formatMoney(option.cost) : 'Gratis'}</span>
+                                        <span className=" font-bold text-lg">{Number(option.cost) > 0 ? formatMoney(option.cost) : 'Gratis'}</span>
                                     </label>
                                 ))}
                             </div>
@@ -461,15 +461,15 @@ export const Checkout = () => {
                                     <div className="flex-1 py-1">
                                         <p className="font-serif font-bold text-slate-900 dark:text-white text-lg leading-none mb-1">{i.name}</p>
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{i.color} / {i.size}</p>
-                                        <p className="font-montserrat font-bold text-slate-900 dark:text-white mt-2">{formatMoney(i.price * i.quantity)}</p>
+                                        <p className=" font-bold text-slate-900 dark:text-white mt-2">{formatMoney(i.price * i.quantity)}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
                         <div className="space-y-3 pt-6 border-t border-dashed border-slate-200 dark:border-white/10">
-                            <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>Subtotal</span><span>{formatMoney(cartTotal)}</span></div>
-                            <div className="flex justify-between text-slate-500 font-montserrat text-sm"><span>Envío</span><span>{Number(selectedShipping.cost) > 0 ? formatMoney(selectedShipping.cost) : 'Gratis'}</span></div>
+                            <div className="flex justify-between text-slate-500 text-sm"><span>Subtotal</span><span>{formatMoney(cartTotal)}</span></div>
+                            <div className="flex justify-between text-slate-500 text-sm"><span>Envío</span><span>{Number(selectedShipping.cost) > 0 ? formatMoney(selectedShipping.cost) : 'Gratis'}</span></div>
                             {paymentConfig?.mpFee > 0 && (
                                 <div className="flex justify-between text-slate-500 text-xs italic">
                                     <span>Recargo Gestión de Pago ({paymentConfig.mpFee}%)</span>
@@ -477,7 +477,7 @@ export const Checkout = () => {
                                 </div>
                             )}
                             {appliedCoupon && (
-                                <div className="flex justify-between text-emerald-600 font-montserrat text-sm font-bold">
+                                <div className="flex justify-between text-emerald-600 text-sm font-bold">
                                     <span className="flex items-center gap-2">
                                         <Ticket className="w-4 h-4" />
                                         Cupón: {appliedCoupon.code}
@@ -489,7 +489,7 @@ export const Checkout = () => {
                                 </div>
                             )}
                             {appliedReferral && (
-                                <div className="flex justify-between text-sky-600 font-montserrat text-sm font-bold">
+                                <div className="flex justify-between text-sky-600 text-sm font-bold">
                                     <span className="flex items-center gap-2">
                                         <User className="w-4 h-4" />
                                         Referido: {appliedReferral.code}
@@ -569,7 +569,7 @@ export const Checkout = () => {
 
                         <div className="flex justify-between items-end pt-6 mt-2 pb-8">
                             <span className="font-cinzel text-xl text-slate-900 dark:text-white">Total</span>
-                            <span className="font-montserrat font-bold text-3xl text-slate-900 dark:text-white">{formatMoney(finalTotal)}</span>
+                            <span className=" font-bold text-3xl text-slate-900 dark:text-white">{formatMoney(finalTotal)}</span>
                         </div>
 
                         <button

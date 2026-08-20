@@ -65,9 +65,33 @@ service cloud.firestore {
     // --- ORDERS ---
     // Usuarios pueden crear sus propias órdenes y leer las propias.
     // Admin puede leer/editar/eliminar todas.
+    //
+    // El checkout entra con login ANÓNIMO, así que "estar logueado" no prueba
+    // nada: cualquier visitante tiene un uid. Sin más condiciones, alguien
+    // podía escribir una orden ya 'approved', con total 0 y los productos que
+    // quisiera, y le aparecía a la dueña como una venta real.
+    //
+    // Una orden nace SIEMPRE pendiente. Quien la aprueba es el webhook de
+    // Mercado Pago con el Admin SDK, que se saltea estas reglas.
+    // El admin queda exento: Lau registra ventas externas ya cobradas, con
+    // status 'approved' y stockApplied, y esas condiciones la bloquearían.
     match /orders/{id} {
-      allow create: if isSignedIn()
-        && request.resource.data.userId == request.auth.uid;
+      allow create: if isAdmin() || (
+        isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        // Nace pendiente: nadie se auto-aprueba una compra.
+        && request.resource.data.status in ['pending_payment', 'pending_wa', 'pending']
+        // El total tiene que ser un número real y no negativo.
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        // Campos que sólo escribe el servidor: el cliente no los puede sembrar.
+        && !request.resource.data.keys().hasAny([
+             'stockApplied', 'stockAppliedAt', 'mpPaymentId', 'mpStatus',
+             'mpUpdatedAt', 'mpAmountMismatch', 'needsStockReview', 'stockError'
+           ])
+      );
       allow read: if isAdmin()
         || (isSignedIn() && resource.data.userId == request.auth.uid);
       allow update, delete: if isAdmin();

@@ -29,7 +29,7 @@ export const ShopTheLook = () => {
     if (!image || imgError || !hotspots.length) return null;
 
     return (
-        <section className="relative py-20 md:py-28 bg-cielo-dark overflow-hidden">
+        <section className="relative py-14 md:py-20 bg-cielo-dark overflow-hidden">
             {/* Fondo con textura sutil */}
             <div className="absolute inset-0 opacity-[0.015]"
                 style={{ backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><path d='M0 0h60v60H0z' fill='none'/><path d='M30 0v60M0 30h60' stroke='white' stroke-width='0.5' opacity='0.5'/></svg>\")" }}
@@ -108,7 +108,7 @@ export const ShopTheLook = () => {
                                                 onClick={(e) => e.stopPropagation()}
                                                 className="block p-3"
                                             >
-                                                <div className="w-full aspect-[3/2] overflow-hidden mb-3 bg-[#080808]">
+                                                <div className="w-full aspect-[4/5] overflow-hidden mb-3 bg-[#080808]">
                                                     <img
                                                         src={optimizeImage(product.image, 400) || product.image}
                                                         alt={product.name}

@@ -13,12 +13,12 @@ const ArrivalCard = ({ product, onQuickView }) => {
             onClick={() => onQuickView?.(product)}
         >
             {/* Image container */}
-            <div className="relative aspect-[3/4] overflow-hidden mb-4" style={{ background: '#080808' }}>
+            <div className="relative aspect-[4/5] overflow-hidden mb-4" style={{ background: '#080808' }}>
                 <img
                     src={optimizeImage(product.image, 600)}
                     alt={product.name}
                     loading="lazy"
-                    className="w-full h-full object-cover object-top transition-transform duration-[1.8s] ease-out group-hover:scale-[1.07]"
+                    className="w-full h-full object-cover object-center transition-transform duration-[1.8s] ease-out group-hover:scale-[1.07]"
                 />
 
                 {/* Gold border on hover */}

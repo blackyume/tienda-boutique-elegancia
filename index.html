@@ -11,16 +11,19 @@
   <meta name="mobile-web-app-capable" content="yes" />
 
   <!-- Favicon + Manifest -->
-  <link rel="icon" type="image/png" href="/logo_lbe.png?v=5" />
-  <link rel="apple-touch-icon" href="/logo_lbe.png?v=5" />
+  <!-- Chico a propósito: antes era el logo de 1860x1860 (400 KB) en cada visita. -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=6" />
+  <!-- iOS usa este, y a 180x180 opaco: no respeta transparencia ni escala bien
+       un PNG gigante, por eso no apunta al logo original de 1860px. -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=6" />
   <link rel="manifest" href="/manifest.webmanifest" />
 
   <!-- SEO Meta Tags -->
   <title>La Boutique de la Elegancia | Moda Femenina Premium Argentina</title>
   <meta name="description"
-    content="Descubrí la moda femenina más elegante de Argentina. Vestidos, blusas, pantalones y accesorios de alta calidad. Envíos a todo el país. ✨ La Boutique de la Elegancia" />
+    content="Moda femenina premium en Argentina. Jeans, camperas, sweaters, tops, bodys y shorts elegidos uno por uno. Envíos a todo el país y pago en cuotas. ✨ La Boutique de la Elegancia" />
   <meta name="keywords"
-    content="moda femenina, ropa mujer argentina, vestidos elegantes, boutique online, ropa premium, moda argentina" />
+    content="moda femenina, ropa mujer argentina, jeans mujer, camperas ecocuero, sweaters, bodys, boutique online, ropa premium, Rafaela" />
   <meta name="author" content="La Boutique de la Elegancia" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://la-boutique-de-la-elegancia.web.app/" />
@@ -30,8 +33,9 @@
   <meta property="og:url" content="https://la-boutique-de-la-elegancia.web.app/" />
   <meta property="og:title" content="La Boutique de la Elegancia | Moda Femenina Premium" />
   <meta property="og:description"
-    content="Descubrí la moda femenina más elegante de Argentina. Vestidos, blusas, pantalones y accesorios de alta calidad." />
-  <meta property="og:image" content="https://la-boutique-de-la-elegancia.web.app/og-image.png" />
+    content="Moda femenina premium en Argentina. Jeans, camperas, sweaters, tops, bodys y shorts elegidos uno por uno. Envíos a todo el país." />
+  <meta property="og:image" content="https://la-boutique-de-la-elegancia.web.app/og-image.jpg?v=3" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="es_AR" />
@@ -40,8 +44,8 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="La Boutique de la Elegancia | Moda Femenina Premium" />
-  <meta name="twitter:description" content="Descubrí la moda femenina más elegante de Argentina." />
-  <meta name="twitter:image" content="https://la-boutique-de-la-elegancia.web.app/og-image.png" />
+  <meta name="twitter:description" content="Moda femenina premium en Argentina. Envíos a todo el país y pago en cuotas." />
+  <meta name="twitter:image" content="https://la-boutique-de-la-elegancia.web.app/og-image.jpg?v=3" />
 
   <!-- Theme Color (para móviles) -->
   <meta name="theme-color" content="#0A0A0A" />
@@ -58,19 +62,39 @@
 
   <!-- Fonts: carga no-bloqueante (antes iban con @import en el CSS, que frena el primer pintado) -->
   <link rel="stylesheet" media="print" onload="this.media='all'"
-    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap">
+    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600&display=swap">
   <noscript>
     <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap">
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,600&family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500;600&display=swap">
   </noscript>
 
   <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGLGH9DZP8"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-SGLGH9DZP8');
+
+    // gtag.js pesa ~480 KB y antes se peleaba con la portada por el ancho de
+    // banda durante la carga. Se trae cuando el navegador queda libre o al
+    // primer gesto de la visitante, lo que pase primero. No se pierde nada:
+    // los eventos de antes quedan encolados en dataLayer y se mandan al cargar.
+    (function () {
+      var pedido = false;
+      function traerGtag() {
+        if (pedido) return;
+        pedido = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-SGLGH9DZP8';
+        document.head.appendChild(s);
+      }
+      ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function (ev) {
+        addEventListener(ev, traerGtag, { once: true, passive: true });
+      });
+      if ('requestIdleCallback' in window) requestIdleCallback(traerGtag, { timeout: 4000 });
+      else setTimeout(traerGtag, 3000);
+    })();
   </script>
 
   <!-- Custom Assets for Modifications -->

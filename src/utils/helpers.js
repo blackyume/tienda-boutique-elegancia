@@ -180,3 +180,16 @@ export const optimizeImage = (url, width = 800) => {
     // 3. Others (return as is)
     return url;
 };
+// Portada del hero. La tienda arrancó con una foto de stock de Unsplash (una
+// modelo ajena a la marca) cargada en el CMS; se reemplazó por una portada
+// propia armada con las prendas publicadas. Mientras el CMS siga apuntando a
+// esa foto de stock se ignora; cualquier portada nueva que se suba sí manda.
+export const PORTADA_PROPIA = '/portada-coleccion.jpg';
+
+export const resolveHeroImage = (siteConfig) => {
+    const configurada = typeof siteConfig?.hero === 'string'
+        ? siteConfig.hero
+        : siteConfig?.hero?.image;
+    if (!configurada || configurada.includes('images.unsplash.com')) return PORTADA_PROPIA;
+    return configurada;
+};

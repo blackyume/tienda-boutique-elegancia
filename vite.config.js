@@ -23,8 +23,11 @@ export default defineConfig({
                         'firebase/storage'
                     ],
                     'mp-vendor': ['@mercadopago/sdk-react'],
-                    'charts-vendor': ['recharts'],
-                    'office-vendor': ['jspdf', 'jspdf-autotable', 'xlsx']
+                    'charts-vendor': ['recharts']
+                    // jspdf/xlsx NO van acá: forzarlos a un chunk fijo los metía
+                    // en el modulepreload del index.html y la tienda se bajaba
+                    // 900 KB de librerías que sólo usa el panel admin. Se
+                    // importan con await import(), así que Vite ya los separa.
                 }
             }
         }
