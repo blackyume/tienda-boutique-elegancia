@@ -1,15 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, Truck, CreditCard, ShieldCheck } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
-import { optimizeImage, resolveHeroImage, PORTADA_PROPIA } from '../../utils/helpers';
+import { resolveHeroImage, PORTADA_PROPIA } from '../../utils/helpers';
+import { armarSlides } from '../../utils/portadas';
+import { usePortadas, CapaPortadas, PuntosPortada } from './PortadaCarrusel';
 
 export const Hero = () => {
     const { siteConfig } = useStore();
     const layerRef = useRef(null);
     const contentRef = useRef(null);
     const [effectsReady, setEffectsReady] = useState(false);
+
+    const slides = useMemo(() => armarSlides(siteConfig), [siteConfig]);
+    const { activa, setActiva, visibles } = usePortadas(slides);
 
     useEffect(() => {
         const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
@@ -60,57 +65,38 @@ export const Hero = () => {
         document.getElementById(buttonLink)?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const heroSrc = heroImage ? optimizeImage(heroImage, 1800) : null;
-
-    // La portada propia viene además en WebP y en una versión chica: es el
+    // Las portadas propias vienen en WebP y en una versión de teléfono: son el
     // elemento más pesado de la home y el que marca el LCP. En JPG a 2400px
-    // pesaba 300 KB y el teléfono se la bajaba entera aunque recorte los
-    // costados; así son 39 KB en escritorio y 11 KB en el celular.
-    const esPortadaPropia = heroImage === PORTADA_PROPIA;
-    // Art direction, no solo resolucion: la foto de modelo es vertical (2:3).
+    // pesaban 300 KB y el teléfono se las bajaba enteras aunque recorte los
+    // costados; así son ~39 KB en escritorio y ~30 KB en el celular.
+    //
+    // Art direction, no sólo resolución: la foto de modelo es vertical (2:3).
     // La apaisada de escritorio se arma extendiendo el dorado a los costados;
-    // en el telefono, donde la pantalla YA es vertical, va la foto casi entera.
-    // Con un srcSet por ancho el telefono elegia la apaisada (390px x DPR 3 =
-    // 1170 > 760) y se comia a la modelo.
-    const PORTADA_ESCRITORIO = '/portada-modelo.webp';
-    const PORTADA_TELEFONO = '/portada-modelo-sm.webp';
+    // en el teléfono, donde la pantalla YA es vertical, va la foto casi entera.
+    // Con un srcSet por ancho el teléfono elegía la apaisada (390px x DPR 3 =
+    // 1170 > 760) y se comía a la modelo.
+    const esPortadaPropia = heroImage === PORTADA_PROPIA;
+    const primera = slides[0];
     const MEDIA_TELEFONO = '(max-width: 767px)';
     const MEDIA_ESCRITORIO = '(min-width: 768px)';
 
     return (
         <section className="relative min-h-screen flex items-end justify-center overflow-hidden bg-cielo-dark">
-            {heroSrc && (
+            {primera && (
                 <Helmet>
                     {esPortadaPropia ? (
-                        <link rel="preload" as="image" href={PORTADA_TELEFONO} media={MEDIA_TELEFONO} fetchPriority="high" />
+                        <>
+                            <link rel="preload" as="image" href={primera.telefono} media={MEDIA_TELEFONO} fetchPriority="high" />
+                            <link rel="preload" as="image" href={primera.escritorio} media={MEDIA_ESCRITORIO} fetchPriority="high" />
+                        </>
                     ) : (
-                        <link rel="preload" as="image" href={heroSrc} fetchPriority="high" />
-                    )}
-                    {esPortadaPropia && (
-                        <link rel="preload" as="image" href={PORTADA_ESCRITORIO} media={MEDIA_ESCRITORIO} fetchPriority="high" />
+                        <link rel="preload" as="image" href={primera.escritorio} fetchPriority="high" />
                     )}
                 </Helmet>
             )}
 
             <div ref={layerRef} className="absolute inset-0 z-0 will-change-transform sin-textura">
-                {heroSrc && (
-                    <picture>
-                        {esPortadaPropia && (
-                            <>
-                                <source media={MEDIA_TELEFONO} type="image/webp" srcSet={PORTADA_TELEFONO} />
-                                <source media={MEDIA_ESCRITORIO} type="image/webp" srcSet={PORTADA_ESCRITORIO} />
-                            </>
-                        )}
-                        <img
-                            src={heroSrc}
-                            alt=""
-                            aria-hidden="true"
-                            fetchPriority="high"
-                            decoding="async"
-                            className="w-full h-full object-cover object-center opacity-95 animate-kenburns motion-reduce:animate-none motion-reduce:scale-110"
-                        />
-                    </picture>
-                )}
+                <CapaPortadas visibles={visibles} activa={activa} propias={esPortadaPropia} />
             </div>
 
             <div
@@ -140,6 +126,8 @@ export const Hero = () => {
                     )`
                 }}
             />
+
+            <PuntosPortada slides={slides} activa={activa} onElegir={setActiva} />
 
             {effectsReady && (
                 <div

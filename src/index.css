@@ -57,7 +57,7 @@ body {
     background-color: #312721;
     background-image: url('/tierra-tile.webp'),
         linear-gradient(180deg, #2A211C 0%, #312721 40%, #362B24 100%);
-    background-size: 940px 940px, cover;
+    background-size: 768px 768px, cover;
     background-attachment: fixed;
     color: white;
 }
@@ -295,7 +295,7 @@ img {
 .bg-cielo-dark,
 [class*="bg-[#312721]"] {
     background-image: url('/tierra-tile.webp');
-    background-size: 940px 940px;
+    background-size: 768px 768px;
 }
 
 

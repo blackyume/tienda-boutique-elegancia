@@ -80,6 +80,58 @@ const ImageUploader = ({ currentImage, onUpload, label, className = "" }) => {
 
 // --- EXTENDED IMAGE UPLOADER ---
 // Modified to include direct URL input
+// Las portadas del carrusel del hero. Guarda `hero.slides` como lista de URLs.
+// Si la lista queda vacía, la home vuelve sola a las portadas de la casa.
+const EditorPortadas = ({ slides, onCambiar }) => {
+    const lista = (Array.isArray(slides) ? slides : [])
+        .map((x) => (typeof x === 'string' ? x : x?.escritorio || x?.image || x?.url || ''))
+        .filter(Boolean);
+
+    const mover = (i, salto) => {
+        const j = i + salto;
+        if (j < 0 || j >= lista.length) return;
+        const copia = [...lista];
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+        onCambiar(copia);
+    };
+
+    return (
+        <div className="space-y-2">
+            <label className="text-xs font-bold uppercase text-slate-500">Portadas del carrusel</label>
+            <p className="text-[11px] text-slate-400 leading-snug">
+                Van rotando en la home con un fundido. Con la lista vacía se usan las dos portadas
+                de modelo que ya vienen cargadas.
+            </p>
+
+            {lista.length > 0 && (
+                <ul className="space-y-2 pt-1">
+                    {lista.map((url, i) => (
+                        <li key={url + i} className="flex items-center gap-2 bg-white dark:bg-[#111] border border-slate-200 dark:border-slate-800 p-1.5">
+                            <img src={url} alt="" className="w-14 h-10 object-cover shrink-0" />
+                            <span className="text-[10px] text-slate-400 truncate grow">{url.split('/').pop()}</span>
+                            <button type="button" onClick={() => mover(i, -1)} disabled={i === 0}
+                                className="p-1 text-slate-400 hover:text-[#D4AF37] disabled:opacity-25" aria-label="Subir">↑</button>
+                            <button type="button" onClick={() => mover(i, 1)} disabled={i === lista.length - 1}
+                                className="p-1 text-slate-400 hover:text-[#D4AF37] disabled:opacity-25" aria-label="Bajar">↓</button>
+                            <button type="button" onClick={() => onCambiar(lista.filter((_, k) => k !== i))}
+                                className="p-1 text-slate-400 hover:text-red-500" aria-label="Quitar">
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            <ImageUploader
+                currentImage={null}
+                onUpload={(url) => onCambiar([...lista, url])}
+                label="Sumar portada"
+                className="w-full h-20"
+            />
+        </div>
+    );
+};
+
 const SmartImageUploader = ({ currentImage, onUpload, label, className = "" }) => {
     return (
         <div className={`space-y-3 ${className}`}>
@@ -403,6 +455,11 @@ export const CMSView = () => {
                                             onBlur={(e) => e.target.value && updateSection('hero', 'image', e.target.value)}
                                         />
                                     </div>
+
+                                    <EditorPortadas
+                                        slides={siteConfig.hero?.slides}
+                                        onCambiar={(lista) => updateSection('hero', 'slides', lista)}
+                                    />
 
                                     <div className="space-y-4">
                                         <div>
