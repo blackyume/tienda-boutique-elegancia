@@ -124,7 +124,7 @@ export const ProductDetail = () => {
     }, [inventory, product]);
 
     if (!product) return (
-        <div className="min-h-screen bg-white dark:bg-[#0A0A0A] flex items-center justify-center">
+        <div className="min-h-screen bg-white dark:bg-[#312721] flex items-center justify-center">
             <div className="flex items-center gap-3 text-[#D4AF37]">
                 <div className="w-8 h-8 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm tracking-wide">Cargando producto…</span>
@@ -162,7 +162,7 @@ export const ProductDetail = () => {
     const showScarcity = siteConfig?.sales?.scarcity?.enabled && totalStock > 0 && totalStock <= scarcityThreshold;
 
     return (
-        <div className="bg-white dark:bg-[#0A0A0A] min-h-screen text-slate-900 dark:text-white transition-colors">
+        <div className="bg-white dark:bg-[#312721] min-h-screen text-slate-900 dark:text-white transition-colors">
             <SEO
                 title={product.name}
                 description={
@@ -189,7 +189,7 @@ export const ProductDetail = () => {
                 {/* Galería */}
                 <div>
                     <div
-                        className="aspect-[3/4] bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group"
+                        className="aspect-[4/5] bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group"
                         onClick={() => setLightbox(true)}
                     >
                         <img
@@ -217,7 +217,7 @@ export const ProductDetail = () => {
                                     key={i}
                                     onClick={() => setActiveImage(i)}
                                     aria-label={`Imagen ${i + 1}`}
-                                    className={`aspect-[3/4] overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
+                                    className={`aspect-[4/5] overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
                                 >
                                     <img src={optimizeImage(img, 300)} alt="" className="w-full h-full object-cover" loading="lazy" />
                                 </button>
@@ -309,7 +309,7 @@ export const ProductDetail = () => {
                                             >
                                                 <span className="absolute inset-0 rounded-full border border-slate-200 dark:border-slate-700" />
                                                 <span
-                                                    className={`w-7 h-7 rounded-full shadow-sm ${selected ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0A0A0A] ring-slate-900 dark:ring-white' : ''}`}
+                                                    className={`w-7 h-7 rounded-full shadow-sm ${selected ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#312721] ring-slate-900 dark:ring-white' : ''}`}
                                                     style={{ background: getColorHex(c, product.colorHex) }}
                                                 />
                                                 {!available && (

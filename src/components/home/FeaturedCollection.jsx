@@ -157,7 +157,7 @@ export const FeaturedCollection = ({ onQuickView }) => {
     const [hero, second, third, fourth, fifth] = featured;
 
     return (
-        <section className="py-14 md:py-20 px-4 md:px-6 bg-[#0A0A0A] relative overflow-hidden">
+        <section className="py-14 md:py-20 px-4 md:px-6 bg-[#312721] relative overflow-hidden">
 
             {/* Faint background texture */}
             <div className="absolute inset-0 opacity-[0.015] pointer-events-none"

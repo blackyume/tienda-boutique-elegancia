@@ -18,7 +18,7 @@ export const Contact = () => {
     };
 
     return (
-        <div className="bg-white dark:bg-[#0A0A0A] min-h-screen pt-32 pb-20 px-6 font-sans">
+        <div className="bg-white dark:bg-[#312721] min-h-screen pt-32 pb-20 px-6 font-sans">
             <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
                     <span className="text-[#D4AF37] font-bold tracking-[0.25em] uppercase text-xs">Estamos para ayudarte</span>

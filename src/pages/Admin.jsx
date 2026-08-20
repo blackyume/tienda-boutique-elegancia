@@ -447,7 +447,7 @@ export const Admin = () => {
     }
 
     return (
-        <div className="flex h-screen bg-[#F5F2EB] dark:bg-[#0A0A0A] font-sans text-slate-800 dark:text-slate-200 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        <div className="flex h-screen bg-[#F5F2EB] dark:bg-[#312721] font-sans text-slate-800 dark:text-slate-200 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
             <CommandPalette commands={paletteCommands} />
             {/* BACKDROP MOBILE */}
             {sidebarOpen && (

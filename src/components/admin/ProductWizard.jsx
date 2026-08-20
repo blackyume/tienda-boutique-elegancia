@@ -305,7 +305,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                         {images.map((u, i) => (
                             <div key={i} className="relative">
                                 <img src={u} alt="" className="w-16 h-20 object-cover rounded-lg border border-white/10" />
-                                <button onClick={() => setImages(prev => prev.filter((_, j) => j !== i))} className="absolute -top-2 -right-2 bg-[#0A0A0A] border border-white/20 rounded-full p-0.5 hover:bg-red-500/20" title="Quitar foto">
+                                <button onClick={() => setImages(prev => prev.filter((_, j) => j !== i))} className="absolute -top-2 -right-2 bg-[#312721] border border-white/20 rounded-full p-0.5 hover:bg-red-500/20" title="Quitar foto">
                                     <X className="w-3.5 h-3.5 text-white/70" />
                                 </button>
                             </div>
@@ -542,7 +542,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                     <button
                                         type="button" onClick={generarDescripcion} disabled={genDesc || !name.trim()}
                                         title={!name.trim() ? 'Primero el nombre' : 'Generar con IA'}
-                                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold text-[#0A0A0A] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 disabled:opacity-40"
+                                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold text-[#312721] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 disabled:opacity-40"
                                     >
                                         {genDesc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                                         {genDesc ? 'Escribiendo…' : 'Generar descripción con IA'}

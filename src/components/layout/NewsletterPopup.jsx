@@ -53,7 +53,7 @@ export const NewsletterPopup = () => {
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn"
                 onClick={handleDismiss}
             />
-            <div className="relative w-full max-w-4xl bg-white dark:bg-[#0A0A0A] rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row animate-slideUp">
+            <div className="relative w-full max-w-4xl bg-white dark:bg-[#312721] rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row animate-slideUp">
                 <button
                     onClick={handleDismiss}
                     className="absolute top-4 right-4 z-20 p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"

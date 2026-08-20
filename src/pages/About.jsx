@@ -67,7 +67,7 @@ export const About = () => {
             </div>
 
             {/* VALUES GRID */}
-            <div className="bg-slate-50 dark:bg-[#0A0A0A] py-24 border-y border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-[#312721] py-24 border-y border-slate-100 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center mb-16">
                         <span className="text-[#D4AF37] font-bold tracking-[0.2em] uppercase text-xs mb-2 block">Nuestros Pilares</span>
@@ -103,7 +103,7 @@ export const About = () => {
                             className="w-full h-[500px] object-cover rounded-sm shadow-2xl grayscale-[20%]"
                             alt="Luxury Packaging"
                         />
-                        <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-[#0A0A0A] p-6 hidden md:flex items-center justify-center text-center border border-white/10 shadow-xl">
+                        <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-[#312721] p-6 hidden md:flex items-center justify-center text-center border border-white/10 shadow-xl">
                             <span className="text-[#D4AF37] font-serif italic text-xl">"Cada entrega es un regalo."</span>
                         </div>
                     </div>

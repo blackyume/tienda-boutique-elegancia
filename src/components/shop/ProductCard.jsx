@@ -54,7 +54,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
         <>
             {quickOpen && <QuickViewModal product={product} onClose={() => setQuickOpen(false)} />}
             <article
-                className="group relative flex flex-col cursor-pointer"
+                className="group relative flex flex-col cursor-pointer relieve relieve-hover overflow-hidden rounded-[3px]"
                 onClick={openQuick}
                 onKeyDown={(e) => (e.key === 'Enter' ? openQuick() : null)}
                 tabIndex={0}
@@ -63,7 +63,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 aria-label={`Vista rápida de ${product.name}`}
             >
                 {/* Imagen */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-[#080808]">
+                <div className="relative aspect-[4/5] overflow-hidden bg-[#1E1714]">
                     <LazyImage
                         src={mainImage}
                         alt={product.name}
@@ -91,7 +91,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             </span>
                         )}
                         {discount > 0 && (
-                            <span className="bg-white/10 backdrop-blur text-white border border-white/20 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
+                            <span className="bg-[#1F1814]/90 backdrop-blur text-white border border-white/25 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
                                 -{discount}%
                             </span>
                         )}
@@ -101,7 +101,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             </span>
                         )}
                         {!outOfStock && lowStock && (
-                            <span className="bg-white/10 backdrop-blur text-cielo-gold border border-cielo-gold/30 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
+                            <span className="bg-[#1F1814]/90 backdrop-blur text-cielo-gold border border-cielo-gold/50 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
                                 Últimas unidades
                             </span>
                         )}
@@ -135,7 +135,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 </div>
 
                 {/* Info */}
-                <div className="pt-4 pb-1 flex flex-col items-center text-center">
+                <div className="pt-4 pb-4 px-3 flex flex-col items-center text-center filo-luz">
                     {product.category && (
                         <span className="text-2xs uppercase tracking-[0.3em] text-cielo-gold/60 mb-1">
                             {product.category}

@@ -43,7 +43,7 @@ export const Tracking = () => {
     };
 
     return (
-        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#0A0A0A] font-sans transition-colors duration-500">
+        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#312721] font-sans transition-colors duration-500">
             <div className="max-w-3xl mx-auto px-4">
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-serif text-slate-900 dark:text-white mb-4">Seguí tu pedido</h1>

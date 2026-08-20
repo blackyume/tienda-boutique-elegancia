@@ -135,7 +135,7 @@ export const Shop = () => {
     ].filter(Boolean);
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0A0A0A] text-slate-900 dark:text-white pt-24 transition-colors">
+        <div className="min-h-screen bg-white dark:bg-[#312721] text-slate-900 dark:text-white pt-24 transition-colors">
             <SEO
                 title="Shop Online — La Boutique de la Elegancia"
                 description="Explora nuestra colección exclusiva de ropa de mujer. Filtrá por talle, color y precio. Envíos a todo el país."
@@ -211,7 +211,7 @@ export const Shop = () => {
                                             key={c}
                                             onClick={() => toggleIn(colors, c, setColors)}
                                             title={c}
-                                            className={`w-7 h-7 rounded-full border transition-all ${colors.has(c) ? 'ring-2 ring-cielo-gold ring-offset-2 dark:ring-offset-[#0A0A0A] scale-110' : 'border-slate-200 dark:border-slate-700 hover:scale-105'}`}
+                                            className={`w-7 h-7 rounded-full border transition-all ${colors.has(c) ? 'ring-2 ring-cielo-gold ring-offset-2 dark:ring-offset-[#312721] scale-110' : 'border-slate-200 dark:border-slate-700 hover:scale-105'}`}
                                             style={{ background: getColorHex(c, colorHexMap) }}
                                             aria-label={c}
                                             aria-pressed={colors.has(c)}
@@ -361,7 +361,7 @@ export const Shop = () => {
 
             {/* Modal mobile */}
             {isMobileFilterOpen && (
-                <div className="fixed inset-0 z-50 bg-white dark:bg-[#0A0A0A] p-6 animate-slideUp overflow-y-auto">
+                <div className="fixed inset-0 z-50 bg-white dark:bg-[#312721] p-6 animate-slideUp overflow-y-auto">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-luxury">Filtros</h2>
                         <button onClick={() => setIsMobileFilterOpen(false)} aria-label="Cerrar filtros">
@@ -418,7 +418,7 @@ export const Shop = () => {
                                         key={c}
                                         onClick={() => toggleIn(colors, c, setColors)}
                                         title={c}
-                                        className={`w-8 h-8 rounded-full border ${colors.has(c) ? 'ring-2 ring-cielo-gold ring-offset-2 dark:ring-offset-[#0A0A0A]' : 'border-slate-200 dark:border-slate-700'}`}
+                                        className={`w-8 h-8 rounded-full border ${colors.has(c) ? 'ring-2 ring-cielo-gold ring-offset-2 dark:ring-offset-[#312721]' : 'border-slate-200 dark:border-slate-700'}`}
                                         style={{ background: getColorHex(c, colorHexMap) }}
                                         aria-label={c}
                                     />

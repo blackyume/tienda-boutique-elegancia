@@ -23,7 +23,7 @@ export const QuickAddCard = ({ product, onQuickView }) => {
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleOpenModal}
         >
-            <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-900 mb-4 rounded-sm ring-1 ring-transparent group-hover:ring-white/10 transition-[box-shadow] duration-500">
+            <div className="relative aspect-[4/5] overflow-hidden bg-slate-100 dark:bg-slate-900 mb-4 rounded-sm ring-1 ring-transparent group-hover:ring-white/10 transition-[box-shadow] duration-500">
                 <img
                     src={product.image}
                     alt={product.name}

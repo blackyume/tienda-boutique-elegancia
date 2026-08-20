@@ -9,7 +9,7 @@ export const Success = () => {
     const { orderId, email } = location.state || { orderId: null, email: null };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0A0A0A] p-4 animate-fadeIn">
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#312721] p-4 animate-fadeIn">
             <div className="text-center max-w-md w-full">
                 {/* Ícono animado */}
                 <div className="w-24 h-24 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">

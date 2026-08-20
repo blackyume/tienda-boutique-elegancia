@@ -31,7 +31,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
          />
 
          {/* Drawer */}
-         <div className={`absolute right-0 top-0 h-full w-full max-w-md bg-[#0A0A0A]/95 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out-quint flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+         <div className={`absolute right-0 top-0 h-full w-full max-w-md bg-[#312721]/95 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-out-quint flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">

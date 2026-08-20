@@ -95,7 +95,7 @@ const AppContent = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-500">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#312721] transition-colors duration-500">
       <ScrollToTop />
       <NavbarWrapper onOpenCart={() => setIsCartOpen(true)} />
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

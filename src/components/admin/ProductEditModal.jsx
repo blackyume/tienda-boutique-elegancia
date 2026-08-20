@@ -691,7 +691,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                     </div>
 
                     {/* PREVIEW SIDEBAR */}
-                    <div className="w-full lg:w-80 bg-slate-50 dark:bg-[#0A0A0A] border-l border-slate-200 dark:border-slate-800 p-8 flex flex-col">
+                    <div className="w-full lg:w-80 bg-slate-50 dark:bg-[#312721] border-l border-slate-200 dark:border-slate-800 p-8 flex flex-col">
                         <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 text-center flex items-center justify-center gap-2"><Calculator className="w-4 h-4" /> Simulación Real</h4>
                         <div className="space-y-3 text-sm flex-1">
                             <Row label="Costo Prenda" value={currentProduct.cost} />

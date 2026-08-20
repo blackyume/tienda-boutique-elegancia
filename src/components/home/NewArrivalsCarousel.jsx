@@ -139,8 +139,8 @@ export const NewArrivalsCarousel = ({ products, onQuickView }) => {
             </div>
 
             {/* Fade edges */}
-            <div className="absolute top-0 right-0 h-full w-20 md:w-32 bg-gradient-to-l from-[#0A0A0A] to-transparent pointer-events-none" />
-            <div className="absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-[#0A0A0A] to-transparent pointer-events-none" />
+            <div className="absolute top-0 right-0 h-full w-20 md:w-32 bg-gradient-to-l from-[#312721] to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-[#312721] to-transparent pointer-events-none" />
         </div>
     );
 };
