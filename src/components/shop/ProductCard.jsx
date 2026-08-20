@@ -5,6 +5,7 @@ import { getTotalStock } from '../../utils/variants';
 import { LazyImage } from '../ui/LazyImage';
 import { QuickViewModal } from './QuickViewModal';
 import { useStore } from '../../context/StoreContext';
+import { useMarcoFoto } from '../../utils/marcoFoto';
 
 const isNew = (product) => {
     if (!product?.createdAt) return false;
@@ -20,6 +21,7 @@ const discountPct = (product) => {
 export const ProductCard = memo(function ProductCard({ product, priority = false, onQuickView }) {
     const { wishlist, setWishlist, addToast } = useStore();
     const [quickOpen, setQuickOpen] = useState(false);
+    const [marcoFoto, setMarcoFoto] = useMarcoFoto();
 
     const totalStock = getTotalStock(product);
     const outOfStock = totalStock <= 0;
@@ -63,11 +65,12 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 aria-label={`Vista rápida de ${product.name}`}
             >
                 {/* Imagen */}
-                <div className="relative aspect-[4/5] overflow-hidden bg-[#1E1714]">
+                <div className={`relative ${marcoFoto} overflow-hidden bg-[#1E1714] transition-[aspect-ratio] duration-300`}>
                     <LazyImage
                         src={mainImage}
                         alt={product.name}
                         width={640}
+                        onNaturalSize={setMarcoFoto}
                         fetchPriority={priority ? 'high' : 'auto'}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
                     />

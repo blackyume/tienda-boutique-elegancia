@@ -3,11 +3,13 @@ import { Eye, ShoppingBag, Check } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { formatMoney, getColorHex } from '../../utils/helpers';
 import { useNavigate } from 'react-router-dom';
+import { useMarcoFoto } from '../../utils/marcoFoto';
 
 export const QuickAddCard = ({ product, onQuickView }) => {
     const { addToCart, addToast } = useStore();
     const navigate = useNavigate();
     const [isHovered, setIsHovered] = useState(false);
+    const [marcoFoto, setMarcoFoto] = useMarcoFoto();
 
     // Premium Interaction: Open Modal for everything
     const handleOpenModal = (e) => {
@@ -23,11 +25,12 @@ export const QuickAddCard = ({ product, onQuickView }) => {
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleOpenModal}
         >
-            <div className="relative aspect-[4/5] overflow-hidden bg-slate-100 dark:bg-slate-900 mb-4 rounded-sm ring-1 ring-transparent group-hover:ring-white/10 transition-[box-shadow] duration-500">
+            <div className={`relative ${marcoFoto} overflow-hidden bg-slate-100 dark:bg-slate-900 mb-4 rounded-sm ring-1 ring-transparent group-hover:ring-white/10 transition-[box-shadow] duration-500`}>
                 <img
                     src={product.image}
                     alt={product.name}
                     loading="lazy"
+                    onLoad={(e) => setMarcoFoto(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)}
                     className="w-full h-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.06]"
                 />
 

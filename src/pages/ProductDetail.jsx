@@ -17,10 +17,12 @@ import {
     isSizeAvailable
 } from '../utils/variants';
 import { trackViewItem } from '../utils/analytics';
+import { useMarcoFoto } from '../utils/marcoFoto';
 
 export const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [marcoFoto, setMarcoFoto] = useMarcoFoto();
     const {
         inventory,
         addToCart,
@@ -189,13 +191,14 @@ export const ProductDetail = () => {
                 {/* Galería */}
                 <div>
                     <div
-                        className="aspect-[4/5] bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group"
+                        className={`${marcoFoto} bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group`}
                         onClick={() => setLightbox(true)}
                     >
                         <img
                             key={images[activeImage]}
                             src={optimizeImage(images[activeImage], 1200)}
                             alt={product.name}
+                            onLoad={(e) => setMarcoFoto(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)}
                             className="w-full h-full object-cover animate-fadeIn transition-transform duration-700 group-hover:scale-105"
                             loading="eager"
                             fetchPriority="high"

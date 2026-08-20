@@ -9,7 +9,12 @@ export const LazyImage = ({
     imgClassName = '',
     sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
     fetchPriority = 'auto',
-    onClick
+    onClick,
+    // Avisa al padre la proporcion REAL del archivo. Lo usa useMarcoFoto para
+    // elegir el marco: el catalogo mezcla prendas en plancha (cuadradas) con
+    // fotos de modelo de cuerpo entero (verticales) y un marco unico recorta
+    // mal a uno de los dos.
+    onNaturalSize
 }) => {
     const [loaded, setLoaded] = useState(false);
 
@@ -44,7 +49,11 @@ export const LazyImage = ({
                 loading={fetchPriority === 'high' ? 'eager' : 'lazy'}
                 decoding="async"
                 fetchPriority={fetchPriority}
-                onLoad={() => setLoaded(true)}
+                onLoad={(e) => {
+                    setLoaded(true);
+                    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+                    if (w && h) onNaturalSize?.(w, h);
+                }}
                 className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'} ${imgClassName}`}
             />
         </div>
