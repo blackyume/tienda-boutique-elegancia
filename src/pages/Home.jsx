@@ -59,7 +59,7 @@ export const Home = () => {
     );
 
     return (
-        <div className="font-sans bg-[#312721] text-white overflow-x-hidden">
+        <div className="font-sans bg-[#1C1F25] text-white overflow-x-hidden">
             <SEO
                 title={siteConfig?.hero?.title}
                 image={resolveHeroImage(siteConfig)}
@@ -71,12 +71,12 @@ export const Home = () => {
             <TrustBar />
 
             {/* Producto primero: el visitante ve mercadería apenas baja */}
-            <Suspense fallback={<div className="h-[600px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[600px] bg-[#1C1F25]" />}>
                 <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
             </Suspense>
 
             {/* Categorías — caminos de compra arriba, junto al producto */}
-            {validCategories.length > 0 && <section id="categories" className="py-14 md:py-20 px-6 bg-[#312721] relative">
+            {validCategories.length > 0 && <section id="categories" className="py-14 md:py-20 px-6 bg-[#1C1F25] relative">
                 <Reveal className="max-w-[1400px] mx-auto">
                     <div className="flex justify-between items-end mb-12">
                         <SectionHeader align="left" eyebrow="Categorías" title="Curaduría exclusiva" />
@@ -127,7 +127,7 @@ export const Home = () => {
             </section>}
 
             {/* New Arrivals — más producto arriba */}
-            <section className="py-14 md:py-20 px-6 bg-[#312721]">
+            <section className="py-14 md:py-20 px-6 bg-[#1C1F25]">
                 <div className="max-w-[1400px] mx-auto">
                     <Suspense fallback={<div className="h-[400px]" />}>
                         <NewArrivalsCarousel
@@ -139,33 +139,33 @@ export const Home = () => {
             </section>
 
             {/* Urgencia: cuenta regresiva del próximo drop/promo (si hay una programada) */}
-            <Suspense fallback={<div className="h-[200px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[200px] bg-[#1C1F25]" />}>
                 <CountdownBanner />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[600px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[600px] bg-[#1C1F25]" />}>
                 <ShopTheLook />
             </Suspense>
 
             {/* Prueba social */}
-            <Suspense fallback={<div className="h-[400px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#1C1F25]" />}>
                 <Testimonials />
             </Suspense>
 
             {/* Pausa de marca: la historia real de la marca */}
-            <Suspense fallback={<div className="h-[400px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#1C1F25]" />}>
                 <Atelier />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[400px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#1C1F25]" />}>
                 <HowItWorks />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[200px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[200px] bg-[#1C1F25]" />}>
                 <NewsletterInline />
             </Suspense>
 
-            <Suspense fallback={<div className="h-[400px] bg-[#312721]" />}>
+            <Suspense fallback={<div className="h-[400px] bg-[#1C1F25]" />}>
                 <InstagramFeed />
             </Suspense>
         </div>

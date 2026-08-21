@@ -327,7 +327,7 @@ export const Checkout = () => {
     };
 
     if (cart.length === 0) return (
-        <div className="min-h-screen flex flex-col items-center justify-center pt-20 bg-white dark:bg-[#312721] text-slate-900 dark:text-white transition-colors">
+        <div className="min-h-screen flex flex-col items-center justify-center pt-20 bg-white dark:bg-[#1C1F25] text-slate-900 dark:text-white transition-colors">
             <ShoppingBag className="w-16 h-16 text-state-300 dark:text-slate-600 mb-6" />
             <h2 className="text-3xl font-cinzel mb-4">Tu bolsa está vacía</h2>
             <Button onClick={() => navigate('/')} className="bg-slate-900 text-white dark:bg-white dark:text-slate-900">Volver al Shop</Button>
@@ -338,7 +338,7 @@ export const Checkout = () => {
     // se muestra a todos; la sesión de invitado (anónima) se crea al confirmar.
 
     return (
-        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#312721] font-sans text-slate-900 dark:text-white transition-colors">
+        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#1C1F25] font-sans text-slate-900 dark:text-white transition-colors">
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
             <div className="max-w-[1400px] mx-auto px-4 lg:px-12 grid lg:grid-cols-12 gap-12 lg:gap-20">
 

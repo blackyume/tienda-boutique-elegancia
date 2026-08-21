@@ -11,28 +11,29 @@ module.exports = {
         extend: {
             colors: {
                 // Paleta black + gold. Remapeamos `slate` a gris neutro para
-                // eliminar el tinte azulado en toda la app (cards, bordes, textos)
-                // sin tocar cada componente. El acento dorado se mantiene.
+                // eliminar el tinte azulado por default de Tailwind en cards,
+                // bordes y textos. El acento dorado se mantiene.
                 slate: neutral,
-                // Fondo: tierra del campo. El tono NO se eligio a ojo, se midio
-                // sobre la foto del corral (CAMPO-TIERRA.jpg): la tierra pisada
-                // del primer plano da H22 S20 de forma consistente en las 4
-                // zonas medidas (dominante #9E816F, 26% de los pixeles).
-                // Toda la rampa sale de ese mismo H22/S20 cambiando la L, para
-                // que la pagina entera sea el mismo puñado de tierra.
-                'cielo-dark': '#312721',
-                // El dorado de marca NO se toca: contra #312721 da 6,92:1,
-                // sigue pasando AA holgado, y es la identidad de la tienda.
+                // Fondo: PLATINO. La rampa conserva la escalera de luz exacta
+                // que tenia la tierra del campo (misma L en cada escalon, para
+                // que el relieve -- que separa por LUZ, no por color -- quede
+                // igual), pero girada a H220 con S~13. Ese tinte frio leve es
+                // lo que hace que se lea PLATA y no carbon: el gris puro (S0)
+                // se ve apagado y el oro no salta.
+                // La tierra NO se borro: vive en git y en /tierra-tile.webp.
+                'cielo-dark': '#1C1F25',
+                // El dorado de marca NO se toca: contra #1C1F25 da 7,85:1
+                // (mejor que los 6,92:1 que daba sobre la tierra).
                 'cielo-gold': '#D4AF37',
-                tierra: {
-                    950: '#1F1814',  // fondo de pagina, el mas hondo
-                    900: '#312721',  // fondo base  (= cielo-dark)
-                    850: '#40332B',  // superficie de card
-                    800: '#503F35',  // card elevada / hover
-                    700: '#685245',  // bordes
-                    500: '#9E816F',  // tierra medida, el tono ancla
-                    300: '#C6B4A9',  // polvo del corral
-                    100: '#EEE7E3',  // texto sobre tierra (13,2:1)
+                plata: {
+                    950: '#131519',  // fondo de pagina, el mas hondo
+                    900: '#1C1F25',  // fondo base  (= cielo-dark)
+                    850: '#272B33',  // superficie de card
+                    800: '#323744',  // card elevada / hover
+                    700: '#3A404B',  // bordes
+                    500: '#7C8695',  // plata media, el tono ancla
+                    300: '#C4CBD6',  // plata clara (texto secundario)
+                    100: '#E6EAF0',  // texto sobre plata (14,7:1 sobre el base)
                 },
             },
             fontFamily: {
@@ -48,17 +49,20 @@ module.exports = {
             backgroundImage: {
                 'gold-metallic': 'linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C)',
                 // Relieve: las cards separan del fondo por LUZ, no por color.
-                // #40332B sobre #312721 contrasta apenas 1,15:1 - a color solo
+                // #272B33 sobre #1C1F25 contrasta apenas 1,15:1 - a color solo
                 // serian invisibles.
-                'tierra-superficie': 'linear-gradient(180deg, #443630 0%, #352A24 100%)',
-                'tierra-elevada': 'linear-gradient(180deg, #534137 0%, #40332B 100%)',
-                'tierra-hondo': 'linear-gradient(180deg, #251D19 0%, #312721 55%, #2A211C 100%)',
+                'plata-superficie': 'linear-gradient(180deg, #2A2E36 0%, #1F2227 100%)',
+                'plata-elevada': 'linear-gradient(180deg, #363B46 0%, #272B33 100%)',
+                'plata-hondo': 'linear-gradient(180deg, #15181D 0%, #1C1F25 55%, #191C22 100%)',
+                // Brillo de plata pulida, el gemelo frio del gold-metallic.
+                'plata-metalica': 'linear-gradient(to right, #7E8590, #F2F5F9, #A7AEBA, #E8ECF2, #6E7682)',
             },
             boxShadow: {
                 // Bisel: filo de luz arriba + filo oscuro abajo + sombra proyectada.
-                'relieve': '0 1px 0 rgba(255,238,220,.07) inset, 0 -1px 0 rgba(0,0,0,.4) inset, 0 8px 20px -10px rgba(0,0,0,.75)',
-                'relieve-alto': '0 1px 0 rgba(255,238,220,.11) inset, 0 -1px 0 rgba(0,0,0,.45) inset, 0 18px 38px -14px rgba(0,0,0,.85)',
-                'relieve-hundido': '0 2px 6px -2px rgba(0,0,0,.6) inset, 0 -1px 0 rgba(255,238,220,.05) inset',
+                'relieve': '0 1px 0 rgba(226,234,245,.07) inset, 0 -1px 0 rgba(0,0,0,.4) inset, 0 8px 20px -10px rgba(0,0,0,.75)',
+                'relieve-alto': '0 1px 0 rgba(226,234,245,.11) inset, 0 -1px 0 rgba(0,0,0,.45) inset, 0 18px 38px -14px rgba(0,0,0,.85)',
+                'relieve-hundido': '0 2px 6px -2px rgba(0,0,0,.6) inset, 0 -1px 0 rgba(226,234,245,.05) inset',
+                'plata': '0 0 0 1px rgba(196,203,214,.30), 0 8px 24px -12px rgba(196,203,214,.35)',
                 'oro': '0 0 0 1px rgba(212,175,55,.35), 0 8px 24px -12px rgba(212,175,55,.45)',
             },
             keyframes: {

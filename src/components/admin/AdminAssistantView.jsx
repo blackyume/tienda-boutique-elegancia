@@ -946,7 +946,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-[#312721]/95 backdrop-blur-md">
+        <div className="fixed inset-0 z-[60] flex flex-col bg-[#1C1F25]/95 backdrop-blur-md">
             {/* Wizard determinístico de carga de producto (no usa IA: cero loops) */}
             {wizardOpen && (
                 <ProductWizard
@@ -969,9 +969,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     <div className="flex items-center gap-3">
                         <div className="relative">
                             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#B38728] flex items-center justify-center shadow-[0_0_22px_rgba(212,175,55,0.45)]">
-                                <Sparkles className="w-5 h-5 text-[#312721]" />
+                                <Sparkles className="w-5 h-5 text-[#1C1F25]" />
                             </div>
-                            <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#312721] ${aiConfigured ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                            <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#1C1F25] ${aiConfigured ? 'bg-emerald-400' : 'bg-rose-400'}`} />
                         </div>
                         <div>
                             <h2 className="text-white font-cinzel tracking-[0.25em] text-lg leading-none">LAU</h2>
@@ -991,7 +991,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             </div>
 
             {showGuide && (
-                <div className="absolute inset-0 z-[70] bg-[#312721]/97 backdrop-blur-xl flex flex-col animate-fadeIn">
+                <div className="absolute inset-0 z-[70] bg-[#1C1F25]/97 backdrop-blur-xl flex flex-col animate-fadeIn">
                     <div className="shrink-0 border-b border-white/10 bg-white/[0.03]">
                         <div className="max-w-3xl mx-auto flex items-center justify-between px-5 h-[72px] [@media(max-height:780px)]:h-14">
                             <div className="flex items-center gap-2.5">
@@ -1028,7 +1028,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                 </div>
                                 <button
                                     onClick={() => { setShowGuide(false); setWizardOpen(true); }}
-                                    className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#312721] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition"
+                                    className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#1C1F25] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition"
                                 >
                                     <PackagePlus className="w-4 h-4" /> Probar ahora
                                 </button>
@@ -1076,7 +1076,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         <div key={i} className={`flex gap-2.5 animate-fadeIn ${m.role === 'user' ? 'justify-end' : m.role === 'system' ? 'justify-center' : 'justify-start'}`}>
                             {m.role === 'ai' && (
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_14px_rgba(212,175,55,0.3)]">
-                                    <Sparkles className="w-4 h-4 text-[#312721]" />
+                                    <Sparkles className="w-4 h-4 text-[#1C1F25]" />
                                 </div>
                             )}
                             {m.role === 'system' ? (
@@ -1096,7 +1096,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                                 <button
                                                     key={opt}
                                                     onClick={() => handleSend(opt)}
-                                                    className="text-xs font-bold text-[#312721] bg-gradient-to-br from-[#D4AF37] to-[#B38728] rounded-full px-4 py-2 hover:brightness-110 active:scale-95 transition shadow-md"
+                                                    className="text-xs font-bold text-[#1C1F25] bg-gradient-to-br from-[#D4AF37] to-[#B38728] rounded-full px-4 py-2 hover:brightness-110 active:scale-95 transition shadow-md"
                                                 >
                                                     {opt}
                                                 </button>
@@ -1105,7 +1105,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                     )}
                                 </div>
                             ) : (
-                                <div className="rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg max-w-[82%] bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#312721] font-medium rounded-br-md">
+                                <div className="rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed shadow-lg max-w-[82%] bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#1C1F25] font-medium rounded-br-md">
                                     {m.img && <img src={m.img} alt="" className="rounded-lg mb-2 max-h-44 border border-white/10" />}
                                     {m.text}
                                 </div>
@@ -1127,7 +1127,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                 ))}
                             </ul>
                             <div className="flex gap-2">
-                                <button onClick={() => resolveConfirm(true)} className="flex items-center gap-1.5 bg-gradient-to-r from-[#D4AF37] to-[#B38728] text-[#312721] text-sm font-bold px-5 py-2.5 rounded-xl hover:brightness-110 transition">
+                                <button onClick={() => resolveConfirm(true)} className="flex items-center gap-1.5 bg-gradient-to-r from-[#D4AF37] to-[#B38728] text-[#1C1F25] text-sm font-bold px-5 py-2.5 rounded-xl hover:brightness-110 transition">
                                     <Check className="w-4 h-4" /> Confirmar
                                 </button>
                                 <button onClick={() => resolveConfirm(false)} className="text-white/60 hover:text-white text-sm px-5 py-2.5 rounded-xl border border-white/15 hover:bg-white/5 transition">Cancelar</button>
@@ -1137,7 +1137,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
                     {loading && (
                         <div className="flex gap-2.5 items-end animate-fadeIn">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] flex items-center justify-center shrink-0"><Sparkles className="w-4 h-4 text-[#312721]" /></div>
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#BF953F] to-[#FCF6BA] flex items-center justify-center shrink-0"><Sparkles className="w-4 h-4 text-[#1C1F25]" /></div>
                             <div className="bg-white/[0.08] border border-white/10 rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2.5">
                                 <span className="flex gap-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce [animation-delay:-0.3s]" />
@@ -1184,7 +1184,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             {previews.map((src, i) => (
                                 <div key={i} className="relative inline-block">
                                     <img src={src} alt="" className="h-20 w-20 object-cover rounded-xl border border-white/15" />
-                                    <button onClick={() => { setFiles(prev => prev.filter((_, j) => j !== i)); setPreviews(prev => prev.filter((_, j) => j !== i)); }} className="absolute -top-2 -right-2 bg-[#312721] border border-white/20 rounded-full p-1 hover:bg-white/10 transition-colors"><X className="w-3.5 h-3.5 text-white/70" /></button>
+                                    <button onClick={() => { setFiles(prev => prev.filter((_, j) => j !== i)); setPreviews(prev => prev.filter((_, j) => j !== i)); }} className="absolute -top-2 -right-2 bg-[#1C1F25] border border-white/20 rounded-full p-1 hover:bg-white/10 transition-colors"><X className="w-3.5 h-3.5 text-white/70" /></button>
                                 </div>
                             ))}
                             {previews.length > 1 && <span className="self-end text-[10px] text-white/40 pb-1">{previews.length} fotos</span>}
@@ -1192,7 +1192,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     )}
                     <button
                         onClick={() => setWizardOpen(true)}
-                        className="w-full mb-2.5 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#312721] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition shadow-[0_0_18px_rgba(212,175,55,0.35)]"
+                        className="w-full mb-2.5 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#1C1F25] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition shadow-[0_0_18px_rgba(212,175,55,0.35)]"
                     >
                         <PackagePlus className="w-4 h-4" /> Cargar producto (paso a paso)
                     </button>
@@ -1208,7 +1208,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             disabled={loading}
                             className="flex-1 resize-none bg-transparent border-0 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-0 max-h-32"
                         />
-                        <button onClick={() => handleSend()} disabled={loading || (!input.trim() && !files.length)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#312721] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
+                        <button onClick={() => handleSend()} disabled={loading || (!input.trim() && !files.length)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B38728] text-[#1C1F25] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                         </button>
                     </div>

@@ -94,7 +94,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             </span>
                         )}
                         {discount > 0 && (
-                            <span className="bg-[#1F1814]/90 backdrop-blur text-white border border-white/25 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
+                            <span className="bg-[#131519]/90 backdrop-blur text-white border border-white/25 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
                                 -{discount}%
                             </span>
                         )}
@@ -104,7 +104,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             </span>
                         )}
                         {!outOfStock && lowStock && (
-                            <span className="bg-[#1F1814]/90 backdrop-blur text-cielo-gold border border-cielo-gold/50 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
+                            <span className="bg-[#131519]/90 backdrop-blur text-cielo-gold border border-cielo-gold/50 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
                                 Últimas unidades
                             </span>
                         )}

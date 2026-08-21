@@ -43,7 +43,7 @@ export const SizeGuideModal = ({ onClose }) => {
                 onClick={(e) => e.stopPropagation()}
             >
                 <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[22px] ring-1 ring-[#D4AF37]/25" />
-                <div className="relative bg-[#312721] rounded-[20px] overflow-hidden">
+                <div className="relative bg-[#1C1F25] rounded-[20px] overflow-hidden">
                     {/* Header */}
                     <div className="px-7 py-5 border-b border-white/10 flex justify-between items-center">
                         <h3 className="font-serif text-xl text-white flex items-center gap-2.5">

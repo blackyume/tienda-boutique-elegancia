@@ -46,7 +46,7 @@ export const PaymentStatus = () => {
     }, [isSuccess, external_reference, orders, cart, clearCart]);
 
     return (
-        <div className="min-h-screen pt-32 pb-20 bg-white dark:bg-[#312721] text-slate-900 dark:text-white flex items-center justify-center animate-fadeIn">
+        <div className="min-h-screen pt-32 pb-20 bg-white dark:bg-[#1C1F25] text-slate-900 dark:text-white flex items-center justify-center animate-fadeIn">
             <div className="text-center max-w-md w-full px-6">
 
                 {isSuccess ? (

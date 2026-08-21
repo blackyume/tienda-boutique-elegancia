@@ -77,7 +77,7 @@ export const WhatsAppButton = () => {
                 >
                     {/* Brillo superior */}
                     <span className="absolute top-0 left-0 right-0 h-1/2 bg-white/20 rounded-t-full" />
-                    <TelegramIcon className="relative w-7 h-7 text-[#312721]" />
+                    <TelegramIcon className="relative w-7 h-7 text-[#1C1F25]" />
                 </div>
             </div>
         </a>

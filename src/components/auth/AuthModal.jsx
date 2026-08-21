@@ -39,7 +39,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
             ></div>
 
             {/* Modal */}
-            <div className="relative bg-white dark:bg-[#312721] w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[600px] animate-slideUp">
+            <div className="relative bg-white dark:bg-[#1C1F25] w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[600px] animate-slideUp">
 
                 {/* Close Button */}
                 <button
@@ -64,7 +64,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Right Side - Form */}
-                <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative bg-white dark:bg-[#312721]">
+                <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative bg-white dark:bg-[#1C1F25]">
 
                     <div className="text-center mb-8">
                         <h2 className="text-3xl font-cinzel text-slate-900 dark:text-white mb-2 tracking-wide">
@@ -138,7 +138,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                             <span className="w-full border-t border-slate-200 dark:border-slate-700"></span>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white dark:bg-[#312721] px-2 text-slate-500">O continuar con</span>
+                            <span className="bg-white dark:bg-[#1C1F25] px-2 text-slate-500">O continuar con</span>
                         </div>
                     </div>
 

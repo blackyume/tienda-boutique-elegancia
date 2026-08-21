@@ -16,7 +16,7 @@ export const Shipping = () => {
     useLayoutEffect(() => { window.scrollTo(0, 0); }, []);
 
     return (
-        <div className="bg-white dark:bg-[#312721] min-h-screen pt-32 pb-20 px-6 font-sans">
+        <div className="bg-white dark:bg-[#1C1F25] min-h-screen pt-32 pb-20 px-6 font-sans">
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
                     <span className="text-[#D4AF37] font-bold tracking-[0.25em] uppercase text-xs">Información</span>

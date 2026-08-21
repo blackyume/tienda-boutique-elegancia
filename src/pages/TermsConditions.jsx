@@ -8,7 +8,7 @@ export const TermsConditions = () => {
     const whatsapp = siteConfig?.contact?.whatsapp;
 
     return (
-        <div className="bg-white dark:bg-[#312721] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
+        <div className="bg-white dark:bg-[#1C1F25] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mb-8 tracking-wide">Términos y Condiciones</h1>
                 <p className="text-sm text-slate-400 mb-12 uppercase tracking-widest">Vigencia: Desde Enero 2026</p>

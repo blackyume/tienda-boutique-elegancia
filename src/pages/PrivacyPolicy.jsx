@@ -7,7 +7,7 @@ export const PrivacyPolicy = () => {
     const email = siteConfig?.contact?.email || 'laboutiquedelaeleganciaoficial@gmail.com';
 
     return (
-        <div className="bg-white dark:bg-[#312721] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
+        <div className="bg-white dark:bg-[#1C1F25] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mb-8 tracking-wide">Política de Privacidad</h1>
                 <p className="text-sm text-slate-400 mb-12 uppercase tracking-widest">Última actualización: 01 de Enero de 2026</p>

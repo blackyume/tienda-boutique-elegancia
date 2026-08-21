@@ -30,10 +30,10 @@ export const AdminLauFab = () => {
                     <span className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_30px_-8px_rgba(212,175,55,0.65)] overflow-hidden"
                         style={{ background: 'linear-gradient(145deg, #FCF6BA 0%, #D4AF37 45%, #B8932E 100%)' }}>
                         <span className="absolute top-0 left-0 right-0 h-1/2 bg-white/25 rounded-t-full" />
-                        <Sparkles className="relative w-6 h-6 text-[#312721]" />
+                        <Sparkles className="relative w-6 h-6 text-[#1C1F25]" />
                         <span className="absolute -inset-1 rounded-full border border-[#D4AF37]/40 animate-pulse pointer-events-none" />
                     </span>
-                    <span className="hidden sm:block bg-[#312721]/90 backdrop-blur border border-[#D4AF37]/30 text-[#D4AF37] text-[11px] font-bold uppercase tracking-[0.15em] px-3 py-2 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300">
+                    <span className="hidden sm:block bg-[#1C1F25]/90 backdrop-blur border border-[#D4AF37]/30 text-[#D4AF37] text-[11px] font-bold uppercase tracking-[0.15em] px-3 py-2 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300">
                         Lau
                     </span>
                 </button>
