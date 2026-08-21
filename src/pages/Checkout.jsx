@@ -9,6 +9,7 @@ import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
 import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
 import { BrandStrip } from '../components/ui/BrandBadges';
+import { canalDePedido } from '../utils/contacto';
 
 export const Checkout = () => {
     const { cart, cartTotal, createOrder, addToast, user, loginAnonymously, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
@@ -253,9 +254,18 @@ export const Checkout = () => {
             // quema un uso si el cliente nunca concreta la compra.
             markAbandonedCartRecovered(formData.email, orderId).catch(() => {});
 
-            const msg = encodeURIComponent(buildWhatsAppMessage(orderId));
-            const whatsappNumber = (siteConfig?.whatsappNumber || "5491144444444").replace(/\D/g, '');
-            window.location.href = `https://wa.me/${whatsappNumber}?text=${msg}`;
+            // Sin numero ni Telegram cargados NO se redirige a ningun lado: el
+            // pedido ya quedo guardado y es preferible avisarlo antes que mandar
+            // a la clienta a un contacto que no es de la tienda.
+            const canal = canalDePedido(siteConfig, buildWhatsAppMessage(orderId));
+            if (!canal) {
+                addToast(`Pedido ${orderId} registrado. Te contactamos para coordinar el pago.`, 'success');
+                setLoading(false);
+                navigate('/success', { state: { orderId } });
+                return;
+            }
+            if (!canal.llevaMensaje) addToast(`Anotá tu pedido: ${orderId}`, 'info');
+            window.location.href = canal.url;
         } catch (error) {
             console.error(error);
             addToast(`Error: ${error.message}`, "error");
@@ -309,14 +319,29 @@ export const Checkout = () => {
             } catch (mpError) {
                 console.error("Error MP, fallback WhatsApp:", mpError);
 
-                // 3. Fallback: Redirigir a WhatsApp si falla MP
-                addToast("Error conectando con Mercado Pago. Redirigiendo a WhatsApp...", "error");
+                // 3. Fallback: coordinar por el canal que este cargado (Telegram o WhatsApp)
+                const itemsList = cart.map(i => `• ${i.name} (${i.size}) x${i.quantity}`).join('\n');
+                const message = `Hola! Acabo de realizar el pedido *#${newOrder.id}*.
 
-                const itemsList = cart.map(i => `• ${i.name} (${i.size}) x${i.quantity}`).join('%0A');
-                const message = `Hola! Acabo de realizar el pedido *#${newOrder.id}*.%0A%0A*Detalle del pedido:*%0A${itemsList}%0A%0A*Total: ${formatMoney(finalTotal)}*%0A*Envío:* ${shippingOptions[shippingMethod].name}%0A%0AHubo un error con el pago automático. Quisiera coordinar por acá.`;
+*Detalle del pedido:*
+${itemsList}
 
-                const whatsappNumber = siteConfig?.whatsappNumber || "5491144444444";
-                window.location.href = `https://wa.me/${whatsappNumber}?text=${message}`;
+*Total: ${formatMoney(finalTotal)}*
+*Envío:* ${shippingOptions[shippingMethod].name}
+
+Hubo un error con el pago automático. Quisiera coordinar por acá.`;
+
+                const canal = canalDePedido(siteConfig, message);
+                if (!canal) {
+                    addToast(`Pedido ${newOrder.id} registrado, pero el pago automático falló. Te contactamos para coordinar.`, 'error');
+                    setLoading(false);
+                    navigate('/success', { state: { orderId: newOrder.id } });
+                    return;
+                }
+                const nombreCanal = canal.canal === 'telegram' ? 'Telegram' : 'WhatsApp';
+                addToast(`Error conectando con Mercado Pago. Redirigiendo a ${nombreCanal}...`, "error");
+                if (!canal.llevaMensaje) addToast(`Anotá tu pedido: ${newOrder.id}`, 'info');
+                window.location.href = canal.url;
             }
 
         } catch (error) {

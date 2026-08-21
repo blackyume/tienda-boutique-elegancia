@@ -383,7 +383,7 @@ export const CMSView = () => {
                         <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm h-full">
                             <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Share2 className="w-5 h-5 text-[#D4AF37]" /> Redes Sociales</h3>
                             <div className="space-y-3">
-                                {['instagram', 'youtube', 'tiktok'].map((social) => (
+                                {['instagram', 'youtube', 'tiktok', 'telegram'].map((social) => (
                                     <div key={social} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
                                         <span className="text-[10px] font-bold uppercase w-16 text-slate-500">{social}</span>
                                         <input
@@ -391,10 +391,13 @@ export const CMSView = () => {
                                             onChange={(e) => updateSection('social', social, e.target.value, true)} // Silent update
                                             onBlur={(e) => updateLink('social', social, e.target.value)}
                                             className="flex-1 bg-transparent text-xs outline-none dark:text-white"
-                                            placeholder="https://..."
+                                            placeholder={social === 'telegram' ? '@tu_usuario' : 'https://...'}
                                         />
                                     </div>
                                 ))}
+                                <p className="text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 px-1">
+                                    El Telegram de acá es el de <strong>contacto con la clienta</strong> (tu usuario, ej. <code>@laboutique</code>): prende el botón flotante y el link del pie. No es el del canal donde se publican los productos, que se configura en Ajustes.
+                                </p>
                             </div>
                         </section>
                     </div>

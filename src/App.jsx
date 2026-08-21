@@ -5,7 +5,7 @@ import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/shop/CartDrawer';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { ConfirmProvider } from './components/ui/ConfirmDialog';
-import { WhatsAppButton } from './components/ui/WhatsAppButton';
+import { BotonesContacto } from './components/ui/BotonesContacto';
 import { ScrollProgress } from './components/ui/ScrollProgress';
 import { UpdatePrompt } from './components/ui/UpdatePrompt';
 import { SystemAlert } from './components/ui/SystemAlert';
@@ -103,7 +103,7 @@ const AppContent = () => {
       <ToastContainer />
       <ScrollProgress />
       <UpdatePrompt />
-      <WhatsAppButton />
+      <BotonesContacto />
       <SystemAlert />
       <PromoPopup />
       <NewsletterPopup />

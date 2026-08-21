@@ -61,7 +61,10 @@ export const StoreProvider = ({ children }) => {
       { icon: "CreditCard", title: "Secure Payment", desc: "Todas las tarjetas y Mercado Pago." },
       { icon: "ShieldCheck", title: "Premium Quality", desc: "Garantía de excelencia en cada prenda." }
     ],
-    whatsappNumber: "5491144444444",
+    // Vacío a propósito: acá vivía un número de ejemplo ("549114444...") y,
+    // como nunca se cargó el real, los pedidos del checkout se iban a ese
+    // contacto ajeno. Sin dato cargado la tienda no ofrece el canal.
+    whatsappNumber: "",
     gaMeasurementId: "",
     emailjs: {
       serviceId: "service_vltg3pi",
