@@ -37,7 +37,7 @@ npx firebase-tools deploy --only firestore:rules
 - `e2e/` — Playwright smoke tests (apunta a producción).
 - `tests/` — Vitest unit tests (utils).
 - `firestore.rules` — admin whitelist por email, no por custom claims.
-- `scripts/` — generadores build-time (sitemap.xml, shopping feed.xml) + `armar-portada.py` (arma las 3 versiones de una portada de hero desde una foto vertical de modelo).
+- `scripts/` — generadores build-time (sitemap.xml, shopping feed.xml) + `armar-portada.py` (portadas del hero desde una foto vertical de modelo) + `fondo-oro.py` (pone una prenda sobre la placa dorada del catálogo).
 - `src/utils/portadas.js` — arma la lista de portadas del hero (CMS `hero.slides` → si no hay, las de la casa). Lógica pura, testeada.
 - `src/components/home/PortadaCarrusel.jsx` — `usePortadas` + `CapaPortadas` + `PuntosPortada`. **Va partido a propósito**: ver "Home" abajo.
 - `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV.
@@ -105,13 +105,14 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
   1. 🔴 **Los puntitos van FUERA de la capa con parallax.** Esa capa lleva `transform`, que abre su propio contexto de apilamiento: un `z-index` alto adentro no sube por encima de los velos oscuros del hero. Por eso el componente está partido en hook + 2 piezas.
   2. **La primera portada es el LCP** — se precarga y va `eager`; las demás entran al DOM recién en `requestIdleCallback`.
   3. No rota con la pestaña oculta ni con `prefers-reduced-motion`.
+- **Fotos de producto nuevas:** `python scripts/fondo-oro.py "C:/ruta/foto.jpg"` (o pasarle una carpeta entera). Recorta la prenda con rembg y la compone sobre la placa dorada del catálogo, con la sombra y el reflejo del piso. Los números no son a ojo: la placa es una campana por canal ajustada sobre las 12 fotos publicadas (error medio 4,5/255) y el encuadre está medido — la prenda ocupa el 81% del ancho, centrada en x=50% e y=52%, y las verticales topean en 88% de alto. El centro de la placa está extrapolado, porque en las 12 fotos la prenda tapa el medio: sólo se nota con prendas chicas.
 - **Portadas nuevas:** `python scripts/armar-portada.py "C:/ruta/foto.jpeg" portada-modelo-3`, y después sumarlas desde Admin → Contenido → Hero (editor de portadas: agregar, ordenar, quitar).
 - ⚠️ **Medir un antes/después en el navegador exige bloquear el service worker** (`newContext({ serviceWorkers: 'block' })`), si no la PWA sirve la copia cacheada y las dos capturas salen idénticas.
 
 ### Pendiente acordado con el dueño
 
 - **La transición del carrusel puede ser más natural** — hoy es fundido cruzado + ken-burns por portada. Queda para otro día; el dueño lo aprobó como está.
-- **Normalizar las fotos de producto al subir** (los fondos amarillos no son el mismo amarillo entre foto y foto).
+- ~~Normalizar las fotos de producto al subir (los fondos amarillos no son el mismo amarillo entre foto y foto).~~ **Falso, medido el 21/08/2026:** las 12 fotos publicadas comparten la MISMA placa de fondo — 40% de sus píxeles son idénticos entre foto y foto y las cuatro esquinas dan `#A07829` en todas, con dispersión cero en H, S y L. No había nada que normalizar. Lo que faltaba era poder **reproducir esa placa** para las fotos nuevas: eso lo hace `scripts/fondo-oro.py`.
 - **La tira de Instagram repite las mismas 6 fotos del catálogo** que ya se ven más arriba.
 - Las fichas de categoría siguen con prenda apoyada; el salto es pasarlas a prenda **puesta**, cuando estén las modelos.
 
