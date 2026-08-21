@@ -52,7 +52,7 @@ const sendCustomerEmail = async (siteConfig, order, opts = {}) => {
         items_summary: itemsSummary,
         shipping_method: order.shippingName || order.shipping || 'No especificado',
         shipping_address: address || 'Retiro en persona',
-        tracking: opts.tracking || order.tracking || '',
+        tracking: opts.tracking || order.tracking || order.trackingNumber || '',
         email_type: type,
         subject: subjectMap[type] || 'Actualización de tu pedido',
         status_label: type === 'shipped' ? 'Pedido enviado' : 'Pedido recibido',
@@ -201,7 +201,7 @@ export const useDbActions = ({
       // Email automático al cliente cuando el pedido se marca como ENVIADO.
       // No bloquea ni rompe el cambio de estado si EmailJS no está configurado.
       if (status === 'shipped' && order) {
-        sendCustomerEmail(siteConfig, { ...order, ...extraData }, { type: 'shipped', tracking: extraData.tracking })
+        sendCustomerEmail(siteConfig, { ...order, ...extraData }, { type: 'shipped', tracking: extraData.trackingNumber || extraData.tracking })
           .then(() => addToast('📧 Email de envío enviado al cliente', 'success'))
           .catch((e) => console.warn('No se pudo enviar email de envío:', e.message));
       }
