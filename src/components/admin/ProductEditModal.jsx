@@ -274,7 +274,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
             <div className="bg-[#F8FAFC] dark:bg-[#121212] w-full max-w-[95vw] rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] border border-slate-200 dark:border-slate-800 shadow-2xl">
                 {/* Header */}
                 <div className="p-3 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-[#1a1a1a] shrink-0">
-                    <h3 className="font-bold text-base sm:text-lg dark:text-white flex items-center gap-2"><Tag className="w-4 h-4 sm:w-5 sm:h-5 text-[#D4AF37]" /> {currentProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+                    <h3 className="font-bold text-base sm:text-lg dark:text-white flex items-center gap-2"><Tag className="w-4 h-4 sm:w-5 sm:h-5 text-[#E8C65E]" /> {currentProduct.id ? 'Editar Producto' : 'Nuevo Producto'}</h3>
                     <button onClick={onClose} aria-label="Cerrar modal" className="bg-slate-100 dark:bg-slate-800 p-2 rounded-full hover:bg-slate-200 transition-colors"><X className="w-5 h-5 text-slate-500" /></button>
                 </div>
 
@@ -284,11 +284,11 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                         <button
                             key={t.id}
                             onClick={() => setTab(t.id)}
-                            className={`relative px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${tab === t.id ? 'text-[#D4AF37]' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+                            className={`relative px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${tab === t.id ? 'text-[#E8C65E]' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
                         >
                             {t.label}
                             {showErrors && tabHasError(t.id) && <span className="absolute top-2 right-1 w-1.5 h-1.5 rounded-full bg-red-500" />}
-                            {tab === t.id && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#D4AF37]" />}
+                            {tab === t.id && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#E8C65E]" />}
                         </button>
                     ))}
                 </div>
@@ -301,7 +301,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                             <section className="flex flex-col gap-6">
                                 <div className="w-full">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h4 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-xs uppercase tracking-widest"><UploadCloud className="w-4 h-4 text-[#D4AF37]" /> Galería Multimedia</h4>
+                                        <h4 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 text-xs uppercase tracking-widest"><UploadCloud className="w-4 h-4 text-[#E8C65E]" /> Galería Multimedia</h4>
                                     </div>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 mb-4">
                                         {(currentProduct.media || []).map((item, index) => (
@@ -311,7 +311,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                                         <img src={item.url} className={`w-full h-full object-cover ${item.status === 'error' ? 'grayscale opacity-50' : ''}`} alt="Media" />
                                                         {item.isUploading && (
                                                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-20">
-                                                                <div className="w-8 h-8 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin mb-2"></div>
+                                                                <div className="w-8 h-8 border-2 border-[#E8C65E] border-t-transparent rounded-full animate-spin mb-2"></div>
                                                                 <span className="text-[10px] font-bold text-white uppercase tracking-wider">Subiendo...</span>
                                                             </div>
                                                         )}
@@ -341,16 +341,16 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                                         <X className="w-3 h-3" />
                                                     </button>
                                                 </div>
-                                                {index === 0 && <span className="absolute bottom-2 left-2 bg-[#D4AF37] text-white text-[9px] px-2 py-0.5 rounded shadow-sm font-bold uppercase tracking-wider backdrop-blur-md">Principal</span>}
+                                                {index === 0 && <span className="absolute bottom-2 left-2 bg-[#E8C65E] text-white text-[9px] px-2 py-0.5 rounded shadow-sm font-bold uppercase tracking-wider backdrop-blur-md">Principal</span>}
                                             </div>
                                         ))}
-                                        <label className="aspect-square rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#D4AF37] dark:hover:border-[#D4AF37] cursor-pointer flex flex-col items-center justify-center text-slate-400 hover:text-[#D4AF37] hover:bg-slate-50 dark:hover:bg-[#1a1a1a] transition-all bg-transparent group">
+                                        <label className="aspect-square rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#E8C65E] dark:hover:border-[#E8C65E] cursor-pointer flex flex-col items-center justify-center text-slate-400 hover:text-[#E8C65E] hover:bg-slate-50 dark:hover:bg-[#1a1a1a] transition-all bg-transparent group">
                                             <UploadCloud className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" />
                                             <span className="text-[10px] font-bold uppercase text-center px-1">Subir Foto</span>
                                             <input type="file" className="hidden" accept=".jpg, .jpeg, .png, .webp" onChange={handleImageUpload} />
                                         </label>
                                     </div>
-                                    <div className="flex gap-2 items-center bg-slate-50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-200 dark:border-slate-800 focus-within:border-[#D4AF37] transition-colors">
+                                    <div className="flex gap-2 items-center bg-slate-50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-200 dark:border-slate-800 focus-within:border-[#E8C65E] transition-colors">
                                         <div className="p-2 bg-white dark:bg-slate-800 rounded-lg text-slate-400"><Monitor className="w-4 h-4" /></div>
                                         <input
                                             type="text"
@@ -425,7 +425,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                                     className="input"
                                                     placeholder="Ej: S, M, L, XL, 38, 40..."
                                                 />
-                                                <button onClick={handleAddSize} aria-label="Agregar talle" className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-slate-900 text-white rounded-lg hover:bg-[#D4AF37] transition-colors"><CheckIcon className="w-3 h-3" /></button>
+                                                <button onClick={handleAddSize} aria-label="Agregar talle" className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-slate-900 text-white rounded-lg hover:bg-[#E8C65E] transition-colors"><CheckIcon className="w-3 h-3" /></button>
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap gap-2">
@@ -515,7 +515,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                         {tab === 'variants' && (
                             <section>
                                 <h4 className="flex items-center gap-2 font-bold text-slate-800 dark:text-white mb-4">
-                                    <SlidersHorizontal className="w-4 h-4 text-[#D4AF37]" /> Variantes (Precio por Talle/Color)
+                                    <SlidersHorizontal className="w-4 h-4 text-[#E8C65E]" /> Variantes (Precio por Talle/Color)
                                 </h4>
                                 <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 mb-4">
                                     <p className="text-xs text-slate-500 mb-3">Opcional: Define precios y stock diferentes para cada combinación de talle y color.</p>
@@ -539,7 +539,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                             setCurrentProduct({ ...currentProduct, variants: [...(currentProduct.variants || []), ...newVariants] });
                                             addToast(`${newVariants.length} variantes generadas`, 'success');
                                         }}
-                                        className="px-4 py-2 bg-slate-800 text-white text-xs font-bold uppercase rounded-lg hover:bg-[#D4AF37] transition-colors"
+                                        className="px-4 py-2 bg-slate-800 text-white text-xs font-bold uppercase rounded-lg hover:bg-[#E8C65E] transition-colors"
                                     >
                                         Generar Variantes Automáticas
                                     </button>
@@ -622,7 +622,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                         {tab === 'pricing' && (
                             <div className="space-y-8">
                                 <section>
-                                    <h4 className="flex items-center gap-2 font-bold text-slate-800 dark:text-white mb-4"><DollarSign className="w-4 h-4 text-[#D4AF37]" /> Estructura de Costos</h4>
+                                    <h4 className="flex items-center gap-2 font-bold text-slate-800 dark:text-white mb-4"><DollarSign className="w-4 h-4 text-[#E8C65E]" /> Estructura de Costos</h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                         <InputGroup label="Costo Prenda ($)" help="Fabricación/Compra">
                                             <input type="number" min="0" placeholder="0" value={currentProduct.cost} onChange={e => setCurrentProduct({ ...currentProduct, cost: e.target.value })} className="input" />
@@ -639,18 +639,18 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                     </div>
                                     <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col gap-3 text-sm mt-4">
                                         <div className="flex items-center gap-2 text-slate-500 font-medium border-b border-slate-200 dark:border-slate-700 pb-2">
-                                            <TruckIcon className="w-4 h-4 text-[#D4AF37]" />
+                                            <TruckIcon className="w-4 h-4 text-[#E8C65E]" />
                                             <span className="text-xs uppercase font-bold tracking-wider">Asistente de Flete (Calculadora Unitaria)</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <div className="flex-1">
                                                 <label className="text-[10px] text-slate-400 block mb-1">Costo Total del Bulto</label>
-                                                <input type="number" placeholder="0" value={calcEnvioTotal} onChange={(e) => updateShippingFromCalc(e.target.value, calcEnvioCant)} className="w-full p-2 border rounded-lg bg-white dark:bg-[#121212] outline-none focus:border-[#D4AF37] text-center font-bold" />
+                                                <input type="number" placeholder="0" value={calcEnvioTotal} onChange={(e) => updateShippingFromCalc(e.target.value, calcEnvioCant)} className="w-full p-2 border rounded-lg bg-white dark:bg-[#121212] outline-none focus:border-[#E8C65E] text-center font-bold" />
                                             </div>
                                             <span className="text-slate-300 text-xl font-light">/</span>
                                             <div className="w-24">
                                                 <label className="text-[10px] text-slate-400 block mb-1">Unidades</label>
-                                                <input type="number" placeholder="0" value={calcEnvioCant} onChange={(e) => updateShippingFromCalc(calcEnvioTotal, e.target.value)} className="w-full p-2 border rounded-lg bg-white dark:bg-[#121212] outline-none focus:border-[#D4AF37] text-center font-bold" />
+                                                <input type="number" placeholder="0" value={calcEnvioCant} onChange={(e) => updateShippingFromCalc(calcEnvioTotal, e.target.value)} className="w-full p-2 border rounded-lg bg-white dark:bg-[#121212] outline-none focus:border-[#E8C65E] text-center font-bold" />
                                             </div>
                                             <span className="text-slate-300 text-xl font-light">=</span>
                                             <div className="flex-1 bg-white dark:bg-[#121212] border border-emerald-100 dark:border-emerald-900/30 p-2 rounded-lg text-center">
@@ -691,7 +691,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                     </div>
 
                     {/* PREVIEW SIDEBAR */}
-                    <div className="w-full lg:w-80 bg-slate-50 dark:bg-[#1C1F25] border-l border-slate-200 dark:border-slate-800 p-8 flex flex-col">
+                    <div className="w-full lg:w-80 bg-slate-50 dark:bg-[#11100D] border-l border-slate-200 dark:border-slate-800 p-8 flex flex-col">
                         <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-8 text-center flex items-center justify-center gap-2"><Calculator className="w-4 h-4" /> Simulación Real</h4>
                         <div className="space-y-3 text-sm flex-1">
                             <Row label="Costo Prenda" value={currentProduct.cost} />
@@ -759,7 +759,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                             onClick={handleSaveProduct}
                             isLoading={isSaving}
                             disabled={validation.blocking.length > 0}
-                            className="bg-[#D4AF37] hover:bg-[#B8932E] disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 sm:px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#D4AF37]/20 text-base sm:text-lg transition-transform active:scale-95"
+                            className="bg-[#E8C65E] hover:bg-[#B8932E] disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 sm:px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#E8C65E]/20 text-base sm:text-lg transition-transform active:scale-95"
                         >
                             {isSaving ? 'Guardando…' : (currentProduct.active ? 'PUBLICAR' : 'GUARDAR BORRADOR')}
                         </Button>

@@ -116,7 +116,7 @@ export const SuppliersView = () => {
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-4 sm:px-6 py-2 sm:py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1 w-full sm:w-auto justify-center"
+                    className="flex items-center gap-2 bg-black hover:bg-[#E8C65E] text-white shadow-xl shadow-black/10 px-4 sm:px-6 py-2 sm:py-3 rounded-none border border-[#E8C65E] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1 w-full sm:w-auto justify-center"
                 >
                     <Plus className="w-4 h-4" /> Nuevo Proveedor
                 </button>
@@ -146,7 +146,7 @@ export const SuppliersView = () => {
                     <input
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-4 py-2.5 w-full text-sm border border-slate-200 rounded-xl bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                        className="pl-10 pr-4 py-2.5 w-full text-sm border border-slate-200 rounded-xl bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                         placeholder="Buscar proveedor..."
                     />
                 </div>
@@ -159,7 +159,7 @@ export const SuppliersView = () => {
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#D4AF37] appearance-none cursor-pointer font-medium w-full sm:min-w-[160px]"
+                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#E8C65E] appearance-none cursor-pointer font-medium w-full sm:min-w-[160px]"
                     >
                         <option value="Todos">Todas las Categorías</option>
                         {(categories || []).map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -183,7 +183,7 @@ export const SuppliersView = () => {
 
                         {/* Header */}
                         <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/20 shrink-0">
+                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#E8C65E]/10 flex items-center justify-center text-[#E8C65E] border border-[#E8C65E]/20 shrink-0">
                                 <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -202,25 +202,25 @@ export const SuppliersView = () => {
                         <div className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4 sm:mb-6">
                             {supplier.contactName && (
                                 <div className="flex items-center gap-2">
-                                    <User className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                                    <User className="w-3.5 h-3.5 text-[#E8C65E] shrink-0" />
                                     <span className="truncate">{supplier.contactName}</span>
                                 </div>
                             )}
                             {supplier.phone && (
                                 <div className="flex items-center gap-2">
-                                    <Phone className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                                    <Phone className="w-3.5 h-3.5 text-[#E8C65E] shrink-0" />
                                     <span>{supplier.phone}</span>
                                 </div>
                             )}
                             {supplier.email && (
                                 <div className="flex items-center gap-2">
-                                    <Mail className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                                    <Mail className="w-3.5 h-3.5 text-[#E8C65E] shrink-0" />
                                     <span className="truncate">{supplier.email}</span>
                                 </div>
                             )}
                             {(supplier.city || supplier.province) && (
                                 <div className="flex items-center gap-2">
-                                    <MapPin className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                                    <MapPin className="w-3.5 h-3.5 text-[#E8C65E] shrink-0" />
                                     <span className="truncate">{[supplier.city, supplier.province].filter(Boolean).join(', ')}</span>
                                 </div>
                             )}
@@ -282,7 +282,7 @@ export const SuppliersView = () => {
                     <p className="text-slate-400 text-sm mb-6">Agrega tu primer proveedor para comenzar.</p>
                     <button
                         onClick={() => handleOpenModal()}
-                        className="inline-flex items-center gap-2 bg-[#D4AF37] hover:bg-[#C19A2E] text-white px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
+                        className="inline-flex items-center gap-2 bg-[#E8C65E] hover:bg-[#C19A2E] text-white px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
                     >
                         <Plus className="w-4 h-4" /> Agregar Proveedor
                     </button>
@@ -296,7 +296,7 @@ export const SuppliersView = () => {
                         {/* Modal Header */}
                         <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-[#1a1a1a] shrink-0">
                             <h3 className="font-bold text-base sm:text-lg dark:text-white flex items-center gap-2">
-                                <Building2 className="w-5 h-5 text-[#D4AF37]" />
+                                <Building2 className="w-5 h-5 text-[#E8C65E]" />
                                 {suppliers?.find(s => s.id === currentSupplier.id) ? 'Editar Proveedor' : 'Nuevo Proveedor'}
                             </h3>
                             <button
@@ -318,7 +318,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.name}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, name: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder="Ej: Textiles del Sur"
                                     />
                                 </div>
@@ -330,7 +330,7 @@ export const SuppliersView = () => {
                                         list="supplier-categories"
                                         value={currentSupplier.category}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, category: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder="Ej: Vestidos"
                                     />
                                     <datalist id="supplier-categories">
@@ -347,7 +347,7 @@ export const SuppliersView = () => {
                                 <input
                                     value={currentSupplier.contactName}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, contactName: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                     placeholder="Ej: María López"
                                 />
                             </div>
@@ -361,7 +361,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.phone}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, phone: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder="Ej: 011 4444-5555"
                                     />
                                 </div>
@@ -372,7 +372,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.whatsapp}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, whatsapp: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder="Ej: 5491123456789"
                                     />
                                 </div>
@@ -387,7 +387,7 @@ export const SuppliersView = () => {
                                     type="email"
                                     value={currentSupplier.email}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, email: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                     placeholder="Ej: contacto@proveedor.com"
                                 />
                             </div>
@@ -400,7 +400,7 @@ export const SuppliersView = () => {
                                 <input
                                     value={currentSupplier.address}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, address: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                     placeholder="Ej: Av. Corrientes 1234"
                                 />
                             </div>
@@ -414,7 +414,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.city}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, city: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder="Ej: Buenos Aires"
                                     />
                                 </div>
@@ -425,7 +425,7 @@ export const SuppliersView = () => {
                                     <input
                                         value={currentSupplier.province}
                                         onChange={(e) => setCurrentSupplier({ ...currentSupplier, province: e.target.value })}
-                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder="Ej: CABA"
                                     />
                                 </div>
@@ -439,7 +439,7 @@ export const SuppliersView = () => {
                                 <textarea
                                     value={currentSupplier.notes}
                                     onChange={(e) => setCurrentSupplier({ ...currentSupplier, notes: e.target.value })}
-                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all min-h-[100px] resize-none"
+                                    className="w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all min-h-[100px] resize-none"
                                     placeholder="Información adicional sobre el proveedor, condiciones de pago, horarios de atención, etc."
                                 />
                             </div>
@@ -474,7 +474,7 @@ export const SuppliersView = () => {
                             <button
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#D4AF37] hover:bg-[#C19A2E] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#E8C65E] hover:bg-[#C19A2E] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold uppercase tracking-wider transition-colors"
                             >
                                 <Check className="w-4 h-4" /> {isSaving ? 'Guardando…' : 'Guardar Proveedor'}
                             </button>

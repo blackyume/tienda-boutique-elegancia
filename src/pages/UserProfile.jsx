@@ -61,7 +61,7 @@ export const UserProfile = () => {
                 {/* HEADER */}
                 <div className="bg-white dark:bg-[#1a1a1a] p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-6">
-                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-3xl font-serif text-[#D4AF37] border border-slate-200 dark:border-slate-700">
+                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-3xl font-serif text-[#E8C65E] border border-slate-200 dark:border-slate-700">
                             {user.email[0].toUpperCase()}
                         </div>
                         <div>
@@ -77,9 +77,9 @@ export const UserProfile = () => {
                 </div>
 
                 {/* REFERRAL SECTION */}
-                <div className="bg-gradient-to-br from-[#D4AF37]/10 via-white to-sky-50 dark:from-[#D4AF37]/10 dark:via-slate-900/50 dark:to-sky-900/10 rounded-2xl border border-[#D4AF37]/30 p-6 md:p-8 mb-8 shadow-sm">
+                <div className="bg-gradient-to-br from-[#E8C65E]/10 via-white to-sky-50 dark:from-[#E8C65E]/10 dark:via-slate-900/50 dark:to-sky-900/10 rounded-2xl border border-[#E8C65E]/30 p-6 md:p-8 mb-8 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-full bg-[#D4AF37] flex items-center justify-center text-white">
+                        <div className="w-12 h-12 rounded-full bg-[#E8C65E] flex items-center justify-center text-white">
                             <Gift className="w-5 h-5" />
                         </div>
                         <div>
@@ -90,7 +90,7 @@ export const UserProfile = () => {
                     <div className="grid md:grid-cols-[auto_1fr_auto] items-center gap-3 bg-white dark:bg-slate-900/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                         <div>
                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Tu código</p>
-                            <p className="font-mono font-black text-xl text-[#D4AF37] tracking-wider">{referralCode}</p>
+                            <p className="font-mono font-black text-xl text-[#E8C65E] tracking-wider">{referralCode}</p>
                         </div>
                         <div className="md:border-l md:pl-4 md:border-slate-200 md:dark:border-slate-700">
                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1">Link para compartir</p>
@@ -100,7 +100,7 @@ export const UserProfile = () => {
                             <button onClick={() => copy(referralLink)} className="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors" title="Copiar link">
                                 <Copy className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                             </button>
-                            <button onClick={share} className="p-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#C19A2E] text-white transition-colors" title="Compartir">
+                            <button onClick={share} className="p-2.5 rounded-lg bg-[#E8C65E] hover:bg-[#C19A2E] text-white transition-colors" title="Compartir">
                                 <Share2 className="w-4 h-4" />
                             </button>
                         </div>
@@ -114,7 +114,7 @@ export const UserProfile = () => {
 
                 {/* ORDERS SECTION */}
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                    <Package className="w-5 h-5 text-[#D4AF37]" /> Mis Pedidos
+                    <Package className="w-5 h-5 text-[#E8C65E]" /> Mis Pedidos
                 </h2>
 
                 <div className="space-y-4">
@@ -137,7 +137,7 @@ export const UserProfile = () => {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm text-slate-500 dark:text-slate-400">Total</p>
-                                        <p className="text-xl font-bold text-[#D4AF37]">{formatMoney(order.total)}</p>
+                                        <p className="text-xl font-bold text-[#E8C65E]">{formatMoney(order.total)}</p>
                                     </div>
                                 </div>
 

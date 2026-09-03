@@ -33,18 +33,18 @@ const Chip = ({ active, onClick, children, swatch, overrides }) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${active
-            ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white'
-            : 'border-white/10 bg-white/[0.03] text-white/80 hover:border-[#D4AF37]/50 hover:bg-white/[0.06]'}`}
+            ? 'border-[#E8C65E] bg-[#E8C65E]/15 text-white'
+            : 'border-white/10 bg-white/[0.03] text-white/80 hover:border-[#E8C65E]/50 hover:bg-white/[0.06]'}`}
     >
         {swatch && <span className="w-4 h-4 rounded-full border border-white/30 shrink-0" style={{ background: swatchBg(swatch, overrides) }} />}
         {children}
-        {active && <Check className="w-4 h-4 text-[#D4AF37]" />}
+        {active && <Check className="w-4 h-4 text-[#E8C65E]" />}
     </button>
 );
 
 const Field = ({ label, children, hint }) => (
     <div>
-        <p className="text-[11px] uppercase tracking-widest text-[#D4AF37] font-bold mb-1">{label}</p>
+        <p className="text-[11px] uppercase tracking-widest text-[#E8C65E] font-bold mb-1">{label}</p>
         {hint && <p className="text-xs text-white/50 mb-3">{hint}</p>}
         {children}
     </div>
@@ -73,12 +73,12 @@ const StepShell = ({ children, canNext, onNext, nextLabel = 'Continuar', isFirst
 
 // Vista previa EN VIVO: muestra cómo va quedando el producto mientras lo cargás.
 const LivePreview = ({ image, name, price, colors = [], sizes = [], totalStock, category, colorHex }) => (
-    <div className="flex gap-3 mb-6 rounded-2xl border border-[#D4AF37]/25 bg-white/[0.03] p-3">
+    <div className="flex gap-3 mb-6 rounded-2xl border border-[#E8C65E]/25 bg-white/[0.03] p-3">
         <div className="w-16 h-20 rounded-lg overflow-hidden shrink-0 border border-white/10 bg-white/[0.04] flex items-center justify-center">
             {image ? <img src={image} alt="" className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-white/20" />}
         </div>
         <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-[0.15em] text-[#D4AF37]/70 font-bold">Vista previa</p>
+            <p className="text-[10px] uppercase tracking-[0.15em] text-[#E8C65E]/70 font-bold">Vista previa</p>
             <p className="text-white font-semibold text-sm truncate mt-0.5">{name?.trim() || 'Tu producto'}</p>
             <p className="text-sm font-black mt-0.5" style={{ background: GOLD, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
                 {price > 0 ? `$${price.toLocaleString('es-AR')}` : 'Sin precio aún'}
@@ -305,7 +305,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                         {images.map((u, i) => (
                             <div key={i} className="relative">
                                 <img src={u} alt="" className="w-16 h-20 object-cover rounded-lg border border-white/10" />
-                                <button onClick={() => setImages(prev => prev.filter((_, j) => j !== i))} className="absolute -top-2 -right-2 bg-[#1C1F25] border border-white/20 rounded-full p-0.5 hover:bg-red-500/20" title="Quitar foto">
+                                <button onClick={() => setImages(prev => prev.filter((_, j) => j !== i))} className="absolute -top-2 -right-2 bg-[#11100D] border border-white/20 rounded-full p-0.5 hover:bg-red-500/20" title="Quitar foto">
                                     <X className="w-3.5 h-3.5 text-white/70" />
                                 </button>
                             </div>
@@ -331,8 +331,8 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                     <StepShell {...shellProps} canNext={true} nextLabel={images.length ? 'Continuar' : 'Continuar sin foto'}>
                         <Field label="Foto de la prenda" hint="Subí una o varias fotos del MISMO producto (quedan como galería). Es opcional, podés seguir sin foto.">
                             <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={pickPhotos} />
-                            <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full py-8 rounded-2xl border-2 border-dashed border-white/15 hover:border-[#D4AF37]/50 text-white/60 hover:text-white flex flex-col items-center gap-2 transition-colors">
-                                {uploading ? <Loader2 className="w-7 h-7 animate-spin text-[#D4AF37]" /> : <Paperclip className="w-7 h-7" />}
+                            <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full py-8 rounded-2xl border-2 border-dashed border-white/15 hover:border-[#E8C65E]/50 text-white/60 hover:text-white flex flex-col items-center gap-2 transition-colors">
+                                {uploading ? <Loader2 className="w-7 h-7 animate-spin text-[#E8C65E]" /> : <Paperclip className="w-7 h-7" />}
                                 <span className="text-sm font-semibold">{uploading ? 'Subiendo…' : 'Tocá para subir foto(s)'}</span>
                             </button>
                         </Field>
@@ -346,7 +346,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                 autoFocus value={name} onChange={e => setName(e.target.value)}
                                 onKeyDown={e => { if (e.key === 'Enter' && name.trim()) goNext(); }}
                                 placeholder="Ej: Vestido Lino Blanco"
-                                className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]"
+                                className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]"
                             />
                         </Field>
                     </StepShell>
@@ -361,7 +361,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                 ))}
                             </div>
                             <div className="flex gap-2">
-                                <input value={newCat} onChange={e => { setNewCat(e.target.value); setCategory(''); }} placeholder="…o nueva categoría" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                <input value={newCat} onChange={e => { setNewCat(e.target.value); setCategory(''); }} placeholder="…o nueva categoría" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                             </div>
                         </Field>
                     </StepShell>
@@ -377,7 +377,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                     ))}
                                 </div>
                                 <div className="flex gap-2">
-                                    <input value={customColor} onChange={e => onCustomColorChange(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addColorWithHex(); }} placeholder="Otro color (ej: rosa bebé)…" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                    <input value={customColor} onChange={e => onCustomColorChange(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addColorWithHex(); }} placeholder="Otro color (ej: rosa bebé)…" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                     <label className="relative w-12 shrink-0 rounded-xl border border-white/10 bg-white/[0.04] cursor-pointer flex items-center justify-center" title="Elegí el tono exacto">
                                         <span className="w-6 h-6 rounded-full border border-white/30" style={{ background: customHex }} />
                                         <input type="color" value={customHex} onChange={e => { setCustomHex(e.target.value); setHexTouched(true); }} className="absolute inset-0 opacity-0 cursor-pointer" />
@@ -409,7 +409,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    <input value={customSize} onChange={e => setCustomSize(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addCustom(customSize, sizes, setSizes, setCustomSize); }} placeholder="Otro talle (ej: 38, 40)…" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                    <input value={customSize} onChange={e => setCustomSize(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addCustom(customSize, sizes, setSizes, setCustomSize); }} placeholder="Otro talle (ej: 38, 40)…" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                     <button onClick={() => addCustom(customSize, sizes, setSizes, setCustomSize)} className="px-4 rounded-xl bg-white/5 text-white/70 hover:text-white border border-white/10"><Plus className="w-4 h-4" /></button>
                                 </div>
                             </Field>
@@ -433,19 +433,19 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                                 value={variantStock[cb.key] ?? ''}
                                                 onChange={e => setVariantStock(prev => ({ ...prev, [cb.key]: e.target.value }))}
                                                 placeholder="0"
-                                                className="w-20 px-3 py-2 rounded-lg bg-white/[0.05] border border-white/10 text-white text-center outline-none focus:border-[#D4AF37]"
+                                                className="w-20 px-3 py-2 rounded-lg bg-white/[0.05] border border-white/10 text-white text-center outline-none focus:border-[#E8C65E]"
                                             />
                                         </div>
                                     ))}
                                 </div>
-                                <p className="text-xs text-[#D4AF37] font-bold mt-3">Total: {totalStock} unidad{totalStock === 1 ? '' : 'es'}</p>
+                                <p className="text-xs text-[#E8C65E] font-bold mt-3">Total: {totalStock} unidad{totalStock === 1 ? '' : 'es'}</p>
                             </Field>
                         ) : (
                             <Field label="Stock" hint="¿Cuántas unidades tenés en total?">
                                 <div className="flex flex-wrap gap-2 mb-3">
                                     {STOCKS.map(s => <Chip key={s} active={stock === s} onClick={() => setStock(s)}>{s}</Chip>)}
                                 </div>
-                                <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} placeholder="Otra cantidad…" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} placeholder="Otra cantidad…" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                             </Field>
                         )}
                     </StepShell>
@@ -464,14 +464,14 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
 
                         {priceMode === 'final' && (
                             <Field label="Precio final" hint="El precio de venta en pesos.">
-                                <input autoFocus type="number" min="0" value={priceFinal} onChange={e => setPriceFinal(e.target.value)} placeholder="Ej: 25000" className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                <input autoFocus type="number" min="0" value={priceFinal} onChange={e => setPriceFinal(e.target.value)} placeholder="Ej: 25000" className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                             </Field>
                         )}
 
                         {priceMode === 'cost' && (
                             <>
                                 <Field label="Costo de la prenda" hint="Lo que te salió a vos (sin packaging ni flete).">
-                                    <input autoFocus type="number" min="0" value={cost} onChange={e => setCost(e.target.value)} placeholder="Ej: 4000" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                    <input autoFocus type="number" min="0" value={cost} onChange={e => setCost(e.target.value)} placeholder="Ej: 4000" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                 </Field>
                                 <Field label="Margen de ganancia" hint="% que querés ganar SOBRE el costo (limpio, ya cubre la comisión de MP).">
                                     <div className="flex flex-wrap gap-2">
@@ -479,16 +479,16 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                     </div>
                                 </Field>
                                 <Field label="Packaging (opcional)" hint="Costo del packaging por prenda. Dejá vacío si no aplica.">
-                                    <input type="number" min="0" value={packaging} onChange={e => setPackaging(e.target.value)} placeholder="Ej: 500" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                    <input type="number" min="0" value={packaging} onChange={e => setPackaging(e.target.value)} placeholder="Ej: 500" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                 </Field>
                                 <Field label="Flete del bulto (opcional)" hint="Costo TOTAL del flete y cuántas unidades vinieron. Reparto el flete por prenda.">
                                     <div className="flex gap-2">
-                                        <input type="number" min="0" value={flete} onChange={e => setFlete(e.target.value)} placeholder="Flete total" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
-                                        <input type="number" min="0" value={fleteUnits} onChange={e => setFleteUnits(e.target.value)} placeholder="Unidades" className="w-28 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37]" />
+                                        <input type="number" min="0" value={flete} onChange={e => setFlete(e.target.value)} placeholder="Flete total" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
+                                        <input type="number" min="0" value={fleteUnits} onChange={e => setFleteUnits(e.target.value)} placeholder="Unidades" className="w-28 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                     </div>
                                 </Field>
                                 {priceCalc && (
-                                    <div className="rounded-2xl p-4 border border-[#D4AF37]/30 bg-[#D4AF37]/[0.06]">
+                                    <div className="rounded-2xl p-4 border border-[#E8C65E]/30 bg-[#E8C65E]/[0.06]">
                                         <p className="text-2xl font-black text-white">${priceCalc.price.toLocaleString('es-AR')}</p>
                                         <p className="text-xs text-white/60 mt-1">Costo total ${priceCalc.totalCost.toLocaleString('es-AR')}{priceCalc.shipPer ? ` (flete $${priceCalc.shipPer.toLocaleString('es-AR')}/u)` : ''} · comisión MP {commission}% = ${priceCalc.commissionAmount.toLocaleString('es-AR')}</p>
                                         <p className="text-sm text-emerald-400 font-bold mt-1">Ganás ${priceCalc.net.toLocaleString('es-AR')} limpios por venta</p>
@@ -510,7 +510,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
 
                 {step === 'summary' && (
                     <div className="flex flex-col gap-4">
-                        <p className="text-[11px] uppercase tracking-widest text-[#D4AF37] font-bold">Revisá antes de cargar</p>
+                        <p className="text-[11px] uppercase tracking-widest text-[#E8C65E] font-bold">Revisá antes de cargar</p>
                         <div className="rounded-2xl border border-white/10 bg-white/[0.03] divide-y divide-white/5">
                             {[
                                 ['Nombre', name || '—'],
@@ -532,17 +532,17 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                         )}
                         <Field label="Descripción (opcional)" hint="Contale a la IA qué es la prenda y te la escribe sola — solo con datos reales, sin inventar.">
                             {hasAdminAI(aiConfig) && (
-                                <div className="mb-2.5 rounded-xl border border-[#D4AF37]/25 bg-[#D4AF37]/[0.05] p-3">
+                                <div className="mb-2.5 rounded-xl border border-[#E8C65E]/25 bg-[#E8C65E]/[0.05] p-3">
                                     <input
                                         value={descDetails}
                                         onChange={e => setDescDetails(e.target.value)}
                                         placeholder="¿Qué es? Ej: remera oversize, cuello redondo, para el día"
-                                        className="w-full px-3 py-2 rounded-lg bg-white/[0.05] border border-white/10 text-white text-sm outline-none focus:border-[#D4AF37] mb-2"
+                                        className="w-full px-3 py-2 rounded-lg bg-white/[0.05] border border-white/10 text-white text-sm outline-none focus:border-[#E8C65E] mb-2"
                                     />
                                     <button
                                         type="button" onClick={generarDescripcion} disabled={genDesc || !name.trim()}
                                         title={!name.trim() ? 'Primero el nombre' : 'Generar con IA'}
-                                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold text-[#1C1F25] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 disabled:opacity-40"
+                                        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold text-[#11100D] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 disabled:opacity-40"
                                     >
                                         {genDesc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                                         {genDesc ? 'Escribiendo…' : 'Generar descripción con IA'}
@@ -550,29 +550,29 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                     {descErr && <p className="text-xs text-red-400 mt-1.5">{descErr}</p>}
                                 </div>
                             )}
-                            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Acá aparece la descripción (o escribila vos)." className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#D4AF37] resize-none" />
+                            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Acá aparece la descripción (o escribila vos)." className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E] resize-none" />
                         </Field>
 
                         <Field label="Detalles extra (opcional)" hint="Lo que sumás acá hace tu prenda más completa. Todo es opcional.">
                             <div className="flex flex-col gap-3">
                                 <div>
                                     <p className="text-xs text-white/55 mb-1.5">Tela / composición <span className="text-white/30">(opcional · si NO la sabés, dejala vacía — no se inventa)</span></p>
-                                    <input value={material} onChange={e => setMaterial(e.target.value)} placeholder="Solo si la conocés. Ej: Algodón 95%, Elastano 5%" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm outline-none focus:border-[#D4AF37]" />
+                                    <input value={material} onChange={e => setMaterial(e.target.value)} placeholder="Solo si la conocés. Ej: Algodón 95%, Elastano 5%" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm outline-none focus:border-[#E8C65E]" />
                                 </div>
-                                <button type="button" onClick={() => setFeatured(v => !v)} className={`flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-semibold transition-all ${featured ? 'border-[#D4AF37] bg-[#D4AF37]/15 text-white' : 'border-white/10 bg-white/[0.03] text-white/75'}`}>
-                                    <span className="flex items-center gap-2"><Star className="w-4 h-4 text-[#D4AF37]" /> Destacar en la home</span>
-                                    {featured ? <Check className="w-4 h-4 text-[#D4AF37]" /> : <span className="text-white/30 text-xs">Off</span>}
+                                <button type="button" onClick={() => setFeatured(v => !v)} className={`flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-semibold transition-all ${featured ? 'border-[#E8C65E] bg-[#E8C65E]/15 text-white' : 'border-white/10 bg-white/[0.03] text-white/75'}`}>
+                                    <span className="flex items-center gap-2"><Star className="w-4 h-4 text-[#E8C65E]" /> Destacar en la home</span>
+                                    {featured ? <Check className="w-4 h-4 text-[#E8C65E]" /> : <span className="text-white/30 text-xs">Off</span>}
                                 </button>
-                                <div className={`rounded-xl border transition-all ${launchSale ? 'border-[#D4AF37]/60 bg-[#D4AF37]/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
+                                <div className={`rounded-xl border transition-all ${launchSale ? 'border-[#E8C65E]/60 bg-[#E8C65E]/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
                                     <button type="button" onClick={() => setLaunchSale(v => !v)} className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-white/85">
-                                        <span className="flex items-center gap-2"><Tag className="w-4 h-4 text-[#D4AF37]" /> Lanzarla en oferta</span>
-                                        {launchSale ? <Check className="w-4 h-4 text-[#D4AF37]" /> : <span className="text-white/30 text-xs">Off</span>}
+                                        <span className="flex items-center gap-2"><Tag className="w-4 h-4 text-[#E8C65E]" /> Lanzarla en oferta</span>
+                                        {launchSale ? <Check className="w-4 h-4 text-[#E8C65E]" /> : <span className="text-white/30 text-xs">Off</span>}
                                     </button>
                                     {launchSale && finalPrice > 0 && (
                                         <div className="px-4 pb-3 -mt-1">
                                             <div className="flex flex-wrap gap-2 mb-2">
                                                 {[10, 15, 20, 30, 40, 50].map(p => (
-                                                    <button key={p} type="button" onClick={() => setSalePercent(p)} className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${salePercent === p ? 'border-[#D4AF37] bg-[#D4AF37]/20 text-white' : 'border-white/10 text-white/70'}`}>{p}%</button>
+                                                    <button key={p} type="button" onClick={() => setSalePercent(p)} className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${salePercent === p ? 'border-[#E8C65E] bg-[#E8C65E]/20 text-white' : 'border-white/10 text-white/70'}`}>{p}%</button>
                                                 ))}
                                             </div>
                                             <p className="text-xs text-white/60">

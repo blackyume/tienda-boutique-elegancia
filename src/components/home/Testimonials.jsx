@@ -56,7 +56,7 @@ export const Testimonials = () => {
                             key={i}
                             onMouseEnter={() => setActive(i)}
                             className={`relative rounded-2xl p-7 border transition-all duration-700 ${active === i
-                                ? 'bg-white/[0.05] border-cielo-gold/40 shadow-[0_20px_60px_-20px_rgba(212,175,55,0.25)] md:scale-[1.03]'
+                                ? 'bg-white/[0.05] border-cielo-gold/40 shadow-[0_20px_60px_-20px_rgba(232,198,94,0.25)] md:scale-[1.03]'
                                 : 'bg-white/[0.02] border-white/10'}`}
                         >
                             <Quote className="w-8 h-8 text-cielo-gold/40 mb-3" strokeWidth={1.2} />

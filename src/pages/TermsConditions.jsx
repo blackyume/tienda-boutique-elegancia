@@ -8,7 +8,7 @@ export const TermsConditions = () => {
     const whatsapp = siteConfig?.contact?.whatsapp;
 
     return (
-        <div className="bg-white dark:bg-[#1C1F25] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
+        <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans text-slate-700 dark:text-slate-300">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mb-8 tracking-wide">Términos y Condiciones</h1>
                 <p className="text-sm text-slate-400 mb-12 uppercase tracking-widest">Vigencia: Desde Enero 2026</p>
@@ -75,8 +75,8 @@ export const TermsConditions = () => {
                     <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-xl border border-slate-100 dark:border-slate-800 mt-12 text-center">
                         <p className="text-sm font-medium mb-2">¿Dudas? Escribinos y te ayudamos:</p>
                         <p className="text-sm">
-                            <a href={`mailto:${email}`} className="text-[#D4AF37] hover:underline">{email}</a>
-                            {whatsapp && <> &nbsp;·&nbsp; <a href={`https://wa.me/${String(whatsapp).replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-[#D4AF37] hover:underline">WhatsApp</a></>}
+                            <a href={`mailto:${email}`} className="text-[#E8C65E] hover:underline">{email}</a>
+                            {whatsapp && <> &nbsp;·&nbsp; <a href={`https://wa.me/${String(whatsapp).replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-[#E8C65E] hover:underline">WhatsApp</a></>}
                         </p>
                     </div>
                 </div>

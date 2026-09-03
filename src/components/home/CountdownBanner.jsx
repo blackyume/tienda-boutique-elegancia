@@ -51,8 +51,8 @@ export const CountdownBanner = () => {
     const desc = next.p?.description || 'Acceso anticipado para suscriptoras. No te lo pierdas.';
 
     return (
-        <section className="relative py-16 px-4 bg-[#1C1F25] overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.07),transparent_60%)] pointer-events-none" />
+        <section className="relative py-16 px-4 bg-[#11100D] overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,198,94,0.07),transparent_60%)] pointer-events-none" />
             <div className="max-w-5xl mx-auto relative">
                 <div className="relative rounded-2xl border border-cielo-gold/30 bg-gradient-to-b from-white/[0.04] to-white/[0.01] backdrop-blur-xl p-8 md:p-12 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7)]">
                     <div className="flex items-center gap-2 text-cielo-gold text-[10px] uppercase tracking-[0.4em] font-bold mb-3">

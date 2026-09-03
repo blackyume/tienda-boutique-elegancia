@@ -42,7 +42,7 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
                 {onNavigateInventory && (
                     <button
                         onClick={onNavigateInventory}
-                        className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] hover:text-[#C19A2E] flex items-center gap-1 transition-colors"
+                        className="text-[10px] font-bold uppercase tracking-wider text-[#E8C65E] hover:text-[#C19A2E] flex items-center gap-1 transition-colors"
                     >
                         Ver inventario <ChevronRight className="w-3 h-3" />
                     </button>
@@ -87,7 +87,7 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); onEditProduct(product); }}
                                                 title="Reponer / editar"
-                                                className="p-2 rounded-lg text-slate-500 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors"
+                                                className="p-2 rounded-lg text-slate-500 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10 transition-colors"
                                             >
                                                 <Edit2 className="w-3.5 h-3.5" />
                                             </button>
@@ -131,7 +131,7 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
             {compact && items.length > shown.length && onNavigateInventory && (
                 <button
                     onClick={onNavigateInventory}
-                    className="w-full py-3 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-[#D4AF37] bg-slate-50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 transition-colors"
+                    className="w-full py-3 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-[#E8C65E] bg-slate-50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800 transition-colors"
                 >
                     Ver {items.length - shown.length} más
                 </button>

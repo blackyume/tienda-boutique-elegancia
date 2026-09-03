@@ -74,7 +74,7 @@ export const AbandonedCartsView = () => {
                 <StatCard label="Pendientes" value={stats.pending.length} icon={Clock} color="text-amber-600 bg-amber-50 dark:bg-amber-900/20" />
                 <StatCard label="Recuperados" value={stats.recovered.length} icon={Check} color="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
                 <StatCard label="Valor Pendiente" value={formatMoney(stats.lostValue)} icon={ShoppingCart} color="text-red-600 bg-red-50 dark:bg-red-900/20" />
-                <StatCard label="Tasa Recuperación" value={`${stats.recoveryRate.toFixed(1)}%`} icon={RefreshCw} color="text-[#D4AF37] bg-orange-50 dark:bg-orange-900/20" />
+                <StatCard label="Tasa Recuperación" value={`${stats.recoveryRate.toFixed(1)}%`} icon={RefreshCw} color="text-[#E8C65E] bg-orange-50 dark:bg-orange-900/20" />
             </div>
 
             {/* FILTER */}
@@ -133,7 +133,7 @@ export const AbandonedCartsView = () => {
                                                 <button
                                                     onClick={() => handleSend(cart)}
                                                     disabled={sendingId === cart.id}
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider bg-[#D4AF37] hover:bg-[#C19A2E] text-white disabled:opacity-50 transition-colors"
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider bg-[#E8C65E] hover:bg-[#C19A2E] text-white disabled:opacity-50 transition-colors"
                                                 >
                                                     {sendingId === cart.id
                                                         ? <><RefreshCw className="w-3 h-3 animate-spin" /> Enviando...</>

@@ -48,7 +48,7 @@ export const CustomersView = ({ orders }) => {
                         {customers.length} clientes registrados históricamente.
                     </p>
                 </div>
-                <div className="bg-[#D4AF37]/10 text-[#D4AF37] px-4 py-2 rounded-xl flex items-center gap-2 border border-[#D4AF37]/20">
+                <div className="bg-[#E8C65E]/10 text-[#E8C65E] px-4 py-2 rounded-xl flex items-center gap-2 border border-[#E8C65E]/20">
                     <Users className="w-5 h-5" />
                     <span className="font-bold text-sm">CRM Activo</span>
                 </div>
@@ -95,10 +95,10 @@ export const CustomersView = ({ orders }) => {
 
                         <div className="space-y-2 text-xs text-slate-500 font-medium">
                             <div className="flex items-center gap-2">
-                                <Phone className="w-3 h-3 text-[#D4AF37]" /> {c.phone}
+                                <Phone className="w-3 h-3 text-[#E8C65E]" /> {c.phone}
                             </div>
                             <div className="flex items-center gap-2">
-                                <BadgeCheck className="w-3 h-3 text-[#D4AF37]" /> {c.city}, {c.province}
+                                <BadgeCheck className="w-3 h-3 text-[#E8C65E]" /> {c.city}, {c.province}
                             </div>
                             <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 mt-3">
                                 <Calendar className="w-3 h-3 text-slate-400" /> Última compra: {new Date(c.lastOrder).toLocaleDateString()}

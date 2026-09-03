@@ -17,8 +17,8 @@ export const NewsletterInline = () => {
     };
 
     return (
-        <section className="relative py-14 md:py-20 px-6 bg-plata-950 border-y border-white/[0.05] overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.05),transparent_60%)] pointer-events-none" />
+        <section className="relative py-14 md:py-20 px-6 bg-noche-950 border-y border-white/[0.05] overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,198,94,0.05),transparent_60%)] pointer-events-none" />
             <Reveal className="relative max-w-3xl mx-auto text-center">
                 <SectionHeader
                     eyebrow="Lista de espera"

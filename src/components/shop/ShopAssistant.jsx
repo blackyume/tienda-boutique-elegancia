@@ -157,7 +157,7 @@ export const ShopAssistant = () => {
                     <div ref={listRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#141414]">
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-lg overflow-hidden border ${msg.role === 'ai' ? 'bg-black border-[#D4AF37]/30' : 'bg-gradient-to-br from-[#d4af37] to-[#8a6a24] border-white/20 text-white'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-lg overflow-hidden border ${msg.role === 'ai' ? 'bg-black border-[#E8C65E]/30' : 'bg-gradient-to-br from-[#e8c65e] to-[#8a6a24] border-white/20 text-white'}`}>
                                     {msg.role === 'ai' ? <img src="/elegancia-ia-logo.png" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
                                 </div>
                                 <div className={`max-w-[85%] rounded-[20px] p-3.5 text-[13px] leading-relaxed whitespace-pre-wrap shadow-lg transition-all ${msg.role === 'ai' ? 'bg-gradient-to-b from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-tl-sm' : 'bg-gradient-to-r from-[#C19A2E] to-[#d4aa7a] text-white rounded-tr-sm border border-[#d4aa7a]/50'}`}>
@@ -189,12 +189,12 @@ export const ShopAssistant = () => {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="Escribe tu consulta..."
-                                className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-full py-2.5 pl-4 pr-10 text-xs focus:ring-1 focus:ring-[#D4AF37] outline-none text-slate-800 dark:text-white"
+                                className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-full py-2.5 pl-4 pr-10 text-xs focus:ring-1 focus:ring-[#E8C65E] outline-none text-slate-800 dark:text-white"
                             />
                             <button
                                 onClick={handleSend}
                                 disabled={!input.trim()}
-                                className="absolute right-1 w-8 h-8 bg-[#D4AF37] rounded-full flex items-center justify-center text-white hover:bg-[#B8932E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="absolute right-1 w-8 h-8 bg-[#E8C65E] rounded-full flex items-center justify-center text-white hover:bg-[#B8932E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Send className="w-3.5 h-3.5 ml-0.5" />
                             </button>

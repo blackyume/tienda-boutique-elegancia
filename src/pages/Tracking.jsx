@@ -43,7 +43,7 @@ export const Tracking = () => {
     };
 
     return (
-        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#1C1F25] font-sans transition-colors duration-500">
+        <div className="min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#11100D] font-sans transition-colors duration-500">
             <div className="max-w-3xl mx-auto px-4">
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-serif text-slate-900 dark:text-white mb-4">Seguí tu pedido</h1>
@@ -59,7 +59,7 @@ export const Tracking = () => {
                                 value={searchId}
                                 onChange={(e) => setSearchId(e.target.value)}
                                 placeholder="Ej: ORD-123456"
-                                className="w-full pl-10 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-slate-900 dark:focus:border-[#D4AF37] text-slate-900 dark:text-white transition-colors"
+                                className="w-full pl-10 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-slate-900 dark:focus:border-[#E8C65E] text-slate-900 dark:text-white transition-colors"
                             />
                         </div>
                         <Button className="px-6">Buscar</Button>

@@ -7,7 +7,7 @@ const GoldDefs = ({ uid, shineFrom = -120, shineTo = 380 }) => (
     <defs>
         <linearGradient id={`${uid}-gold`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#FBEFA8" />
-            <stop offset="22%" stopColor="#D4AF37" />
+            <stop offset="22%" stopColor="#E8C65E" />
             <stop offset="46%" stopColor="#FFF7CC" />
             <stop offset="55%" stopColor="#EFD98C" />
             <stop offset="78%" stopColor="#AE882C" />
@@ -22,15 +22,15 @@ const GoldDefs = ({ uid, shineFrom = -120, shineTo = 380 }) => (
             <animate attributeName="x2" values={`${shineFrom + 80};${shineTo + 80}`} dur="6s" begin="1.2s" repeatCount="indefinite" />
         </linearGradient>
         <linearGradient id={`${uid}-line`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#D4AF37" stopOpacity="0" />
-            <stop offset="30%" stopColor="#D4AF37" stopOpacity="0.6" />
-            <stop offset="70%" stopColor="#D4AF37" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
+            <stop offset="0%" stopColor="#E8C65E" stopOpacity="0" />
+            <stop offset="30%" stopColor="#E8C65E" stopOpacity="0.6" />
+            <stop offset="70%" stopColor="#E8C65E" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#E8C65E" stopOpacity="0" />
         </linearGradient>
         <linearGradient id={`${uid}-line2`} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="#E8C65E" stopOpacity="0.5" />
             <stop offset="50%" stopColor="#FCF6BA" stopOpacity="0.75" />
-            <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#E8C65E" stopOpacity="0.5" />
         </linearGradient>
     </defs>
 );
@@ -59,7 +59,7 @@ export const LogoSVG = ({ to = '/', onClick, width = 210, className = '' }) => {
 
                 {/* Ornamental row */}
                 <line x1="18" y1="60" x2="141" y2="60" stroke={`url(#${uid}-line2)`} strokeWidth="0.55" />
-                <polygon points="170,53 175,60 170,67 165,60" fill="#D4AF37" opacity="0.65" />
+                <polygon points="170,53 175,60 170,67 165,60" fill="#E8C65E" opacity="0.65" />
                 <line x1="199" y1="60" x2="322" y2="60" stroke={`url(#${uid}-line2)`} strokeWidth="0.55" />
 
                 {/* de la Elegancia */}
@@ -87,14 +87,14 @@ export const LogoSVGFooter = ({ width = 260, className = '' }) => {
             <GoldDefs uid={uid} shineFrom={-130} shineTo={420} />
 
             {/* Corner ornaments */}
-            <line x1="0" y1="0" x2="18" y2="0" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
-            <line x1="0" y1="0" x2="0" y2="18" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
-            <line x1="380" y1="0" x2="362" y2="0" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
-            <line x1="380" y1="0" x2="380" y2="18" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
-            <line x1="0" y1="110" x2="18" y2="110" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
-            <line x1="0" y1="110" x2="0" y2="92" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
-            <line x1="380" y1="110" x2="362" y2="110" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
-            <line x1="380" y1="110" x2="380" y2="92" stroke="#D4AF37" strokeWidth="0.8" opacity="0.5" />
+            <line x1="0" y1="0" x2="18" y2="0" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
+            <line x1="0" y1="0" x2="0" y2="18" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
+            <line x1="380" y1="0" x2="362" y2="0" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
+            <line x1="380" y1="0" x2="380" y2="18" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
+            <line x1="0" y1="110" x2="18" y2="110" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
+            <line x1="0" y1="110" x2="0" y2="92" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
+            <line x1="380" y1="110" x2="362" y2="110" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
+            <line x1="380" y1="110" x2="380" y2="92" stroke="#E8C65E" strokeWidth="0.8" opacity="0.5" />
 
             {/* LA BOUTIQUE — oro metálico + brillo */}
             <text x="190" y="56" fontFamily="Cinzel, 'Times New Roman', serif" fontSize="36" fontWeight="700" letterSpacing="10" textAnchor="middle" fill={`url(#${uid}-gold)`}>LA BOUTIQUE</text>
@@ -102,7 +102,7 @@ export const LogoSVGFooter = ({ width = 260, className = '' }) => {
 
             {/* Ornamental row */}
             <line x1="22" y1="67" x2="152" y2="67" stroke={`url(#${uid}-line)`} strokeWidth="0.55" />
-            <polygon points="190,60 195,67 190,74 185,67" fill="#D4AF37" opacity="0.65" />
+            <polygon points="190,60 195,67 190,74 185,67" fill="#E8C65E" opacity="0.65" />
             <line x1="228" y1="67" x2="358" y2="67" stroke={`url(#${uid}-line)`} strokeWidth="0.55" />
 
             {/* de la Elegancia */}

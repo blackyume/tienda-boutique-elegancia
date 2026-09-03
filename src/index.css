@@ -49,23 +49,28 @@
 }
 
 
-/* Grano de metal pulido. Reemplaza a /tierra-tile.webp (que sigue en el
-   repo por si volvemos a la tierra). Al ser SVG generado no pesa un byte de
+/* Grano de metal. Reemplaza a /tierra-tile.webp (que sigue en el repo por
+   si alguna vez volvemos a la tierra). Al ser SVG generado no pesa un byte de
    red, y no tiene el problema de las "mariposas" al repetir: el ruido fractal
    con stitchTiles cose los bordes solo. */
 :root {
-    --grano-plata: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)' opacity='0.035'/%3E%3C/svg%3E");
+    --grano-metal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)' opacity='0.035'/%3E%3C/svg%3E");
 }
 
 body {
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
-    /* Platino (H220 S13), la escalera de luz de la tierra girada al frio. El degradé es MUY sutil -- da
-       profundidad de pagina sin que se lea como una textura. */
-    background-color: #1C1F25;
-    background-image: var(--grano-plata),
-        linear-gradient(180deg, #171A20 0%, #1C1F25 40%, #21242B 100%);
-    background-size: 200px 200px, cover;
+    /* NEGRO CALIDO (H40 S12 L6). Es negro de verdad -- el blanco encima da
+       19:1 -- pero con una pizca de calor: sobre un negro frio el oro se lee
+       como amarillo pegado encima en vez de como metal.
+       Tres capas: grano, resplandor dorado que baja del borde de arriba (muy
+       bajo, .045: da la sensacion de luz de vitrina sin ensuciar el negro) y
+       el degrade de profundidad. */
+    background-color: #11100D;
+    background-image: var(--grano-metal),
+        radial-gradient(120% 55% at 50% 0%, rgba(232, 198, 94, .045) 0%, rgba(232, 198, 94, 0) 60%),
+        linear-gradient(180deg, #0C0B09 0%, #11100D 40%, #171510 100%);
+    background-size: 200px 200px, cover, cover;
     background-attachment: fixed;
     color: white;
 }
@@ -101,16 +106,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #1C1F25;
+    background: #11100D;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3A404B;
+    background: #3F3A31;
     border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #D4AF37;
+    background: #E8C65E;
 }
 
 /* Scrollbar dorada — igual al borde del modal premium */
@@ -204,7 +209,7 @@ html {
 /* Foco accesible y elegante: anillo dorado en vez del azul del navegador.
    Sólo con teclado (no molesta al hacer click con el mouse). */
 :focus-visible {
-    outline: 2px solid #D4AF37;
+    outline: 2px solid #E8C65E;
     outline-offset: 2px;
     border-radius: 2px;
 }
@@ -236,42 +241,44 @@ img {
 }
 
 /* ===== RELIEVE ============================================================
-   Sobre fondo tierra las superficies contrastan apenas 1,14:1: a puro color
-   una card seria invisible. Separan por LUZ, no por color -- filo claro
-   arriba, filo oscuro abajo, sombra proyectada. Es relieve de diseño: no hay
-   ninguna textura de la foto del campo.
+   Sobre el negro las superficies contrastan 1,17:1: a puro color una card
+   seria invisible. Separan por LUZ, no por color -- filo claro arriba, filo
+   oscuro abajo, sombra proyectada. Sobre negro la sombra ya casi no ayuda
+   (no hay nada mas oscuro que el fondo), asi que el trabajo lo hace el FILO
+   DE LUZ de arriba: por eso subio de .07 a .10, y el borde pasa de marron
+   (herencia de la tierra) a un hilo de oro al 10%.
    ========================================================================= */
 
 .relieve {
-    background-image: linear-gradient(180deg, #2A2E36 0%, #21242B 100%);
-    border: 1px solid rgba(104, 82, 69, .6);
+    background-image: linear-gradient(180deg, #26231D 0%, #171510 100%);
+    border: 1px solid rgba(232, 198, 94, .10);
     box-shadow:
-        0 1px 0 rgba(226, 234, 245, .07) inset,
+        0 1px 0 rgba(255, 244, 214, .10) inset,
         0 -1px 0 rgba(0, 0, 0, .4) inset,
         0 8px 20px -10px rgba(0, 0, 0, .75);
 }
 
 .relieve-alto {
-    background-image: linear-gradient(180deg, #363B46 0%, #272B33 100%);
-    border: 1px solid rgba(112, 88, 74, .6);
+    background-image: linear-gradient(180deg, #34302A 0%, #22201B 100%);
+    border: 1px solid rgba(232, 198, 94, .14);
     box-shadow:
-        0 1px 0 rgba(226, 234, 245, .11) inset,
+        0 1px 0 rgba(255, 244, 214, .15) inset,
         0 -1px 0 rgba(0, 0, 0, .45) inset,
         0 18px 38px -14px rgba(0, 0, 0, .85);
 }
 
 /* Hundido: para campos de formulario y buscadores. */
 .relieve-hundido {
-    background-color: #171A20;
-    border: 1px solid rgba(92, 72, 61, .45);
+    background-color: #0C0B09;
+    border: 1px solid rgba(232, 198, 94, .08);
     box-shadow:
         0 2px 6px -2px rgba(0, 0, 0, .6) inset,
-        0 -1px 0 rgba(226, 234, 245, .05) inset;
+        0 -1px 0 rgba(255, 244, 214, .05) inset;
 }
 
 /* Filo de luz de un solo pixel: separa secciones sin dibujar una linea dura. */
 .filo-luz {
-    border-top: 1px solid rgba(226, 234, 245, .06);
+    border-top: 1px solid rgba(255, 244, 214, .06);
     box-shadow: 0 -12px 24px -20px rgba(0, 0, 0, .9);
 }
 
@@ -282,12 +289,12 @@ img {
 
 .relieve-hover:hover {
     transform: translateY(-2px);
-    border-color: rgba(212, 175, 55, .35);
+    border-color: rgba(232, 198, 94, .35);
     box-shadow:
-        0 1px 0 rgba(226, 234, 245, .13) inset,
+        0 1px 0 rgba(255, 244, 214, .17) inset,
         0 -1px 0 rgba(0, 0, 0, .45) inset,
         0 22px 44px -16px rgba(0, 0, 0, .9),
-        0 0 0 1px rgba(212, 175, 55, .18);
+        0 0 0 1px rgba(232, 198, 94, .18);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -301,8 +308,8 @@ img {
    del body. Asi la textura se ve donde tiene que verse y jamas toca una foto
    de producto. */
 .bg-cielo-dark,
-[class*="bg-[#1C1F25]"] {
-    background-image: var(--grano-plata);
+[class*="bg-[#11100D]"] {
+    background-image: var(--grano-metal);
     background-size: 200px 200px;
 }
 

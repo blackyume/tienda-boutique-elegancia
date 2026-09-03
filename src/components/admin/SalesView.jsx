@@ -64,7 +64,7 @@ export const SalesView = ({ salesLog }) => {
     return (
         <div className="max-w-6xl mx-auto p-6 lg:p-8">
             <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
-                <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><TrendingUp className="w-6 h-6 text-[#D4AF37]" /> Registro de Ventas</h1>
+                <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><TrendingUp className="w-6 h-6 text-[#E8C65E]" /> Registro de Ventas</h1>
                 <div className="flex items-center gap-2 flex-wrap">
                     <div className="relative">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -72,7 +72,7 @@ export const SalesView = ({ salesLog }) => {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Buscar producto o N° de pedido…"
-                            className="pl-9 pr-3 py-2.5 text-sm w-64 bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors"
+                            className="pl-9 pr-3 py-2.5 text-sm w-64 bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#E8C65E] transition-colors"
                         />
                     </div>
                     <div className="flex items-center gap-2 bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 px-3 py-2.5 rounded-lg">
@@ -86,7 +86,7 @@ export const SalesView = ({ salesLog }) => {
                     <button
                         onClick={exportSales}
                         disabled={!filtered.length}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#D4AF37] hover:bg-[#B8932E] text-white text-xs font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E8C65E] hover:bg-[#B8932E] text-white text-xs font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                         <Download className="w-4 h-4" /> Excel
                     </button>

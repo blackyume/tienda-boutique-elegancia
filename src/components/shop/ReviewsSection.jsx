@@ -14,7 +14,7 @@ const Stars = ({ value, onSet, size = 'md' }) => {
                     className={onSet ? 'transition-transform hover:scale-110' : 'pointer-events-none'}
                     aria-label={`${n} estrellas`}
                 >
-                    <Star className={`${cls} ${n <= value ? 'text-[#D4AF37] fill-[#D4AF37]' : 'text-slate-300 dark:text-slate-600'}`} />
+                    <Star className={`${cls} ${n <= value ? 'text-[#E8C65E] fill-[#E8C65E]' : 'text-slate-300 dark:text-slate-600'}`} />
                 </button>
             ))}
         </div>
@@ -107,7 +107,7 @@ export const ReviewsSection = ({ productId }) => {
                 {user && hasBought && !hasReviewed && !showForm && (
                     <button
                         onClick={() => setShowForm(true)}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#D4AF37] hover:bg-[#C19A2E] text-white transition-colors"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E8C65E] hover:bg-[#C19A2E] text-white transition-colors"
                     >
                         Dejar mi reseña
                     </button>
@@ -119,13 +119,13 @@ export const ReviewsSection = ({ productId }) => {
                 <>
                     {!user && (
                         <div className="mb-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 flex items-center gap-3">
-                            <Lock className="w-4 h-4 text-[#D4AF37]" />
+                            <Lock className="w-4 h-4 text-[#E8C65E]" />
                             Iniciá sesión para ver si podés dejar reseña.
                         </div>
                     )}
                     {user && !hasBought && (
                         <div className="mb-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-300 flex items-center gap-3">
-                            <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+                            <ShieldCheck className="w-4 h-4 text-[#E8C65E]" />
                             Solo clientes que compraron este producto pueden dejar reseña.
                         </div>
                     )}
@@ -153,7 +153,7 @@ export const ReviewsSection = ({ productId }) => {
                             rows={4}
                             maxLength={1000}
                             placeholder="Contanos cómo te quedó, cómo fue la entrega, la calidad..."
-                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#D4AF37] resize-none"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#E8C65E] resize-none"
                         />
                         <p className="text-[10px] text-slate-400 mt-1 text-right">{text.length} / 1000</p>
                     </div>
@@ -174,7 +174,7 @@ export const ReviewsSection = ({ productId }) => {
                                 </div>
                             ))}
                             {photos.length < 4 && (
-                                <label className="w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-400 hover:text-[#D4AF37] hover:border-[#D4AF37] cursor-pointer transition-colors">
+                                <label className="w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center text-slate-400 hover:text-[#E8C65E] hover:border-[#E8C65E] cursor-pointer transition-colors">
                                     {uploading
                                         ? <Upload className="w-5 h-5 animate-pulse" />
                                         : <Camera className="w-5 h-5" />}
@@ -195,7 +195,7 @@ export const ReviewsSection = ({ productId }) => {
                         <button
                             type="submit"
                             disabled={submitting || uploading}
-                            className="inline-flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-[#D4AF37] hover:bg-[#C19A2E] text-white disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E8C65E] hover:bg-[#C19A2E] text-white disabled:opacity-50 transition-colors"
                         >
                             {submitting ? 'Enviando…' : 'Enviar reseña'}
                         </button>
@@ -210,7 +210,7 @@ export const ReviewsSection = ({ productId }) => {
                         <article key={r.id} className="p-5 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] font-bold text-sm">
+                                    <div className="w-10 h-10 rounded-full bg-[#E8C65E]/20 flex items-center justify-center text-[#E8C65E] font-bold text-sm">
                                         {(r.userName || 'C').charAt(0).toUpperCase()}
                                     </div>
                                     <div>

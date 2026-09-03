@@ -74,7 +74,7 @@ export const SubscribersView = () => {
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <Mail className="w-6 h-6 text-[#D4AF37]" /> Suscriptores
+                        <Mail className="w-6 h-6 text-[#E8C65E]" /> Suscriptores
                     </h2>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                         {total === 0 ? 'Todavía no hay suscriptores.' : `${total} email${total === 1 ? '' : 's'} capturado${total === 1 ? '' : 's'} desde los formularios de la tienda.`}
@@ -84,7 +84,7 @@ export const SubscribersView = () => {
                     <button
                         onClick={copyEmails}
                         disabled={!emails.length}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-[#D4AF37]/50 disabled:opacity-40 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-[#E8C65E]/50 disabled:opacity-40 transition-colors"
                     >
                         {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                         Copiar emails
@@ -115,7 +115,7 @@ export const SubscribersView = () => {
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
                             placeholder="Buscar email…"
-                            className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white outline-none focus:border-[#D4AF37]/50"
+                            className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white outline-none focus:border-[#E8C65E]/50"
                         />
                     </div>
 
@@ -134,7 +134,7 @@ export const SubscribersView = () => {
                                     <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.03]">
                                         <td className="px-4 py-3 text-slate-900 dark:text-white font-medium break-all">{s.email}</td>
                                         <td className="px-4 py-3">
-                                            <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#D4AF37]/10 text-[#B38728] dark:text-[#D4AF37] border border-[#D4AF37]/20">
+                                            <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#E8C65E]/10 text-[#B38728] dark:text-[#E8C65E] border border-[#E8C65E]/20">
                                                 {SOURCE_LABEL[s.source] || s.source || '—'}
                                             </span>
                                         </td>

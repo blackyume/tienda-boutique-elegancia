@@ -45,7 +45,7 @@ const FaqItem = ({ q, a, open, onToggle }) => (
             className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors"
         >
             <span className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">{q}</span>
-            <ChevronDown className={`w-5 h-5 text-[#D4AF37] shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-5 h-5 text-[#E8C65E] shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
         </button>
         <div className={`grid transition-all duration-300 ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
             <div className="overflow-hidden">
@@ -62,10 +62,10 @@ export const FAQ = () => {
     const whatsapp = String(siteConfig?.contact?.whatsapp || '5493492216487').replace(/\D/g, '');
 
     return (
-        <div className="bg-white dark:bg-[#1C1F25] min-h-screen pt-32 pb-20 px-6 font-sans">
+        <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans">
             <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-12">
-                    <span className="text-[#D4AF37] font-bold tracking-[0.25em] uppercase text-xs">Ayuda</span>
+                    <span className="text-[#E8C65E] font-bold tracking-[0.25em] uppercase text-xs">Ayuda</span>
                     <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mt-2 tracking-wide">Preguntas Frecuentes</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-3 text-sm">Todo lo que necesitás saber antes de comprar.</p>
                 </div>
@@ -88,7 +88,7 @@ export const FAQ = () => {
                         <MessageCircle className="w-4 h-4" /> Escribinos por WhatsApp
                     </a>
                     <p className="text-xs text-slate-400 mt-4">
-                        También podés ver nuestra <Link to="/envios" className="text-[#D4AF37] hover:underline">política de envíos</Link> o los <Link to="/terms" className="text-[#D4AF37] hover:underline">términos y condiciones</Link>.
+                        También podés ver nuestra <Link to="/envios" className="text-[#E8C65E] hover:underline">política de envíos</Link> o los <Link to="/terms" className="text-[#E8C65E] hover:underline">términos y condiciones</Link>.
                     </p>
                 </div>
             </div>

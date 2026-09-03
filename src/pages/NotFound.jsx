@@ -16,7 +16,7 @@ export const NotFound = () => {
             </div>
 
             <div className="relative z-10 text-center px-6 max-w-2xl">
-                <span className="text-[#D4AF37] font-bold tracking-[0.4em] uppercase text-xs mb-4 block animate-fadeIn">Error 404</span>
+                <span className="text-[#E8C65E] font-bold tracking-[0.4em] uppercase text-xs mb-4 block animate-fadeIn">Error 404</span>
                 <h1 className="text-6xl md:text-8xl font-cinzel font-bold text-white mb-6 text-shadow-lg animate-slideUp">
                     Extraviado en <br /><span className="italic font-serif font-light">el Lujo</span>
                 </h1>
@@ -24,7 +24,7 @@ export const NotFound = () => {
                     La página que buscas no existe o ha sido movida a una colección privada.
                 </p>
                 <div className="animate-slideUp delay-200">
-                    <Button onClick={() => navigate('/')} className="bg-white text-black hover:bg-[#D4AF37] hover:text-white px-10 py-4 rounded-none font-bold tracking-[0.2em] transform transition-all duration-500 hover:scale-105">
+                    <Button onClick={() => navigate('/')} className="bg-white text-black hover:bg-[#E8C65E] hover:text-white px-10 py-4 rounded-none font-bold tracking-[0.2em] transform transition-all duration-500 hover:scale-105">
                         VOLVER A LA BOUTIQUE
                     </Button>
                 </div>

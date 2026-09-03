@@ -88,7 +88,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
             >
                 <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
                     <div className="flex items-center gap-3">
-                        <FileSpreadsheet className="w-5 h-5 text-[#D4AF37]" />
+                        <FileSpreadsheet className="w-5 h-5 text-[#E8C65E]" />
                         <div>
                             <h2 className="font-luxury font-bold uppercase tracking-[0.2em] text-sm dark:text-white">Importar inventario</h2>
                             <p className="text-[11px] text-slate-500 mt-0.5">{archivo || 'Excel o CSV — se empareja por nombre de producto'}</p>
@@ -105,7 +105,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
                             onClick={() => inputRef.current?.click()}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => { e.preventDefault(); procesar(e.dataTransfer.files?.[0]); }}
-                            className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#D4AF37] cursor-pointer p-12 text-center transition-colors"
+                            className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#E8C65E] cursor-pointer p-12 text-center transition-colors"
                         >
                             <Upload className="w-10 h-10 mx-auto text-slate-400 mb-4" />
                             <p className="font-medium dark:text-white">{leyendo ? 'Leyendo el archivo…' : 'Soltá acá el Excel o hacé click para elegirlo'}</p>
@@ -127,7 +127,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
                         <div className="space-y-6">
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                                 <Contador icono={Plus} n={plan.altas.length} texto="Nuevos" color="border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/10" />
-                                <Contador icono={RefreshCw} n={plan.cambios.length} texto="Actualizados" color="border-[#D4AF37]/40 text-[#B8932E] dark:text-[#D4AF37] bg-[#D4AF37]/5" />
+                                <Contador icono={RefreshCw} n={plan.cambios.length} texto="Actualizados" color="border-[#E8C65E]/40 text-[#B8932E] dark:text-[#E8C65E] bg-[#E8C65E]/5" />
                                 <Contador icono={Check} n={plan.sinCambios} texto="Sin cambios" color="border-slate-200 dark:border-slate-800 text-slate-500" />
                                 <Contador icono={AlertTriangle} n={plan.errores.length} texto="Con error" color="border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10" />
                             </div>
@@ -168,7 +168,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
 
                             {plan.cambios.length > 0 && (
                                 <section>
-                                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#B8932E] dark:text-[#D4AF37] mb-2">Cambios</h3>
+                                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-[#B8932E] dark:text-[#E8C65E] mb-2">Cambios</h3>
                                     <ul className="text-sm border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
                                         {plan.cambios.map((c, i) => (
                                             <li key={i} className="px-3 py-2">
@@ -216,7 +216,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
                         <Button
                             onClick={aplicar}
                             disabled={!plan || aplicando || totalEscrituras === 0}
-                            className="bg-black hover:bg-[#D4AF37] text-white px-6 py-2.5 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] disabled:opacity-40 disabled:pointer-events-none"
+                            className="bg-black hover:bg-[#E8C65E] text-white px-6 py-2.5 rounded-none border border-[#E8C65E] text-xs uppercase tracking-[0.2em] disabled:opacity-40 disabled:pointer-events-none"
                         >
                             {aplicando ? 'Guardando…' : 'Confirmar importación'}
                         </Button>

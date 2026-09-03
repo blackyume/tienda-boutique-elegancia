@@ -62,13 +62,13 @@ export const PromoPopup = () => {
 
                     {code && (
                         <div className="flex flex-col gap-2">
-                            <p className="text-xs font-bold uppercase tracking-widest text-[#D4AF37]">Tu código exclusivo</p>
+                            <p className="text-xs font-bold uppercase tracking-widest text-[#E8C65E]">Tu código exclusivo</p>
                             <div
                                 onClick={copyCode}
-                                className="bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-[#D4AF37] group transition-colors"
+                                className="bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-[#E8C65E] group transition-colors"
                             >
                                 <span className="font-mono text-xl font-bold tracking-widest text-slate-800 dark:text-white">{code}</span>
-                                <Copy className="w-5 h-5 text-slate-400 group-hover:text-[#D4AF37]" />
+                                <Copy className="w-5 h-5 text-slate-400 group-hover:text-[#E8C65E]" />
                             </div>
                             <p className="text-[10px] text-slate-400 mt-1">Haz click para copiar</p>
                         </div>

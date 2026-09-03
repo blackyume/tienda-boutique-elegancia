@@ -31,10 +31,21 @@ pip install pillow numpy scipy rembg
 ⚠️ La primera vez que corras `fondo-oro.py`, **rembg descarga el modelo u2net
 (176 MB)**. Tarda y parece colgado, pero es la descarga. Después ya queda.
 
+## Lo que se hizo el 02/09
+
+- **Paleta NEGRO + ORO BRILLANTE** (`#11100D` + `#E8C65E`), pedida por el dueño.
+  El negro es cálido (H40 S12): sobre un negro frío el oro se lee como amarillo
+  pegado encima en vez de como metal. El oro subió de `#D4AF37` a `#E8C65E`
+  (11,48:1 contra el fondo, contra 9,05:1). La rampa `plata.*` de Tailwind se
+  llama ahora `noche.*`. Detalle y números en `CLAUDE.md`.
+- De paso salieron a la luz los **bordes marrones** que habían quedado sin
+  migrar de la época de la tierra en `.relieve` — ahora son un hilo de oro.
+
 ## Lo que se hizo el 21/08
 
-- **Paleta platino + oro** (`#1C1F25`). Reemplaza el fondo de tierra, que quedó
-  archivado — volver es revertir `f844712`, el tile sigue en `public/`.
+- **Paleta platino + oro** (`#1C1F25`). Reemplazó al fondo de tierra. Duró hasta
+  el 02/09; volver a cualquiera de las dos es revertir el commit de la paleta
+  (`f844712` para el platino), y el tile de tierra sigue en `public/`.
 - **`scripts/fondo-oro.py`**: pone una prenda sobre la placa dorada del
   catálogo. Es la herramienta para las fotos de ropa nuevas.
 - **Fix del email de seguimiento**: la plantilla usaba sintaxis de Handlebars

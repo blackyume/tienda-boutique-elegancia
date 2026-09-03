@@ -64,7 +64,7 @@ export const Maintenance = () => {
                     WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, transparent 35%, black 50%, black 100%)'
                 }}
             ></div>
-            <div className="fixed bottom-0 left-0 right-0 h-1/3 z-0 bg-gradient-to-t from-[#D4AF37]/5 via-transparent to-transparent"></div>
+            <div className="fixed bottom-0 left-0 right-0 h-1/3 z-0 bg-gradient-to-t from-[#E8C65E]/5 via-transparent to-transparent"></div>
 
             {/* ========== MAIN CONTENT ========== */}
             <div className="relative z-10 max-w-xl w-full text-center flex flex-col items-center">
@@ -76,7 +76,7 @@ export const Maintenance = () => {
 
                     {/* BREATHING GOLDEN GLOW - Always on, pulses brighter */}
                     <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#D4AF37] rounded-full blur-[120px] z-0"
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#E8C65E] rounded-full blur-[120px] z-0"
                         style={{
                             animation: 'breathingGlow 3s ease-in-out infinite',
                         }}
@@ -94,13 +94,13 @@ export const Maintenance = () => {
 
                     {/* ========== MANY SPARKLE STARS - Very close to logo ========== */}
                     {/* Top area */}
-                    <div className="absolute -top-1 right-6 z-20 text-[#D4AF37]" style={{ animation: 'twinkle 2s ease-in-out infinite' }}>
+                    <div className="absolute -top-1 right-6 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 2s ease-in-out infinite' }}>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
-                    <div className="absolute top-2 right-1 z-20 text-[#D4AF37]" style={{ animation: 'twinkle 1.8s ease-in-out infinite 0.3s' }}>
+                    <div className="absolute top-2 right-1 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 1.8s ease-in-out infinite 0.3s' }}>
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
-                    <div className="absolute -top-2 left-8 z-20 text-[#D4AF37]/90" style={{ animation: 'twinkle 2.2s ease-in-out infinite 0.5s' }}>
+                    <div className="absolute -top-2 left-8 z-20 text-[#E8C65E]/90" style={{ animation: 'twinkle 2.2s ease-in-out infinite 0.5s' }}>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
                     <div className="absolute top-0 left-2 z-20 text-white/60" style={{ animation: 'twinkle 2.5s ease-in-out infinite 0.2s' }}>
@@ -108,15 +108,15 @@ export const Maintenance = () => {
                     </div>
 
                     {/* Right side */}
-                    <div className="absolute top-1/4 -right-1 z-20 text-[#D4AF37]" style={{ animation: 'twinkle 1.9s ease-in-out infinite 0.7s' }}>
+                    <div className="absolute top-1/4 -right-1 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 1.9s ease-in-out infinite 0.7s' }}>
                         <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
-                    <div className="absolute top-1/2 right-0 z-20 text-[#D4AF37]/80" style={{ animation: 'twinkle 2.3s ease-in-out infinite 0.4s' }}>
+                    <div className="absolute top-1/2 right-0 z-20 text-[#E8C65E]/80" style={{ animation: 'twinkle 2.3s ease-in-out infinite 0.4s' }}>
                         <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
 
                     {/* Left side */}
-                    <div className="absolute top-1/3 -left-1 z-20 text-[#D4AF37]" style={{ animation: 'twinkle 2.1s ease-in-out infinite 0.6s' }}>
+                    <div className="absolute top-1/3 -left-1 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 2.1s ease-in-out infinite 0.6s' }}>
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
                     <div className="absolute top-1/2 left-1 z-20 text-white/50" style={{ animation: 'twinkle 2.6s ease-in-out infinite 0.9s' }}>
@@ -124,13 +124,13 @@ export const Maintenance = () => {
                     </div>
 
                     {/* Bottom area */}
-                    <div className="absolute bottom-2 right-4 z-20 text-[#D4AF37]" style={{ animation: 'twinkle 2s ease-in-out infinite 0.8s' }}>
+                    <div className="absolute bottom-2 right-4 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 2s ease-in-out infinite 0.8s' }}>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
-                    <div className="absolute -bottom-1 right-8 z-20 text-[#D4AF37]/70" style={{ animation: 'twinkle 1.7s ease-in-out infinite 0.1s' }}>
+                    <div className="absolute -bottom-1 right-8 z-20 text-[#E8C65E]/70" style={{ animation: 'twinkle 1.7s ease-in-out infinite 0.1s' }}>
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
-                    <div className="absolute bottom-0 left-6 z-20 text-[#D4AF37]/80" style={{ animation: 'twinkle 2.4s ease-in-out infinite 0.35s' }}>
+                    <div className="absolute bottom-0 left-6 z-20 text-[#E8C65E]/80" style={{ animation: 'twinkle 2.4s ease-in-out infinite 0.35s' }}>
                         <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                     </div>
                     <div className="absolute bottom-4 left-0 z-20 text-white/40" style={{ animation: 'twinkle 2.8s ease-in-out infinite 0.55s' }}>
@@ -145,7 +145,7 @@ export const Maintenance = () => {
                 </div>
 
                 {/* Gold Divider */}
-                <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mb-6 opacity-50"></div>
+                <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#E8C65E] to-transparent mb-6 opacity-50"></div>
 
                 {/* Main Heading */}
                 <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-white mb-3 tracking-[0.2em] uppercase">
@@ -158,11 +158,11 @@ export const Maintenance = () => {
                     <span className="block mt-2 text-gray-500 text-xs">Nuestra tienda online está siendo optimizada para brindarte el mejor servicio.</span>
                 </p>
 
-                <span className="block text-[#D4AF37] font-medium tracking-[0.2em] text-xs md:text-sm mb-6 uppercase">Nueva Colección 2026 • Muy Pronto</span>
+                <span className="block text-[#E8C65E] font-medium tracking-[0.2em] text-xs md:text-sm mb-6 uppercase">Nueva Colección 2026 • Muy Pronto</span>
 
                 {/* Email Form */}
                 <div className="w-full max-w-sm mx-auto mb-10">
-                    <form onSubmit={handleSubmit} className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full p-1 pl-5 shadow-xl hover:border-[#D4AF37]/30 transition-colors duration-500">
+                    <form onSubmit={handleSubmit} className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full p-1 pl-5 shadow-xl hover:border-[#E8C65E]/30 transition-colors duration-500">
                         <input
                             type="email"
                             required
@@ -175,13 +175,13 @@ export const Maintenance = () => {
                         <button
                             type="submit"
                             disabled={status === 'success' || status === 'loading'}
-                            className="bg-[#D4AF37] hover:bg-[#C19A2E] text-black px-5 py-2.5 rounded-full font-semibold text-xs uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
+                            className="bg-[#E8C65E] hover:bg-[#C19A2E] text-black px-5 py-2.5 rounded-full font-semibold text-xs uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
                         >
                             {status === 'loading' ? <Loader className="w-4 h-4 animate-spin" /> : (status === 'success' ? '¡Listo!' : 'Notificarme')}
                         </button>
                     </form>
                     {status === 'success' && (
-                        <p className="mt-4 text-[#D4AF37] text-xs font-medium uppercase tracking-widest animate-pulse">
+                        <p className="mt-4 text-[#E8C65E] text-xs font-medium uppercase tracking-widest animate-pulse">
                             Te avisaremos.
                         </p>
                     )}
@@ -189,7 +189,7 @@ export const Maintenance = () => {
 
                 {/* Social Icons */}
                 <div className="flex items-center justify-center gap-6 mt-4">
-                    <a href="https://www.instagram.com/laboutiquedelaeleganciaoficial/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#D4AF37] transition-colors duration-300" aria-label="Instagram">
+                    <a href="https://www.instagram.com/laboutiquedelaeleganciaoficial/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#E8C65E] transition-colors duration-300" aria-label="Instagram">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
@@ -203,13 +203,13 @@ export const Maintenance = () => {
                     <button
                         onClick={handleAdminLogin}
                         disabled={loginLoading}
-                        className="p-2.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-[#D4AF37]/40 transition-all duration-300 group"
+                        className="p-2.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-[#E8C65E]/40 transition-all duration-300 group"
                         title="Acceso"
                     >
                         {loginLoading ? (
                             <Loader className="w-5 h-5 animate-spin text-gray-400" />
                         ) : (
-                            <svg className="w-5 h-5 text-gray-400 group-hover:text-[#D4AF37] transition-colors" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-gray-400 group-hover:text-[#E8C65E] transition-colors" viewBox="0 0 24 24">
                                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                 <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />

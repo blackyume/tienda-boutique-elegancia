@@ -32,7 +32,7 @@ const steps = [
 
 export const HowItWorks = () => {
     return (
-        <section className="relative py-14 md:py-20 px-6 bg-[#1C1F25] overflow-hidden">
+        <section className="relative py-14 md:py-20 px-6 bg-[#11100D] overflow-hidden">
             <div className="max-w-6xl mx-auto relative z-10">
                 <SectionHeader
                     eyebrow="La experiencia LBE"
@@ -59,7 +59,7 @@ export const HowItWorks = () => {
                                     {/* Outer ring */}
                                     <div className="absolute inset-0 rounded-full border border-cielo-gold/20 scale-125 group-hover:scale-150 group-hover:border-cielo-gold/40 transition-all duration-700" />
                                     {/* Icon circle */}
-                                    <div className="relative w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-cielo-gold/10 group-hover:border-cielo-gold/40 transition-all duration-500 shadow-[0_0_40px_rgba(212,175,55,0.05)] group-hover:shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+                                    <div className="relative w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-cielo-gold/10 group-hover:border-cielo-gold/40 transition-all duration-500 shadow-[0_0_40px_rgba(232,198,94,0.05)] group-hover:shadow-[0_0_40px_rgba(232,198,94,0.2)]">
                                         <Icon className="w-8 h-8 text-cielo-gold group-hover:scale-110 transition-transform duration-500" strokeWidth={1.5} />
                                     </div>
                                     {/* Step number */}

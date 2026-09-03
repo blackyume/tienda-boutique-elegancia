@@ -17,7 +17,7 @@ E-commerce de moda femenina premium en Argentina. Solo-dev, iteración rápida.
 ```bash
 npm run dev               # Vite dev server
 npm run build             # prebuild genera sitemap + shopping-feed → vite build
-npm test                  # vitest run (90 tests, excluye e2e/)
+npm test                  # vitest run (103 tests, excluye e2e/)
 npm run e2e               # playwright (apunta a prod por default)
 npm run e2e:install       # bajar Chromium para playwright
 npm run lint
@@ -97,10 +97,12 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Home — identidad visual (lo que no se toca sin leer)
 
-- **Paleta: PLATINO + oro** (`#1C1F25` base). La rampa `plata.*` de Tailwind conserva la **escalera de luz exacta** que tenía la tierra —mismo L en cada escalón, para que el relieve, que separa por LUZ y no por color, quedara igual— girada a H220 con S~13. Ese tinte frío leve es lo que la hace leer *plata* y no carbón: en gris puro (S0) el oro no salta. **No usar `#050505` ni negros puros** en secciones de la home: entre bloques se lee como parche.
-- **La tierra no se borró, se archivó.** Vivió en `#312721` (medido de una foto del campo del dueño) hasta el 21/08/2026. Sigue en git y en `public/tierra-tile.webp`; volver es revertir el commit de la paleta. El color de prenda `'tierra': '#a0522d'` de `utils/colors.js` es del catálogo y no tiene nada que ver.
-- **Textura de fondo:** grano de metal en SVG generado (`--grano-plata` en `src/index.css`, 200×200, `feTurbulence` desaturado a 0). No pesa un byte de red y `stitchTiles` cose los bordes solo, así que no tiene el problema de las "mariposas" al repetir. Se usa en dos lugares (`body` y `.bg-cielo-dark`) y el `background-size` tiene que coincidir en ambos. *(La textura anterior era la foto `tierra-tile.webp`, 768×768, cosida sin espejo con ventana coseno sobre un toro: sobre platino quedaba marrón.)*
-- **Contraste:** sobre el platino, blanco al 40% da 3,78:1 y **sigue sin llegar a AA** (sobre la tierra daba 3,61:1). El piso para texto chico sigue siendo **50–55%**. El oro `#D4AF37` mejoró: 7,85:1 contra el base (daba 6,92:1 sobre la tierra). En el pie viven los links obligatorios (Defensa al Consumidor, Botón de Arrepentimiento) — no bajarlos.
+- **Paleta: NEGRO + ORO** (`#11100D` base, rampa `noche.*`). Es negro de verdad — el blanco encima da **19,03:1** — pero girado a **H40 con S~12** en vez de gris puro. Esa pizca de calor es lo que hace que el oro se lea como **metal sobre la página** y no como un amarillo pegado encima: contra un negro frío (el platino iba a H220) el dorado le pelea el tono. **No mezclar negros fríos ni `#000` plano** en secciones nuevas: usar los escalones de `noche.*`.
+- **Las paletas viejas no se borraron, se archivaron.** Tierra `#312721` (medida de una foto del campo del dueño) hasta el 21/08/2026, después platino `#1C1F25` hasta el 02/09/2026. Las dos viven en git y la tierra además en `public/tierra-tile.webp`; volver es revertir el commit de la paleta. El color de prenda `'tierra': '#a0522d'` de `utils/colors.js` es del catálogo y no tiene nada que ver — por eso `scripts/` y `utils/colors.js` + `utils/helpers.js` **quedan afuera** de cualquier reemplazo global de color: ahí `#D4AF37` es el *camel* de una remera, no el acento de la marca.
+- **Textura de fondo:** grano de metal en SVG generado (`--grano-metal` en `src/index.css`, 200×200, `feTurbulence` desaturado a 0). No pesa un byte de red y `stitchTiles` cose los bordes solo, así que no tiene el problema de las "mariposas" al repetir. Se usa en dos lugares (`body` y `.bg-cielo-dark`) y el `background-size` tiene que coincidir en ambos. *(La textura anterior era la foto `tierra-tile.webp`, 768×768, cosida sin espejo con ventana coseno sobre un toro: fuera de la tierra queda marrón.)*
+- **El `body` lleva tres capas**, en este orden: el grano, un **resplandor dorado** que baja del borde de arriba (`radial-gradient`, alfa .045 — luz de vitrina, no un degradé visible) y el degradé de profundidad. Subirle el alfa al resplandor ensucia el negro enseguida.
+- **Contraste:** sobre el negro, blanco al 40% da 3,83:1 y **sigue sin llegar a AA**. El piso para texto chico sigue siendo **50–55%** (5,36 y 6,20:1). El oro pasó a `#E8C65E` (H45 S75 L64): **11,48:1** contra el base, contra los 9,05:1 que daría el `#D4AF37` viejo en el mismo fondo. En el pie viven los links obligatorios (Defensa al Consumidor, Botón de Arrepentimiento) — no bajarlos.
+- **El relieve cambia de motor sobre negro.** Una card (`#22201B`) contra el fondo contrasta 1,17:1: la **sombra proyectada ya no separa** (no hay nada más oscuro que la página), así que el trabajo lo hace el **filo de luz de arriba** — por eso subió de .07 a .10 — y el borde, que pasó de marrón (herencia de la tierra, había quedado sin migrar) a un **hilo de oro al 10%**.
 - **Carrusel del hero:** fundido cruzado de 1,6 s cada 7 s. Tres cuidados que no son opcionales:
   1. 🔴 **Los puntitos van FUERA de la capa con parallax.** Esa capa lleva `transform`, que abre su propio contexto de apilamiento: un `z-index` alto adentro no sube por encima de los velos oscuros del hero. Por eso el componente está partido en hook + 2 piezas.
   2. **La primera portada es el LCP** — se precarga y va `eager`; las demás entran al DOM recién en `requestIdleCallback`.
@@ -126,7 +128,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Testing
 
-- **Vitest unit tests** en `tests/`. 90 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `importarInventario` (con round-trip real de `.xlsx`) y `portadas`. Excluye `e2e/`.
+- **Vitest unit tests** en `tests/`. 103 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `contacto`, `importarInventario` (con round-trip real de `.xlsx`) y `portadas`. Excluye `e2e/`.
 - **Playwright e2e** en `e2e/`. 6 smoke tests apuntando a prod (override con `BASE_URL=http://localhost:4173`).
 - **GitHub Actions** corre tests + build en push/PR a master (`.github/workflows/ci.yml`).
 

@@ -13,7 +13,7 @@ const CATS = [
     { value: 'otros', label: 'Otros' },
 ];
 
-const inputCls = 'p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors';
+const inputCls = 'p-2.5 text-sm bg-white dark:bg-[#121212] border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#E8C65E] transition-colors';
 
 export const ExpensesView = () => {
     const { expenses = [], addExpense, deleteExpense, addToast } = useStore();
@@ -46,7 +46,7 @@ export const ExpensesView = () => {
             <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn">
                 <div>
                     <h1 className="text-3xl font-bold tracking-wide flex items-center gap-3">
-                        <Wallet className="w-7 h-7 text-[#D4AF37]" /> Gastos
+                        <Wallet className="w-7 h-7 text-[#E8C65E]" /> Gastos
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Registrá lo que gastás en el negocio. Se resta de tu ganancia neta.</p>
                 </div>
@@ -60,7 +60,7 @@ export const ExpensesView = () => {
                         <select value={category} onChange={e => setCategory(e.target.value)} className={inputCls + ' sm:col-span-2 [&>option]:bg-slate-800'}>
                             {CATS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                         </select>
-                        <Button onClick={handleAdd} disabled={saving} className="sm:col-span-2 bg-[#D4AF37] hover:bg-[#B8932E] text-white justify-center">
+                        <Button onClick={handleAdd} disabled={saving} className="sm:col-span-2 bg-[#E8C65E] hover:bg-[#B8932E] text-white justify-center">
                             <Plus className="w-4 h-4 mr-1" /> Cargar
                         </Button>
                     </div>
@@ -70,7 +70,7 @@ export const ExpensesView = () => {
                 <div className="flex items-center justify-between flex-wrap gap-3 bg-gradient-to-br from-[#1a1a1a] to-[#121212] text-white p-6 rounded-2xl">
                     <div>
                         <p className="text-xs uppercase tracking-widest text-slate-400 mb-1">Total gastado ({range === 'all' ? 'histórico' : `${range} días`})</p>
-                        <p className="text-3xl font-black text-[#D4AF37]">{formatMoney(total)}</p>
+                        <p className="text-3xl font-black text-[#E8C65E]">{formatMoney(total)}</p>
                     </div>
                     <div className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-lg border border-white/10">
                         <Calendar className="w-4 h-4 text-slate-400" />

@@ -132,7 +132,7 @@ export const CouponsView = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl font-luxury font-bold dark:text-white text-slate-900 tracking-wider flex items-center gap-3">
-                        <Ticket className="w-8 h-8 text-[#D4AF37]" />
+                        <Ticket className="w-8 h-8 text-[#E8C65E]" />
                         Cupones de Descuento
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">
@@ -141,7 +141,7 @@ export const CouponsView = () => {
                 </div>
                 <Button
                     onClick={() => openModal()}
-                    className="bg-black hover:bg-[#D4AF37] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#D4AF37] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1"
+                    className="bg-black hover:bg-[#E8C65E] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#E8C65E] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1"
                 >
                     <Plus className="w-4 h-4 mr-2" /> Nuevo Cupón
                 </Button>
@@ -250,7 +250,7 @@ export const CouponsView = () => {
 
                                         {/* DISCOUNT */}
                                         <td className="p-4 text-center">
-                                            <span className="inline-flex items-center gap-1 font-bold text-[#D4AF37]">
+                                            <span className="inline-flex items-center gap-1 font-bold text-[#E8C65E]">
                                                 {coupon.type === 'percentage' ? (
                                                     <><Percent className="w-4 h-4" /> {coupon.value}%</>
                                                 ) : (
@@ -331,7 +331,7 @@ export const CouponsView = () => {
                         {/* Modal Header */}
                         <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-[#161616]">
                             <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
-                                <Ticket className="w-5 h-5 text-[#D4AF37]" />
+                                <Ticket className="w-5 h-5 text-[#E8C65E]" />
                                 {editingCoupon ? 'Editar Cupón' : 'Nuevo Cupón'}
                             </h3>
                             <button
@@ -353,7 +353,7 @@ export const CouponsView = () => {
                                     type="text"
                                     value={formData.code}
                                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-mono font-bold text-lg tracking-widest outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/20 transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-mono font-bold text-lg tracking-widest outline-none focus:border-[#E8C65E] focus:ring-1 focus:ring-[#E8C65E]/20 transition-all"
                                     placeholder="EJ: VERANO20"
                                 />
                             </div>
@@ -369,8 +369,8 @@ export const CouponsView = () => {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'percentage' })}
                                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold text-sm transition-all ${formData.type === 'percentage'
-                                                ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
-                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#D4AF37]'
+                                                ? 'bg-[#E8C65E] text-white border-[#E8C65E]'
+                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#E8C65E]'
                                                 }`}
                                         >
                                             <Percent className="w-4 h-4" /> %
@@ -379,8 +379,8 @@ export const CouponsView = () => {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, type: 'fixed' })}
                                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-bold text-sm transition-all ${formData.type === 'fixed'
-                                                ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
-                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#D4AF37]'
+                                                ? 'bg-[#E8C65E] text-white border-[#E8C65E]'
+                                                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-[#E8C65E]'
                                                 }`}
                                         >
                                             <DollarSign className="w-4 h-4" /> $
@@ -395,7 +395,7 @@ export const CouponsView = () => {
                                         type="number"
                                         value={formData.value}
                                         onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder={formData.type === 'percentage' ? 'Ej: 20' : 'Ej: 5000'}
                                         min="1"
                                     />
@@ -411,7 +411,7 @@ export const CouponsView = () => {
                                     type="number"
                                     value={formData.minPurchase}
                                     onChange={(e) => setFormData({ ...formData, minPurchase: e.target.value })}
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                     placeholder="Sin mínimo"
                                 />
                             </div>
@@ -426,7 +426,7 @@ export const CouponsView = () => {
                                         type="date"
                                         value={formData.expiresAt}
                                         onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                     />
                                 </div>
                                 <div>
@@ -437,7 +437,7 @@ export const CouponsView = () => {
                                         type="number"
                                         value={formData.maxUses}
                                         onChange={(e) => setFormData({ ...formData, maxUses: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#D4AF37] transition-all"
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#E8C65E] transition-all"
                                         placeholder="Sin límite"
                                         min="1"
                                     />
@@ -456,7 +456,7 @@ export const CouponsView = () => {
                                 <Button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="flex-1 bg-[#D4AF37] hover:bg-[#B8932E] disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-[#D4AF37]/20"
+                                    className="flex-1 bg-[#E8C65E] hover:bg-[#B8932E] disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-[#E8C65E]/20"
                                 >
                                     {isSubmitting ? 'Guardando…' : (editingCoupon ? 'Guardar Cambios' : 'Crear Cupón')}
                                 </Button>

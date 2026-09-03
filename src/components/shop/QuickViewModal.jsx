@@ -90,7 +90,7 @@ export const QuickViewModal = ({ product, onClose }) => {
             <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" onClick={onClose} />
 
             {/* Halo dorado que respira detrás del modal */}
-            <div aria-hidden className="pointer-events-none absolute w-[min(1080px,92vw)] h-[78vh] rounded-full bg-[#D4AF37]/15 blur-[130px] animate-pulse" />
+            <div aria-hidden className="pointer-events-none absolute w-[min(1080px,92vw)] h-[78vh] rounded-full bg-[#E8C65E]/15 blur-[130px] animate-pulse" />
 
             {/* Marco con borde dorado animado (cometa que gira y destaca) */}
             <div
@@ -106,7 +106,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                     }}
                 />
                 {/* Borde estático tenue para que el marco siempre se lea */}
-                <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[26px] ring-1 ring-[#D4AF37]/20" />
+                <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[26px] ring-1 ring-[#E8C65E]/20" />
 
                 <div className="scrollbar-gold relative bg-white dark:bg-slate-950 w-full max-h-[92vh] rounded-[24px] flex flex-col md:flex-row overflow-y-auto md:overflow-hidden" onClick={(e) => e.stopPropagation()}>
 
@@ -147,7 +147,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                                 <button
                                     key={idx}
                                     onClick={() => setActiveMediaIndex(idx)}
-                                    className={`relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activeMediaIndex === idx ? 'border-[#D4AF37] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                    className={`relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${activeMediaIndex === idx ? 'border-[#E8C65E] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                 >
                                     {item.type === 'video' ? (
                                         <div className="w-full h-full bg-slate-800 flex items-center justify-center text-white">
@@ -165,7 +165,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                 {/* INFO — sólo esta columna scrollea en desktop */}
                 <div className="scrollbar-gold w-full md:w-[45%] p-8 md:p-10 flex flex-col bg-white dark:bg-slate-950 md:overflow-y-auto md:max-h-[92vh]">
                     <div className="flex justify-between items-start mb-2 pr-8">
-                        <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-[0.2em]">{product.category}</span>
+                        <span className="text-xs font-bold text-[#E8C65E] uppercase tracking-[0.2em]">{product.category}</span>
                         <button onClick={copyLink} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cielo-gold transition-colors" title="Copiar enlace">
                             {copied ? <span className="text-green-500 flex items-center gap-1"><Check className="w-4 h-4" /> Copiado</span> : <span className="flex items-center gap-1"><Share2 className="w-4 h-4" /> Compartir</span>}
                         </button>
@@ -203,7 +203,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                         <div>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest">Talle: <span className="text-slate-500 font-normal">{selectedSize || 'Elegir'}</span></span>
-                                <button onClick={() => setIsSizeGuideOpen(true)} className="text-xs text-[#D4AF37] hover:underline flex items-center gap-1"><Ruler className="w-3 h-3" /> Tabla de Talles</button>
+                                <button onClick={() => setIsSizeGuideOpen(true)} className="text-xs text-[#E8C65E] hover:underline flex items-center gap-1"><Ruler className="w-3 h-3" /> Tabla de Talles</button>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {product.sizes && product.sizes.map(size => {
@@ -235,7 +235,7 @@ export const QuickViewModal = ({ product, onClose }) => {
 
                     <button
                         onClick={goToDetail}
-                        className="mt-4 w-full h-12 rounded-xl border border-[#D4AF37]/60 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black text-xs font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group/ficha"
+                        className="mt-4 w-full h-12 rounded-xl border border-[#E8C65E]/60 text-[#E8C65E] hover:bg-[#E8C65E] hover:text-black text-xs font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group/ficha"
                     >
                         Ver ficha completa y comprar
                         <ArrowRight className="w-4 h-4 transition-transform group-hover/ficha:translate-x-1" />

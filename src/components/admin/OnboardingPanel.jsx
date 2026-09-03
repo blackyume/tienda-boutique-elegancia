@@ -68,13 +68,13 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
     }
 
     return (
-        <div className="rounded-2xl overflow-hidden border border-[#D4AF37]/30 bg-white dark:bg-[#1a1a1a] shadow-sm">
+        <div className="rounded-2xl overflow-hidden border border-[#E8C65E]/30 bg-white dark:bg-[#1a1a1a] shadow-sm">
             {/* Header dorado */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-white/5" style={{ background: 'linear-gradient(100deg, rgba(212,175,55,0.12), transparent)' }}>
+            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-white/5" style={{ background: 'linear-gradient(100deg, rgba(232,198,94,0.12), transparent)' }}>
                 <div className="flex items-center justify-between flex-wrap gap-3">
                     <div className="flex items-center gap-3">
-                        <span className="w-10 h-10 rounded-full bg-[#D4AF37]/15 flex items-center justify-center">
-                            <Sparkles className="w-5 h-5 text-[#D4AF37]" />
+                        <span className="w-10 h-10 rounded-full bg-[#E8C65E]/15 flex items-center justify-center">
+                            <Sparkles className="w-5 h-5 text-[#E8C65E]" />
                         </span>
                         <div>
                             <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">Primeros pasos</h3>
@@ -82,7 +82,7 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
                         </div>
                     </div>
                     <div className="text-right">
-                        <span className="text-2xl font-black text-[#D4AF37]">{doneCount}/{steps.length}</span>
+                        <span className="text-2xl font-black text-[#E8C65E]">{doneCount}/{steps.length}</span>
                         <p className="text-[10px] uppercase tracking-widest text-slate-400">completados</p>
                     </div>
                 </div>
@@ -106,7 +106,7 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
                         {!s.done && (
                             <button
                                 onClick={s.action}
-                                className="shrink-0 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-lg bg-slate-900 dark:bg-[#D4AF37] text-white dark:text-black hover:opacity-90 transition-opacity"
+                                className="shrink-0 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-lg bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 transition-opacity"
                             >
                                 {s.cta} <ArrowRight className="w-3.5 h-3.5" />
                             </button>

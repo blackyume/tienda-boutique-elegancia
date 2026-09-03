@@ -35,10 +35,10 @@ export const Contact = () => {
     };
 
     return (
-        <div className="bg-white dark:bg-[#1C1F25] min-h-screen pt-32 pb-20 px-6 font-sans">
+        <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans">
             <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
-                    <span className="text-[#D4AF37] font-bold tracking-[0.25em] uppercase text-xs">Estamos para ayudarte</span>
+                    <span className="text-[#E8C65E] font-bold tracking-[0.25em] uppercase text-xs">Estamos para ayudarte</span>
                     <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mt-2 tracking-wide">Contacto</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-3 text-sm">¿Tenés una consulta? Escribinos por el canal que prefieras.</p>
                 </div>
@@ -62,8 +62,8 @@ export const Contact = () => {
                                 <p className="text-slate-500 dark:text-slate-400 text-xs">También estamos acá</p>
                             </div>
                         </a>
-                        <a href={`mailto:${email}`} className="flex items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-[#D4AF37]/50 transition-colors group">
-                            <span className="w-12 h-12 rounded-full bg-[#D4AF37]/10 flex items-center justify-center"><Mail className="w-6 h-6 text-[#D4AF37]" /></span>
+                        <a href={`mailto:${email}`} className="flex items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-[#E8C65E]/50 transition-colors group">
+                            <span className="w-12 h-12 rounded-full bg-[#E8C65E]/10 flex items-center justify-center"><Mail className="w-6 h-6 text-[#E8C65E]" /></span>
                             <div>
                                 <p className="font-bold text-slate-900 dark:text-white text-sm">Email</p>
                                 <p className="text-slate-500 dark:text-slate-400 text-xs break-all">{email}</p>
@@ -94,7 +94,7 @@ export const Contact = () => {
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
                             placeholder="Ej: Sofía"
-                            className="w-full mb-4 p-3 text-sm rounded-xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors"
+                            className="w-full mb-4 p-3 text-sm rounded-xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-[#E8C65E] transition-colors"
                         />
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Tu consulta</label>
                         <textarea
@@ -102,7 +102,7 @@ export const Contact = () => {
                             onChange={(e) => setMensaje(e.target.value)}
                             rows={4}
                             placeholder="Contanos en qué te podemos ayudar…"
-                            className="w-full mb-5 p-3 text-sm rounded-xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-[#D4AF37] transition-colors resize-none"
+                            className="w-full mb-5 p-3 text-sm rounded-xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white outline-none focus:border-[#E8C65E] transition-colors resize-none"
                         />
                         <div className="space-y-2.5">
                             {telegramUrl && (

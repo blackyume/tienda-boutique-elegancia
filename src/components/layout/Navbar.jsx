@@ -136,7 +136,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 {/* MEGA MENU — el pt-3 es un puente invisible para que no se cierre
                                     al bajar el mouse del botón al menú (antes el mt-2 dejaba un hueco). */}
                                 <div className={`absolute top-full left-0 pt-3 transition-all duration-300 origin-top-left ${isShopMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-                                    <div className="min-w-[200px] bg-[#1C1F25]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                                    <div className="min-w-[200px] bg-[#11100D]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
                                         <button onClick={() => handleCategoryClick("Todos")} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">Ver Todo</button>
                                         <div className="h-px bg-white/10 my-1"></div>
                                         {categories.map(cat => (
@@ -194,7 +194,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 />
                             </div>
                             {isSearchOpen && suggestions.length > 0 && (
-                                <div className="absolute top-full right-0 mt-2 w-80 bg-[#1C1F25]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-40">
+                                <div className="absolute top-full right-0 mt-2 w-80 bg-[#11100D]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-40">
                                     <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-white/5">
                                         Sugerencias
                                     </div>
@@ -242,7 +242,7 @@ export const Navbar = ({ onOpenCart }) => {
                             {/* USER DROPDOWN - WITH INVISIBLE BRIDGE */}
                             {user && (
                                 <div className={`absolute top-full right-0 pt-4 w-60 transform transition-all duration-300 origin-top-right z-20 ${isUserMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}>
-                                    <div className="bg-[#1C1F25]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                                    <div className="bg-[#11100D]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
                                         <div className="px-5 py-4 border-b border-white/5 bg-white/5">
                                             <p className="text-xs font-bold text-white truncate font-cinzel">{user.email}</p>
                                             <div className="flex items-center gap-2 mt-1">
@@ -284,7 +284,7 @@ export const Navbar = ({ onOpenCart }) => {
                         <button onClick={onOpenCart} className="relative p-2 text-white hover:text-cielo-gold transition-colors magnetic-btn group">
                             <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             {cart.length > 0 && (
-                                <span className="absolute top-1 right-1 min-w-[14px] h-[14px] bg-cielo-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center shadow-md border border-[#1C1F25] animate-bounce-slow leading-none pt-[1px]">
+                                <span className="absolute top-1 right-1 min-w-[14px] h-[14px] bg-cielo-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center shadow-md border border-[#11100D] animate-bounce-slow leading-none pt-[1px]">
                                     {cart.reduce((a, b) => a + b.quantity, 0)}
                                 </span>
                             )}
@@ -298,7 +298,7 @@ export const Navbar = ({ onOpenCart }) => {
                 contenido pasa el alto de un teléfono y antes, al estar centrado
                 y sin overflow, se comía el título y los links del pie quedaban
                 fuera de la pantalla sin manera de llegar. */}
-            <div className={`fixed inset-0 z-[60] bg-[#1C1F25]/95 backdrop-blur-2xl transition-opacity duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'}`}>
+            <div className={`fixed inset-0 z-[60] bg-[#11100D]/95 backdrop-blur-2xl transition-opacity duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'}`}>
                 <button
                     onClick={() => setIsMobileMenuOpen(false)}
                     aria-label="Cerrar menú"

@@ -25,13 +25,13 @@ const Burbuja = ({ href, etiqueta, children, retraso }) => (
         className="group/btn relative block"
         style={{ transitionDelay: `${retraso}ms` }}
     >
-        <span className="absolute -inset-1 rounded-full border border-[#D4AF37]/40 animate-pulse" />
-        <span className="absolute inset-0 rounded-full bg-[#D4AF37]/30 blur-lg opacity-70 group-hover/btn:opacity-90 transition-opacity" />
+        <span className="absolute -inset-1 rounded-full border border-[#E8C65E]/40 animate-pulse" />
+        <span className="absolute inset-0 rounded-full bg-[#E8C65E]/30 blur-lg opacity-70 group-hover/btn:opacity-90 transition-opacity" />
         <div
             className="relative w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 group-hover/btn:scale-[1.06] active:scale-95 overflow-hidden"
             style={{
-                background: 'linear-gradient(145deg, #FCF6BA 0%, #D4AF37 45%, #B8932E 100%)',
-                boxShadow: '0 8px 24px -6px rgba(212,175,55,0.55), inset 0 1px 0 rgba(255,255,255,0.35)'
+                background: 'linear-gradient(145deg, #FCF6BA 0%, #E8C65E 45%, #B8932E 100%)',
+                boxShadow: '0 8px 24px -6px rgba(232,198,94,0.55), inset 0 1px 0 rgba(255,255,255,0.35)'
             }}
         >
             <span className="absolute top-0 left-0 right-0 h-1/2 bg-white/20 rounded-t-full" />
@@ -69,8 +69,8 @@ export const BotonesContacto = () => {
             className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 group flex flex-col items-end gap-3 transition-all duration-700 ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
         >
             <div className={`origin-bottom-right transition-all duration-400 ${showTip ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}`}>
-                <div className="relative bg-slate-900/95 backdrop-blur-xl border border-[#D4AF37]/30 px-4 py-3 rounded-xl rounded-br-none shadow-[0_8px_32px_rgba(0,0,0,0.45)] max-w-[220px]">
-                    <p className="text-[11px] font-semibold tracking-wide text-[#D4AF37] mb-0.5" style={{ fontFamily: "'Cinzel', serif" }}>
+                <div className="relative bg-slate-900/95 backdrop-blur-xl border border-[#E8C65E]/30 px-4 py-3 rounded-xl rounded-br-none shadow-[0_8px_32px_rgba(0,0,0,0.45)] max-w-[220px]">
+                    <p className="text-[11px] font-semibold tracking-wide text-[#E8C65E] mb-0.5" style={{ fontFamily: "'Cinzel', serif" }}>
                         Atención Personalizada
                     </p>
                     <p className="text-[10px] leading-relaxed text-slate-300">
@@ -78,18 +78,18 @@ export const BotonesContacto = () => {
                             ? 'Escribinos por Telegram o WhatsApp, te asesoramos al instante.'
                             : `Escribinos por ${telegram ? 'Telegram' : 'WhatsApp'}, te asesoramos al instante.`}
                     </p>
-                    <span className="absolute -bottom-[6px] right-3 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-[#D4AF37]/30" />
+                    <span className="absolute -bottom-[6px] right-3 w-3 h-3 rotate-45 bg-slate-900 border-r border-b border-[#E8C65E]/30" />
                 </div>
             </div>
 
             {telegram && (
                 <Burbuja href={telegram} etiqueta="Contactar por Telegram" retraso={0}>
-                    <IconoTelegram className="relative w-7 h-7 text-[#1C1F25]" />
+                    <IconoTelegram className="relative w-7 h-7 text-[#11100D]" />
                 </Burbuja>
             )}
             {whatsapp && (
                 <Burbuja href={whatsapp} etiqueta="Contactar por WhatsApp" retraso={80}>
-                    <IconoWhatsApp className="relative w-7 h-7 text-[#1C1F25]" />
+                    <IconoWhatsApp className="relative w-7 h-7 text-[#11100D]" />
                 </Burbuja>
             )}
         </div>

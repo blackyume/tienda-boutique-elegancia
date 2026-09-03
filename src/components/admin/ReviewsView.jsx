@@ -73,7 +73,7 @@ export const ReviewsView = () => {
                                         </div>
                                         <div className="flex items-center gap-1 mb-2">
                                             {[1, 2, 3, 4, 5].map(n => (
-                                                <Star key={n} className={`w-3.5 h-3.5 ${n <= (r.rating || 0) ? 'text-[#D4AF37] fill-[#D4AF37]' : 'text-slate-300 dark:text-slate-600'}`} />
+                                                <Star key={n} className={`w-3.5 h-3.5 ${n <= (r.rating || 0) ? 'text-[#E8C65E] fill-[#E8C65E]' : 'text-slate-300 dark:text-slate-600'}`} />
                                             ))}
                                             <span className="ml-1 text-xs text-slate-400">· {new Date(r.createdAt || 0).toLocaleString()}</span>
                                         </div>

@@ -78,7 +78,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-3">
-                                            <p className="font-bold text-[#D4AF37] text-lg font-mono">#{String(o.id || '').slice(-6)}</p>
+                                            <p className="font-bold text-[#E8C65E] text-lg font-mono">#{String(o.id || '').slice(-6)}</p>
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getStatusClasses(o.status)}`}>
                                                 {getStatusLabel(o.status)}
                                             </span>

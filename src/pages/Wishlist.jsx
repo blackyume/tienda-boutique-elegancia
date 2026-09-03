@@ -30,7 +30,7 @@ export const Wishlist = () => {
                 </p>
                 <Button
                     onClick={() => navigate('/shop')}
-                    className="bg-[#D4AF37] hover:bg-[#B8932E] text-white px-8 py-3 font-bold tracking-widest uppercase"
+                    className="bg-[#E8C65E] hover:bg-[#B8932E] text-white px-8 py-3 font-bold tracking-widest uppercase"
                 >
                     Explorar Colección
                 </Button>

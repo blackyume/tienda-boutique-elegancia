@@ -39,7 +39,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
             ></div>
 
             {/* Modal */}
-            <div className="relative bg-white dark:bg-[#1C1F25] w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[600px] animate-slideUp">
+            <div className="relative bg-white dark:bg-[#11100D] w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[600px] animate-slideUp">
 
                 {/* Close Button */}
                 <button
@@ -64,7 +64,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Right Side - Form */}
-                <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative bg-white dark:bg-[#1C1F25]">
+                <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative bg-white dark:bg-[#11100D]">
 
                     <div className="text-center mb-8">
                         <h2 className="text-3xl font-cinzel text-slate-900 dark:text-white mb-2 tracking-wide">
@@ -80,12 +80,12 @@ export const AuthModal = ({ isOpen, onClose }) => {
                             <div className="group">
                                 <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Nombre</label>
                                 <div className="relative">
-                                    <User className="absolute top-3 left-0 w-5 h-5 text-slate-400 group-focus-within:text-[#D4AF37] transition-colors" />
+                                    <User className="absolute top-3 left-0 w-5 h-5 text-slate-400 group-focus-within:text-[#E8C65E] transition-colors" />
                                     <input
                                         type="text"
                                         placeholder="Tu nombre completo"
                                         required
-                                        className="w-full pl-8 pr-4 py-2 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#D4AF37] outline-none transition-colors text-slate-900 dark:text-white"
+                                        className="w-full pl-8 pr-4 py-2 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#E8C65E] outline-none transition-colors text-slate-900 dark:text-white"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     />
@@ -96,12 +96,12 @@ export const AuthModal = ({ isOpen, onClose }) => {
                         <div className="group">
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Email</label>
                             <div className="relative">
-                                <Mail className="absolute top-3 left-0 w-5 h-5 text-slate-400 group-focus-within:text-[#D4AF37] transition-colors" />
+                                <Mail className="absolute top-3 left-0 w-5 h-5 text-slate-400 group-focus-within:text-[#E8C65E] transition-colors" />
                                 <input
                                     type="email"
                                     placeholder="tu@email.com"
                                     required
-                                    className="w-full pl-8 pr-4 py-2 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#D4AF37] outline-none transition-colors text-slate-900 dark:text-white"
+                                    className="w-full pl-8 pr-4 py-2 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#E8C65E] outline-none transition-colors text-slate-900 dark:text-white"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                                 />
@@ -111,13 +111,13 @@ export const AuthModal = ({ isOpen, onClose }) => {
                         <div className="group">
                             <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Contraseña</label>
                             <div className="relative">
-                                <Lock className="absolute top-3 left-0 w-5 h-5 text-slate-400 group-focus-within:text-[#D4AF37] transition-colors" />
+                                <Lock className="absolute top-3 left-0 w-5 h-5 text-slate-400 group-focus-within:text-[#E8C65E] transition-colors" />
                                 <input
                                     type="password"
                                     placeholder="••••••••"
                                     required
                                     minLength={6}
-                                    className="w-full pl-8 pr-4 py-2 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#D4AF37] outline-none transition-colors text-slate-900 dark:text-white"
+                                    className="w-full pl-8 pr-4 py-2 bg-transparent border-b border-slate-200 dark:border-slate-700 focus:border-[#E8C65E] outline-none transition-colors text-slate-900 dark:text-white"
                                     value={formData.password}
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}
                                 />
@@ -138,7 +138,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                             <span className="w-full border-t border-slate-200 dark:border-slate-700"></span>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white dark:bg-[#1C1F25] px-2 text-slate-500">O continuar con</span>
+                            <span className="bg-white dark:bg-[#11100D] px-2 text-slate-500">O continuar con</span>
                         </div>
                     </div>
 
@@ -167,7 +167,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
                             {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
                             <button
                                 onClick={() => setIsLogin(!isLogin)}
-                                className="ml-2 font-bold text-[#D4AF37] hover:underline uppercase text-xs tracking-wider"
+                                className="ml-2 font-bold text-[#E8C65E] hover:underline uppercase text-xs tracking-wider"
                             >
                                 {isLogin ? 'Registrarse' : 'Iniciar Sesión'}
                             </button>
