@@ -8,7 +8,7 @@ E-commerce de moda femenina premium en Argentina. Solo-dev, iteración rápida.
 - Firebase: Firestore (real-time snapshots), Auth, Hosting, Storage; **firebase-admin** server-side
 - Vercel: API routes serverless en `api/*.js` (CommonJS, no ESM); cron en `api/cron/*.js`
 - Mercado Pago SDK (checkout) + webhook server-side + fallback WhatsApp deep-link
-- Gemini API (@google/generative-ai) con rotación de keys
+- Gemini API (@google/generative-ai) con rotación de keys y modelos. **La lista de modelos vive en `utils/gemini.js` (`DEFAULT_MODELS`)** y la reusan `geminiVision.js` y `api/ai-proxy.js`. A sep-2026: `gemini-3.8-flash` primero; `gemini-2.5-flash` último como respaldo porque Google lo apaga el **16/10/2026**. Los 2.0 están apagados desde junio 2026. Cuando Google retire uno, se saca de esa única lista.
 - Service Worker hand-rolled en `public/sw.js`; FCM en `public/firebase-messaging-sw.js`
 - Sentry (`@sentry/react`) error monitoring opt-in vía `VITE_SENTRY_DSN`
 
@@ -40,7 +40,7 @@ npx firebase-tools deploy --only firestore:rules
 - `scripts/` — generadores build-time (sitemap.xml, shopping feed.xml) + `armar-portada.py` (portadas del hero desde una foto vertical de modelo) + `fondo-oro.py` (pone una prenda sobre la placa dorada del catálogo).
 - `src/utils/portadas.js` — arma la lista de portadas del hero (CMS `hero.slides` → si no hay, las de la casa). Lógica pura, testeada.
 - `src/components/home/PortadaCarrusel.jsx` — `usePortadas` + `CapaPortadas` + `PuntosPortada`. **Va partido a propósito**: ver "Home" abajo.
-- `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV **con fotos**: se sueltan junto al Excel y se emparejan por nombre de archivo (`claveDeArchivo`/`agruparFotos`/`fotosDeFila`, puras y testeadas). Un producto nuevo con foto entra publicado; a uno que ya tiene foto no se le pisa. Guía para el dueño en `docs/GUIA-CARGA-MASIVA.md`, plantilla en `docs/plantilla-productos.xlsx` (hay un test que la lee con el importador real).
+- `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV **con fotos**: se sueltan junto al Excel y se emparejan por nombre de archivo (`claveDeArchivo`/`agruparFotos`/`fotosDeFila`, puras y testeadas). Un producto nuevo con foto entra publicado; a uno que ya tiene foto no se le pisa. Guía para el dueño en `docs/GUIA-CARGA-MASIVA.md`, plantilla en `docs/plantilla-productos.xlsx` (hay un test que la lee con el importador real). Para cargar de a uno por chat: `docs/GUIA-CHAT-LAU.md`.
 - `src/utils/contacto.js` — Telegram y WhatsApp de la tienda. `WHATSAPP_DE_LA_CASA` es el número real dado por el dueño; lo que se carga en Admin → Configuración manda sobre él. `canalDePedido` elige por dónde coordinar un pedido (WhatsApp primero porque `wa.me` acepta el mensaje escrito, `t.me` no).
 - `src/utils/envios.js` — opciones de envío del checkout, **pagadas por la clienta** (decisión del dueño, 12/09/2026). Tarifa de la casa: Correo Argentino a domicilio $10.900 y retiro en sucursal $7.900 — MiCorreo sep-2026 para 1 kg, zona más cara, +3% de embalaje, así ningún destino deja en pérdida. `COSTO_REAL_CORREO_1KG` es el piso sin margen. El correo aumenta cada 2-3 meses: se ajusta desde Admin → Envíos, sin código.
 
@@ -78,6 +78,7 @@ npx firebase-tools deploy --only firestore:rules
 | Rate-limit distribuido (opc) | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | upstash.com — sin estos cae a memoria |
 | Sentry (opc) | `VITE_SENTRY_DSN` | sentry.io |
 | CORS extra | `CORS_EXTRA_ORIGINS` (CSV) | — |
+| Envíos cotizados (pendiente) | `ZIPNOVA_API_KEY`, `ZIPNOVA_SECRET` | app.zipnova.com.ar → Configuración → Integraciones. Guía para el trámite en `docs/GUIA-REGISTRO-ENVIOS.md`. Envíopack se descartó: exige despacho desde AMBA |
 
 EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → Integraciones/Configuración (se guardan en `config/site_content` en Firestore).
 

@@ -14,7 +14,8 @@ const { checkRateLimit, getClientIp } = require('./_rateLimit');
 
 const CEREBRAS_URL = 'https://api.cerebras.ai/v1/chat/completions';
 const CEREBRAS_MODELS = ['qwen-3-235b-a22b-instruct-2507', 'zai-glm-4.7', 'gpt-oss-120b', 'llama3.1-8b'];
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro', 'gemini-pro'];
+// Vigentes a sep-2026; 2.5-flash de respaldo hasta que Google lo apague el 16/10/2026.
+const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
 
 const STATIC_ALLOWED_ORIGINS = [
     'https://la-boutique-de-la-elegancia.web.app',

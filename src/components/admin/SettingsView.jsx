@@ -327,7 +327,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
 
                             <p className="text-xs font-bold uppercase text-slate-400 mb-2">Gemini · Visión + Fallback</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label className={labelCls}>Llaves Administrador (Lau, copy, visión)</label><textarea id="aiAdminKeys" defaultValue={aiConfig?.adminKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
+                                <div><label className={labelCls}>Llaves Administrador (Lau, copy, visión)</label><textarea id="aiAdminKeys" defaultValue={aiConfig?.adminKeys || ''} placeholder="AQ.… (las nuevas) o AIzaSy… (las viejas). Varias: una por línea." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
                                 <div><label className={labelCls}>Llaves Cliente (Elegancia IA)</label><textarea id="aiCustomerKeys" defaultValue={aiConfig?.customerKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
                             </div>
                             <div className="bg-gradient-to-br from-emerald-500/10 to-transparent p-4 rounded-xl border border-emerald-500/30 mt-4">

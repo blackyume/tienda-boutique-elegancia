@@ -37,6 +37,15 @@ pip install pillow numpy scipy rembg
   el Excel y las fotos juntos; cada foto va a su producto por el nombre del
   archivo y el producto entra publicado. Guía paso a paso en
   `docs/GUIA-CARGA-MASIVA.md` y plantilla en `docs/plantilla-productos.xlsx`.
+  Para cargar de a uno hablándole a Lau: `docs/GUIA-CHAT-LAU.md`.
+- **Lau con modelos vigentes.** La lista tenía `gemini-2.0-flash` (apagado en
+  junio) y arrancaba por `gemini-2.5-flash`, que Google **apaga el 16/10/2026**.
+  Ahora arranca por `gemini-3.8-flash`. Una sola lista en `utils/gemini.js`.
+- **Envíos con cotización automática: decidido Zipnova.** Envíopack se
+  descartó porque exige despachar desde AMBA (textual en su ayuda). Guía
+  detallada del trámite, pensada para que la haga otra persona, en
+  `docs/GUIA-REGISTRO-ENVIOS.md`. Cuando estén `ZIPNOVA_API_KEY` y
+  `ZIPNOVA_SECRET` en Vercel, se programa la integración.
 
 - **🔒 Las API keys ya no son públicas.** `config/ai_settings` (Gemini, Cerebras)
   pasó a admin-only en las reglas y el front sólo se suscribe si sos admin.
@@ -91,12 +100,11 @@ Para publicar: `npm run build && npx firebase-tools deploy --only hosting`.
 
 ## Pendientes, en orden de lo que más cuesta
 
-1. **Revisar la tarifa de envío cada vez que aumente el correo.** Se cambia
-   en Admin → Envíos sin tocar código; el piso para no perder está en
-   `utils/envios.js`. Cotización en tiempo real (Envíopack/Zippin) es posible
-   —el checkout ya pide código postal— pero exige cuenta con saldo prepago y
-   **peso por producto**, que hoy no existe; el atajo sería un peso por
-   categoría. No hace falta para abrir.
+1. **Integrar Zipnova** cuando lleguen las credenciales (ver arriba):
+   peso por categoría (son 8), `api/cotizar-envio.js`, checkout con precio
+   real por CP y la tabla fija de respaldo, creación del envío al confirmar
+   el pago. Mientras tanto: revisar la tarifa fija en Admin → Envíos cada vez
+   que aumente el correo; el piso está en `utils/envios.js`.
 2. **Google Analytics** — `gaMeasurementId` vacío. Sin esto no se sabe cuánta
    gente entra ni dónde abandona el checkout.
 3. **Fotos de Unsplash** en `editorial.image` y `promoPopup.image`: son de stock

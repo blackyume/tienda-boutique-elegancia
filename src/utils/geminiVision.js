@@ -2,9 +2,10 @@
 // prenda usamos Gemini multimodal. Devuelve un borrador de producto que
 // el copiloto propone (con precio editable) antes de publicar.
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { parseJsonFromResponse } from './gemini';
+import { parseJsonFromResponse, DEFAULT_MODELS } from './gemini';
 
-const VISION_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro'];
+// Misma lista que gemini.js: los flash de la generación 3 ven imágenes.
+const VISION_MODELS = DEFAULT_MODELS;
 
 const parseKeys = (raw) => {
     if (!raw) return [];

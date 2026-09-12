@@ -4,13 +4,17 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const DEFAULT_MODELS = [
+// Modelos vigentes a septiembre 2026 (ai.google.dev/gemini-api/docs/models).
+// Se prueban en orden: flash alcanza para la tienda y es el más barato.
+// gemini-2.5-flash queda último como respaldo: Google lo apaga el 16/10/2026.
+// Los 2.0 ya están apagados (junio 2026) y 1.0-pro / gemini-pro hace rato:
+// cada uno que quedaba en la lista era un intento perdido antes de responder.
+export const DEFAULT_MODELS = [
+    'gemini-3.8-flash',
+    'gemini-3.7-flash',
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
     'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-2.5-pro',
-    'gemini-2.0-pro',
-    'gemini-1.0-pro',
-    'gemini-pro',
 ];
 
 const parseKeys = (raw) => {
