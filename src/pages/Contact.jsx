@@ -1,12 +1,12 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { MessageCircle, Mail, Instagram, MapPin, Send } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
-import { telegramDeConfig } from '../utils/contacto';
+import { telegramDeConfig, whatsappDeConfig } from '../utils/contacto';
 
 export const Contact = () => {
     useLayoutEffect(() => { window.scrollTo(0, 0); }, []);
     const { siteConfig } = useStore();
-    const whatsapp = String(siteConfig?.whatsappNumber || siteConfig?.contact?.whatsapp || '5493492216487').replace(/\D/g, '');
+    const whatsappUrl = whatsappDeConfig(siteConfig);
     const email = siteConfig?.contact?.email || 'laboutiquedelaeleganciaoficial@gmail.com';
     const instagramUrl = siteConfig?.social?.instagram || 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
 
@@ -19,7 +19,7 @@ export const Contact = () => {
     const textoConsulta = () => `¡Hola! Soy ${nombre || 'un cliente'}.\n\n${mensaje || 'Quería hacer una consulta.'}`;
 
     const enviarWhatsapp = () => {
-        window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(textoConsulta())}`, '_blank');
+        window.open(whatsappDeConfig(siteConfig, textoConsulta()), '_blank');
     };
 
     // Telegram no deja prellenar el mensaje de un chat privado (no existe un
@@ -55,7 +55,7 @@ export const Contact = () => {
                                 </div>
                             </a>
                         )}
-                        <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-[#25D366]/50 transition-colors group">
+                        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-[#25D366]/50 transition-colors group">
                             <span className="w-12 h-12 rounded-full bg-[#25D366]/10 flex items-center justify-center group-hover:bg-[#25D366]/20 transition-colors"><MessageCircle className="w-6 h-6 text-[#25D366]" /></span>
                             <div>
                                 <p className="font-bold text-slate-900 dark:text-white text-sm">WhatsApp</p>

@@ -39,10 +39,7 @@ export const Checkout = () => {
     const [referralError, setReferralError] = useState('');
     const [applyingReferral, setApplyingReferral] = useState(false);
 
-    const shippingOptions = shippingRates || {
-        correo_domicilio: { name: 'Correo Argentino a domicilio', cost: 6000, time: '3-7 días hábiles' },
-        sucursal: { name: 'Correo Argentino · Retiro en sucursal', cost: 4500, time: '3-5 días hábiles', note: 'Lo enviamos a la sucursal de Correo Argentino más cercana a tu domicilio para que lo retires. Te avisamos cuál cuando lo despachamos.' }
-    };
+    const shippingOptions = shippingRates;
     const selectedShipping = shippingOptions[shippingMethod] || {};
 
     // Si el método elegido no existe entre las opciones (cambió la config), uso el primero válido.

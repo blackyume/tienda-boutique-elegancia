@@ -26,9 +26,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // config es publico-read SALVO ai_settings: ahi viven las API keys de
+    // Gemini y Cerebras, y con read-all cualquiera las sacaba sin login.
+    // (payments y site_content llevan solo claves PUBLICAS de MP y EmailJS.)
     match /config/{id} {
-      allow read: if true;
+      allow read: if id != 'ai_settings';
       allow write: if isAdmin();
+    }
+
+    match /config/ai_settings {
+      allow read, write: if isAdmin();
     }
 
     match /shipping_provinces/{id} {

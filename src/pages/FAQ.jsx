@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
+import { whatsappDeConfig } from '../utils/contacto';
 
 const FAQS = [
     {
@@ -59,7 +60,7 @@ export const FAQ = () => {
     useLayoutEffect(() => { window.scrollTo(0, 0); }, []);
     const { siteConfig } = useStore();
     const [openIdx, setOpenIdx] = useState(0);
-    const whatsapp = String(siteConfig?.contact?.whatsapp || '5493492216487').replace(/\D/g, '');
+    const whatsappUrl = whatsappDeConfig(siteConfig);
 
     return (
         <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans">
@@ -80,7 +81,7 @@ export const FAQ = () => {
                     <p className="text-slate-700 dark:text-white font-semibold mb-1">¿No encontraste tu respuesta?</p>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mb-5">Escribinos y te ayudamos al toque.</p>
                     <a
-                        href={`https://wa.me/${whatsapp}`}
+                        href={whatsappUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 bg-[#25D366] hover:brightness-110 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all"

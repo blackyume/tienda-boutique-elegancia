@@ -17,7 +17,7 @@ E-commerce de moda femenina premium en Argentina. Solo-dev, iteración rápida.
 ```bash
 npm run dev               # Vite dev server
 npm run build             # prebuild genera sitemap + shopping-feed → vite build
-npm test                  # vitest run (103 tests, excluye e2e/)
+npm test                  # vitest run (111 tests, excluye e2e/)
 npm run e2e               # playwright (apunta a prod por default)
 npm run e2e:install       # bajar Chromium para playwright
 npm run lint
@@ -41,6 +41,8 @@ npx firebase-tools deploy --only firestore:rules
 - `src/utils/portadas.js` — arma la lista de portadas del hero (CMS `hero.slides` → si no hay, las de la casa). Lógica pura, testeada.
 - `src/components/home/PortadaCarrusel.jsx` — `usePortadas` + `CapaPortadas` + `PuntosPortada`. **Va partido a propósito**: ver "Home" abajo.
 - `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV.
+- `src/utils/contacto.js` — Telegram y WhatsApp de la tienda. `WHATSAPP_DE_LA_CASA` es el número real dado por el dueño; lo que se carga en Admin → Configuración manda sobre él. `canalDePedido` elige por dónde coordinar un pedido (WhatsApp primero porque `wa.me` acepta el mensaje escrito, `t.me` no).
+- `src/utils/envios.js` — opciones de envío del checkout. Decisión de lanzamiento (12/09/2026): **envío gratis a todo el país**, una sola opción. `COSTO_REAL_CORREO_1KG` guarda lo que cuesta de verdad cada envío regalado (MiCorreo sep-2026, zona más cara), para el día que se cobre.
 
 ## Modelo de datos
 
@@ -81,7 +83,10 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Firestore collections
 
-- `products`, `categories`, `config`, `shipping_provinces`, `coupons` — público-read, admin-write
+- `products`, `categories`, `coupons` — público-read, admin-write
+- `config/*` — público-read, admin-write, **salvo `config/ai_settings` que es admin-only**: ahí viven las API keys de Gemini y Cerebras, y hasta el 12/09/2026 cualquiera las leía sin login. El front sólo se suscribe a ese doc si el usuario es admin (`useFirestoreSubscriptions`, bloque `if (admin)`).
+- `config/shipping` — las opciones de envío del checkout (se editan en Admin → Envíos). Pasan por `utils/envios.sanearTarifas`: una opción sin nombre o sin costo numérico se descarta, y si no queda ninguna corren las de la casa (`TARIFAS_DE_LA_CASA`). En producción el doc quedó guardado en blanco y el checkout mostraba tres botones sin nombre, todos "Gratis".
+- `shipping_provinces` — **sin uso**. La tabla de 25 provincias que la acompañaba en `StoreContext` no la leía ningún componente y se borró el 12/09/2026; la regla sigue por si se retoma.
 - `suppliers`, `simulations`, `scheduled_promotions`, `ai_history` — admin-only
 - `orders` — user crea, lee propias; admin lee/actualiza todas
 - `users` — self-managed + admin read-all
@@ -128,7 +133,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Testing
 
-- **Vitest unit tests** en `tests/`. 103 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `contacto`, `importarInventario` (con round-trip real de `.xlsx`) y `portadas`. Excluye `e2e/`.
+- **Vitest unit tests** en `tests/`. 111 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `contacto`, `envios`, `importarInventario` (con round-trip real de `.xlsx`) y `portadas`. Excluye `e2e/`.
 - **Playwright e2e** en `e2e/`. 6 smoke tests apuntando a prod (override con `BASE_URL=http://localhost:4173`).
 - **GitHub Actions** corre tests + build en push/PR a master (`.github/workflows/ci.yml`).
 

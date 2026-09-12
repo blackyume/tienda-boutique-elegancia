@@ -7,6 +7,7 @@ import { useFirestoreSubscriptions } from '../hooks/useFirestoreSubscriptions';
 import { useCart } from '../hooks/useCart';
 import { useDbActions } from '../hooks/useDbActions';
 import { useAuth } from '../hooks/useAuth';
+import { TARIFAS_DE_LA_CASA, sanearTarifas } from '../utils/envios';
 
 const StoreContext = createContext();
 
@@ -101,34 +102,6 @@ export const StoreProvider = ({ children }) => {
   const [reviews, setReviews] = useState([]);
   const [visitStatsHourly, setVisitStatsHourly] = useState([]);
 
-  // Shipping Rates by Province (precargados)
-  const [shippingProvinces, setShippingProvinces] = useState([
-    { id: 'caba', name: 'CABA', price: 2500, zone: 'AMBA' },
-    { id: 'buenos_aires', name: 'Buenos Aires (GBA)', price: 3000, zone: 'AMBA' },
-    { id: 'buenos_aires_int', name: 'Buenos Aires (Interior)', price: 4500, zone: 'Centro' },
-    { id: 'cordoba', name: 'Córdoba', price: 5500, zone: 'Centro' },
-    { id: 'santa_fe', name: 'Santa Fe', price: 5000, zone: 'Centro' },
-    { id: 'mendoza', name: 'Mendoza', price: 6500, zone: 'Cuyo' },
-    { id: 'san_luis', name: 'San Luis', price: 6000, zone: 'Cuyo' },
-    { id: 'san_juan', name: 'San Juan', price: 7000, zone: 'Cuyo' },
-    { id: 'entre_rios', name: 'Entre Ríos', price: 5000, zone: 'Litoral' },
-    { id: 'corrientes', name: 'Corrientes', price: 6500, zone: 'NEA' },
-    { id: 'misiones', name: 'Misiones', price: 7000, zone: 'NEA' },
-    { id: 'chaco', name: 'Chaco', price: 7000, zone: 'NEA' },
-    { id: 'formosa', name: 'Formosa', price: 7500, zone: 'NEA' },
-    { id: 'tucuman', name: 'Tucumán', price: 7000, zone: 'NOA' },
-    { id: 'salta', name: 'Salta', price: 8000, zone: 'NOA' },
-    { id: 'jujuy', name: 'Jujuy', price: 8500, zone: 'NOA' },
-    { id: 'santiago', name: 'Santiago del Estero', price: 7000, zone: 'NOA' },
-    { id: 'catamarca', name: 'Catamarca', price: 7500, zone: 'NOA' },
-    { id: 'la_rioja', name: 'La Rioja', price: 7000, zone: 'Cuyo' },
-    { id: 'neuquen', name: 'Neuquén', price: 8000, zone: 'Patagonia' },
-    { id: 'rio_negro', name: 'Río Negro', price: 8500, zone: 'Patagonia' },
-    { id: 'la_pampa', name: 'La Pampa', price: 6000, zone: 'Centro' },
-    { id: 'chubut', name: 'Chubut', price: 9500, zone: 'Patagonia' },
-    { id: 'santa_cruz', name: 'Santa Cruz', price: 11000, zone: 'Patagonia' },
-    { id: 'tierra_del_fuego', name: 'Tierra del Fuego', price: 13000, zone: 'Patagonia' }
-  ]);
 
   // --- UI STATE ---
   const [isMaintenance, setIsMaintenance] = useState(false);
@@ -144,7 +117,7 @@ export const StoreProvider = ({ children }) => {
   useFirestoreSubscriptions({
     user,
     setUser, setInventory, setCategories, setSiteConfig, setCloudinaryConfig,
-    setAiConfig, setIsMaintenance, setCoupons, setReviews, setShippingProvinces,
+    setAiConfig, setIsMaintenance, setCoupons, setReviews,
     setLoading, setOrders, setSimulations, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
     setAbandonedCarts, setActiveSessions, setExpenses, setNewsletterSubscribers
@@ -179,17 +152,12 @@ export const StoreProvider = ({ children }) => {
   });
 
   // --- FIREBASE ACTIONS ---
-  const [shippingRates, setShippingRates] = useState({
-    andreani: { name: 'Andreani', cost: 5800, time: '2-4 días' },
-    oca: { name: 'OCA', cost: 4900, time: '3-6 días' },
-    correo_argentino: { name: 'Correo Argentino', cost: 3500, time: '5-7 días' }
-  });
-
+  const [shippingRates, setShippingRates] = useState(TARIFAS_DE_LA_CASA);
   useEffect(() => {
+    // Lo que se guarda en Admin → Envíos pasa por sanearTarifas: una opción
+    // sin nombre o sin costo numérico no llega al checkout.
     const unsubShipping = onSnapshot(doc(db, "config", "shipping"), (doc) => {
-      if (doc.exists()) {
-        setShippingRates(doc.data());
-      }
+      setShippingRates(sanearTarifas(doc.exists() ? doc.data() : null));
     });
     return () => unsubShipping();
   }, []);
@@ -274,7 +242,6 @@ export const StoreProvider = ({ children }) => {
       visitCount, incrementVisits, paymentConfig, coupons,
       suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
       abandonedCarts, activeSessions, reviews, visitStatsHourly, expenses, newsletterSubscribers,
-      shippingProvinces, setShippingProvinces,
       ...dbActions
     }}>
       {children}

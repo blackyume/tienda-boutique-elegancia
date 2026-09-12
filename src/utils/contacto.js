@@ -29,8 +29,14 @@ export const linkWhatsApp = (valor, mensaje = '') => {
 
 export const telegramDeConfig = (siteConfig) => linkTelegram(siteConfig?.social?.telegram);
 
+// El WhatsApp de la tienda, dado por el dueño el 12/09/2026. Es el respaldo
+// cuando en Admin → Configuración no hay nada cargado: lo que se carga ahí
+// manda. Antes el respaldo era un número de ejemplo (549114444...) y los
+// pedidos se iban a un desconocido; éste es el de verdad.
+export const WHATSAPP_DE_LA_CASA = '5493492216487';
+
 export const whatsappDeConfig = (siteConfig, mensaje = '') => linkWhatsApp(
-    siteConfig?.whatsappNumber || siteConfig?.contact?.whatsapp || siteConfig?.social?.whatsapp,
+    siteConfig?.whatsappNumber || siteConfig?.contact?.whatsapp || siteConfig?.social?.whatsapp || WHATSAPP_DE_LA_CASA,
     mensaje
 );
 

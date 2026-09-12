@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { linkTelegram, linkWhatsApp, telegramDeConfig, whatsappDeConfig, canalDePedido } from '../src/utils/contacto';
+import { linkTelegram, linkWhatsApp, telegramDeConfig, whatsappDeConfig, canalDePedido, WHATSAPP_DE_LA_CASA } from '../src/utils/contacto';
 
 describe('linkTelegram', () => {
     it('acepta las formas en que uno escribe un usuario', () => {
@@ -67,14 +67,17 @@ describe('canalDePedido', () => {
         expect(r.url).toContain('text=');
     });
 
-    it('cae a Telegram si no hay WhatsApp cargado', () => {
-        const r = canalDePedido({ social: { telegram: '@lbde' } }, 'Pedido #1');
-        expect(r.canal).toBe('telegram');
-        expect(r.llevaMensaje).toBe(false);
+    it('sin nada cargado va al WhatsApp de la casa, con el pedido escrito', () => {
+        for (const config of [{}, { whatsappNumber: '' }, { social: { telegram: '@lbde' } }]) {
+            const r = canalDePedido(config, 'Pedido #1');
+            expect(r.canal).toBe('whatsapp');
+            expect(r.llevaMensaje).toBe(true);
+            expect(r.url).toBe(`https://wa.me/${WHATSAPP_DE_LA_CASA}?text=Pedido%20%231`);
+        }
     });
 
-    it('sin nada cargado devuelve null en vez de un numero inventado', () => {
-        expect(canalDePedido({}, 'Pedido #1')).toBeNull();
-        expect(canalDePedido({ whatsappNumber: '' }, 'x')).toBeNull();
+    it('el numero de la casa es el de la tienda, no uno de ejemplo', () => {
+        expect(WHATSAPP_DE_LA_CASA).toBe('5493492216487');
+        expect(WHATSAPP_DE_LA_CASA).not.toMatch(/4444|1234/);
     });
 });

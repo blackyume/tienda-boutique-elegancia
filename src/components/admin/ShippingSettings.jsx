@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
 import { Truck, Save, RefreshCw, Plus, Trash2, Store, MapPin } from 'lucide-react';
+import { esOpcionValida } from '../../utils/envios';
 
 export const ShippingSettings = () => {
     const { shippingRates, updateShippingRates, addToast, siteConfig, updateSiteConfig } = useStore();
@@ -58,7 +59,18 @@ export const ShippingSettings = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await updateShippingRates(localRates);
+            // Un metodo sin nombre o sin costo numerico no se guarda: asi
+            // quedo el doc de produccion con tres transportes en blanco que el
+            // checkout mostraba como "Gratis". Se avisa cuales se dejaron afuera.
+            const validas = Object.fromEntries(Object.entries(localRates).filter(([, o]) => esOpcionValida(o)));
+            const descartadas = Object.keys(localRates).length - Object.keys(validas).length;
+            if (!Object.keys(validas).length) {
+                addToast('Cargá al menos un método con nombre y costo', 'error');
+                setIsSaving(false);
+                return;
+            }
+            if (descartadas) addToast(`${descartadas} método${descartadas > 1 ? 's' : ''} sin nombre o sin costo no se guardaron`, 'info');
+            await updateShippingRates(validas);
         } catch (error) {
             console.error(error);
             addToast("Error al guardar", "error");

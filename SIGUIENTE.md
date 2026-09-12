@@ -1,4 +1,4 @@
-# Dónde quedamos — 21/08/2026
+# Dónde quedamos — 12/09/2026
 
 Nota para retomar el proyecto en otra máquina. Lo técnico de cada decisión
 está en `CLAUDE.md`; acá está el **estado** y **qué sigue**.
@@ -31,6 +31,27 @@ pip install pillow numpy scipy rembg
 ⚠️ La primera vez que corras `fondo-oro.py`, **rembg descarga el modelo u2net
 (176 MB)**. Tarda y parece colgado, pero es la descarga. Después ya queda.
 
+## Lo que se hizo el 12/09
+
+- **🔒 Las API keys ya no son públicas.** `config/ai_settings` (Gemini, Cerebras)
+  pasó a admin-only en las reglas y el front sólo se suscribe si sos admin.
+  Verificado desde afuera: `PERMISSION_DENIED`. **Falta que vos generes keys
+  nuevas** en Google AI Studio y Cerebras y las pegues en Admin → IA: las
+  actuales estuvieron expuestas tres semanas.
+- **Envíos: gratis a todo el país, a propósito.** El checkout mostraba tres
+  botones sin nombre y "Gratis" porque `config/shipping` quedó guardado en
+  blanco desde el panel. Ahora una opción sin nombre no llega al checkout, y
+  el respaldo es "Envío gratis a todo el país". Cada envío te cuesta ~$10.600
+  a domicilio (MiCorreo, 1 kg, zona más cara): está anotado en
+  `utils/envios.js` para cuando quieras cobrarlo, desde Admin → Envíos.
+- **WhatsApp conectado:** `5493492216487` como número de la casa. Aparece el
+  botón flotante, Contacto y FAQ usan el mismo, y el checkout manda ahí los
+  pedidos con el detalle escrito. Lo que cargues en Admin → Configuración
+  pisa este valor.
+- La tabla de 25 provincias que nadie usaba se borró.
+
+**Publicado:** hosting y reglas, todo al día con `master`.
+
 ## Lo que se hizo el 02/09
 
 - **Paleta NEGRO + ORO BRILLANTE** (`#11100D` + `#E8C65E`), pedida por el dueño.
@@ -57,34 +78,29 @@ pip install pillow numpy scipy rembg
 **Publicado en Firebase Hosting:** todo menos el último commit de contacto.
 Para publicar: `npm run build && npx firebase-tools deploy --only hosting`.
 
-## Lo primero al retomar: cargar dos datos
+## Lo primero al retomar
 
-Están vacíos y por eso **no se ve ningún botón de contacto** en la tienda:
-
-| Dato | Dónde se carga |
-|---|---|
-| Usuario de Telegram (ej. `@laboutique`) | Admin → Contenido → Redes |
-| Número de WhatsApp con código de país | Admin → Configuración |
-
-No se cargaron desde el código a propósito: no hay que inventar un número de
-contacto, porque si está mal los pedidos se van a un desconocido.
+1. **Keys nuevas de Gemini y Cerebras** (ver arriba) — 5 minutos.
+2. **Telegram**, si lo querés: Admin → Contenido → Redes, `@tu_usuario`. Hasta
+   que no esté, sólo aparece WhatsApp, que ya anda.
 
 ## Pendientes, en orden de lo que más cuesta
 
-1. **Precios de envío.** `shipping_provinces` está vacío en Firestore, así que
-   corren 25 provincias hardcodeadas en `StoreContext.jsx` que nadie calibró.
-   Si no coinciden con lo que cobra el correo, se pierde plata en cada venta.
-   Se evaluó cotización en tiempo real (Envíopack/Zippin): es posible y el
-   checkout ya pide código postal, pero **los productos no tienen peso** y toda
-   API lo exige. El atajo sería un peso por categoría (son 8) en vez de por
-   producto.
+1. **Cobrar el envío, cuando el gratis deje de cerrar.** Se cambia en
+   Admin → Envíos sin tocar código. El piso para no perder está en
+   `utils/envios.js`. Cotización en tiempo real (Envíopack/Zippin) es posible
+   —el checkout ya pide código postal— pero exige cuenta con saldo prepago y
+   **peso por producto**, que hoy no existe; el atajo sería un peso por
+   categoría. No hace falta para abrir.
 2. **Google Analytics** — `gaMeasurementId` vacío. Sin esto no se sabe cuánta
    gente entra ni dónde abandona el checkout.
 3. **Fotos de Unsplash** en `editorial.image` y `promoPopup.image`: son de stock
    ajenas, en la sección que habla de la marca.
 4. **La tira de Instagram** repite las 6 fotos del catálogo que ya se ven arriba.
-5. **`config/shipping`** en Firestore (Andreani/OCA/Correo, todo vacío): no lo
-   lee ningún código. Conviene borrarlo para que no confunda.
+5. ~~`config/shipping` no lo lee ningún código.~~ **Falso**: es justo lo que
+   lee el checkout. Ya está saneado en código; si querés, desde Admin → Envíos
+   borrá los tres métodos vacíos y guardá el de envío gratis para que Firestore
+   y el código digan lo mismo.
 
 ## Antes de sacar el mantenimiento
 

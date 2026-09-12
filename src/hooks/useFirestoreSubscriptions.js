@@ -16,7 +16,7 @@ export const quietSnap = (label) => (err) => {
 export const useFirestoreSubscriptions = ({
     user,
     setUser, setInventory, setCategories, setSiteConfig, setCloudinaryConfig,
-    setAiConfig, setIsMaintenance, setCoupons, setReviews, setShippingProvinces,
+    setAiConfig, setIsMaintenance, setCoupons, setReviews,
     setLoading, setOrders, setSimulations, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
     setAbandonedCarts, setActiveSessions, setExpenses, setNewsletterSubscribers
@@ -57,18 +57,6 @@ export const useFirestoreSubscriptions = ({
             }
         });
 
-        const unsubAiConfig = onSnapshot(doc(db, "config", "ai_settings"), (docSnap) => {
-            if (docSnap.exists()) {
-                setAiConfig({
-                    cerebrasKey: docSnap.data().cerebrasKey || "",
-                    cerebrasModel: docSnap.data().cerebrasModel || "",
-                    adminKeys: docSnap.data().adminKeys || "",
-                    customerKeys: docSnap.data().customerKeys || "",
-                    nvidiaKey: docSnap.data().nvidiaKey || "",
-                    nvidiaModel: docSnap.data().nvidiaModel || "",
-                });
-            }
-        });
 
         const unsubMaintenance = onSnapshot(doc(db, "config", "store_settings"), (docSnap) => {
             if (docSnap.exists()) {
@@ -88,19 +76,13 @@ export const useFirestoreSubscriptions = ({
             setReviews(data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
         });
 
-        const unsubShipping = onSnapshot(collection(db, "shipping_provinces"), (snap) => {
-            if (snap.docs.length > 0) {
-                const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
-                setShippingProvinces(data.sort((a, b) => a.name.localeCompare(b.name)));
-            }
-        });
 
         setLoading(false);
         return () => {
             unsubAuth(); unsubProd(); unsubCats();
-            unsubSiteConfig(); unsubCloudinary(); unsubAiConfig();
+            unsubSiteConfig(); unsubCloudinary();
             unsubMaintenance(); unsubCoupons();
-            unsubShipping(); unsubReviews();
+            unsubReviews();
         };
          
     }, []);
@@ -112,6 +94,22 @@ export const useFirestoreSubscriptions = ({
         const subs = [];
 
         if (admin) {
+            // Las API keys de IA viven aca y las reglas solo se las dan a un
+            // admin. Antes se suscribia cualquier visitante y la clave de
+            // Gemini se leia desde afuera sin login.
+            subs.push(onSnapshot(doc(db, 'config', 'ai_settings'), (docSnap) => {
+                if (!docSnap.exists()) return;
+                const d = docSnap.data();
+                setAiConfig({
+                    cerebrasKey: d.cerebrasKey || "",
+                    cerebrasModel: d.cerebrasModel || "",
+                    adminKeys: d.adminKeys || "",
+                    customerKeys: d.customerKeys || "",
+                    nvidiaKey: d.nvidiaKey || "",
+                    nvidiaModel: d.nvidiaModel || "",
+                });
+            }, quietSnap('ai_settings')));
+
             subs.push(onSnapshot(collection(db, 'orders'), (snap) => {
                 const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
                 setOrders(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
