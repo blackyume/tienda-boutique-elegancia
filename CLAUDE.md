@@ -78,7 +78,7 @@ npx firebase-tools deploy --only firestore:rules
 | Rate-limit distribuido (opc) | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | upstash.com — sin estos cae a memoria |
 | Sentry (opc) | `VITE_SENTRY_DSN` | sentry.io |
 | CORS extra | `CORS_EXTRA_ORIGINS` (CSV) | — |
-| Envíos cotizados (pendiente) | `ZIPNOVA_API_KEY`, `ZIPNOVA_SECRET` | app.zipnova.com.ar → Configuración → Integraciones. Guía para el trámite en `docs/GUIA-REGISTRO-ENVIOS.md`. Envíopack se descartó: exige despacho desde AMBA |
+| Envíos cotizados (pendiente) | `ZIPNOVA_API_KEY`, `ZIPNOVA_SECRET` | app.zipnova.com.ar → Configuración → Integraciones. Guía para el trámite en `docs/GUIA-REGISTRO-ENVIOS.md`. Envíopack se descartó: exige despacho desde AMBA. La colecta a domicilio NO depende de esto: la da MiCorreo sin contrato (`docs/GUIA-MICORREO-RETIRO.md`) |
 
 EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → Integraciones/Configuración (se guardan en `config/site_content` en Firestore).
 

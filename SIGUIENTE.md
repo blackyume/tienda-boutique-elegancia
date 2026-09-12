@@ -41,11 +41,18 @@ pip install pillow numpy scipy rembg
 - **Lau con modelos vigentes.** La lista tenía `gemini-2.0-flash` (apagado en
   junio) y arrancaba por `gemini-2.5-flash`, que Google **apaga el 16/10/2026**.
   Ahora arranca por `gemini-3.8-flash`. Una sola lista en `utils/gemini.js`.
-- **Envíos con cotización automática: decidido Zipnova.** Envíopack se
-  descartó porque exige despachar desde AMBA (textual en su ayuda). Guía
-  detallada del trámite, pensada para que la haga otra persona, en
-  `docs/GUIA-REGISTRO-ENVIOS.md`. Cuando estén `ZIPNOVA_API_KEY` y
-  `ZIPNOVA_SECRET` en Vercel, se programa la integración.
+- **Que pasen a buscar los paquetes: MiCorreo (Correo Argentino).** Sin
+  contrato ni mínimo; se pide desde Mi perfil → Domicilios y la sucursal
+  confirma si cubre la dirección de Rafaela. Cuesta $11.200 por visita (no
+  por paquete); 10-14 paquetes 40% off, 15+ gratis → conviene juntar y pedir
+  retiro dos días fijos por semana. Guía completa del flujo (registro,
+  retiro, crear envío, etiqueta, seguimiento al panel) en
+  `docs/GUIA-MICORREO-RETIRO.md`. **Hace falta impresora** para la etiqueta.
+- **Cotización automática por CP: Zipnova, para más adelante.** Envíopack se
+  descartó porque exige despachar desde AMBA (textual en su ayuda). Guía del
+  trámite en `docs/GUIA-REGISTRO-ENVIOS.md`. Cuando estén `ZIPNOVA_API_KEY` y
+  `ZIPNOVA_SECRET` en Vercel, se programa la integración. No hace falta para
+  abrir ni para que pasen a buscar.
 
 - **🔒 Las API keys ya no son públicas.** `config/ai_settings` (Gemini, Cerebras)
   pasó a admin-only en las reglas y el front sólo se suscribe si sos admin.
