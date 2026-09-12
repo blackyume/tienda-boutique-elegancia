@@ -11,7 +11,7 @@ import {
     Image as ImageIcon, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
     Check as CheckIcon, Lock, Settings, Blocks, Bot, Ticket, Building2,
-    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen, Mail
+    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen, Mail, BookOpen
 } from 'lucide-react';
 import { StatusSelector } from '../components/admin/StatusSelector';
 import { usePagination, Pagination } from '../components/ui/Pagination';
@@ -38,6 +38,7 @@ const ExpensesView = lazyNamed(() => import('../components/admin/ExpensesView'),
 const AbandonedCartsView = lazyNamed(() => import('../components/admin/AbandonedCartsView'), 'AbandonedCartsView');
 const ReviewsView = lazyNamed(() => import('../components/admin/ReviewsView'), 'ReviewsView');
 const SubscribersView = lazyNamed(() => import('../components/admin/SubscribersView'), 'SubscribersView');
+const GuiasView = lazyNamed(() => import('../components/admin/guias/GuiasView'), 'GuiasView');
 
 const TabLoader = () => (
     <div className="flex items-center justify-center py-32">
@@ -50,7 +51,7 @@ const TAB_LABELS = {
     dashboard: 'Dashboard', inventory: 'Inventario', orders: 'Pedidos', customers: 'Clientes',
     sales: 'Ventas', assistant: 'Asistente Lau', cms: 'CMS / Diseño', coupons: 'Cupones',
     suppliers: 'Proveedores', abandoned: 'Carritos Abandonados', reviews: 'Reseñas',
-    calculator: 'Historial de Costos', expenses: 'Gastos', subscribers: 'Suscriptores', settings: 'Configuración'
+    calculator: 'Historial de Costos', expenses: 'Gastos', subscribers: 'Suscriptores', guides: 'Guías', settings: 'Configuración'
 };
 
 export const Admin = () => {
@@ -411,6 +412,7 @@ export const Admin = () => {
         const cmds = [
             { id: 'act-new-product', label: 'Nuevo producto', group: 'Acción', icon: Tag, action: () => { setAdminTab('inventory'); openNewProduct(); } },
             { id: 'act-assistant', label: 'Abrir Lau (copiloto IA)', group: 'Acción', icon: Bot, action: () => setAdminTab('assistant') },
+            { id: 'act-guides', label: 'Guías de uso (cómo cargar productos, envíos…)', group: 'Acción', icon: BookOpen, action: () => setAdminTab('guides') },
             { id: 'act-store', label: 'Ir a la tienda', group: 'Acción', icon: LinkIcon, action: () => { window.location.href = '/'; } },
             ...Object.entries(TAB_LABELS).map(([k, label]) => ({ id: `nav-${k}`, label, group: 'Sección', action: () => setAdminTab(k) })),
             ...inventory.slice(0, 80).map(p => ({
@@ -491,6 +493,7 @@ export const Admin = () => {
 
                     <div className="my-6 border-t border-slate-100 dark:border-slate-800"></div>
                     <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Sistema</p>
+                    <SidebarItem icon={BookOpen} label="Guías" active={adminTab === 'guides'} onClick={() => setAdminTab('guides')} />
                     <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
                 </nav>
                 <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#161616] space-y-2">
@@ -814,6 +817,7 @@ export const Admin = () => {
                 {adminTab === 'abandoned' && <AbandonedCartsView />}
                 {adminTab === 'reviews' && <ReviewsView />}
                 {adminTab === 'subscribers' && <SubscribersView />}
+                {adminTab === 'guides' && <GuiasView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
                 </Suspense>
             </main >

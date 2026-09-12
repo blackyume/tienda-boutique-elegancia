@@ -33,6 +33,15 @@ pip install pillow numpy scipy rembg
 
 ## Lo que se hizo el 12/09
 
+- **Guías dentro del panel: Admin → Guías.** Ocho manuales ilustrados (entrar,
+  carga masiva, Lau, del pedido al envío con MiCorreo, tarifas, Zipnova,
+  llaves de IA, abrir la tienda) siempre online, con buscador, índice
+  lateral, impresión y enlaces entre sí. Viven en
+  `src/components/admin/guias/` (`contenido.jsx` es el texto; `bloques.jsx`
+  las piezas; `ilustraciones.jsx` los SVG). Los precios de envío que dicen
+  salen de `utils/envios.js`, así nunca contradicen al checkout. La plantilla
+  de Excel se sirve en `/docs/plantilla-productos.xlsx` (copia en `public/`).
+  Los `.md` de `docs/` quedan como fuente para leer en GitHub.
 - **Carga masiva con fotos.** Admin → Inventario → Importar Excel ahora acepta
   el Excel y las fotos juntos; cada foto va a su producto por el nombre del
   archivo y el producto entra publicado. Guía paso a paso en

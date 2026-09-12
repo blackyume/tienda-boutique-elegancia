@@ -334,3 +334,12 @@ img {
 .relieve img, .relieve-alto img { position: relative; z-index: 1; }
 
 
+
+
+/* Imprimir una guía del panel: sólo la guía, sin menú ni topbar. */
+@media print {
+    body * { visibility: hidden; }
+    #guia-impresa, #guia-impresa * { visibility: visible; }
+    #guia-impresa { position: absolute; left: 0; top: 0; width: 100%; padding: 0 12mm; }
+    #guia-impresa .print\:hidden { display: none !important; }
+}
