@@ -288,13 +288,13 @@ const PedidoEnvio = ({ abrir }) => (
         </Seccion>
 
         <Seccion id="pedido" titulo="3. Cada vez que entra un pedido">
-            <P>Del panel, <Ruta pasos={['Admin', 'Pedidos']} />, sacás los datos de la clienta: nombre, dirección, código postal, teléfono, y si eligió <strong>a domicilio</strong> o <strong>retiro en sucursal</strong>. Después, en MiCorreo:</P>
+            <P>Del panel, <Ruta pasos={['Admin', 'Pedidos']} />, en el pedido tocá <K>Datos y envío</K>: se despliega todo lo que necesitás (qué va, DNI, teléfono, dirección completa, y si eligió <strong>a domicilio</strong> o <strong>retiro en sucursal</strong>). El botón <K>Copiar datos para MiCorreo</K> te deja el bloque listo para pegar. Después, en MiCorreo:</P>
             <Pasos>
                 <Paso>
                     <K>Nuevo envío</K>. Tres partes:
                     <Lista items={[
                         <><strong>Origen:</strong> tus datos. Quedan guardados desde la primera vez.</>,
-                        <><strong>Destino:</strong> los datos de la clienta, y si va a domicilio o a sucursal.</>,
+                        <><strong>Destino:</strong> los datos de la clienta, tal cual los copiaste del panel, y si va a domicilio o a sucursal.</>,
                         <><strong>Paquete:</strong> medidas, peso y contenido. Una prenda en bolsa o caja chica: alrededor de 30 × 25 × 5 cm y 0,5 a 1 kg.</>,
                     ]} />
                 </Paso>

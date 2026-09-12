@@ -1,9 +1,11 @@
 import { AuthModal } from '../components/auth/AuthModal';
 import { useStore } from '../context/StoreContext';
 import { useState, useEffect } from 'react';
+import { CampoCheckout, BotonGoogle } from '../components/checkout/CamposCheckout';
+import { validarDatosCheckout, normalizarDatosCheckout, esRetiroEnSucursal, PROVINCIAS, partirNombreCompleto } from '../utils/direccion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { User, Lock, ChevronRight, ShieldCheck, ShoppingBag, Ticket, X, MessageCircle } from 'lucide-react';
+import { User, Lock, ChevronRight, ShieldCheck, ShoppingBag, Ticket, X, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
@@ -12,20 +14,28 @@ import { BrandStrip } from '../components/ui/BrandBadges';
 import { canalDePedido } from '../utils/contacto';
 
 export const Checkout = () => {
-    const { cart, cartTotal, createOrder, addToast, user, loginAnonymously, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
+    const { cart, cartTotal, createOrder, addToast, user, loginAnonymously, loginWithGoogle, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '' });
+    const [formData, setFormData] = useState({ nombre: '', apellido: '', email: '', telefono: '', dni: '', calle: '', altura: '', piso: '', cp: '', ciudad: '', provincia: '', referencias: '' });
+    const [errores, setErrores] = useState({});
     const [shippingMethod, setShippingMethod] = useState('correo_domicilio');
     const [loading, setLoading] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-    // Pre-fill email from user
+    // Si entró con Google, ya sabemos email y nombre: se prellenan sin pisar
+    // lo que la clienta haya escrito. La sesión de invitada no trae nada.
+    const logueada = !!user && !user.isAnonymous;
     useEffect(() => {
-        if (user?.email) {
-            setFormData(prev => ({ ...prev, email: user.email }));
-        }
-    }, [user]);
+        if (!logueada) return;
+        const { nombre, apellido } = partirNombreCompleto(user.displayName);
+        setFormData(prev => ({
+            ...prev,
+            email: prev.email || user.email || '',
+            nombre: prev.nombre || nombre,
+            apellido: prev.apellido || apellido,
+        }));
+    }, [user, logueada]);
 
     // Coupon state
     const [couponCode, setCouponCode] = useState('');
@@ -65,7 +75,28 @@ export const Checkout = () => {
 
     const finalTotal = cartTotal + (selectedShipping.cost || 0) + paymentSurcharge - couponDiscount - referralDiscount;
 
-    const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errores[name]) setErrores(prev => { const n = { ...prev }; delete n[name]; return n; });
+    };
+
+    const retiroEnSucursal = esRetiroEnSucursal(shippingMethod, selectedShipping);
+
+    // Una sola validación para los dos botones (Mercado Pago y WhatsApp): el
+    // de WhatsApp no es submit del form, así que el "required" del navegador
+    // no lo cubría y salían pedidos sin dirección.
+    const validar = () => {
+        const e = validarDatosCheckout(formData, { retiroEnSucursal });
+        setErrores(e);
+        const primero = Object.keys(e)[0];
+        if (!primero) return true;
+        addToast(e[primero], 'error');
+        const campo = document.querySelector(`[name="${primero}"]`);
+        campo?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        campo?.focus({ preventScroll: true });
+        return false;
+    };
 
     // Validate and apply coupon
     const handleApplyCoupon = () => {
@@ -190,7 +221,10 @@ export const Checkout = () => {
         const itemsList = cart.map(i => `• ${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity} — ${formatMoney(i.price * i.quantity)}`).join('\n');
         const shippingLine = `*Envío:* ${shippingOptions[shippingMethod]?.name || shippingMethod} — ${formatMoney(shippingOptions[shippingMethod]?.cost || 0)}`;
         const couponLine = appliedCoupon ? `\n*Cupón:* ${appliedCoupon.code} (-${formatMoney(couponDiscount)})` : '';
-        const addressLine = formData.calle ? `\n*Dirección:* ${formData.calle}${formData.altura ? ' ' + formData.altura : ''}${formData.ciudad ? ', ' + formData.ciudad : ''}${formData.cp ? ' (' + formData.cp + ')' : ''}` : '';
+        const direccion = retiroEnSucursal
+            ? `${formData.ciudad}, ${formData.provincia} (${formData.cp}) — retiro en sucursal`
+            : `${formData.calle} ${formData.altura}${formData.piso ? ', ' + formData.piso : ''}, ${formData.ciudad}, ${formData.provincia} (${formData.cp})`;
+        const addressLine = `\n*Dirección:* ${direccion}` + (formData.referencias ? `\n*Referencias:* ${formData.referencias}` : '');
         return [
             `¡Hola! Quisiera finalizar mi pedido *#${orderId}* por WhatsApp.`,
             '',
@@ -200,9 +234,10 @@ export const Checkout = () => {
             shippingLine + couponLine,
             `*Total:* ${formatMoney(finalTotal)}`,
             '',
-            `*Nombre:* ${formData.nombre || ''}`,
-            `*Email:* ${formData.email || ''}`,
-            `*DNI:* ${formData.dni || ''}` + addressLine,
+            `*Nombre:* ${formData.nombre} ${formData.apellido}`,
+            `*Email:* ${formData.email}`,
+            `*Teléfono:* ${formData.telefono}`,
+            `*DNI:* ${formData.dni}` + addressLine,
         ].join('\n');
     };
 
@@ -217,10 +252,9 @@ export const Checkout = () => {
     };
 
     const handleWhatsappCheckout = async () => {
-        if (!formData.nombre || !formData.email || !formData.dni) {
-            return addToast("Completá nombre, email y DNI antes de continuar", "error");
-        }
         if (cart.length === 0) return;
+        if (!validar()) return;
+        const datos = normalizarDatosCheckout(formData);
 
         setLoading(true);
         const buyer = await ensureBuyer();
@@ -232,7 +266,7 @@ export const Checkout = () => {
                 date: new Date().toISOString(),
                 status: 'pending_wa',
                 total: finalTotal,
-                customer: { ...formData, userId: buyer.uid, email: formData.email },
+                customer: { ...datos, userId: buyer.uid },
                 items: cart,
                 shipping: shippingMethod,
                 shippingName: selectedShipping.name || shippingMethod,
@@ -272,7 +306,8 @@ export const Checkout = () => {
 
     const handleCheckout = async (e) => {
         e.preventDefault();
-        if (!formData.nombre || !formData.email || !formData.dni) return addToast("Completa los datos obligatorios", "error");
+        if (!validar()) return;
+        const datos = normalizarDatosCheckout(formData);
 
         setLoading(true);
         const buyer = await ensureBuyer();
@@ -284,7 +319,7 @@ export const Checkout = () => {
                 date: new Date().toISOString(),
                 status: 'pending_payment', // Inicialmente pendiente
                 total: finalTotal,
-                customer: { ...formData, userId: buyer.uid, email: formData.email },
+                customer: { ...datos, userId: buyer.uid },
                 items: cart,
                 shipping: shippingMethod,
                 shippingName: selectedShipping.name || shippingMethod,
@@ -374,96 +409,109 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
 
                     <h1 className="text-4xl md:text-5xl font-cinzel text-slate-900 dark:text-white">Checkout</h1>
 
-                    {/* Comprás como invitado — registro NO requerido. Login opcional para quien vuelve. */}
-                    {!user && (
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Comprás como invitado, sin crear cuenta.{' '}
-                            <button type="button" onClick={() => setIsAuthModalOpen(true)} className="font-bold text-cielo-gold hover:underline">
-                                ¿Ya tenés cuenta? Iniciá sesión
-                            </button>
-                        </p>
+                    {/* Comprar NO exige cuenta. Google se ofrece grande porque es un
+                        toque y llena nombre y email solo; la invitada sigue igual. */}
+                    {logueada ? (
+                        <div className="flex items-center gap-3 p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 text-sm">
+                            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                            <p className="text-slate-700 dark:text-slate-200">
+                                Comprás como <strong>{user.displayName || user.email}</strong>. Tus datos ya están cargados abajo; revisalos.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/50 space-y-3">
+                            <BotonGoogle onClick={loginWithGoogle} />
+                            <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+                                Un toque y se cargan tu nombre y tu email. <strong className="text-slate-700 dark:text-slate-200">No es obligatorio:</strong> podés seguir y comprar sin cuenta.
+                                {' '}<button type="button" onClick={() => setIsAuthModalOpen(true)} className="font-bold text-cielo-gold hover:underline">Tengo cuenta con email</button>
+                            </p>
+                        </div>
                     )}
 
-                    <form id="checkout-form" onSubmit={handleCheckout} className="space-y-10">
+                    <form id="checkout-form" onSubmit={handleCheckout} noValidate className="space-y-10">
                         {/* Datos Personales */}
-                        <section className="bg-white dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-sm">
+                        <section className="bg-white dark:bg-slate-900/50 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-sm">
                             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-cielo-gold mb-8 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-cielo-gold/10 flex items-center justify-center text-cielo-gold text-lg font-serif">1</span>
                                 Tus Datos
                             </h3>
-                            <div className="grid grid-cols-2 gap-6 mb-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">Nombre</label>
-                                    <input required name="nombre" onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors placeholder-transparent" placeholder="Nombre" />
+                            <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
+                                <CampoCheckout label="Nombre" name="nombre" value={formData.nombre} onChange={handleInputChange} error={errores.nombre} autoComplete="given-name" />
+                                <CampoCheckout label="Apellido" name="apellido" value={formData.apellido} onChange={handleInputChange} error={errores.apellido} autoComplete="family-name" />
+                                <div className="sm:col-span-2">
+                                    <CampoCheckout label="Email" name="email" type="email" value={formData.email} onChange={handleInputChange} error={errores.email} autoComplete="email" inputMode="email" hint="Ahí te llega la confirmación y el número de seguimiento." />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">Apellido</label>
-                                    <input required name="apellido" onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors placeholder-transparent" placeholder="Apellido" />
-                                </div>
-                            </div>
-                            <div className="space-y-2 mb-6">
-                                <label className="text-xs font-bold uppercase text-slate-400 ml-1">Email</label>
-                                <input
-                                    required
-                                    name="email"
-                                    onChange={handleInputChange}
-                                    value={formData.email}
-                                    className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors placeholder-transparent"
-                                    placeholder="Email"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">DNI</label>
-                                    <input required name="dni" onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">Teléfono</label>
-                                    <input required name="telefono" onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" />
-                                </div>
+                                <CampoCheckout label="Teléfono" name="telefono" type="tel" value={formData.telefono} onChange={handleInputChange} error={errores.telefono} autoComplete="tel-national" inputMode="tel" placeholder="3492 216487" hint="Con código de área, sin 0 ni 15. Es para el correo si no te encuentra." />
+                                <CampoCheckout label="DNI" name="dni" value={formData.dni} onChange={handleInputChange} error={errores.dni} inputMode="numeric" placeholder="30123456" hint="Sin puntos. Lo pide el correo para entregar." />
                             </div>
                         </section>
 
                         {/* Envío */}
-                        <section className="bg-white dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-sm">
+                        <section className="bg-white dark:bg-slate-900/50 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-sm">
                             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-cielo-gold mb-8 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-cielo-gold/10 flex items-center justify-center text-cielo-gold text-lg font-serif">2</span>
                                 Envío
                             </h3>
-                            <div className="grid grid-cols-2 gap-6 mb-8">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">Dirección</label>
-                                    <input required name="calle" value={formData.calle} onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" placeholder="Calle y número" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-slate-400 ml-1">CP</label>
-                                    <input required name="cp" value={formData.cp} onChange={handleInputChange} className="w-full bg-transparent border-b border-slate-300 dark:border-slate-700 py-3 text-lg outline-none focus:border-cielo-gold transition-colors" />
-                                </div>
-                            </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-4 mb-8">
                                 {Object.entries(shippingOptions).map(([key, option]) => (
-                                    <label key={key} className={`relative flex items-center justify-between p-6 border rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${shippingMethod === key ? `bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900` : 'border-slate-200 dark:border-slate-700 hover:border-slate-400'}`}>
-                                        <div className="flex items-center gap-5">
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingMethod === key ? 'border-cielo-gold' : 'border-slate-300'}`}>
+                                    <label key={key} className={`relative flex items-center justify-between gap-4 p-5 sm:p-6 border rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${shippingMethod === key ? `bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900` : 'border-slate-200 dark:border-slate-700 hover:border-slate-400'}`}>
+                                        <div className="flex items-center gap-4 sm:gap-5 min-w-0">
+                                            <div className={`w-5 h-5 shrink-0 rounded-full border-2 flex items-center justify-center ${shippingMethod === key ? 'border-cielo-gold' : 'border-slate-300'}`}>
                                                 {shippingMethod === key && <div className="w-2.5 h-2.5 rounded-full bg-cielo-gold" />}
                                             </div>
-                                            <input type="radio" checked={shippingMethod === key} onChange={() => setShippingMethod(key)} className="hidden" />
-                                            <div>
-                                                <span className="font-bold font-serif text-lg block tracking-wide">{option.name}</span>
-                                                <span className={`text-xs uppercase tracking-widest font-bold ${shippingMethod === key ? 'text-white/60 dark:text-black/60' : 'text-slate-400'}`}>Llega en {option.time}</span>
+                                            <input type="radio" name="metodoEnvio" checked={shippingMethod === key} onChange={() => setShippingMethod(key)} className="hidden" />
+                                            <div className="min-w-0">
+                                                <span className="font-bold font-serif text-base sm:text-lg block tracking-wide leading-tight">{option.name}</span>
+                                                <span className={`text-[11px] uppercase tracking-widest font-bold ${shippingMethod === key ? 'text-white/60 dark:text-black/60' : 'text-slate-400'}`}>Llega en {option.time}</span>
                                             </div>
                                         </div>
-                                        <span className=" font-bold text-lg">{Number(option.cost) > 0 ? formatMoney(option.cost) : 'Gratis'}</span>
+                                        <span className="font-bold text-lg shrink-0">{Number(option.cost) > 0 ? formatMoney(option.cost) : 'Gratis'}</span>
                                     </label>
                                 ))}
                             </div>
                             {selectedShipping.note && (
-                                <div className="mt-5 p-4 rounded-2xl border border-cielo-gold/30 bg-cielo-gold/5 flex items-start gap-3">
+                                <div className="mb-8 p-4 rounded-2xl border border-cielo-gold/30 bg-cielo-gold/5 flex items-start gap-3">
                                     <span className="text-xl">📦</span>
                                     <p className="text-sm text-slate-600 dark:text-slate-300 leading-snug">{selectedShipping.note}</p>
                                 </div>
                             )}
+
+                            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-5">
+                                {retiroEnSucursal ? '¿A qué ciudad va? El correo lo deja en la sucursal más cercana a tu código postal.' : '¿A dónde lo mandamos?'}
+                            </p>
+                            <div className="grid sm:grid-cols-6 gap-x-6 gap-y-5">
+                                {!retiroEnSucursal && (
+                                    <>
+                                        <div className="sm:col-span-3">
+                                            <CampoCheckout label="Calle" name="calle" value={formData.calle} onChange={handleInputChange} error={errores.calle} autoComplete="address-line1" placeholder="Belgrano" />
+                                        </div>
+                                        <div className="sm:col-span-1">
+                                            <CampoCheckout label="Altura" name="altura" value={formData.altura} onChange={handleInputChange} error={errores.altura} inputMode="numeric" placeholder="1234" />
+                                        </div>
+                                        <div className="sm:col-span-2">
+                                            <CampoCheckout label="Piso / Depto" name="piso" value={formData.piso} onChange={handleInputChange} opcional placeholder="2° B" autoComplete="address-line2" />
+                                        </div>
+                                    </>
+                                )}
+                                <div className="sm:col-span-3">
+                                    <CampoCheckout label="Localidad" name="ciudad" value={formData.ciudad} onChange={handleInputChange} error={errores.ciudad} autoComplete="address-level2" placeholder="Rafaela" />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <CampoCheckout label="Provincia" name="provincia" as="select" value={formData.provincia} onChange={handleInputChange} error={errores.provincia} autoComplete="address-level1">
+                                        <option value="">Elegí…</option>
+                                        {PROVINCIAS.map(p => <option key={p} value={p}>{p}</option>)}
+                                    </CampoCheckout>
+                                </div>
+                                <div className="sm:col-span-1">
+                                    <CampoCheckout label="CP" name="cp" value={formData.cp} onChange={handleInputChange} error={errores.cp} inputMode="numeric" autoComplete="postal-code" placeholder="2300" />
+                                </div>
+                                {!retiroEnSucursal && (
+                                    <div className="sm:col-span-6">
+                                        <CampoCheckout label="Referencias para el cartero" name="referencias" value={formData.referencias} onChange={handleInputChange} opcional placeholder="Portón negro, timbre roto, dejar en la oficina de 9 a 13…" />
+                                    </div>
+                                )}
+                            </div>
                         </section>
                     </form>
                 </div>

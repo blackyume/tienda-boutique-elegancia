@@ -3,7 +3,9 @@ import { formatMoney } from '../../utils/helpers';
 import { KanbanBoard } from './KanbanBoard';
 import { EmptyState } from '../ui/EmptyState';
 import { usePrompt, useConfirm } from '../ui/ConfirmDialog';
-import { LayoutList, KanbanSquare, PackageOpen } from 'lucide-react';
+import { LayoutList, KanbanSquare, PackageOpen, ChevronDown } from 'lucide-react';
+import { DetallePedido } from './DetallePedido';
+import { useStore } from '../../context/StoreContext';
 import { usePagination, Pagination } from '../ui/Pagination';
 import { getStatusLabel, getStatusClasses, isFulfillable } from '../../utils/orderStatus';
 
@@ -12,6 +14,8 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
     const confirm = useConfirm();
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'board'
     const [filter, setFilter] = useState('all');
+    const [abierto, setAbierto] = useState(null); // id del pedido con el detalle desplegado
+    const { addToast } = useStore();
 
     // Derived state
     const filteredOrders = (orders || []).filter(o => filter === 'all' || o.status === filter);
@@ -71,7 +75,8 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                         />
                     ) : (
                         ordPage.pageItems.map(o => (
-                            <div key={o.id} className="group p-6 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors gap-4">
+                            <div key={o.id} className="group p-6 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center font-bold text-slate-500">
                                         {(o.items || []).length}
@@ -93,7 +98,14 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
 
                                 <div className="flex flex-col items-end gap-2 w-full md:w-auto pl-16 md:pl-0">
                                     <span className="font-bold text-xl dark:text-white mb-2">{formatMoney(o.total)}</span>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                                        <button
+                                            onClick={() => setAbierto(abierto === o.id ? null : o.id)}
+                                            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold uppercase border transition-colors ${abierto === o.id ? 'border-[#E8C65E] text-[#B38728] dark:text-[#E8C65E] bg-[#E8C65E]/10' : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:border-[#E8C65E]/60 hover:text-[#B38728] dark:hover:text-[#E8C65E]'}`}
+                                            aria-expanded={abierto === o.id}
+                                        >
+                                            Datos y envío <ChevronDown className={`w-3.5 h-3.5 transition-transform ${abierto === o.id ? 'rotate-180' : ''}`} />
+                                        </button>
                                         {isFulfillable(o.status) && (
                                             <button
                                                 onClick={() => handleUpdate(o.id, 'shipped')}
@@ -124,6 +136,8 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                            {abierto === o.id && <DetallePedido pedido={o} addToast={addToast} />}
                             </div>
                         )))}
                 </div>

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { db } from '../lib/firebase';
+import { direccionEnUnaLinea } from '../utils/direccion';
 import { collection, addDoc, updateDoc, deleteDoc, doc, setDoc, increment } from 'firebase/firestore';
 import imageCompression from 'browser-image-compression';
 import { deleteProductImages } from '../utils/cloudinaryDelete';
@@ -27,7 +28,7 @@ const sendCustomerEmail = async (siteConfig, order, opts = {}) => {
   const itemsSummary = (order.items || [])
     .map(i => `${i.name}${i.size ? ` (${i.size})` : ''}${i.color ? ` · ${i.color}` : ''} x${i.quantity}`)
     .join(', ') || 'Sin items';
-  const address = [c.calle, c.altura, c.piso, c.ciudad, c.cp].filter(Boolean).join(' ');
+  const address = direccionEnUnaLinea(c);
   const subjectMap = {
     confirmed: `Recibimos tu pedido ${order.id || ''} 🛍️`,
     shipped: `¡Tu pedido ${order.id || ''} va en camino! 🚚`,
@@ -408,7 +409,8 @@ export const useDbActions = ({
               phone: orderData.customer.telefono,
               dni: orderData.customer.dni,
               zip: orderData.customer.cp,
-              street: orderData.customer.calle
+              street: orderData.customer.calle,
+              street_number: orderData.customer.altura
             },
             shipping_cost: orderData.shippingCost,
             external_reference: orderData.id,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
+import { direccionEnUnaLinea } from '../utils/direccion';
 import { Search, Package, Truck, CheckCircle, MapPin, Clock, AlertCircle, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { formatMoney } from '../utils/helpers';
@@ -116,8 +117,7 @@ export const Tracking = () => {
                                     <h4 className="font-bold text-sm uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
                                         <MapPin className="w-4 h-4" /> Dirección de Envío
                                     </h4>
-                                    <p className="font-bold text-slate-900 dark:text-white">{activeOrder.customer.calle} {activeOrder.customer.altura}</p>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">{activeOrder.customer.ciudad} ({activeOrder.customer.cp})</p>
+                                    <p className="font-bold text-slate-900 dark:text-white">{direccionEnUnaLinea(activeOrder.customer) || 'Retiro en sucursal'}</p>
                                     <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">{activeOrder.customer.nombre} {activeOrder.customer.apellido}</p>
                                 </div>
                                 <div>

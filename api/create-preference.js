@@ -167,7 +167,7 @@ module.exports = async (req, res) => {
                 email: String(payer.email).slice(0, 120),
                 phone: { area_code: '', number: String(payer.phone || '') },
                 identification: { type: 'DNI', number: String(payer.dni || '') },
-                address: { zip_code: String(payer.zip || ''), street_name: String(payer.street || ''), street_number: 0 }
+                address: { zip_code: String(payer.zip || ''), street_name: String(payer.street || ''), street_number: parseInt(payer.street_number, 10) || 0 }
             },
             external_reference: orderId,
             back_urls: {

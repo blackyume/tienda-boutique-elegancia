@@ -33,6 +33,18 @@ pip install pillow numpy scipy rembg
 
 ## Lo que se hizo el 12/09
 
+- **Checkout: datos completos y validados.** Faltaban localidad y provincia
+  (el Correo no despacha sin eso), piso/depto y referencias para el cartero;
+  el botón de WhatsApp salteaba la validación y el de Mercado Pago está fuera
+  del `<form>`, así que el `required` nunca corría. Ahora una sola validación
+  (`utils/direccion.js`, testeada) cubre los dos botones, con mensaje por
+  campo. Retiro en sucursal pide sólo localidad/provincia/CP. **Google se
+  ofrece grande pero sigue siendo opcional**: se compra sin cuenta. Si entra
+  con Google, nombre y email se prellenan.
+- **Admin → Pedidos muestra el pedido completo.** Antes sólo nombre y total:
+  no había forma de ver la dirección. Botón "Datos y envío" despliega
+  contenido, DNI, teléfono (con link a WhatsApp), email y dirección, y
+  "Copiar datos para MiCorreo" arma el bloque para pegar en Nuevo envío.
 - **Guías dentro del panel: Admin → Guías.** Ocho manuales ilustrados (entrar,
   carga masiva, Lau, del pedido al envío con MiCorreo, tarifas, Zipnova,
   llaves de IA, abrir la tienda) siempre online, con buscador, índice

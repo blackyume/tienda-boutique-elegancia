@@ -37,8 +37,10 @@ paquetes por visita, el retiro te sale $2.240 por paquete.
 
 ## 3. Cada vez que entra un pedido
 
-Del panel de la tienda (**Admin → Pedidos**) sacás los datos de la clienta:
-nombre, dirección, código postal, teléfono. Y en MiCorreo:
+Del panel de la tienda (**Admin → Pedidos**), en el pedido tocá **Datos y
+envío**: ahí está todo (qué va, DNI, teléfono, dirección completa, a domicilio
+o a sucursal) y el botón **Copiar datos para MiCorreo** te deja el bloque
+listo para pegar. Y en MiCorreo:
 
 1. **Nuevo envío.** Tres partes:
    - **Origen**: tus datos (ya quedan guardados).
