@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { aNumero, aLista, aEstado, normalizarFila, planearImportacion } from '../src/utils/importarInventario';
+import { aNumero, aLista, aEstado, normalizarFila, planearImportacion, claveDeArchivo, agruparFotos, fotosDeFila } from '../src/utils/importarInventario';
 
 describe('aNumero', () => {
     it('lee el formato argentino', () => {
@@ -48,6 +48,7 @@ describe('normalizarFila', () => {
             'Estado': 'Publicado',
         });
         expect(f).toEqual({
+            fotos: '',
             nombre: 'Vestido Aurora',
             categoria: 'Vestidos',
             precio: 45000,
@@ -131,5 +132,107 @@ describe('planearImportacion', () => {
         const plan = planearImportacion([{ Producto: 'Vestido Aurora', 'Precio venta': 99000 }], inv);
         expect(plan.cambios).toHaveLength(0);
         expect(plan.errores[0].motivo).toMatch(/más de un producto/i);
+    });
+});
+
+describe('fotos: claveDeArchivo', () => {
+    it('saca extensión, separadores y el número de orden', () => {
+        expect(claveDeArchivo('jean-oxford.jpg')).toEqual({ base: 'jean oxford', orden: 0 });
+        expect(claveDeArchivo('jean-oxford-1.jpg')).toEqual({ base: 'jean oxford', orden: 1 });
+        expect(claveDeArchivo('Jean_Oxford 2.JPG')).toEqual({ base: 'jean oxford', orden: 2 });
+        expect(claveDeArchivo('jean oxford (3).png')).toEqual({ base: 'jean oxford', orden: 3 });
+        expect(claveDeArchivo('Campera Ecocuero Chocolate.webp')).toEqual({ base: 'campera ecocuero chocolate', orden: 0 });
+    });
+
+    it('ignora acentos y mayúsculas, como el resto del importador', () => {
+        expect(claveDeArchivo('Musculosa Básica.jpg').base).toBe('musculosa basica');
+    });
+});
+
+describe('fotos: agruparFotos', () => {
+    it('agrupa las variantes de una misma prenda y las ordena', () => {
+        const g = agruparFotos(['jean-oxford-2.jpg', 'jean-oxford-1.jpg', 'jean-oxford.jpg', 'top-rib.png']);
+        expect([...g.keys()]).toEqual(['jean oxford', 'top rib']);
+        expect(g.get('jean oxford').map((x) => x.nombre)).toEqual(['jean-oxford.jpg', 'jean-oxford-1.jpg', 'jean-oxford-2.jpg']);
+    });
+
+    it('descarta lo que no es imagen', () => {
+        const g = agruparFotos(['lista.xlsx', 'notas.txt', 'foto.jpg']);
+        expect([...g.keys()]).toEqual(['foto']);
+    });
+
+    it('acepta objetos File (usa .name)', () => {
+        const g = agruparFotos([{ name: 'short-santi.jpg' }]);
+        expect(g.get('short santi')[0].archivo).toEqual({ name: 'short-santi.jpg' });
+    });
+});
+
+describe('fotos: fotosDeFila', () => {
+    const grupos = agruparFotos(['jean-oxford-1.jpg', 'jean-oxford-2.jpg', 'top-rib.png', 'gamulan.jpg']);
+
+    it('sin columna Foto, empareja por el nombre del producto', () => {
+        expect(fotosDeFila({}, 'Jean Oxford', grupos).fotos).toEqual(['jean-oxford-1.jpg', 'jean-oxford-2.jpg']);
+        expect(fotosDeFila({}, 'Top Rib', grupos).fotos).toEqual(['top-rib.png']);
+        expect(fotosDeFila({}, 'Vestido Aurora', grupos)).toEqual({ fotos: [], faltan: [] });
+    });
+
+    it('con columna Foto, respeta lo que pide: archivo exacto, base sin extensión o varias', () => {
+        expect(fotosDeFila({ fotos: 'gamulan.jpg' }, 'Cualquier nombre', grupos).fotos).toEqual(['gamulan.jpg']);
+        expect(fotosDeFila({ fotos: 'jean-oxford' }, 'x', grupos).fotos).toEqual(['jean-oxford-1.jpg', 'jean-oxford-2.jpg']);
+        expect(fotosDeFila({ fotos: 'top-rib.png, gamulan.jpg' }, 'x', grupos).fotos).toEqual(['top-rib.png', 'gamulan.jpg']);
+    });
+
+    it('acepta una URL directa y avisa lo que no encuentra', () => {
+        const r = fotosDeFila({ fotos: 'https://res.cloudinary.com/x/a.jpg, no-existe.jpg' }, 'x', grupos);
+        expect(r.fotos).toEqual(['https://res.cloudinary.com/x/a.jpg']);
+        expect(r.faltan).toEqual(['no-existe.jpg']);
+    });
+});
+
+describe('planearImportacion con fotos', () => {
+    const fotos = ['jean-oxford-1.jpg', 'jean-oxford-2.jpg', 'top-rib.png', 'suelta.jpg'];
+
+    it('un producto nuevo con foto se crea PUBLICADO y con sus fotos', () => {
+        const plan = planearImportacion([{ Producto: 'Jean Oxford', 'Precio venta': 46500 }], [], fotos);
+        expect(plan.altas).toHaveLength(1);
+        expect(plan.altas[0].fotos).toEqual(['jean-oxford-1.jpg', 'jean-oxford-2.jpg']);
+        expect(plan.altas[0].datos.active).toBe(true);
+        expect(plan.altas[0].avisos).toEqual([]);
+    });
+
+    it('nuevo con foto pero marcado Borrador queda borrador', () => {
+        const plan = planearImportacion([{ Producto: 'Jean Oxford', Precio: 46500, Estado: 'Borrador' }], [], fotos);
+        expect(plan.altas[0].datos.active).toBe(false);
+    });
+
+    it('nuevo sin foto sigue entrando como borrador, con el aviso', () => {
+        const plan = planearImportacion([{ Producto: 'Vestido Aurora', Precio: 45000 }], [], fotos);
+        expect(plan.altas[0].datos.active).toBe(false);
+        expect(plan.altas[0].fotos).toEqual([]);
+        expect(plan.altas[0].avisos[0]).toMatch(/Sin foto/);
+    });
+
+    it('a un existente SIN foto se la pone y lo publica; a uno CON foto no se la toca', () => {
+        const inventario = [
+            { id: 'a', name: 'Top Rib', price: 14800, image: '', active: false },
+            { id: 'b', name: 'Jean Oxford', price: 46500, image: 'https://ya-tiene.jpg', active: true },
+        ];
+        const plan = planearImportacion([{ Producto: 'Top Rib' }, { Producto: 'Jean Oxford' }], inventario, fotos);
+        const top = plan.cambios.find((c) => c.id === 'a');
+        expect(top.fotos).toEqual(['top-rib.png']);
+        expect(top.campos.active).toBe(true);
+        expect(plan.cambios.find((c) => c.id === 'b')).toBeUndefined();
+        expect(plan.sinCambios).toBe(1);
+    });
+
+    it('avisa las fotos que no matchearon con ninguna fila', () => {
+        const plan = planearImportacion([{ Producto: 'Jean Oxford', Precio: 1 }], [], fotos);
+        expect(plan.fotosSueltas).toEqual(['suelta.jpg', 'top-rib.png']);
+    });
+
+    it('sin fotos, el plan es el de siempre', () => {
+        const plan = planearImportacion([{ Producto: 'Jean Oxford', Precio: 1 }], []);
+        expect(plan.altas[0].datos.active).toBe(false);
+        expect(plan.fotosSueltas).toEqual([]);
     });
 });

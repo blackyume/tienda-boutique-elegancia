@@ -284,9 +284,10 @@ export const useDbActions = ({
     },
 
     // --- CLOUDINARY UPLOAD ---
-    uploadImage: async (file, path = 'products') => {
+    uploadImage: async (file, path = 'products', { silencioso = false } = {}) => {
       if (!file) return null;
       if (!isAdmin) return null;
+      const avisar = (msg, tipo) => { if (!silencioso) addToast(msg, tipo); };
 
       if (!cloudinaryConfig.cloudName || !cloudinaryConfig.uploadPreset) {
         addToast("Falta configurar Cloudinary en Admin > Configuración", "error");
@@ -294,7 +295,7 @@ export const useDbActions = ({
       }
 
       try {
-        addToast("Preparando imagen...", "info");
+        avisar("Preparando imagen...", "info");
         const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true, fileType: 'image/jpeg', initialQuality: 0.8 };
         let fileToUpload = file;
         try { fileToUpload = await imageCompression(file, options); } catch (e) { console.warn("Compression skipped:", e); }
@@ -304,12 +305,12 @@ export const useDbActions = ({
         formData.append("upload_preset", cloudinaryConfig.uploadPreset);
         formData.append("folder", "tienda-cielo");
 
-        addToast("Subiendo a Cloud...", "info");
+        avisar("Subiendo a Cloud...", "info");
         const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, { method: "POST", body: formData });
         if (!res.ok) throw new Error("Error desconocido en Cloudinary");
 
         const data = await res.json();
-        addToast("Imagen subida correctamente", "success");
+        avisar("Imagen subida correctamente", "success");
         return data.secure_url;
 
       } catch (error) {

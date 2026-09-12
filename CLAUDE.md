@@ -17,7 +17,7 @@ E-commerce de moda femenina premium en Argentina. Solo-dev, iteración rápida.
 ```bash
 npm run dev               # Vite dev server
 npm run build             # prebuild genera sitemap + shopping-feed → vite build
-npm test                  # vitest run (111 tests, excluye e2e/)
+npm test                  # vitest run (127 tests, excluye e2e/)
 npm run e2e               # playwright (apunta a prod por default)
 npm run e2e:install       # bajar Chromium para playwright
 npm run lint
@@ -40,7 +40,7 @@ npx firebase-tools deploy --only firestore:rules
 - `scripts/` — generadores build-time (sitemap.xml, shopping feed.xml) + `armar-portada.py` (portadas del hero desde una foto vertical de modelo) + `fondo-oro.py` (pone una prenda sobre la placa dorada del catálogo).
 - `src/utils/portadas.js` — arma la lista de portadas del hero (CMS `hero.slides` → si no hay, las de la casa). Lógica pura, testeada.
 - `src/components/home/PortadaCarrusel.jsx` — `usePortadas` + `CapaPortadas` + `PuntosPortada`. **Va partido a propósito**: ver "Home" abajo.
-- `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV.
+- `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV **con fotos**: se sueltan junto al Excel y se emparejan por nombre de archivo (`claveDeArchivo`/`agruparFotos`/`fotosDeFila`, puras y testeadas). Un producto nuevo con foto entra publicado; a uno que ya tiene foto no se le pisa. Guía para el dueño en `docs/GUIA-CARGA-MASIVA.md`, plantilla en `docs/plantilla-productos.xlsx` (hay un test que la lee con el importador real).
 - `src/utils/contacto.js` — Telegram y WhatsApp de la tienda. `WHATSAPP_DE_LA_CASA` es el número real dado por el dueño; lo que se carga en Admin → Configuración manda sobre él. `canalDePedido` elige por dónde coordinar un pedido (WhatsApp primero porque `wa.me` acepta el mensaje escrito, `t.me` no).
 - `src/utils/envios.js` — opciones de envío del checkout, **pagadas por la clienta** (decisión del dueño, 12/09/2026). Tarifa de la casa: Correo Argentino a domicilio $10.900 y retiro en sucursal $7.900 — MiCorreo sep-2026 para 1 kg, zona más cara, +3% de embalaje, así ningún destino deja en pérdida. `COSTO_REAL_CORREO_1KG` es el piso sin margen. El correo aumenta cada 2-3 meses: se ajusta desde Admin → Envíos, sin código.
 
@@ -133,7 +133,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Testing
 
-- **Vitest unit tests** en `tests/`. 111 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `contacto`, `envios`, `importarInventario` (con round-trip real de `.xlsx`) y `portadas`. Excluye `e2e/`.
+- **Vitest unit tests** en `tests/`. 127 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `contacto`, `envios`, `importarInventario` (con round-trip real de `.xlsx`) y `portadas`. Excluye `e2e/`.
 - **Playwright e2e** en `e2e/`. 6 smoke tests apuntando a prod (override con `BASE_URL=http://localhost:4173`).
 - **GitHub Actions** corre tests + build en push/PR a master (`.github/workflows/ci.yml`).
 
@@ -141,7 +141,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 - **PWA + offline.html** + UpdatePrompt con SW versioning.
 - **Hero + parallax + carrusel de portadas** con LCP optimizado (parallax difere 800ms, noise SVG vía rIC).
-- **Importar inventario desde Excel/CSV** (Admin → ⤴ Importar Excel) — planifica antes de escribir.
+- **Importar inventario desde Excel/CSV + fotos** (Admin → Inventario → ⤴ Importar Excel) — planifica antes de escribir; las fotos se emparejan por nombre de archivo y suben a Cloudinary al confirmar.
 - **Reviews con fotos + moderación** — solo usuarios que compraron + admin aprueba.
 - **Filtros Shop** — categoría, talle, color, rango precio (min+max), stock.
 - **Búsqueda autocompletada** en Navbar (top-6 productos).

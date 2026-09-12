@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { X, Upload, FileSpreadsheet, AlertTriangle, Plus, RefreshCw, Check } from 'lucide-react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { X, Upload, FileSpreadsheet, AlertTriangle, Plus, RefreshCw, Check, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useStore } from '../../context/StoreContext';
 import { planearImportacion, filasDesdeCsv, filasDesdeExcel } from '../../utils/importarInventario';
@@ -21,64 +21,142 @@ const valorLegible = (v) => {
     return String(v);
 };
 
+const esPlanilla = (f) => /\.(xlsx|csv)$/i.test(f?.name || '');
+const esImagen = (f) => /\.(jpe?g|png|webp|avif|gif)$/i.test(f?.name || '');
+
+// Miniaturas de las fotos que van a un producto. Un File se previsualiza con
+// una object URL; una URL ya subida se muestra tal cual.
+const Miniaturas = ({ fotos }) => {
+    const [urls, setUrls] = useState([]);
+    useEffect(() => {
+        const creadas = fotos.map((f) => (typeof f === 'string' ? f : URL.createObjectURL(f)));
+        setUrls(creadas);
+        return () => fotos.forEach((f, i) => { if (typeof f !== 'string') URL.revokeObjectURL(creadas[i]); });
+    }, [fotos]);
+    if (!fotos.length) return null;
+    return (
+        <div className="flex gap-1.5 mt-1.5">
+            {urls.map((u, i) => (
+                <img key={i} src={u} alt="" className="w-10 h-12 object-cover border border-slate-200 dark:border-slate-700" />
+            ))}
+        </div>
+    );
+};
+
 export const ImportarInventarioModal = ({ onClose }) => {
-    const { inventory, addProduct, updateProduct, addToast } = useStore();
-    const [plan, setPlan] = useState(null);
+    const { inventory, addProduct, updateProduct, uploadImage, addToast } = useStore();
+    const [filas, setFilas] = useState(null);
     const [archivo, setArchivo] = useState('');
+    const [fotos, setFotos] = useState([]);
+    const [plan, setPlan] = useState(null);
     const [leyendo, setLeyendo] = useState(false);
     const [aplicando, setAplicando] = useState(false);
-    const [avance, setAvance] = useState(0);
+    const [avance, setAvance] = useState('');
     const inputRef = useRef(null);
+    const inputFotosRef = useRef(null);
 
-    const procesar = useCallback(async (file) => {
-        if (!file) return;
+    // El plan se rearma cada vez que cambia el Excel o las fotos: así se pueden
+    // soltar las fotos después del Excel, o al revés, y la vista previa sigue.
+    useEffect(() => {
+        if (!filas) { setPlan(null); return; }
+        setPlan(planearImportacion(filas, inventory, fotos));
+    }, [filas, fotos, inventory]);
+
+    const recibir = useCallback(async (lista) => {
+        const archivos = [...(lista || [])];
+        const planilla = archivos.find(esPlanilla);
+        const imagenes = archivos.filter(esImagen);
+        const otros = archivos.length - imagenes.length - (planilla ? 1 : 0);
+        if (otros > 0) addToast(`${otros} archivo${otros > 1 ? 's' : ''} que no son Excel ni foto se ignoraron`, 'info');
+
+        if (imagenes.length) {
+            setFotos((prev) => {
+                const vistos = new Set(prev.map((f) => f.name));
+                return [...prev, ...imagenes.filter((f) => !vistos.has(f.name))];
+            });
+        }
+        if (!planilla) {
+            if (!imagenes.length) addToast('Soltá un Excel (.xlsx o .csv) y/o fotos', 'error');
+            return;
+        }
+
         setLeyendo(true);
-        setPlan(null);
         try {
-            const esCsv = /\.csv$/i.test(file.name);
-            const filas = esCsv
-                ? filasDesdeCsv(await file.text())
-                : await filasDesdeExcel(await file.arrayBuffer());
-            if (!filas.length) {
+            const leidas = /\.csv$/i.test(planilla.name)
+                ? filasDesdeCsv(await planilla.text())
+                : await filasDesdeExcel(await planilla.arrayBuffer());
+            if (!leidas.length) {
                 addToast('El archivo no tiene filas con datos', 'error');
                 return;
             }
-            setArchivo(file.name);
-            setPlan(planearImportacion(filas, inventory));
+            setArchivo(planilla.name);
+            setFilas(leidas);
         } catch (e) {
             console.error(e);
             addToast('No pude leer el archivo. Tiene que ser .xlsx o .csv', 'error');
         } finally {
             setLeyendo(false);
         }
-    }, [inventory, addToast]);
+    }, [addToast]);
+
+    // Sube las fotos de un ítem y devuelve los campos de imagen listos. Una
+    // URL que ya venía en la planilla no se vuelve a subir.
+    const subirFotos = async (lista, etiqueta) => {
+        const urls = [];
+        for (let i = 0; i < lista.length; i += 1) {
+            const f = lista[i];
+            setAvance(`${etiqueta} · foto ${i + 1} de ${lista.length}`);
+            const url = typeof f === 'string' ? f : await uploadImage(f, 'products', { silencioso: true });
+            if (url) urls.push(url);
+        }
+        if (!urls.length) return null;
+        return { image: urls[0], media: urls.map((u) => ({ type: 'image', url: u })) };
+    };
 
     const aplicar = async () => {
         if (!plan) return;
         setAplicando(true);
-        setAvance(0);
         const total = plan.altas.length + plan.cambios.length;
         let hechos = 0;
         let fallados = 0;
+        let sinSubir = 0;
+
         for (const alta of plan.altas) {
-            try { await addProduct(alta.datos, { silencioso: true }); }
-            catch { fallados += 1; }
+            try {
+                const imagenes = alta.fotos.length ? await subirFotos(alta.fotos, alta.nombre) : null;
+                if (alta.fotos.length && !imagenes) sinSubir += 1;
+                // Si ninguna foto llegó a Cloudinary, no se publica: quedaría un
+                // producto visible sin imagen.
+                const datos = imagenes ? { ...alta.datos, ...imagenes } : { ...alta.datos, active: false };
+                await addProduct(datos, { silencioso: true });
+            } catch { fallados += 1; }
             hechos += 1;
-            setAvance(Math.round((hechos / total) * 100));
+            setAvance(`${hechos} de ${total}`);
         }
         for (const cambio of plan.cambios) {
-            try { await updateProduct(cambio.id, cambio.campos, { silencioso: true }); }
-            catch { fallados += 1; }
+            try {
+                const imagenes = cambio.fotos?.length ? await subirFotos(cambio.fotos, cambio.nombre) : null;
+                if (cambio.fotos?.length && !imagenes) sinSubir += 1;
+                const campos = imagenes ? { ...cambio.campos, ...imagenes } : { ...cambio.campos };
+                if (cambio.fotos?.length && !imagenes) delete campos.active;
+                await updateProduct(cambio.id, campos, { silencioso: true });
+            } catch { fallados += 1; }
             hechos += 1;
-            setAvance(Math.round((hechos / total) * 100));
+            setAvance(`${hechos} de ${total}`);
         }
+
         setAplicando(false);
         if (fallados) addToast(`${total - fallados} listos, ${fallados} fallaron`, 'error');
         else addToast(`Importación lista: ${plan.altas.length} nuevos y ${plan.cambios.length} actualizados`, 'success');
+        if (sinSubir) addToast(`${sinSubir} producto${sinSubir > 1 ? 's' : ''} quedaron como borrador porque la foto no se pudo subir`, 'error');
         onClose();
     };
 
     const totalEscrituras = plan ? plan.altas.length + plan.cambios.length : 0;
+    const conFoto = plan ? plan.altas.filter((a) => a.fotos.length).length + plan.cambios.filter((c) => c.fotos?.length).length : 0;
+    const totalFotos = plan
+        ? plan.altas.reduce((n, a) => n + a.fotos.length, 0) + plan.cambios.reduce((n, c) => n + (c.fotos?.length || 0), 0)
+        : 0;
 
     return (
         <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={aplicando ? undefined : onClose}>
@@ -90,8 +168,10 @@ export const ImportarInventarioModal = ({ onClose }) => {
                     <div className="flex items-center gap-3">
                         <FileSpreadsheet className="w-5 h-5 text-[#E8C65E]" />
                         <div>
-                            <h2 className="font-luxury font-bold uppercase tracking-[0.2em] text-sm dark:text-white">Importar inventario</h2>
-                            <p className="text-[11px] text-slate-500 mt-0.5">{archivo || 'Excel o CSV — se empareja por nombre de producto'}</p>
+                            <h2 className="font-luxury font-bold uppercase tracking-[0.2em] text-sm dark:text-white">Importar productos</h2>
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                {archivo ? `${archivo}${fotos.length ? ` + ${fotos.length} foto${fotos.length === 1 ? '' : 's'}` : ''}` : 'Excel o CSV + las fotos, todo junto'}
+                            </p>
                         </div>
                     </div>
                     <button onClick={onClose} disabled={aplicando} className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-40">
@@ -104,33 +184,84 @@ export const ImportarInventarioModal = ({ onClose }) => {
                         <div
                             onClick={() => inputRef.current?.click()}
                             onDragOver={(e) => e.preventDefault()}
-                            onDrop={(e) => { e.preventDefault(); procesar(e.dataTransfer.files?.[0]); }}
+                            onDrop={(e) => { e.preventDefault(); recibir(e.dataTransfer.files); }}
                             className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-[#E8C65E] cursor-pointer p-12 text-center transition-colors"
                         >
                             <Upload className="w-10 h-10 mx-auto text-slate-400 mb-4" />
-                            <p className="font-medium dark:text-white">{leyendo ? 'Leyendo el archivo…' : 'Soltá acá el Excel o hacé click para elegirlo'}</p>
-                            <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto">
-                                Sirve la misma planilla que baja <strong>Exportar Excel</strong>: cambiás precios y stock en Excel y la volvés a subir.
-                                Un nombre que no exista se crea como borrador.
+                            <p className="font-medium dark:text-white">
+                                {leyendo ? 'Leyendo el archivo…' : 'Soltá acá el Excel y las fotos, o hacé click para elegirlos'}
                             </p>
+                            <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto">
+                                Cada foto se empareja con su producto por el <strong>nombre del archivo</strong>: <code>jean-oxford.jpg</code> va al
+                                producto "Jean Oxford". Varias fotos: <code>jean-oxford-1.jpg</code>, <code>jean-oxford-2.jpg</code>.
+                                Un producto con foto entra <strong>publicado</strong>.
+                            </p>
+                            {fotos.length > 0 && (
+                                <p className="text-xs text-[#B8932E] dark:text-[#E8C65E] mt-3">
+                                    {fotos.length} foto{fotos.length === 1 ? '' : 's'} en espera — falta el Excel
+                                </p>
+                            )}
                             <input
                                 ref={inputRef}
                                 type="file"
-                                accept=".xlsx,.csv"
+                                accept=".xlsx,.csv,image/*"
+                                multiple
                                 className="hidden"
-                                onChange={(e) => { procesar(e.target.files?.[0]); e.target.value = ''; }}
+                                onChange={(e) => { recibir(e.target.files); e.target.value = ''; }}
                             />
                         </div>
                     )}
 
                     {plan && (
                         <div className="space-y-6">
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                                 <Contador icono={Plus} n={plan.altas.length} texto="Nuevos" color="border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/10" />
                                 <Contador icono={RefreshCw} n={plan.cambios.length} texto="Actualizados" color="border-[#E8C65E]/40 text-[#B8932E] dark:text-[#E8C65E] bg-[#E8C65E]/5" />
+                                <Contador icono={ImageIcon} n={conFoto} texto="Con foto" color="border-sky-200 dark:border-sky-900/50 text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/10" />
                                 <Contador icono={Check} n={plan.sinCambios} texto="Sin cambios" color="border-slate-200 dark:border-slate-800 text-slate-500" />
                                 <Contador icono={AlertTriangle} n={plan.errores.length} texto="Con error" color="border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10" />
                             </div>
+
+                            <div
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => { e.preventDefault(); recibir(e.dataTransfer.files); }}
+                                className="flex items-center justify-between gap-4 border border-dashed border-slate-300 dark:border-slate-700 px-4 py-3"
+                            >
+                                <p className="text-xs text-slate-500">
+                                    {fotos.length
+                                        ? `${fotos.length} foto${fotos.length === 1 ? '' : 's'} cargada${fotos.length === 1 ? '' : 's'}. Podés soltar más acá.`
+                                        : 'Sin fotos todavía: soltalas acá o elegilas, y la vista previa se actualiza sola.'}
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => inputFotosRef.current?.click()}
+                                    className="shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-2 border border-[#E8C65E] text-[#B8932E] dark:text-[#E8C65E] hover:bg-[#E8C65E]/10"
+                                >
+                                    Agregar fotos
+                                </button>
+                                <input
+                                    ref={inputFotosRef}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => { recibir(e.target.files); e.target.value = ''; }}
+                                />
+                            </div>
+
+                            {plan.fotosSueltas.length > 0 && (
+                                <section>
+                                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-2">Fotos que no van a ningún producto</h3>
+                                    <p className="text-xs text-slate-500 mb-2">
+                                        El nombre del archivo no coincide con ningún producto de la planilla. Renombrala como el producto, o poné el nombre del archivo en la columna <strong>Foto</strong>.
+                                    </p>
+                                    <ul className="text-xs border border-amber-200 dark:border-amber-900/40 divide-y divide-amber-100 dark:divide-amber-900/30">
+                                        {plan.fotosSueltas.map((n) => (
+                                            <li key={n} className="px-3 py-1.5 bg-amber-50/50 dark:bg-amber-900/10 dark:text-slate-200 font-mono">{n}</li>
+                                        ))}
+                                    </ul>
+                                </section>
+                            )}
 
                             {plan.errores.length > 0 && (
                                 <section>
@@ -148,15 +279,21 @@ export const ImportarInventarioModal = ({ onClose }) => {
 
                             {plan.altas.length > 0 && (
                                 <section>
-                                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mb-2">Se crean como borrador</h3>
+                                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mb-2">Nuevos</h3>
                                     <ul className="text-sm border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
                                         {plan.altas.map((a, i) => (
                                             <li key={i} className="px-3 py-2">
-                                                <p className="font-medium dark:text-white">{a.nombre}</p>
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <p className="font-medium dark:text-white">{a.nombre}</p>
+                                                    <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 border ${a.datos.active ? 'border-emerald-300 text-emerald-600' : 'border-slate-300 text-slate-500'}`}>
+                                                        {a.datos.active ? 'Publicado' : 'Borrador'}
+                                                    </span>
+                                                </div>
                                                 <p className="text-xs text-slate-500">
                                                     {formatMoney(a.datos.price)} · stock {a.datos.stock}
                                                     {a.datos.category ? ` · ${a.datos.category}` : ''}
                                                 </p>
+                                                <Miniaturas fotos={a.fotos} />
                                                 {a.avisos.map((av, j) => (
                                                     <p key={j} className="text-[11px] text-amber-600 dark:text-amber-500 mt-0.5">⚠ {av}</p>
                                                 ))}
@@ -182,6 +319,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
                                                         </span>
                                                     ))}
                                                 </div>
+                                                <Miniaturas fotos={c.fotos || []} />
                                                 {c.avisos.map((av, j) => (
                                                     <p key={j} className="text-[11px] text-amber-600 dark:text-amber-500 mt-0.5">⚠ {av}</p>
                                                 ))}
@@ -193,7 +331,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
 
                             <p className="text-[11px] text-slate-500 border-t border-slate-200 dark:border-slate-800 pt-4">
                                 Se empareja por <strong>nombre</strong>. Si le cambiaste el nombre a un producto en el Excel, acá va a aparecer
-                                como <strong>nuevo</strong> en vez de como cambio.
+                                como <strong>nuevo</strong> en vez de como cambio. A un producto que ya tiene foto no se le pisa.
                             </p>
                         </div>
                     )}
@@ -202,15 +340,15 @@ export const ImportarInventarioModal = ({ onClose }) => {
                 <footer className="flex items-center justify-between gap-4 px-6 py-4 border-t border-slate-200 dark:border-slate-800 shrink-0">
                     <p className="text-xs text-slate-500">
                         {aplicando
-                            ? `Guardando… ${avance}%`
+                            ? `Guardando… ${avance}`
                             : plan
-                                ? `${totalEscrituras} producto${totalEscrituras === 1 ? '' : 's'} se van a guardar`
+                                ? `${totalEscrituras} producto${totalEscrituras === 1 ? '' : 's'} se van a guardar${totalFotos ? ` y ${totalFotos} foto${totalFotos === 1 ? '' : 's'} a subir` : ''}`
                                 : 'Nada se guarda hasta que confirmes'}
                     </p>
                     <div className="flex items-center gap-3">
                         {plan && !aplicando && (
-                            <Button onClick={() => { setPlan(null); setArchivo(''); }} className="!bg-transparent !text-slate-500 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-none text-xs uppercase tracking-[0.2em]">
-                                Otro archivo
+                            <Button onClick={() => { setFilas(null); setArchivo(''); setFotos([]); }} className="!bg-transparent !text-slate-500 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-none text-xs uppercase tracking-[0.2em]">
+                                Empezar de nuevo
                             </Button>
                         )}
                         <Button

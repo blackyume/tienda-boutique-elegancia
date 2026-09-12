@@ -4,6 +4,11 @@
 // encabezados (Producto, Categoría, Precio venta, Costo, Stock, Talles,
 // Colores, Estado) y también los nombres sueltos que suele escribir la gente.
 //
+// Las fotos van APARTE del Excel, en una carpeta, y se emparejan por nombre de
+// archivo: o por la columna "Foto" (jean-oxford.jpg, o varias separadas por
+// coma), o si no está, por el nombre del producto. Un Excel no lleva imágenes
+// adentro de forma que sirva; así lo hacen todas las plataformas.
+//
 // Nada se escribe acá. `planearImportacion` sólo devuelve qué se daría de alta,
 // qué cambiaría y qué está mal, para poder mostrarlo antes de tocar la base.
 
@@ -46,10 +51,15 @@ const ALIAS = {
     publicado: 'estado',
     descripcion: 'descripcion',
     detalle: 'descripcion',
+    foto: 'fotos',
+    fotos: 'fotos',
+    imagen: 'fotos',
+    imagenes: 'fotos',
+    archivo: 'fotos',
 };
 
 // Columnas calculadas del export: se ignoran, no son datos de origen.
-const IGNORADAS = new Set(['foto', 'imagen', 'ganancia x unidad', 'ganancia', 'valor en stock', 'valor']);
+const IGNORADAS = new Set(['ganancia x unidad', 'ganancia', 'valor en stock', 'valor']);
 
 // "$ 12.500,50" -> 12500.5 · "12.500" -> 12500 · "12,5" -> 12.5
 export const aNumero = (v) => {
@@ -101,10 +111,68 @@ export const normalizarFila = (fila) => {
     return salida;
 };
 
+// ---------------------------------------------------------------------------
+// Fotos. `archivos` es la lista de archivos que el dueño soltó junto al Excel
+// (objetos File, o nombres sueltos en los tests). Se agrupan por nombre base:
+// "jean-oxford-1.jpg" y "jean_oxford 2.JPG" son las dos fotos de "jean oxford".
+
+const EXT_IMAGEN = /\.(jpe?g|png|webp|avif|gif)$/i;
+const SUFIJO_NUMERO = /[\s_-]*\(?(\d{1,2})\)?$/;
+
+export const claveDeArchivo = (nombre) => {
+    const sinExt = String(nombre ?? '').replace(/\.[a-z0-9]{2,5}$/i, '');
+    const plano = normalizarTexto(sinExt.replace(/[_-]+/g, ' '));
+    const m = plano.match(SUFIJO_NUMERO);
+    const orden = m ? Number(m[1]) : 0;
+    const base = m ? plano.slice(0, m.index).trim() : plano;
+    return { base: base || plano, orden };
+};
+
+const nombreDe = (a) => (typeof a === 'string' ? a : a?.name ?? '');
+
+export const agruparFotos = (archivos) => {
+    const grupos = new Map();
+    (archivos || []).forEach((a) => {
+        const nombre = nombreDe(a);
+        if (!EXT_IMAGEN.test(nombre)) return;
+        const { base, orden } = claveDeArchivo(nombre);
+        if (!grupos.has(base)) grupos.set(base, []);
+        grupos.get(base).push({ archivo: a, nombre, orden });
+    });
+    grupos.forEach((lista) => lista.sort((x, y) => x.orden - y.orden || x.nombre.localeCompare(y.nombre)));
+    return grupos;
+};
+
+// Resuelve las fotos de UNA fila: { fotos: [File|url], faltan: [nombre pedido] }.
+export const fotosDeFila = (f, nombreProducto, grupos) => {
+    // No va por aLista: esa parte por "/" y rompería una URL.
+    const pedidas = f.fotos === undefined ? [] : String(f.fotos).split(/[,;|]+/).map((x) => x.trim()).filter(Boolean);
+    if (!pedidas.length) {
+        const propias = grupos.get(claveDeArchivo(nombreProducto).base) || [];
+        return { fotos: propias.map((x) => x.archivo), faltan: [] };
+    }
+    const porNombre = new Map();
+    grupos.forEach((lista) => lista.forEach((x) => porNombre.set(normalizarTexto(x.nombre), x.archivo)));
+    const fotos = [];
+    const faltan = [];
+    pedidas.forEach((pedida) => {
+        if (/^https?:\/\//i.test(pedida)) { fotos.push(pedida); return; }
+        const exacta = porNombre.get(normalizarTexto(pedida));
+        if (exacta) { fotos.push(exacta); return; }
+        // Sin extensión ("jean-oxford") trae el grupo entero, en orden.
+        const grupo = grupos.get(claveDeArchivo(pedida).base);
+        if (grupo && grupo.length) { grupo.forEach((x) => fotos.push(x.archivo)); return; }
+        faltan.push(pedida);
+    });
+    return { fotos: [...new Set(fotos)], faltan };
+};
+
 const mismaLista = (a, b) =>
     normalizarTexto((a || []).join('|')) === normalizarTexto((b || []).join('|'));
 
-export const planearImportacion = (filas, inventario = []) => {
+export const planearImportacion = (filas, inventario = [], archivosFotos = []) => {
+    const grupos = agruparFotos(archivosFotos);
+    const usados = new Set();
     const altas = [];
     const cambios = [];
     const errores = [];
@@ -163,18 +231,27 @@ export const planearImportacion = (filas, inventario = []) => {
         }
 
         const existente = porNombre.get(clave);
+        const { fotos, faltan } = fotosDeFila(f, nombre, grupos);
+        fotos.forEach((x) => usados.add(nombreDe(x)));
 
         if (!existente) {
             if (precio === null || precio <= 0) {
                 errores.push({ fila: nro, nombre, motivo: 'Producto nuevo sin precio: no se puede crear' });
                 return;
             }
-            const avisos = ['Sin foto: entra como borrador y hay que subirle la imagen'];
-            if (estado === true) avisos.push('La planilla lo marca Publicado, pero sin foto no se publica');
+            const avisos = faltan.map((x) => `No encontré la foto "${x}" entre los archivos`);
+            // Con foto se publica salvo que la planilla diga Borrador. Sin foto
+            // no hay forma de publicarlo: entra como borrador.
+            const publicar = fotos.length > 0 && estado !== false;
+            if (!fotos.length) {
+                avisos.push('Sin foto: entra como borrador y hay que subirle la imagen');
+                if (estado === true) avisos.push('La planilla lo marca Publicado, pero sin foto no se publica');
+            }
             altas.push({
                 fila: nro,
                 nombre,
                 avisos,
+                fotos,
                 datos: {
                     name: nombre,
                     category: categoria || '',
@@ -186,7 +263,7 @@ export const planearImportacion = (filas, inventario = []) => {
                     description: descripcion || '',
                     image: '',
                     media: [],
-                    active: false,
+                    active: publicar,
                 },
             });
             return;
@@ -218,8 +295,25 @@ export const planearImportacion = (filas, inventario = []) => {
         if (colores && colores.length && !mismaLista(colores, existente.colors)) {
             anotar('colors', 'Colores', (existente.colors || []).join(', ') || '—', colores.join(', '));
         }
-        if (estado !== undefined && estado !== (existente.active !== false)) {
-            if (estado === true && !existente.image) {
+        // A un producto que ya tiene foto no se le pisa: reemplazar fotos por
+        // accidente es peor que no tocarlas.
+        let fotosNuevas = [];
+        if (fotos.length) {
+            if (existente.image) {
+                avisos.push(`Ya tiene foto: las ${fotos.length} del archivo no se tocan (borrásela al producto si querés reemplazarla)`);
+            } else {
+                fotosNuevas = fotos;
+                detalle.push({ campo: 'Foto', de: '—', a: `${fotos.length} foto${fotos.length === 1 ? '' : 's'}` });
+                if (estado !== false && existente.active === false) {
+                    campos.active = true;
+                    detalle.push({ campo: 'Estado', de: 'Borrador', a: 'Publicado' });
+                }
+            }
+        }
+        faltan.forEach((x) => avisos.push(`No encontré la foto "${x}" entre los archivos`));
+
+        if (estado !== undefined && estado !== (existente.active !== false) && campos.active === undefined) {
+            if (estado === true && !existente.image && !fotosNuevas.length) {
                 avisos.push('No se publica: el producto no tiene foto');
             } else {
                 anotar('active', 'Estado', existente.active === false ? 'Borrador' : 'Publicado', estado ? 'Publicado' : 'Borrador');
@@ -237,10 +331,15 @@ export const planearImportacion = (filas, inventario = []) => {
             sinCambios += 1;
             return;
         }
-        cambios.push({ fila: nro, id: existente.id, nombre, campos, detalle, avisos });
+        cambios.push({ fila: nro, id: existente.id, nombre, campos, detalle, avisos, fotos: fotosNuevas });
     });
 
-    return { altas, cambios, errores, sinCambios };
+    // Fotos que no matchearon con ninguna fila: casi siempre un nombre mal escrito.
+    const fotosSueltas = [];
+    grupos.forEach((lista) => lista.forEach((x) => { if (!usados.has(x.nombre)) fotosSueltas.push(x.nombre); }));
+    fotosSueltas.sort();
+
+    return { altas, cambios, errores, sinCambios, fotosSueltas };
 };
 
 // ---------------------------------------------------------------------------

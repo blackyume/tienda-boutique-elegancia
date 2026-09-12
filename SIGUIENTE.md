@@ -33,6 +33,11 @@ pip install pillow numpy scipy rembg
 
 ## Lo que se hizo el 12/09
 
+- **Carga masiva con fotos.** Admin → Inventario → Importar Excel ahora acepta
+  el Excel y las fotos juntos; cada foto va a su producto por el nombre del
+  archivo y el producto entra publicado. Guía paso a paso en
+  `docs/GUIA-CARGA-MASIVA.md` y plantilla en `docs/plantilla-productos.xlsx`.
+
 - **🔒 Las API keys ya no son públicas.** `config/ai_settings` (Gemini, Cerebras)
   pasó a admin-only en las reglas y el front sólo se suscribe si sos admin.
   Verificado desde afuera: `PERMISSION_DENIED`. **Falta que vos generes keys
