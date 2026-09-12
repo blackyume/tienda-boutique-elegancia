@@ -8,6 +8,21 @@ productos de ejemplo (borralos) y una segunda hoja que explica cada columna.
 
 ---
 
+## Antes que nada: entrar al panel
+
+1. Abrí **https://la-boutique-de-la-elegancia.web.app/admin**
+2. Tocá **Continuar con Google** y elegí la cuenta de Google que el dueño
+   registró como administradora. **Tiene que ser exactamente esa cuenta**: con
+   otra, la página se ve como clienta y no aparece el panel.
+3. Si la tienda está "EN RENOVACIÓN", es normal: el panel funciona igual y a
+   vos te deja pasar.
+
+Si entrás y no ves el menú de la izquierda (Inventario, Pedidos…), la cuenta
+no está autorizada: avisale al dueño.
+
+---
+
+
 ## 1. Las fotos
 
 Las fotos **no van adentro del Excel**. Van sueltas, en una carpeta. Se emparejan

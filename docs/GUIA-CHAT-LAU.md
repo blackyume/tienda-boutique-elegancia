@@ -4,10 +4,25 @@ Lau es el asistente del panel. Le adjuntás la foto, le dictás los datos, y
 crea el producto. Para 1 a 10 productos es lo más rápido que hay. Para cargar
 una colección entera conviene el Excel (`GUIA-CARGA-MASIVA.md`).
 
-## Antes de empezar (una sola vez)
+## Antes que nada: entrar al panel
+
+1. Abrí **https://la-boutique-de-la-elegancia.web.app/admin**
+2. Tocá **Continuar con Google** y elegí la cuenta de Google que el dueño
+   registró como administradora. **Tiene que ser exactamente esa cuenta**: con
+   otra, la página se ve como clienta y no aparece el panel.
+3. Si la tienda está "EN RENOVACIÓN", es normal: el panel funciona igual y a
+   vos te deja pasar.
+
+Si entrás y no ves el menú de la izquierda (Inventario, Pedidos…), la cuenta
+no está autorizada: avisale al dueño.
+
+---
+
+## La key de Gemini (la carga el dueño, una sola vez)
 
 Lau funciona con Gemini y necesita una key **nueva**: la anterior estuvo
-expuesta y hay que descartarla.
+expuesta y hay que descartarla. Esto lo hace el dueño; si Lau no responde,
+probablemente falte este paso.
 
 1. Entrá a [Google AI Studio](https://aistudio.google.com/apikey) con la cuenta
    de Google de la tienda → **Create API key**.
