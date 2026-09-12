@@ -1,5 +1,7 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Calendar, TrendingUp, Package, Download } from 'lucide-react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
+import { Search, Calendar, TrendingUp, Package, Download, Upload } from 'lucide-react';
+
+const ImportarVentasModal = lazy(() => import('./ImportarVentasModal').then(m => ({ default: m.ImportarVentasModal })));
 import { formatMoney } from '../../utils/helpers';
 
 // Miniatura con fallback: si no hay imagen o se rompe (ej: producto borrado),
@@ -19,6 +21,7 @@ const SaleThumb = ({ src, name }) => {
 export const SalesView = ({ salesLog }) => {
     const [search, setSearch] = useState('');
     const [range, setRange] = useState('all');
+    const [importando, setImportando] = useState(false);
 
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
@@ -63,6 +66,7 @@ export const SalesView = ({ salesLog }) => {
 
     return (
         <div className="max-w-6xl mx-auto p-6 lg:p-8">
+            {importando && <Suspense fallback={null}><ImportarVentasModal onClose={() => setImportando(false)} /></Suspense>}
             <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
                 <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><TrendingUp className="w-6 h-6 text-[#E8C65E]" /> Registro de Ventas</h1>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -83,6 +87,13 @@ export const SalesView = ({ salesLog }) => {
                             <option value="30">Últimos 30 días</option>
                         </select>
                     </div>
+                    <button
+                        onClick={() => setImportando(true)}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider hover:border-[#E8C65E] hover:text-[#B8932E] dark:hover:text-[#E8C65E] transition-colors"
+                        title="Registrar ventas hechas por fuera desde tu planilla"
+                    >
+                        <Upload className="w-4 h-4" /> Importar ventas
+                    </button>
                     <button
                         onClick={exportSales}
                         disabled={!filtered.length}

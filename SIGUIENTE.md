@@ -33,6 +33,12 @@ pip install pillow numpy scipy rembg
 
 ## Lo que se hizo el 12/09
 
+- **Importar ventas por fuera desde la planilla del dueño** (Admin → Ventas →
+  Importar ventas). Lee `WAKANDA 09-26.xlsx` tal cual: una columna por
+  clienta. Cada clienta queda como pedido `MAN-…` pagado, con fecha del nombre
+  del archivo. No duplica si se vuelve a soltar. Guía nueva en Admin → Guías:
+  "Anotar las ventas de WhatsApp y del local". **El dueño tiene que soltar el
+  archivo él**: las reglas sólo dejan crear pedidos a su cuenta.
 - **Checkout: datos completos y validados.** Faltaban localidad y provincia
   (el Correo no despacha sin eso), piso/depto y referencias para el cartero;
   el botón de WhatsApp salteaba la validación y el de Mercado Pago está fuera

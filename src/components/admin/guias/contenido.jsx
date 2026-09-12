@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-key -- las celdas y los items van como datos en arrays; Tabla y Lista les ponen key al renderizar */
 import React from 'react';
-import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket } from 'lucide-react';
+import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket, Receipt } from 'lucide-react';
 import { Seccion, P, K, Cod, Ruta, Pasos, Paso, Lista, Aviso, Tabla, Mensaje, Botones, Figura, Link } from './bloques';
 import {
     IlusNombresFotos, IlusExcel, IlusImportar, IlusFlujoPedido, IlusRetiroCosto,
-    IlusEtiqueta, IlusClaves, IlusLau, IlusMenu,
+    IlusEtiqueta, IlusClaves, IlusLau, IlusMenu, IlusPlanillaVentas,
 } from './ilustraciones';
 import { TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../../../utils/envios';
 
@@ -248,6 +248,47 @@ const Lau = ({ abrir }) => (
                 <>Falta o venció la llave de Gemini. Es la causa el 90% de las veces → <button className="font-bold text-[#8a6a1a] dark:text-[#E8C65E] underline" onClick={() => abrir('ia-keys')}>guía de las llaves</button>.</>,
                 <>Si dice que fallaron “todos los modelos”, puede ser la cuota gratis de Google del día. Esperá una hora, o activá facturación en AI Studio (son centavos por producto).</>,
             ]} />
+        </Seccion>
+    </>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. Ventas por fuera
+// ─────────────────────────────────────────────────────────────────────────────
+const VentasFuera = ({ abrir }) => (
+    <>
+        <Seccion id="por-que" titulo="Por qué anotarlas en la tienda">
+            <P>Lo que vendés por WhatsApp, en el local o en una feria no pasa por el checkout, pero conviene que quede en el panel: así <strong>Ventas</strong> y el <strong>Dashboard</strong> muestran lo que vendiste de verdad, y el stock no miente. Cada venta queda como un pedido <Cod>MAN-…</Cod> en Pedidos, igual que uno de la tienda.</P>
+            <P>Hay dos formas: de a una hablándole a Lau, o muchas de golpe desde tu planilla.</P>
+        </Seccion>
+
+        <Seccion id="lau" titulo="De a una: decíselo a Lau">
+            <Mensaje>vendí un short sastrero talle 5 chocolate a 13500 por WhatsApp, a Lorena</Mensaje>
+            <P>Lau descuenta el stock, lo anota en Ventas y te confirma. Sirve cuando el producto <strong>está en el inventario</strong>. Más en la <button className="font-bold text-[#8a6a1a] dark:text-[#E8C65E] underline" onClick={() => abrir('lau')}>guía de Lau</button>.</P>
+        </Seccion>
+
+        <Seccion id="planilla" titulo="Muchas de golpe: tu planilla, tal cual la armás">
+            <Figura titulo="El formato que ya usás. Una columna por clienta; cada prenda son cuatro líneas y una línea en blanco entre prenda y prenda.">
+                <IlusPlanillaVentas />
+            </Figura>
+            <Lista items={[
+                <><strong>Arriba, el nombre de la clienta.</strong> Una columna por clienta.</>,
+                <><strong>Cada prenda, cuatro líneas:</strong> el nombre, <Cod>TALLE …</Cod>, el color, <Cod>PRECIO $ …</Cod>. Y una línea en blanco antes de la siguiente.</>,
+                <><strong>Al final:</strong> <Cod>TOTAL $ …</Cod> y <Cod>PAGADO</Cod> (o <Cod>DEBE</Cod> si quedó pendiente).</>,
+                <>Si vendiste dos iguales, agregá una línea <Cod>CANTIDAD 2</Cod> antes del precio.</>,
+                <>Los precios pueden ir <Cod>13,501</Cod> o <Cod>13.501</Cod>: los dos se leen como trece mil quinientos uno.</>,
+            ]} />
+            <Aviso tipo="tip">Poné el mes en el nombre del archivo (<Cod>WAKANDA 09-26.xlsx</Cod>) y la fecha de la venta se completa sola. Si no, la elegís al importar.</Aviso>
+        </Seccion>
+
+        <Seccion id="importar" titulo="Importar la planilla">
+            <Pasos>
+                <Paso>Entrá a <Ruta pasos={['Admin', 'Ventas', '⤴ Importar ventas']} />.</Paso>
+                <Paso>Soltá el Excel. Aparece la <strong>vista previa</strong>: una tarjeta por clienta con sus prendas y el total, y arriba cuántas clientas, cuántas prendas y cuánto suma.</Paso>
+                <Paso>Revisá la <strong>fecha</strong> y el <strong>canal</strong> (WhatsApp, Local, Feria…). Si las prendas están cargadas en el inventario con el mismo nombre, podés tildar <K>Descontar stock</K>.</Paso>
+                <Paso><K>Registrar ventas</K>. Listo: ya figuran en Ventas y en el Dashboard.</Paso>
+            </Pasos>
+            <Aviso tipo="dato">Si volvés a soltar la misma planilla con la misma fecha, <strong>no se duplica</strong>: te avisa que esas ventas ya estaban.</Aviso>
         </Seccion>
     </>
 );
@@ -589,6 +630,13 @@ export const GUIAS = [
         palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos'],
         secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
         Contenido: Lau,
+    },
+    {
+        id: 'ventas-fuera', titulo: 'Anotar las ventas de WhatsApp y del local', icono: Receipt, duracion: '5 min', para: 'Dueño',
+        resumen: 'Las ventas por fuera de la tienda también cuentan: de a una con Lau, o soltando tu planilla en Admin → Ventas.',
+        palabras: ['ventas', 'planilla', 'excel', 'whatsapp', 'local', 'feria', 'importar ventas', 'pagado', 'clienta', 'wakanda'],
+        secciones: [['por-que', 'Por qué anotarlas'], ['lau', 'De a una: Lau'], ['planilla', 'Tu planilla'], ['importar', 'Importar']],
+        Contenido: VentasFuera,
     },
     {
         id: 'pedido-envio', titulo: 'Del pedido al envío: que pasen a buscar', icono: PackageCheck, duracion: '15 min', para: 'Dueño',

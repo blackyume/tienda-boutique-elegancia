@@ -17,7 +17,7 @@ E-commerce de moda femenina premium en Argentina. Solo-dev, iteración rápida.
 ```bash
 npm run dev               # Vite dev server
 npm run build             # prebuild genera sitemap + shopping-feed → vite build
-npm test                  # vitest run (138 tests, excluye e2e/)
+npm test                  # vitest run (excluye e2e/)
 npm run e2e               # playwright (apunta a prod por default)
 npm run e2e:install       # bajar Chromium para playwright
 npm run lint
@@ -41,7 +41,8 @@ npx firebase-tools deploy --only firestore:rules
 - `src/utils/portadas.js` — arma la lista de portadas del hero (CMS `hero.slides` → si no hay, las de la casa). Lógica pura, testeada.
 - `src/components/home/PortadaCarrusel.jsx` — `usePortadas` + `CapaPortadas` + `PuntosPortada`. **Va partido a propósito**: ver "Home" abajo.
 - `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV **con fotos**: se sueltan junto al Excel y se emparejan por nombre de archivo (`claveDeArchivo`/`agruparFotos`/`fotosDeFila`, puras y testeadas). Un producto nuevo con foto entra publicado; a uno que ya tiene foto no se le pisa. Guía para el dueño en `docs/GUIA-CARGA-MASIVA.md`, plantilla en `docs/plantilla-productos.xlsx` (hay un test que la lee con el importador real). Para cargar de a uno por chat: `docs/GUIA-CHAT-LAU.md`.
-- `src/components/admin/guias/` — la sección **Admin → Guías**: manuales de uso para el dueño y quien carga productos, siempre online. `contenido.jsx` es el texto de cada guía (JSX con los bloques de `bloques.jsx` y los SVG de `ilustraciones.jsx`); `GuiasView.jsx` la portada, el buscador y el lector con índice. Al cambiar rutas del panel (nombres de pestañas, botones), revisar que las guías sigan diciendo lo mismo: hay un test que renderiza las ocho y comprueba precios e índices. La plantilla de Excel se sirve desde `public/docs/`.
+- `src/components/admin/guias/` — la sección **Admin → Guías**: manuales de uso para el dueño y quien carga productos, siempre online. `contenido.jsx` es el texto de cada guía (JSX con los bloques de `bloques.jsx` y los SVG de `ilustraciones.jsx`); `GuiasView.jsx` la portada, el buscador y el lector con índice. Al cambiar rutas del panel (nombres de pestañas, botones), revisar que las guías sigan diciendo lo mismo: hay un test que renderiza todas y comprueba precios e índices. La plantilla de Excel se sirve desde `public/docs/`.
+- `src/utils/importarVentas.js` + `components/admin/ImportarVentasModal.jsx` — **Admin → Ventas → Importar ventas**: lee la planilla de ventas por fuera tal cual la arma el dueño (una columna por clienta, bloques de 4 líneas: prenda / TALLE / color / PRECIO $, y TOTAL + PAGADO al final; también una tabla con cabecera) y crea un pedido manual `MAN-…` por clienta, igual que `record_sale` de Lau. `aPrecio` lee "13,501" como 13501 (en pesos no hay centavos; `aNumero` del importador de inventario lo leería como 13,5). `importKey` evita duplicar si sueltan la misma planilla dos veces. Enlaza prendas al inventario por nombre; el descuento de stock es opcional y sólo para stock numérico.
 - `src/utils/direccion.js` — datos de la clienta en el checkout: `validarDatosCheckout` (una sola validación para Mercado Pago y WhatsApp; a sucursal no exige calle), `normalizarDatosCheckout`, `direccionEnUnaLinea`, `datosParaCorreo` (el bloque que se pega en MiCorreo desde Admin → Pedidos → "Datos y envío"), `telefonoInternacional` (wa.me), `PROVINCIAS`. Los campos del form están en `components/checkout/CamposCheckout.jsx` (fuera de Checkout.jsx para no perder el foco al tipear). **Comprar no exige cuenta**: Google se ofrece grande pero es opcional, decisión del dueño 12/09/2026.
 - `src/utils/contacto.js` — Telegram y WhatsApp de la tienda. `WHATSAPP_DE_LA_CASA` es el número real dado por el dueño; lo que se carga en Admin → Configuración manda sobre él. `canalDePedido` elige por dónde coordinar un pedido (WhatsApp primero porque `wa.me` acepta el mensaje escrito, `t.me` no).
 - `src/utils/envios.js` — opciones de envío del checkout, **pagadas por la clienta** (decisión del dueño, 12/09/2026). Tarifa de la casa: Correo Argentino a domicilio $10.900 y retiro en sucursal $7.900 — MiCorreo sep-2026 para 1 kg, zona más cara, +3% de embalaje, así ningún destino deja en pérdida. `COSTO_REAL_CORREO_1KG` es el piso sin margen. El correo aumenta cada 2-3 meses: se ajusta desde Admin → Envíos, sin código.
@@ -136,7 +137,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 ## Testing
 
-- **Vitest unit tests** en `tests/`. 138 tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `contacto`, `envios`, `importarInventario` (con round-trip real de `.xlsx`), `portadas` y `guias` (renderiza las ocho guías del panel). Excluye `e2e/`.
+- **Vitest unit tests** en `tests/`. Tests sobre `variants`, `lowStock`, `pricing`, `ordersReview`, `gemini.parseJsonFromResponse`, `marcoFoto`, `contacto`, `envios`, `importarInventario` (con round-trip real de `.xlsx`), `portadas`, `guias` (renderiza todas las guías del panel), `direccion`, `detallePedido` e `importarVentas`. Excluye `e2e/`.
 - **Playwright e2e** en `e2e/`. 6 smoke tests apuntando a prod (override con `BASE_URL=http://localhost:4173`).
 - **GitHub Actions** corre tests + build en push/PR a master (`.github/workflows/ci.yml`).
 

@@ -382,3 +382,35 @@ export const IlusMenu = ({ resaltar = 'Inventario', nota }) => {
         </Svg>
     );
 };
+
+/** La planilla de ventas por fuera: una columna por clienta. */
+export const IlusPlanillaVentas = () => {
+    const col = (x, nombre, bloques, total, estado) => (
+        <g transform={`translate(${x} 0)`}>
+            <rect x="0" y="20" width="300" height="300" rx="10" className={papel} />
+            <rect x="0" y="20" width="300" height="300" rx="10" fill="none" className={linea} strokeWidth="1.2" />
+            <rect x="0" y="20" width="300" height="34" rx="10" fill={ORO} />
+            <text x="16" y="43" fontSize="13" fontWeight="900" fill="#111">{nombre}</text>
+            {bloques.map((b, i) => (
+                <g key={i} transform={`translate(16 ${70 + i * 92})`}>
+                    <text x="0" y="12" fontSize="11" fontWeight="800" className={texto}>{b[0]}</text>
+                    <text x="0" y="30" fontSize="11" className={textoSuave}>TALLE {b[1]}</text>
+                    <text x="0" y="48" fontSize="11" className={textoSuave}>{b[2]}</text>
+                    <text x="0" y="66" fontSize="11" style={mono} className={texto}>PRECIO $ {b[3]}</text>
+                </g>
+            ))}
+            <line x1="16" y1={70 + bloques.length * 92 - 8} x2="284" y2={70 + bloques.length * 92 - 8} className={linea} strokeDasharray="4 4" />
+            <text x="16" y={70 + bloques.length * 92 + 12} fontSize="11.5" fontWeight="900" className={texto}>TOTAL $ {total}</text>
+            <text x="16" y={70 + bloques.length * 92 + 32} fontSize="11.5" fontWeight="900" fill={estado === 'PAGADO' ? '#059669' : '#d97706'}>{estado}</text>
+        </g>
+    );
+    return (
+        <Svg alto={330} label="La planilla de ventas: una columna por clienta">
+            {col(30, 'LORENA', [['SHORT SASTRERO', '5', 'CHOCOLATE', '13,501'], ['BODY MUSCULOSA MODAL', 'XL', 'BEIGE', '10,501']], '24,002', 'PAGADO')}
+            {col(390, 'ANA', [['REMERA MANGA JAPONESA', 'M', 'NEGRO', '12,400'], ['SHORT WKND', '2', 'BEIGE', '13,501']], '25,901', 'DEBE')}
+            <text x="345" y="200" textAnchor="middle" fontSize="10" className={textoSuave}>una</text>
+            <text x="345" y="213" textAnchor="middle" fontSize="10" className={textoSuave}>columna</text>
+            <text x="345" y="226" textAnchor="middle" fontSize="10" className={textoSuave}>por clienta</text>
+        </Svg>
+    );
+};
