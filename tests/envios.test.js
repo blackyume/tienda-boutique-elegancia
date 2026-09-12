@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { esOpcionValida, sanearTarifas, TARIFAS_DE_LA_CASA } from '../src/utils/envios';
+import { esOpcionValida, sanearTarifas, TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../src/utils/envios';
 
 describe('esOpcionValida', () => {
     it('acepta una opción con nombre y costo numérico', () => {
@@ -53,12 +53,17 @@ describe('sanearTarifas', () => {
         expect(sanearTarifas(propias)).toEqual(propias);
     });
 
-    it('las tarifas de la casa son gratis A PROPÓSITO: con nombre, nunca en blanco', () => {
+    it('las tarifas de la casa se cobran: con nombre, nunca gratis ni en blanco', () => {
         const opciones = Object.values(TARIFAS_DE_LA_CASA);
         expect(opciones.length).toBeGreaterThan(0);
         for (const opcion of opciones) {
             expect(esOpcionValida(opcion)).toBe(true);
-            expect(opcion.name.trim().length).toBeGreaterThan(0);
+            expect(opcion.cost).toBeGreaterThan(0);
         }
+    });
+
+    it('ninguna tarifa de la casa queda por debajo de lo que cobra el correo', () => {
+        expect(TARIFAS_DE_LA_CASA.correo_domicilio.cost).toBeGreaterThanOrEqual(COSTO_REAL_CORREO_1KG.domicilio);
+        expect(TARIFAS_DE_LA_CASA.sucursal.cost).toBeGreaterThanOrEqual(COSTO_REAL_CORREO_1KG.sucursal);
     });
 });

@@ -42,7 +42,7 @@ npx firebase-tools deploy --only firestore:rules
 - `src/components/home/PortadaCarrusel.jsx` — `usePortadas` + `CapaPortadas` + `PuntosPortada`. **Va partido a propósito**: ver "Home" abajo.
 - `src/utils/importarInventario.js` + `src/components/admin/ImportarInventarioModal.jsx` — importador de Excel/CSV.
 - `src/utils/contacto.js` — Telegram y WhatsApp de la tienda. `WHATSAPP_DE_LA_CASA` es el número real dado por el dueño; lo que se carga en Admin → Configuración manda sobre él. `canalDePedido` elige por dónde coordinar un pedido (WhatsApp primero porque `wa.me` acepta el mensaje escrito, `t.me` no).
-- `src/utils/envios.js` — opciones de envío del checkout. Decisión de lanzamiento (12/09/2026): **envío gratis a todo el país**, una sola opción. `COSTO_REAL_CORREO_1KG` guarda lo que cuesta de verdad cada envío regalado (MiCorreo sep-2026, zona más cara), para el día que se cobre.
+- `src/utils/envios.js` — opciones de envío del checkout, **pagadas por la clienta** (decisión del dueño, 12/09/2026). Tarifa de la casa: Correo Argentino a domicilio $10.900 y retiro en sucursal $7.900 — MiCorreo sep-2026 para 1 kg, zona más cara, +3% de embalaje, así ningún destino deja en pérdida. `COSTO_REAL_CORREO_1KG` es el piso sin margen. El correo aumenta cada 2-3 meses: se ajusta desde Admin → Envíos, sin código.
 
 ## Modelo de datos
 
@@ -85,7 +85,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 - `products`, `categories`, `coupons` — público-read, admin-write
 - `config/*` — público-read, admin-write, **salvo `config/ai_settings` que es admin-only**: ahí viven las API keys de Gemini y Cerebras, y hasta el 12/09/2026 cualquiera las leía sin login. El front sólo se suscribe a ese doc si el usuario es admin (`useFirestoreSubscriptions`, bloque `if (admin)`).
-- `config/shipping` — las opciones de envío del checkout (se editan en Admin → Envíos). Pasan por `utils/envios.sanearTarifas`: una opción sin nombre o sin costo numérico se descarta, y si no queda ninguna corren las de la casa (`TARIFAS_DE_LA_CASA`). En producción el doc quedó guardado en blanco y el checkout mostraba tres botones sin nombre, todos "Gratis".
+- `config/shipping` — las opciones de envío del checkout (se editan en Admin → Envíos). Pasan por `utils/envios.sanearTarifas`: una opción sin nombre o sin costo numérico se descarta, y si no queda ninguna corren las de la casa (`TARIFAS_DE_LA_CASA`). En producción el doc quedó guardado en blanco y el checkout mostraba tres botones sin nombre, todos "Gratis" — o sea que **regalaba el envío por accidente**.
 - `shipping_provinces` — **sin uso**. La tabla de 25 provincias que la acompañaba en `StoreContext` no la leía ningún componente y se borró el 12/09/2026; la regla sigue por si se retoma.
 - `suppliers`, `simulations`, `scheduled_promotions`, `ai_history` — admin-only
 - `orders` — user crea, lee propias; admin lee/actualiza todas

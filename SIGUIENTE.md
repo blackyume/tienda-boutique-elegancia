@@ -38,12 +38,12 @@ pip install pillow numpy scipy rembg
   Verificado desde afuera: `PERMISSION_DENIED`. **Falta que vos generes keys
   nuevas** en Google AI Studio y Cerebras y las pegues en Admin → IA: las
   actuales estuvieron expuestas tres semanas.
-- **Envíos: gratis a todo el país, a propósito.** El checkout mostraba tres
-  botones sin nombre y "Gratis" porque `config/shipping` quedó guardado en
-  blanco desde el panel. Ahora una opción sin nombre no llega al checkout, y
-  el respaldo es "Envío gratis a todo el país". Cada envío te cuesta ~$10.600
-  a domicilio (MiCorreo, 1 kg, zona más cara): está anotado en
-  `utils/envios.js` para cuando quieras cobrarlo, desde Admin → Envíos.
+- **Envíos: la clienta los paga.** El checkout mostraba tres botones sin
+  nombre y "Gratis" porque `config/shipping` quedó guardado en blanco desde
+  el panel — regalaba el envío por accidente. Ahora una opción sin nombre no
+  llega al checkout, y el respaldo cobra tarifa real: **a domicilio $10.900,
+  retiro en sucursal $7.900** (MiCorreo sep-2026, 1 kg, zona más cara, +3%).
+  El correo aumenta cada 2-3 meses: revisá y ajustá desde Admin → Envíos.
 - **WhatsApp conectado:** `5493492216487` como número de la casa. Aparece el
   botón flotante, Contacto y FAQ usan el mismo, y el checkout manda ahí los
   pedidos con el detalle escrito. Lo que cargues en Admin → Configuración
@@ -86,8 +86,8 @@ Para publicar: `npm run build && npx firebase-tools deploy --only hosting`.
 
 ## Pendientes, en orden de lo que más cuesta
 
-1. **Cobrar el envío, cuando el gratis deje de cerrar.** Se cambia en
-   Admin → Envíos sin tocar código. El piso para no perder está en
+1. **Revisar la tarifa de envío cada vez que aumente el correo.** Se cambia
+   en Admin → Envíos sin tocar código; el piso para no perder está en
    `utils/envios.js`. Cotización en tiempo real (Envíopack/Zippin) es posible
    —el checkout ya pide código postal— pero exige cuenta con saldo prepago y
    **peso por producto**, que hoy no existe; el atajo sería un peso por
@@ -99,8 +99,8 @@ Para publicar: `npm run build && npx firebase-tools deploy --only hosting`.
 4. **La tira de Instagram** repite las 6 fotos del catálogo que ya se ven arriba.
 5. ~~`config/shipping` no lo lee ningún código.~~ **Falso**: es justo lo que
    lee el checkout. Ya está saneado en código; si querés, desde Admin → Envíos
-   borrá los tres métodos vacíos y guardá el de envío gratis para que Firestore
-   y el código digan lo mismo.
+   borrá los tres métodos vacíos y cargá los dos de Correo Argentino para que
+   Firestore y el código digan lo mismo.
 
 ## Antes de sacar el mantenimiento
 
