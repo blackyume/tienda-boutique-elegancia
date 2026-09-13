@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { StatusSelector } from './StatusSelector';
 import { Calculator, Save, Trash2, ArrowRight, DollarSign, FileDown, Sheet, History, Plus } from 'lucide-react';
 import { formatMoney, getColorHex } from '../../utils/helpers';
+import { comisionMP } from '../../utils/comision';
 // jsPDF, jspdf-autotable y xlsx se importan dinámicamente al usarse.
 
 export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduct }) => {
@@ -34,11 +35,11 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
         } catch { /* noop */ }
     }, [form.costPack, form.shipUnit, form.comision, form.marginDesired]);
 
-    // Si todavía no cargaste una comisión, usamos la REAL que Mercado Pago te
-    // cobró en tus ventas (la captura el webhook). Se va afinando con cada venta.
+    // Si todavía no cargaste una comisión, usamos la de la tienda: la REAL que
+    // Mercado Pago te cobró en tus ventas (la captura el webhook), o el estimado.
     useEffect(() => {
-        const real = Number(paymentConfig?.realMpFeePercent);
-        if (real > 0) setForm(f => (f.comision === '' || f.comision == null) ? { ...f, comision: String(real) } : f);
+        const c = comisionMP(paymentConfig);
+        setForm(f => (f.comision === '' || f.comision == null) ? { ...f, comision: String(c) } : f);
     }, [paymentConfig?.realMpFeePercent]);
 
     const totalCost = Number(form.costPr) + Number(form.costPack) + Number(form.shipUnit);
@@ -267,7 +268,10 @@ export const SimulationsView = ({ onSaveToProduct, onEditProduct, onDeleteProduc
                                     {/* MARGIN SLIDER */}
                                     <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-100 dark:border-slate-800">
                                         <div className="flex justify-between items-center mb-4">
-                                            <label className="text-xs font-bold uppercase text-slate-500">Margen de Ganancia Deseado</label>
+                                            <div>
+                                                <label className="text-xs font-bold uppercase text-slate-500">Margen de Ganancia Deseado</label>
+                                                <p className="text-[10px] text-slate-400 leading-tight">% del precio final que te queda limpio. Ojo: Lau y el cargador rápido piden el margen SOBRE EL COSTO, que es otro número (50% del precio ≈ 100% sobre el costo).</p>
+                                            </div>
                                             <span className="text-2xl font-black text-[#E8C65E]">{form.marginDesired}%</span>
                                         </div>
                                         <input

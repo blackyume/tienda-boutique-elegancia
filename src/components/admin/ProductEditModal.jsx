@@ -10,6 +10,7 @@ import {
 import { formatMoney } from '../../utils/helpers';
 import { generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { getTotalStock } from '../../utils/variants';
+import { comisionDeProducto } from '../../utils/comision';
 import { getColorHex } from '../../utils/colors';
 
 const TABS = [
@@ -19,7 +20,7 @@ const TABS = [
 ];
 
 export const ProductEditModal = ({ initialProduct, onClose }) => {
-    const { inventory, addProduct, updateProduct, addToast, categories, uploadImage, aiConfig } = useStore();
+    const { inventory, addProduct, updateProduct, addToast, categories, uploadImage, aiConfig, paymentConfig } = useStore();
     const confirm = useConfirm();
 
     const [currentProduct, setCurrentProduct] = useState(() => initialProduct || {});
@@ -44,9 +45,13 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
     const priceNum = Number(currentProduct.price) || 0;
     const baseCosts = (Number(currentProduct.cost) || 0) + (Number(currentProduct.shippingCost) || 0) + (Number(currentProduct.packagingCost) || 0);
     const fixedFeeNum = Number(currentProduct.fixedFee) || 0;
-    const feeVar = priceNum * ((Number(currentProduct.feePercent) || 0) / 100);
+    // Si el producto no tiene comisión propia, usa la de la tienda (la real
+    // medida de las ventas, o el estimado): nunca "0%", que infla la ganancia.
+    const feePct = comisionDeProducto(currentProduct, paymentConfig);
+    const feeVar = priceNum * (feePct / 100);
     const netProfit = priceNum > 0 ? priceNum - baseCosts - fixedFeeNum - feeVar : null;
     const marginPct = priceNum > 0 ? ((netProfit / priceNum) * 100).toFixed(1) : null;
+    const marginSobreCosto = priceNum > 0 && totalCost > 0 ? ((netProfit / totalCost) * 100).toFixed(0) : null;
 
     const validation = useMemo(() => {
         const blocking = [];
@@ -245,7 +250,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
         if (!targetMargin || isNaN(margin) || margin <= 0) return addToast('Ingresá un margen % válido', 'error');
         const t = Number(currentProduct.cost || 0) + Number(currentProduct.shippingCost || 0) + Number(currentProduct.packagingCost || 0) + Number(currentProduct.fixedFee || 0);
         if (t <= 0) return addToast('Cargá primero el costo de la prenda para usar el margen %', 'error');
-        const feeDecimal = (Number(currentProduct.feePercent || 0) / 100);
+        const feeDecimal = feePct / 100;
         if (feeDecimal >= 1) return addToast('La comisión no puede ser 100% o más', 'error');
         let p = (t * (1 + margin / 100)) / (1 - feeDecimal);
         if (!isFinite(p) || p <= 0) return addToast('No se pudo calcular el precio', 'error');
@@ -259,7 +264,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
         const profit = Number(targetProfit);
         if (!targetProfit || isNaN(profit) || profit <= 0) return addToast('Ingresá un monto de ganancia válido', 'error');
         const t = Number(currentProduct.cost || 0) + Number(currentProduct.shippingCost || 0) + Number(currentProduct.packagingCost || 0) + Number(currentProduct.fixedFee || 0);
-        const feeDecimal = (Number(currentProduct.feePercent || 0) / 100);
+        const feeDecimal = feePct / 100;
         if (feeDecimal >= 1) return addToast('La comisión no puede ser 100% o más', 'error');
         let p = (t + profit) / (1 - feeDecimal);
         if (!isFinite(p) || p <= 0) return addToast('No se pudo calcular el precio', 'error');
@@ -630,8 +635,8 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                         <InputGroup label="Packaging ($)" help="Bolsa, etiquetas">
                                             <input type="number" min="0" placeholder="0" value={currentProduct.packagingCost} onChange={e => setCurrentProduct({ ...currentProduct, packagingCost: e.target.value })} className="input" />
                                         </InputGroup>
-                                        <InputGroup label="Comisión MP (%)" help="Ej: 6%">
-                                            <input type="number" min="0" max="100" placeholder="0" value={currentProduct.feePercent} onChange={e => setCurrentProduct({ ...currentProduct, feePercent: e.target.value })} className="input" />
+                                        <InputGroup label="Comisión MP (%)" help={`Vacío = la de la tienda (${feePct}%)`}>
+                                            <input type="number" min="0" max="100" step="0.1" placeholder={String(feePct)} value={currentProduct.feePercent} onChange={e => setCurrentProduct({ ...currentProduct, feePercent: e.target.value })} className="input" />
                                         </InputGroup>
                                         <InputGroup label="Costo Fijo MP ($)" help="Ej: 1500 (Opcional)">
                                             <input type="number" min="0" placeholder="0" value={currentProduct.fixedFee} onChange={e => setCurrentProduct({ ...currentProduct, fixedFee: e.target.value })} className="input" />
@@ -700,7 +705,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                             <div className="border-t border-slate-200 dark:border-slate-800 my-2"></div>
                             <Row label="Subtotal Costos" value={(Number(currentProduct.cost) || 0) + (Number(currentProduct.shippingCost) || 0) + (Number(currentProduct.packagingCost) || 0)} bold />
                             <div className="py-4"></div>
-                            <Row label={`Comisión Variable (${currentProduct.feePercent || 0}%)`} value={feeVar} isNegative />
+                            <Row label={`Comisión MP (${feePct}%)`} value={feeVar} isNegative />
                             {fixedFeeNum > 0 && <Row label="Comisión Fija MP" value={fixedFeeNum} isNegative />}
                             <div className="border-t border-slate-200 dark:border-slate-800 my-4"></div>
                             <div className="bg-white dark:bg-[#1a1a1a] p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -710,7 +715,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                 </p>
                                 <div className="text-center">
                                     <span className="inline-block px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded text-[10px] font-bold uppercase">
-                                        Margen: {marginPct === null ? '—' : `${marginPct}%`}
+                                        {marginPct === null ? 'Margen: —' : `${marginPct}% del precio${marginSobreCosto !== null ? ` · ${marginSobreCosto}% sobre el costo` : ''}`}
                                     </span>
                                 </div>
                             </div>

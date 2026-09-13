@@ -126,7 +126,7 @@ export const Mensaje = ({ de = 'vos', children }) => {
     const esVos = de === 'vos';
     return (
         <div className={`flex ${esVos ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed shadow-sm ${esVos
+            <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed shadow-sm whitespace-pre-wrap ${esVos
                 ? 'bg-[#E8C65E] text-black rounded-br-sm'
                 : 'bg-white dark:bg-[#1f1f1f] border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-sm'}`}>
                 {!esVos && <p className="text-[10px] font-black uppercase tracking-widest text-[#B38728] dark:text-[#E8C65E] mb-1">Lau</p>}

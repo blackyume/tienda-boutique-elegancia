@@ -6,16 +6,20 @@ import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { isSensitive, buildSnapshot, buildAgentMessages, parsePlan } from '../../utils/aiCopilot';
 import { generateShippingLabel } from '../../utils/shippingLabel';
 import { getTotalStock, getVariantStock } from '../../utils/variants';
-import { celdasDesdeExcel, leerVentasDeCeldas, planearVentas, notaDesdeNombre, interpretarMensajeDePlanilla, resumirPlanDeVentas } from '../../utils/importarVentas';
+import { celdasDesdeExcel, leerVentasDeCeldas, planearVentas, notaDesdeNombre, interpretarMensajeDePlanilla, resumirPlanDeVentas, renombrarClientas } from '../../utils/importarVentas';
 import { planearImportacion, filasDesdeExcel } from '../../utils/importarInventario';
 import { aplicarPlanDeProductos, resumirPlanDeProductos } from '../../utils/aplicarImportacion';
+import { responderDirecto, avisoNuevaVenta, avisoCambiosDeStock, fotoDeStock, ventasDesde, nombreCliente } from '../../utils/lauDirecto';
+import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA } from '../../utils/comision';
 
 const HISTORY_KEY = 'lau_copilot_v4';
+const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
 const MAX_STEPS = 5;
 const WELCOME = {
     role: 'ai', text:
         '¡Hola! 👋 Soy Lau, tu copiloto. Manejás toda la tienda hablándome como a una empleada — y yo ejecuto las acciones de verdad (lo importante siempre te lo confirmo antes).\n\n' +
         'Para cargar un producto, tocá el botón dorado "Cargar producto (paso a paso)" abajo: te lleva con botones por nombre, color, talle, stock y precio, sin vueltas. Para todo lo demás, pedímelo en tus palabras.\n\n' +
+        'Preguntame "¿cuánto queda del vestido negro?" o "¿qué se vendió hoy?" y te lo digo al instante. Y mientras me tengas abierta te aviso sola cada venta que entra y cada prenda que se agota.\n\n' +
         'Tocá 📖 Guía arriba para ver TODO con ejemplos. ¿Arrancamos?'
 };
 
@@ -262,6 +266,56 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
     const push = (m) => setMessages(prev => [...prev, m]);
     const aiConfigured = hasAdminAI(aiConfig);
+    const umbralStock = parseInt(siteConfig?.sales?.scarcity?.threshold) || 5;
+
+    // --- EN VIVO: Lau avisa sola cuando entra una venta o baja el stock ---
+    // Los pedidos y el inventario llegan de Firestore en tiempo real; acá solo
+    // se compara la foto anterior con la nueva y se cuenta lo que cambió.
+    const pedidosVistos = useRef(null);
+    const stockAnterior = useRef(null);
+    const recienVendidos = useRef(new Map()); // id → cuándo se avisó la venta (para no repetir el "bajó el stock")
+    useEffect(() => {
+        if (!Array.isArray(orders)) return;
+        if (pedidosVistos.current === null) {
+            pedidosVistos.current = new Set(orders.map(o => o.id));
+            // Lo que entró mientras Lau estaba cerrada.
+            try {
+                const desde = localStorage.getItem(VISTO_KEY);
+                const nuevos = desde ? ventasDesde(orders, desde) : [];
+                if (nuevos.length) {
+                    const total = nuevos.reduce((a, o) => a + (Number(o.total) || 0), 0);
+                    const L = [`🛍️ Mientras no estabas entraron ${nuevos.length} venta${nuevos.length === 1 ? '' : 's'} por $${total.toLocaleString('es-AR')}:`];
+                    for (const o of nuevos.slice(0, 8)) L.push(`• ${nombreCliente(o)} · $${Number(o.total || 0).toLocaleString('es-AR')} · ${(o.items || []).map(i => i.name).slice(0, 3).join(', ')}`);
+                    if (nuevos.length > 8) L.push(`… y ${nuevos.length - 8} más.`);
+                    L.push('Preguntame "¿qué se vendió hoy?" para el detalle.');
+                    push({ role: 'ai', text: L.join('\n') });
+                }
+            } catch { /* noop */ }
+        } else {
+            const ahora = Date.now();
+            for (const o of orders) {
+                if (pedidosVistos.current.has(o.id)) continue;
+                pedidosVistos.current.add(o.id);
+                // Un pedido que aparece pero es viejo es una carga en bloque (o el
+                // historial que terminó de llegar), no una venta de recién.
+                const edad = ahora - new Date(o.date || 0).getTime();
+                if (o.manual || Number.isNaN(edad) || edad > 15 * 60 * 1000) continue;
+                push({ role: 'ai', text: avisoNuevaVenta(o, inventory, { umbral: umbralStock }) });
+                for (const i of o.items || []) recienVendidos.current.set(String(i.id), ahora);
+            }
+        }
+        try { localStorage.setItem(VISTO_KEY, new Date().toISOString()); } catch { /* noop */ }
+    }, [orders]);
+    useEffect(() => {
+        if (!Array.isArray(inventory) || !inventory.length) return;
+        if (stockAnterior.current === null) { stockAnterior.current = fotoDeStock(inventory); return; }
+        // Lo que bajó por una venta recién avisada ya se dijo ("→ quedan 2").
+        const antes = new Map(stockAnterior.current);
+        for (const [id, ts] of recienVendidos.current) if (Date.now() - ts < 10000) antes.delete(id); else recienVendidos.current.delete(id);
+        const aviso = avisoCambiosDeStock(antes, inventory, { umbral: umbralStock });
+        stockAnterior.current = fotoDeStock(inventory);
+        if (aviso) push({ role: 'ai', text: aviso });
+    }, [inventory]);
 
     const findProduct = (q) => {
         if (q == null) return null;
@@ -320,8 +374,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const pack = Number(A.packaging) || 0;
                 const ship = Number(A.shipping) || 0;
                 const margin = A.margin != null ? Number(A.margin) : 50;
-                const defaultFee = Number(paymentConfig?.realMpFeePercent) || Number(paymentConfig?.mpFee) || 6;
-                const commission = A.commission != null ? Number(A.commission) : defaultFee;
+                const commission = A.commission != null ? Number(A.commission) : comisionMP(paymentConfig);
                 const totalCost = cost + pack + ship;
                 const feeFactor = 1 - commission / 100;
                 if (feeFactor <= 0) return `La comisión de MP (${commission}%) es 100% o más, revisá ese dato.`;
@@ -335,10 +388,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             }
             case 'query_mp_fee': {
                 const real = Number(paymentConfig?.realMpFeePercent) || 0;
-                const manual = Number(paymentConfig?.mpFee) || 0;
                 if (real > 0) return `La comisión de Mercado Pago que uso es ${real}%, MEDIDA de tus ventas reales (se actualiza sola con cada venta aprobada — no tenés que fijarte nada). Es la que aplico al calcular precios.`;
-                if (manual > 0) return `Uso ${manual}% de comisión de MP (la que cargaste en Configuración). Apenas entren ventas por Mercado Pago, la mido sola de tu cuenta y la actualizo a la real.`;
-                return `Todavía no hubo ventas por Mercado Pago para medir tu comisión real, así que uso un estimado de 6%. En cuanto tengas una venta aprobada, la mido sola de tu cuenta y la empiezo a usar automáticamente (no tenés que mirar nada).`;
+                return `Todavía no hubo ventas por Mercado Pago para medir tu comisión real, así que uso un estimado de ${COMISION_MP_ESTIMADA}% (6,29% + IVA, "dinero al instante"). En cuanto tengas una venta aprobada, la mido sola de tu cuenta y la empiezo a usar automáticamente (no tenés que mirar nada).`;
             }
             case 'query_reviews': {
                 let r = [...(reviews || [])];
@@ -454,11 +505,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         if (!c) sinCosto++;
                         cost += c * (Number(it.quantity) || 1);
                     }
-                    if (o.mpFeeAmount != null) fees += Number(o.mpFeeAmount) || 0;
-                    else if (!o.manual) {
-                        const pct = Number(paymentConfig?.realMpFeePercent || paymentConfig?.mpFee) || 0;
-                        fees += (Number(o.total) || 0) * pct / 100;
-                    }
+                    fees += comisionDelPedido(o, paymentConfig);
                 }
                 // Gastos cargados en el mismo período
                 let gastos = 0;
@@ -713,6 +760,12 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const product = {
                     name: String(A.name || 'Producto'),
                     price: Number(A.price) || 0,
+                    // El costo va al producto: sin esto la ganancia del Dashboard
+                    // y de Ventas contaría el precio entero como ganancia.
+                    cost: Number(A.cost) || 0,
+                    packagingCost: Number(A.packagingCost) || 0,
+                    shippingCost: Number(A.shippingCost) || 0,
+                    feePercent: comisionMP(paymentConfig),
                     stock: Number(A.stock) || 0,
                     category: String(A.category || ''),
                     colors: toArr(A.colors),
@@ -899,9 +952,11 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             setBusyMsg('Leyendo la planilla…');
             const buffer = await archivo.arrayBuffer();
             const celdas = await celdasDesdeExcel(buffer);
-            const { ventas, avisos } = leerVentasDeCeldas(celdas);
-            if (!ventas.length) { await importarProductos(archivo, buffer, fotos); return; }
+            const { ventas: leidas, avisos } = leerVentasDeCeldas(celdas);
+            if (!leidas.length) { await importarProductos(archivo, buffer, fotos); return; }
             const { fecha, canal, descontarStock } = interpretarMensajeDePlanilla(text, archivo.name);
+            const { ventas, cambios } = renombrarClientas(leidas, text);
+            for (const c of cambios) avisos.push(`Clienta "${c.de}" → "${c.a}", como me pediste.`);
             const plan = planearVentas(ventas, { inventario: inventory, pedidos: orders, fecha, canal, nota: notaDesdeNombre(archivo.name), descontarStock });
             push({ role: 'ai', text: resumirPlanDeVentas(plan, { fecha, canal, avisos }) });
             if (!plan.nuevos.length) return;
@@ -935,6 +990,12 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         const text = (typeof overrideText === 'string' ? overrideText : input).trim();
         if (planilla && !loading) { setInput(''); await importarPlanilla(planilla, text); return; }
         if ((!text && !files.length) || loading) return;
+        // "¿cuánto queda del vestido negro?", "¿qué se vendió hoy?": se contesta
+        // al instante con los datos en pantalla, sin pasar por la IA.
+        if (text && !files.length && !pendingPhotosRef.current.length) {
+            const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock });
+            if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }
+        }
         if (!aiConfigured) { push({ role: 'system', text: 'Configurá una key de Cerebras (o Gemini) en Admin → Configuración para activarme.' }); return; }
 
         setInput('');

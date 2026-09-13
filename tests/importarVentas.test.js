@@ -101,7 +101,7 @@ describe('planearVentas', () => {
         expect(p.status).toBe('approved');
         expect(plan.nuevos[1].status).toBe('pending');
         expect(p.date.startsWith('2026-09-01')).toBe(true);
-        expect(p.customer.nombre).toBe('CLIENTA UNO');
+        expect(p.customer.nombre).toBe('Clienta Uno'); // la planilla venía en mayúsculas
         expect(p.total).toBe(24002);
         expect(p.note).toBe('WAKANDA 09-26');
         expect(plan.totalNuevos).toBe(24002 + 25901);
@@ -163,8 +163,8 @@ describe('resumirPlanDeVentas', () => {
         const plan = planearVentas(ventas, { fecha: '2026-09-01', canal: 'WhatsApp' });
         const txt = resumirPlanDeVentas(plan, { fecha: '2026-09-01', canal: 'WhatsApp' });
         expect(txt).toContain('2 clientas, 4 prendas, $49.903');
-        expect(txt).toContain('• CLIENTA UNO — $24.002');
-        expect(txt).toContain('• CLIENTA DOS — $25.901 (pendiente de pago)');
+        expect(txt).toContain('• Clienta Uno — $24.002');
+        expect(txt).toContain('• Clienta Dos — $25.901 (pendiente de pago)');
         expect(txt).toContain('Fecha 01/09/2026 · canal WhatsApp');
         const vacio = resumirPlanDeVentas(planearVentas([], {}), {});
         expect(vacio).toContain('No encontré ventas');

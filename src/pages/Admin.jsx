@@ -16,6 +16,7 @@ import {
 import { StatusSelector } from '../components/admin/StatusSelector';
 import { usePagination, Pagination } from '../components/ui/Pagination';
 import { getTotalStock } from '../utils/variants';
+import { comisionMP, comisionDeProducto, comisionDelPedido, costoUnitario } from '../utils/comision';
 import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock';
 
 // Cada tab se carga bajo demanda (code-splitting) — el bundle inicial del
@@ -56,7 +57,7 @@ const TAB_LABELS = {
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers, paymentConfig } = useStore();
     const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -179,10 +180,10 @@ export const Admin = () => {
     // --- METRICAS ---
     const metrics = useMemo(() => {
         return inventory.reduce((acc, p) => {
-            const cost = (Number(p.cost) || 0) + (Number(p.shippingCost) || 0) + (Number(p.packagingCost) || 0);
+            const cost = costoUnitario(p);
             const price = Number(p.price) || 0;
-            const stock = Number(p.stock) || 0;
-            const feePercent = Number(p.feePercent) || 0;
+            const stock = getTotalStock(p);
+            const feePercent = comisionDeProducto(p, paymentConfig);
 
             const profit = price - cost - (price * (feePercent / 100));
 
@@ -192,7 +193,7 @@ export const Admin = () => {
             acc.totalValue += price * stock;
             return acc;
         }, { invested: 0, potentialProfit: 0, totalStock: 0, totalValue: 0 });
-    }, [inventory]);
+    }, [inventory, paymentConfig]);
 
     const salesMetrics = orders.reduce((acc, o) => { acc.totalRevenue += o.total; acc.count += 1; return acc; }, { totalRevenue: 0, count: 0 });
 
@@ -200,8 +201,11 @@ export const Admin = () => {
         const product = inventory.find(p => String(p.id) === String(item.id))
             || inventory.find(p => (p.name || '').trim().toLowerCase() === (item.name || '').trim().toLowerCase())
             || item;
-        const cost = (Number(product.cost) || 0) + (Number(product.shippingCost) || 0) + (Number(product.packagingCost) || 0);
-        const fee = item.price * ((Number(product.feePercent) || 0) / 100);
+        const cost = costoUnitario(product);
+        // Comisión: la real del pedido si MP ya la informó, repartida entre las
+        // prendas según su precio; cero si fue una venta por fuera.
+        const feePedido = comisionDelPedido(order, paymentConfig);
+        const fee = Number(order.total) > 0 ? feePedido * (item.price * (Number(item.quantity) || 1)) / Number(order.total) / (Number(item.quantity) || 1) : 0;
         const profit = item.price - cost - fee;
         return {
             date: order.date,
@@ -547,8 +551,8 @@ export const Admin = () => {
                         {/* STATS RAPIDAS */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                             <StatSmall label="Valor Inventario" value={formatMoney(metrics.totalValue)} icon={DollarSign} color="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
-                            <StatSmall label="Inversión" value={formatMoney(metrics.invested)} icon={Wallet} color="text-blue-600 bg-blue-50 dark:bg-blue-900/20" />
-                            <StatSmall label="Ganancia Potencial" value={formatMoney(metrics.potentialProfit)} icon={TrendingUp} color="text-[#E8C65E] bg-orange-50 dark:bg-orange-900/20" />
+                            <StatSmall label="Inversión" value={formatMoney(metrics.invested)} icon={Wallet} color="text-blue-600 bg-blue-50 dark:bg-blue-900/20" hint="Costo + envío + packaging de todo el stock" />
+                            <StatSmall label="Ganancia Potencial" value={formatMoney(metrics.potentialProfit)} icon={TrendingUp} color="text-[#E8C65E] bg-orange-50 dark:bg-orange-900/20" hint={`Si vendés todo por la tienda, ya descontada la comisión de MP (${comisionMP(paymentConfig)}%)`} />
                             <StatSmall label="Total Prendas" value={metrics.totalStock} icon={Tag} color="text-purple-600 bg-purple-50 dark:bg-purple-900/20" />
                         </div>
 
@@ -867,10 +871,14 @@ const SidebarItem = ({ icon: Icon, label, active, onClick, count }) => (
     </button>
 );
 
-const StatSmall = ({ label, value, icon: Icon, color }) => (
-    <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]">
+const StatSmall = ({ label, value, icon: Icon, color, hint }) => (
+    <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]" title={hint}>
         <div className={`p-3 rounded-xl ${color}`}><Icon className="w-5 h-5" /></div>
-        <div><p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">{label}</p><p className="text-xl font-bold dark:text-white">{value}</p></div>
+        <div>
+            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">{label}</p>
+            <p className="text-xl font-bold dark:text-white">{value}</p>
+            {hint && <p className="text-[10px] text-slate-400 leading-tight mt-0.5">{hint}</p>}
+        </div>
     </div>
 );
 

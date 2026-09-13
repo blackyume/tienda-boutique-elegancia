@@ -92,6 +92,15 @@ una decisión, no una falla.
 - **Gastos**: "gasté 20000 en packaging" → lo resta de la ganancia.
 - **Ofertas**: "poné 15% off en camperas el finde".
 - **Resumen**: "cómo va el negocio", "qué repongo".
+- **Stock y ventas en vivo** (sin IA, al instante): "¿cuánto queda del
+  vestido negro?", "stock jean oxford", "¿cómo está el stock?", "¿qué se
+  vendió hoy?", "¿cuánto vendí ayer?", "ventas de la semana", "últimas ventas".
+  Y mientras está abierta avisa sola cada venta que entra ("¡Venta nueva!…
+  → quedan 2") y cada prenda que se agota; al volver a abrirla cuenta lo que
+  entró mientras no estabas.
+- **Planilla de ventas con nombres corregidos**: junto con el archivo,
+  "Ana Mena y Lorena Petroli" → empareja por el primer nombre y guarda el
+  nombre completo.
 
 Todo lo que cambia algo en la tienda **te pide confirmación** antes. Y no
 borra en masa: si le decís "borrá todo", te va a pedir que confirmes uno por

@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Paperclip, X, ChevronLeft, Check, Plus, Sparkles, Loader2, Image as ImageIcon, Star, Tag } from 'lucide-react';
 import { getColorHex } from '../../utils/helpers';
+import { comisionMP } from '../../utils/comision';
 import { generateGroundedDescription, hasAdminAI } from '../../utils/ai';
 
 // Wizard DETERMINÍSTICO de carga de producto. NO usa IA: es una secuencia fija
@@ -130,7 +131,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
     const [fleteUnits, setFleteUnits] = useState('');
     const [visible, setVisible] = useState(true);
 
-    const commission = Number(paymentConfig?.realMpFeePercent) || Number(paymentConfig?.mpFee) || 6;
+    const commission = comisionMP(paymentConfig);
 
     const priceCalc = useMemo(() => {
         const c = Number(cost) || 0;
@@ -227,6 +228,11 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                 price: salePrice,
                 ...(pct > 0 ? { compareAtPrice: finalPrice } : {}),
                 cost: Number(cost) || 0,
+                // Lo demás que se usó para el precio también queda en el producto,
+                // así la ganancia del Dashboard y de Ventas sale con los mismos números.
+                packagingCost: Number(packaging) || 0,
+                shippingCost: priceCalc?.shipPer || 0,
+                feePercent: commission,
                 stock: totalStock,
                 ...(variants ? { variants } : {}),
                 category: catName,

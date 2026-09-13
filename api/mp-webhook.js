@@ -156,10 +156,15 @@ module.exports = async (req, res) => {
 
         // Comisión REAL que Mercado Pago nos cobró en este pago (la que paga el
         // vendedor). La usamos para auto-cargar la comisión en la calculadora.
+        // Lo más fiel es "cobrado − lo que nos depositan": incluye IVA y
+        // cualquier costo de financiación. Si no viene, se suman los fee_details.
+        const netReceived = Number(payment.transaction_details?.net_received_amount);
         const feeDetails = Array.isArray(payment.fee_details) ? payment.fee_details : [];
-        const mpFeeAmount = feeDetails
-            .filter(f => f && (f.fee_payer === 'collector' || f.type === 'mercadopago_fee'))
-            .reduce((a, f) => a + (Number(f.amount) || 0), 0);
+        const mpFeeAmount = netReceived > 0 && paidAmount > netReceived
+            ? Math.round((paidAmount - netReceived) * 100) / 100
+            : feeDetails
+                .filter(f => f && (f.fee_payer === 'collector' || f.type === 'mercadopago_fee'))
+                .reduce((a, f) => a + (Number(f.amount) || 0), 0);
         const mpFeePercent = paidAmount > 0 ? Math.round((mpFeeAmount / paidAmount) * 1000) / 10 : 0;
 
         // Buscar la orden (external_reference == order.id; puede o no ser el docId)

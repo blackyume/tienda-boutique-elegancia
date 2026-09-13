@@ -224,7 +224,7 @@ export const planearVentas = (ventas, { inventario = [], pedidos = [], fecha, ca
             stockApplied: descontarStock,
             importKey,
             note: nota,
-            customer: { nombre: v.cliente || 'Venta externa', email: '' },
+            customer: { nombre: nombrePropio(v.cliente) || 'Venta externa', email: '' },
             items,
         };
         (yaImportadas.has(importKey) ? repetidas : nuevos).push(pedido);
@@ -287,6 +287,44 @@ export const interpretarMensajeDePlanilla = (texto = '', nombreArchivo = '', hoy
     return { fecha, canal, descontarStock };
 };
 
+/** "LORENA CAMPO" → "Lorena Campo". Las planillas suelen venir en mayúsculas. */
+export const nombrePropio = (s = '') => String(s).trim().split(/\s+/).filter(Boolean)
+    .map(w => w.length <= 2 && !/^[a-záéíóúñ]/i.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+
+// Palabras que cortan un nombre dentro del mensaje ("Ana Mena en el local" →
+// el nombre termina antes de "en").
+const CORTA_NOMBRE = new Set(['y', 'e', 'en', 'el', 'la', 'por', 'para', 'con', 'del', 'de', 'fecha', 'canal', 'local', 'whatsapp', 'wasap', 'wsp', 'instagram', 'feria', 'descont', 'descontá', 'desconta', 'stock', 'hoy', 'ayer', 'es', 'se', 'llama', 'ponele', 'nombre', 'clienta', 'clientas', 'cliente', 'clientes', 'son', 'las', 'los', 'a', 'que', 'ke', 'q', 'porfa', 'porfas', 'favor']);
+
+/**
+ * El dueño puede corregir los nombres de las clientas en el mismo mensaje en
+ * que manda la planilla: "Ana Mena y Lorena Vivas". Se emparejan por el
+ * primer nombre (la planilla dice "ANA CAMPO", el mensaje "Ana Mena" → queda
+ * "Ana Mena"). Devuelve las ventas con los nombres nuevos y la lista de cambios.
+ */
+export const renombrarClientas = (ventas = [], texto = '') => {
+    const crudas = String(texto || '').replace(/[¿?¡!.,;:"'()]+/g, ' ').split(/\s+/).filter(Boolean);
+    const palabras = crudas.map(normalizarTexto);
+    const cambios = [];
+    const nuevas = ventas.map(v => {
+        const primero = normalizarTexto(v.cliente).split(' ')[0];
+        if (!primero || primero.length < 2) return v;
+        const i = palabras.indexOf(primero);
+        if (i < 0) return v;
+        const tomadas = [crudas[i]];
+        for (let j = i + 1; j < palabras.length && tomadas.length < 4; j += 1) {
+            if (CORTA_NOMBRE.has(palabras[j]) || /\d/.test(palabras[j])) break;
+            tomadas.push(crudas[j]);
+        }
+        if (tomadas.length < 2) return v; // solo el primer nombre: no hay nada nuevo
+        const nuevo = nombrePropio(tomadas.join(' '));
+        if (normalizarTexto(nuevo) === normalizarTexto(v.cliente)) return v;
+        cambios.push({ de: nombrePropio(v.cliente), a: nuevo });
+        return { ...v, cliente: nuevo };
+    });
+    return { ventas: nuevas, cambios };
+};
+
 /** Resumen en texto de un plan, para que Lau lo muestre antes de confirmar. */
 export const resumirPlanDeVentas = (plan, { fecha, canal, avisos = [] } = {}) => {
     const $ = (n) => `$${Number(n).toLocaleString('es-AR')}`;
@@ -298,7 +336,7 @@ export const resumirPlanDeVentas = (plan, { fecha, canal, avisos = [] } = {}) =>
             lineas.push(`• ${p.customer.nombre} — ${$(p.total)}${p.status === 'approved' ? '' : ' (pendiente de pago)'}`);
             for (const i of p.items) lineas.push(`   ${i.quantity > 1 ? `${i.quantity}× ` : ''}${i.name}${[i.size && `talle ${i.size}`, i.color].filter(Boolean).length ? ` · ${[i.size && `talle ${i.size}`, i.color].filter(Boolean).join(' · ')}` : ''} — ${$(i.price * i.quantity)}${i.enInventario ? ' ✓ en inventario' : ''}`);
         }
-        lineas.push(`Fecha ${f} · canal ${canal}. Si querés otra fecha, decime "fecha 5/9/2026" y volvé a adjuntar.`);
+        lineas.push(`Fecha ${f} · canal ${canal}. Si querés otra fecha, otro canal o corregir un nombre, escribilo junto con el archivo: "fecha 5/9, en el local, Ana Mena y Lorena Vivas".`);
     }
     if (plan.repetidas.length) lineas.push(`Ya estaban registradas con esta fecha: ${plan.repetidas.map(p => p.customer.nombre).join(', ')}. No las repito.`);
     for (const a of avisos) lineas.push(`⚠️ ${a}`);

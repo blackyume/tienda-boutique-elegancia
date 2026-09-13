@@ -216,9 +216,26 @@ const Lau = ({ abrir }) => (
             <P>Con el mismo clip 📎 podés adjuntar un <strong>Excel</strong>. Lau lo lee sola, sin inteligencia artificial de por medio, te muestra qué entendió y te pide confirmar:</P>
             <Lista items={[
                 <><strong>La plantilla de productos</strong> (con las fotos adjuntas en el mismo mensaje): crea los productos, sube las fotos y los publica. Es lo mismo que <Ruta pasos={['Inventario', 'Importar Excel']} />, pero desde el chat.</>,
-                <><strong>Tu planilla de ventas</strong> (una columna por clienta): registra cada clienta como una venta. Podés agregarle texto: <em>“ventas del 5/9 por instagram”</em>, <em>“descontá el stock”</em>.</>,
+                <><strong>Tu planilla de ventas</strong> (una columna por clienta): registra cada clienta como una venta. Podés agregarle texto: <em>“ventas del 5/9 por instagram”</em>, <em>“descontá el stock”</em>, o corregir un nombre: <em>“Ana Mena y Lorena Vivas”</em> (empareja por el primer nombre y usa el completo).</>,
             ]} />
             <Aviso tipo="tip">Para esto no hace falta la llave de Gemini: aunque Lau diga “IA no configurada”, las planillas las lee igual.</Aviso>
+        </Seccion>
+
+        <Seccion id="en-vivo" titulo="Stock y ventas en tiempo real">
+            <P>Lau ve el inventario y los pedidos <strong>en vivo</strong>: lo que cambia en la tienda, cambia en el chat en el mismo segundo. Y estas preguntas las contesta al instante, con datos exactos, sin pasar por la inteligencia artificial (funcionan aunque no haya llave):</P>
+            <Tabla
+                cabecera={['Preguntás', 'Te dice']}
+                filas={[
+                    ['“¿cuánto queda del vestido negro?” / “stock jean oxford” / “¿hay top rib?”', 'Cuántas unidades quedan, precio, y el detalle por talle y color si lo tiene. Con ⚠️ si queda poco y ⛔ si se agotó.'],
+                    ['“¿cuántos vestidos quedan?”', 'Si hay varios que coinciden, te lista todos con su stock.'],
+                    ['“¿cómo está el stock?” / “¿qué está agotado?” / “¿qué repongo?”', 'El panorama: cuántos productos y unidades, qué se agotó y qué está por agotarse.'],
+                    ['“¿qué se vendió hoy?” / “¿cuánto vendí ayer?” / “ventas de la semana” / “este mes” / “últimas ventas”', 'Cada venta con hora, clienta, total, canal y prendas, y el total del período.'],
+                ]}
+            />
+            <P>Además, mientras tengas a Lau abierta, <strong>te avisa sola</strong>:</P>
+            <Mensaje de="lau">{'🛍️ ¡Venta nueva! Carla Pérez · $45.000 · Tienda web · pagado\n• Vestido Negro Largo (talle M) → ⚠️ quedan 2\nCuando lo despaches, en Pedidos tenés "Copiar datos para MiCorreo".'}</Mensaje>
+            <Mensaje de="lau">{'⛔ Campera Puffer se agotó (tenías 1). Reponer o sacarlo de la tienda.'}</Mensaje>
+            <P>Y al volver a abrirla te cuenta lo que entró mientras no estabas. Si querés enterarte aunque el panel esté cerrado, el navegador también manda una notificación por cada pedido (la primera vez te pide permiso).</P>
         </Seccion>
 
         <Seccion id="frases" titulo="Frases que entiende">
@@ -639,8 +656,8 @@ export const GUIAS = [
     {
         id: 'lau', titulo: 'Cargar productos hablándole a Lau', icono: Bot, duracion: '5 min', para: 'Quien carga productos',
         resumen: 'Le adjuntás la foto, le dictás los datos y crea el producto. Lo que falta lo pregunta con botones.',
-        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos'],
-        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
+        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos', 'stock', 'tiempo real', 'en vivo', 'cuanto queda', 'que se vendio'],
+        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['en-vivo', 'Stock y ventas en vivo'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
         Contenido: Lau,
     },
     {
