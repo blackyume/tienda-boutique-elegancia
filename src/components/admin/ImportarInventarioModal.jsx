@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { useStore } from '../../context/StoreContext';
 import { planearImportacion, filasDesdeCsv, filasDesdeExcel } from '../../utils/importarInventario';
 import { aplicarPlanDeProductos } from '../../utils/aplicarImportacion';
+import { precioSugerido } from '../../utils/comision';
 import { formatMoney } from '../../utils/helpers';
 
 const Contador = ({ icono: Icono, n, texto, color }) => (
@@ -45,7 +46,7 @@ const Miniaturas = ({ fotos }) => {
 };
 
 export const ImportarInventarioModal = ({ onClose }) => {
-    const { inventory, addProduct, updateProduct, uploadImage, addToast } = useStore();
+    const { inventory, addProduct, updateProduct, uploadImage, addToast, siteConfig, paymentConfig } = useStore();
     const [filas, setFilas] = useState(null);
     const [archivo, setArchivo] = useState('');
     const [fotos, setFotos] = useState([]);
@@ -60,7 +61,7 @@ export const ImportarInventarioModal = ({ onClose }) => {
     // soltar las fotos después del Excel, o al revés, y la vista previa sigue.
     useEffect(() => {
         if (!filas) { setPlan(null); return; }
-        setPlan(planearImportacion(filas, inventory, fotos));
+        setPlan(planearImportacion(filas, inventory, fotos, { cotizar: (costo, cat) => precioSugerido(costo, { categoria: cat, siteConfig, paymentConfig }) }));
     }, [filas, fotos, inventory]);
 
     const recibir = useCallback(async (lista) => {

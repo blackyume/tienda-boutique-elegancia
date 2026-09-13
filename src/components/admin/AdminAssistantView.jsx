@@ -10,7 +10,7 @@ import { celdasDesdeExcel, leerVentasDeCeldas, planearVentas, notaDesdeNombre, i
 import { planearImportacion, filasDesdeExcel } from '../../utils/importarInventario';
 import { aplicarPlanDeProductos, resumirPlanDeProductos } from '../../utils/aplicarImportacion';
 import { responderDirecto, avisoNuevaVenta, avisoCambiosDeStock, fotoDeStock, ventasDesde, nombreCliente } from '../../utils/lauDirecto';
-import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA } from '../../utils/comision';
+import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, precioSugerido, explicarPrecio, avisoMargenBajo, fotoDeCostos } from '../../utils/comision';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
@@ -273,6 +273,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     // se compara la foto anterior con la nueva y se cuenta lo que cambió.
     const pedidosVistos = useRef(null);
     const stockAnterior = useRef(null);
+    const costosAnteriores = useRef(null);
     const recienVendidos = useRef(new Map()); // id → cuándo se avisó la venta (para no repetir el "bajó el stock")
     useEffect(() => {
         if (!Array.isArray(orders)) return;
@@ -308,13 +309,19 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     }, [orders]);
     useEffect(() => {
         if (!Array.isArray(inventory) || !inventory.length) return;
-        if (stockAnterior.current === null) { stockAnterior.current = fotoDeStock(inventory); return; }
+        if (stockAnterior.current === null) { stockAnterior.current = fotoDeStock(inventory); costosAnteriores.current = fotoDeCostos(inventory); return; }
         // Lo que bajó por una venta recién avisada ya se dijo ("→ quedan 2").
         const antes = new Map(stockAnterior.current);
         for (const [id, ts] of recienVendidos.current) if (Date.now() - ts < 10000) antes.delete(id); else recienVendidos.current.delete(id);
         const aviso = avisoCambiosDeStock(antes, inventory, { umbral: umbralStock });
         stockAnterior.current = fotoDeStock(inventory);
         if (aviso) push({ role: 'ai', text: aviso });
+        // Subió el costo (o bajó el precio) y ya no llega al margen configurado.
+        if (costosAnteriores.current) {
+            const margen = avisoMargenBajo(costosAnteriores.current, inventory, { siteConfig, paymentConfig });
+            if (margen) push({ role: 'ai', text: margen });
+        }
+        costosAnteriores.current = fotoDeCostos(inventory);
     }, [inventory]);
 
     const findProduct = (q) => {
@@ -369,22 +376,11 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 return JSON.stringify({ id: p.id, name: p.name, price: p.price, compareAtPrice: p.compareAtPrice, stock: p.stock, variants: p.variants || null, hasVariants: Array.isArray(p.variants) && p.variants.length > 0, category: p.category, colors: p.colors, sizes: p.sizes, visible: p.active !== false, badges: p.badges, description: p.description }, null, 1);
             }
             case 'quote_price': {
-                const cost = Number(A.cost) || 0;
-                if (cost <= 0) return 'Decime el costo de la prenda para calcular el precio.';
-                const pack = Number(A.packaging) || 0;
-                const ship = Number(A.shipping) || 0;
-                const margin = A.margin != null ? Number(A.margin) : 50;
-                const commission = A.commission != null ? Number(A.commission) : comisionMP(paymentConfig);
-                const totalCost = cost + pack + ship;
-                const feeFactor = 1 - commission / 100;
-                if (feeFactor <= 0) return `La comisión de MP (${commission}%) es 100% o más, revisá ese dato.`;
-                // Margen = markup SOBRE el costo (lo que querés ganar sobre lo que te costó),
-                // ajustado para que ESE margen te quede LIMPIO después de la comisión de MP.
-                // precio = costo × (1 + margen%) / (1 − comisión%). Redondeo al múltiplo de 100.
-                const price = Math.ceil((totalCost * (1 + margin / 100) / feeFactor) / 100) * 100;
-                const commissionAmount = Math.round(price * commission / 100);
-                const net = price - totalCost - commissionAmount;
-                return `Precio de venta sugerido: $${price.toLocaleString('es-AR')}. Desglose: costo $${totalCost.toLocaleString('es-AR')}${(pack || ship) ? ` (prenda $${cost.toLocaleString('es-AR')}${pack ? ' + packaging $' + pack.toLocaleString('es-AR') : ''}${ship ? ' + envío $' + ship.toLocaleString('es-AR') : ''})` : ''}, comisión MP ${commission}% = $${commissionAmount.toLocaleString('es-AR')}. Con un margen del ${margin}% sobre el costo, ganás $${net.toLocaleString('es-AR')} netos por venta (después de MP). Para publicarlo usá create_product con price ${price}.`;
+                // Margen, packaging, flete y comisión salen de Configuración → Precios
+                // (y de la comisión real de MP); solo se pisan si el dueño los dijo.
+                const r = precioSugerido(A.cost, { categoria: A.category, siteConfig, paymentConfig, margen: A.margin, packaging: A.packaging, flete: A.shipping, comision: A.commission });
+                if (!r) return 'Decime el costo de la prenda para calcular el precio.';
+                return `${explicarPrecio(r)} Para publicarlo usá create_product con price ${r.precio}, cost ${r.costo}, packagingCost ${r.packaging}, shippingCost ${r.flete}.`;
             }
             case 'query_mp_fee': {
                 const real = Number(paymentConfig?.realMpFeePercent) || 0;
@@ -757,14 +753,16 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 // Soporta una sola foto (imageUrl) o varias del mismo producto (imageUrls -> galería)
                 const imgs = (Array.isArray(A.imageUrls) ? A.imageUrls : [A.imageUrl]).map(u => String(u || '').trim()).filter(Boolean);
                 const img = imgs[0] || '';
+                const cfgPrecios = configPrecios(siteConfig);
+                const sugerido = !(Number(A.price) > 0) && Number(A.cost) > 0 ? precioSugerido(A.cost, { categoria: A.category, siteConfig, paymentConfig }) : null;
                 const product = {
                     name: String(A.name || 'Producto'),
-                    price: Number(A.price) || 0,
+                    price: Number(A.price) > 0 ? Number(A.price) : (sugerido?.precio || 0),
                     // El costo va al producto: sin esto la ganancia del Dashboard
                     // y de Ventas contaría el precio entero como ganancia.
                     cost: Number(A.cost) || 0,
-                    packagingCost: Number(A.packagingCost) || 0,
-                    shippingCost: Number(A.shippingCost) || 0,
+                    packagingCost: A.packagingCost != null ? Number(A.packagingCost) || 0 : (Number(A.cost) > 0 ? cfgPrecios.packaging : 0),
+                    shippingCost: A.shippingCost != null ? Number(A.shippingCost) || 0 : (Number(A.cost) > 0 ? cfgPrecios.flete : 0),
                     feePercent: comisionMP(paymentConfig),
                     stock: Number(A.stock) || 0,
                     category: String(A.category || ''),
@@ -781,7 +779,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 // Quitar de las fotos pendientes las que se acaban de usar (flujo guiado)
                 if (imgs.length) pendingPhotosRef.current = pendingPhotosRef.current.filter(p => !imgs.includes(p.url));
                 const galeria = imgs.length > 1 ? ` con ${imgs.length} fotos` : '';
-                return id ? `Producto "${product.name}"${galeria} ${visible ? 'PUBLICADO' : 'guardado como borrador'} (id ${id}).` : 'No se pudo crear (revisá Cloudinary/permisos).';
+                return id ? `Producto "${product.name}"${galeria} ${visible ? 'PUBLICADO' : 'guardado como borrador'} (id ${id})${sugerido ? ` a $${sugerido.precio.toLocaleString('es-AR')} (calculado desde el costo con tu margen del ${sugerido.margen}%)` : ''}.` : 'No se pudo crear (revisá Cloudinary/permisos).';
             }
             case 'set_price': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
@@ -928,7 +926,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     // carga masiva, pero desde el chat. Misma lógica que Inventario → Importar.
     const importarProductos = async (archivo, buffer, fotos) => {
         const filas = await filasDesdeExcel(buffer);
-        const plan = planearImportacion(filas, inventory, fotos);
+        const plan = planearImportacion(filas, inventory, fotos, { cotizar: (costo, cat) => precioSugerido(costo, { categoria: cat, siteConfig, paymentConfig }) });
         push({ role: 'ai', text: `Es una planilla de productos.\n${resumirPlanDeProductos(plan)}` });
         if (!plan.altas.length && !plan.cambios.length) return;
         const conFoto = plan.altas.filter(a => a.fotos.length).length;
@@ -993,7 +991,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         // "¿cuánto queda del vestido negro?", "¿qué se vendió hoy?": se contesta
         // al instante con los datos en pantalla, sin pasar por la IA.
         if (text && !files.length && !pendingPhotosRef.current.length) {
-            const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock });
+            const cotizar = (costo, cat) => explicarPrecio(precioSugerido(costo, { categoria: cat, siteConfig, paymentConfig }));
+            const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name) });
             if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }
         }
         if (!aiConfigured) { push({ role: 'system', text: 'Configurá una key de Cerebras (o Gemini) en Admin → Configuración para activarme.' }); return; }
@@ -1088,6 +1087,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     addProduct={addProduct}
                     addCategory={addCategory}
                     paymentConfig={paymentConfig}
+                    siteConfig={siteConfig}
                     aiConfig={aiConfig}
                     onClose={() => setWizardOpen(false)}
                     onDone={(r) => { if (r === 'reset') { setWizardOpen(false); setTimeout(() => setWizardOpen(true), 50); } }}

@@ -230,9 +230,35 @@ const periodoDe = (t) => {
  * Si el texto es una pregunta de stock o de ventas, devuelve la respuesta.
  * Si no (o si es un pedido de cambio), devuelve null y sigue la IA.
  */
-export const responderDirecto = (texto, { inventario = [], pedidos = [], umbral = 5, ahora = new Date() } = {}) => {
+// "me costó 24000", "¿a cuánto vendo algo que me salió 18.500?", "precio para costo 24000 en camperas".
+const COSTO = /\b(cost[oó]|costaron|cuesta|pagu[eé]|pague|sal[ei]o|salió|salieron|precio para|cotiz\w*)\b/;
+const numeroDe = (t) => {
+    const m = t.match(/\$?\s*(\d{1,3}(?:[.,]\d{3})+|\d+)(?:[.,]\d{1,2})?\b/);
+    if (!m) return null;
+    const n = Number(m[1].replace(/[.,]/g, ''));
+    return n > 0 ? n : null;
+};
+
+/**
+ * Si el texto es "me costó X" (sin pedir crear nada), devuelve el precio
+ * sugerido usando `cotizar(costo, categoria)`. Si no, null.
+ */
+export const responderPrecio = (texto, { cotizar, categorias = [] } = {}) => {
+    if (typeof cotizar !== 'function') return null;
+    const t = limpiar(texto);
+    if (!t || t.length > 140 || !COSTO.test(t) || ACCION.test(t)) return null;
+    const costo = numeroDe(normalizarTexto(texto)); // con los puntos de miles, que `limpiar` saca
+    if (!costo) return null;
+    const cat = categorias.find((c) => c && t.includes(normalizarTexto(c))) || '';
+    return cotizar(costo, cat);
+};
+
+export const responderDirecto = (texto, { inventario = [], pedidos = [], umbral = 5, ahora = new Date(), cotizar, categorias = [] } = {}) => {
     const t = limpiar(texto);
     if (!t || t.length > 140) return null;
+
+    const precio = responderPrecio(texto, { cotizar, categorias });
+    if (precio) return precio;
 
     // Ventas: "¿cuánto vendí hoy?", "qué se vendió ayer", "últimas ventas".
     // Con números ("vendí 2 jeans") o con envíos ("qué tengo que enviar") va a la IA.

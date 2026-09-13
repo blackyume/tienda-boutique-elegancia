@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Paperclip, X, ChevronLeft, Check, Plus, Sparkles, Loader2, Image as ImageIcon, Star, Tag } from 'lucide-react';
 import { getColorHex } from '../../utils/helpers';
-import { comisionMP } from '../../utils/comision';
+import { comisionMP, configPrecios, margenPara, redondear } from '../../utils/comision';
 import { generateGroundedDescription, hasAdminAI } from '../../utils/ai';
 
 // Wizard DETERMINÍSTICO de carga de producto. NO usa IA: es una secuencia fija
@@ -94,7 +94,9 @@ const LivePreview = ({ image, name, price, colors = [], sizes = [], totalStock, 
     </div>
 );
 
-export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCategory, paymentConfig, aiConfig, initialImages = [], onClose, onDone }) => {
+export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCategory, paymentConfig, siteConfig, aiConfig, initialImages = [], onClose, onDone }) => {
+    // Lo configurado en Configuración → Precios viene puesto; se puede pisar acá.
+    const cfgPrecios = configPrecios(siteConfig);
     const [step, setStep] = useState(initialImages.length ? 'name' : 'photos');
     const [images, setImages] = useState(initialImages);
     const [uploading, setUploading] = useState(false);
@@ -125,27 +127,34 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
     const [priceMode, setPriceMode] = useState('');
     const [priceFinal, setPriceFinal] = useState('');
     const [cost, setCost] = useState('');
-    const [margin, setMargin] = useState(50);
-    const [packaging, setPackaging] = useState('');
+    const [margin, setMargin] = useState(cfgPrecios.margen);
+    const [marginTocado, setMarginTocado] = useState(false);
+    const [packaging, setPackaging] = useState(cfgPrecios.packaging ? String(cfgPrecios.packaging) : '');
     const [flete, setFlete] = useState('');
     const [fleteUnits, setFleteUnits] = useState('');
     const [visible, setVisible] = useState(true);
 
     const commission = comisionMP(paymentConfig);
 
+    // Margen por categoría (si el dueño lo configuró y no tocó el margen a mano).
+    const catActual = newCat.trim() || category;
+    const margenCategoria = margenPara(catActual, cfgPrecios);
+    const margenEfectivo = marginTocado ? margin : margenCategoria;
+
     const priceCalc = useMemo(() => {
         const c = Number(cost) || 0;
         const pack = Number(packaging) || 0;
         const units = Number(fleteUnits) || 0;
-        const shipPer = units > 0 ? (Number(flete) || 0) / units : 0;
+        // Flete: el del bulto repartido por unidad si lo cargó; si no, el fijo configurado.
+        const shipPer = units > 0 ? (Number(flete) || 0) / units : cfgPrecios.flete;
         const totalCost = c + pack + shipPer;
         const feeFactor = 1 - commission / 100;
         if (c <= 0 || feeFactor <= 0) return null;
-        const price = Math.ceil((totalCost * (1 + margin / 100) / feeFactor) / 100) * 100;
+        const price = redondear(totalCost * (1 + margenEfectivo / 100) / feeFactor, cfgPrecios.redondeo);
         const commissionAmount = Math.round(price * commission / 100);
         const net = price - totalCost - commissionAmount;
         return { price, totalCost: Math.round(totalCost), commissionAmount, net, shipPer: Math.round(shipPer) };
-    }, [cost, packaging, flete, fleteUnits, margin, commission]);
+    }, [cost, packaging, flete, fleteUnits, margenEfectivo, commission, cfgPrecios.flete, cfgPrecios.redondeo]);
 
     const finalPrice = priceMode === 'final' ? (Number(priceFinal) || 0) : (priceCalc?.price || 0);
 
@@ -479,15 +488,15 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                 <Field label="Costo de la prenda" hint="Lo que te salió a vos (sin packaging ni flete).">
                                     <input autoFocus type="number" min="0" value={cost} onChange={e => setCost(e.target.value)} placeholder="Ej: 4000" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                 </Field>
-                                <Field label="Margen de ganancia" hint="% que querés ganar SOBRE el costo (limpio, ya cubre la comisión de MP).">
+                                <Field label="Margen de ganancia" hint={`% SOBRE el costo, limpio después de MP. Viene puesto el configurado (${margenCategoria}%${cfgPrecios.margenPorCategoria[String(catActual || '').toLowerCase()] ? ' para esta categoría' : ''}); tocá otro si esta prenda es distinta.`}>
                                     <div className="flex flex-wrap gap-2">
-                                        {MARGENES.map(m => <Chip key={m} active={margin === m} onClick={() => setMargin(m)}>{m}%</Chip>)}
+                                        {[...new Set([...MARGENES, margenCategoria])].sort((a, b) => a - b).map(m => <Chip key={m} active={margenEfectivo === m} onClick={() => { setMargin(m); setMarginTocado(true); }}>{m}%</Chip>)}
                                     </div>
                                 </Field>
-                                <Field label="Packaging (opcional)" hint="Costo del packaging por prenda. Dejá vacío si no aplica.">
+                                <Field label="Packaging (opcional)" hint={cfgPrecios.packaging ? `Viene el configurado ($${cfgPrecios.packaging}). Cambialo si esta prenda lleva otro.` : 'Costo del packaging por prenda. Dejá vacío si no aplica (o cargalo una vez en Configuración → Precios).'}>
                                     <input type="number" min="0" value={packaging} onChange={e => setPackaging(e.target.value)} placeholder="Ej: 500" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                 </Field>
-                                <Field label="Flete del bulto (opcional)" hint="Costo TOTAL del flete y cuántas unidades vinieron. Reparto el flete por prenda.">
+                                <Field label="Flete del bulto (opcional)" hint={cfgPrecios.flete ? `Si no cargás nada, uso el flete configurado ($${cfgPrecios.flete} por prenda). Si ponés el total del bulto y las unidades, lo reparto.` : 'Costo TOTAL del flete y cuántas unidades vinieron. Reparto el flete por prenda.'}>
                                     <div className="flex gap-2">
                                         <input type="number" min="0" value={flete} onChange={e => setFlete(e.target.value)} placeholder="Flete total" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
                                         <input type="number" min="0" value={fleteUnits} onChange={e => setFleteUnits(e.target.value)} placeholder="Unidades" className="w-28 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />

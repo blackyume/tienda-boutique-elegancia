@@ -69,7 +69,7 @@ distintos?** Mismo producto = una galería. Distintos = te guía uno por uno.
 | "publicalo" / "subilo" / "ponelo" | Lo crea visible en la tienda |
 | "guardalo" / "borrador" | Lo crea oculto |
 | "tengo 5" / "hay 5" / "quedan 5" | Stock 5 |
-| "me costó 24000" | Te arma el precio: te pregunta el margen con botones (5%, 10%…), suma packaging y flete, y calcula con la comisión de Mercado Pago |
+| "me costó 24000" | Te da el precio al instante con el margen, packaging, flete y comisión de MP configurados en Configuración → Precios ("con 60%" si esa prenda lleva otro margen) |
 | "generá una descripción" | Escribe él la descripción |
 | "todos negros" / "es negro" | Color negro |
 

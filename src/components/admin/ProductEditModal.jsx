@@ -10,7 +10,7 @@ import {
 import { formatMoney } from '../../utils/helpers';
 import { generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { getTotalStock } from '../../utils/variants';
-import { comisionDeProducto } from '../../utils/comision';
+import { comisionDeProducto, configPrecios, margenPara, redondear } from '../../utils/comision';
 import { getColorHex } from '../../utils/colors';
 
 const TABS = [
@@ -20,7 +20,9 @@ const TABS = [
 ];
 
 export const ProductEditModal = ({ initialProduct, onClose }) => {
-    const { inventory, addProduct, updateProduct, addToast, categories, uploadImage, aiConfig, paymentConfig } = useStore();
+    const { inventory, addProduct, updateProduct, addToast, categories, uploadImage, aiConfig, paymentConfig, siteConfig } = useStore();
+    const cfgPrecios = configPrecios(siteConfig);
+    const margenConfigurado = margenPara(currentProduct.category, cfgPrecios);
     const confirm = useConfirm();
 
     const [currentProduct, setCurrentProduct] = useState(() => initialProduct || {});
@@ -246,15 +248,16 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
     const removeSize = (index) => setCurrentProduct({ ...currentProduct, sizes: currentProduct.sizes.filter((_, i) => i !== index) });
 
     const applyTargetMargin = () => {
-        const margin = Number(targetMargin);
-        if (!targetMargin || isNaN(margin) || margin <= 0) return addToast('Ingresá un margen % válido', 'error');
+        // Vacío = el margen configurado (general o de la categoría).
+        const margin = targetMargin === '' ? margenConfigurado : Number(targetMargin);
+        if (isNaN(margin) || margin <= 0) return addToast('Ingresá un margen % válido', 'error');
         const t = Number(currentProduct.cost || 0) + Number(currentProduct.shippingCost || 0) + Number(currentProduct.packagingCost || 0) + Number(currentProduct.fixedFee || 0);
         if (t <= 0) return addToast('Cargá primero el costo de la prenda para usar el margen %', 'error');
         const feeDecimal = feePct / 100;
         if (feeDecimal >= 1) return addToast('La comisión no puede ser 100% o más', 'error');
         let p = (t * (1 + margin / 100)) / (1 - feeDecimal);
         if (!isFinite(p) || p <= 0) return addToast('No se pudo calcular el precio', 'error');
-        p = Math.ceil(p / 100) * 100;
+        p = redondear(p, cfgPrecios.redondeo);
         setCurrentProduct(prev => ({ ...prev, price: p }));
         setTargetProfit('');
         addToast(`Precio fijado en ${formatMoney(p)}`, 'success');
@@ -268,7 +271,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
         if (feeDecimal >= 1) return addToast('La comisión no puede ser 100% o más', 'error');
         let p = (t + profit) / (1 - feeDecimal);
         if (!isFinite(p) || p <= 0) return addToast('No se pudo calcular el precio', 'error');
-        p = Math.ceil(p / 100) * 100;
+        p = redondear(p, cfgPrecios.redondeo);
         setCurrentProduct(prev => ({ ...prev, price: p }));
         setTargetMargin('');
         addToast(`Precio fijado en ${formatMoney(p)}`, 'success');
@@ -672,7 +675,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                         <div className="flex gap-2 items-center justify-between bg-white dark:bg-emerald-900/20 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800 shadow-sm">
                                             <div className="flex flex-col">
                                                 <span className="text-[10px] uppercase font-bold text-emerald-600/70 tracking-wider">Margen Deseado %</span>
-                                                <input type="number" placeholder="50" value={targetMargin} onChange={(e) => setTargetMargin(e.target.value)} className="w-full text-lg border-none outline-none bg-transparent text-emerald-900 dark:text-emerald-100 placeholder-emerald-300/50 font-bold p-0 mt-1" />
+                                                <input type="number" placeholder={String(margenConfigurado)} value={targetMargin} onChange={(e) => setTargetMargin(e.target.value)} className="w-full text-lg border-none outline-none bg-transparent text-emerald-900 dark:text-emerald-100 placeholder-emerald-300/50 font-bold p-0 mt-1" />
                                             </div>
                                             <Button onClick={applyTargetMargin} className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider py-2 px-3 h-auto rounded-lg shadow-emerald-200 dark:shadow-none">Aplicar</Button>
                                         </div>

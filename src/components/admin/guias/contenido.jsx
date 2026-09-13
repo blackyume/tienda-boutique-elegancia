@@ -238,6 +238,20 @@ const Lau = ({ abrir }) => (
             <P>Y al volver a abrirla te cuenta lo que entró mientras no estabas. Si querés enterarte aunque el panel esté cerrado, el navegador también manda una notificación por cada pedido (la primera vez te pide permiso).</P>
         </Seccion>
 
+        <Seccion id="precio" titulo="El precio sale solo">
+            <P>No hace falta pensar el precio prenda por prenda. Una vez, en <Ruta pasos={['Configuración', 'Precios']} />, cargás tu <strong>margen</strong> (% sobre el costo, limpio después de Mercado Pago), el <strong>packaging</strong> y el <strong>flete</strong> por prenda, y cómo <strong>redondear</strong>. Si alguna categoría lleva otro margen (camperas 80%, remeras 120%), ahí mismo lo ponés.</P>
+            <P>Desde entonces, en todos lados alcanza con el costo:</P>
+            <Lista items={[
+                <><strong>Lau:</strong> <em>“me costó 24000”</em> → precio sugerido y ganancia limpia, sin preguntas. Si además la estás cargando, la crea con ese precio.</>,
+                <><strong>Cargador rápido:</strong> elegís “Te doy el costo”, ponés el número y el precio aparece. Margen, packaging y flete vienen puestos; se cambian solo si esa prenda es distinta.</>,
+                <><strong>Excel:</strong> columna <Cod>costo</Cod> sin <Cod>precio</Cod> → el precio se calcula al importar (lo ves en la vista previa).</>,
+                <><strong>Editar producto:</strong> el botón de margen con el campo vacío usa el configurado.</>,
+            ]} />
+            <Aviso tipo="dato" titulo="La comisión de Mercado Pago no se carga">
+                Se mide sola de tus ventas: lo que MP cobró menos lo que te depositó. Hasta la primera venta usa un estimado (6,29% + IVA ≈ 7,6%). Y si reponés una prenda más cara y el precio ya no cubre tu margen, Lau te avisa y te propone el precio nuevo.
+            </Aviso>
+        </Seccion>
+
         <Seccion id="frases" titulo="Frases que entiende">
             <Tabla
                 cabecera={['Decís', 'Hace']}
@@ -245,7 +259,7 @@ const Lau = ({ abrir }) => (
                     ['“publicalo” / “subilo” / “ponelo”', 'Lo crea visible en la tienda.'],
                     ['“guardalo” / “borrador”', 'Lo crea oculto.'],
                     ['“tengo 5” / “hay 5” / “quedan 5”', 'Stock 5.'],
-                    ['“me costó 24000”', 'Te arma el precio: pregunta el margen con botones (5%, 10%…), suma packaging y flete, y calcula con la comisión de Mercado Pago.'],
+                    ['“me costó 24000”', 'Te da el precio al instante con tu margen, packaging, flete y la comisión de Mercado Pago (todo configurado en Configuración → Precios). Si querés otro margen para esa prenda: “me costó 24000, con 60%”.'],
                     ['“generá una descripción”', 'Escribe él la descripción.'],
                     ['“todos negros” / “es negro”', 'Color negro.'],
                 ]}
@@ -656,8 +670,8 @@ export const GUIAS = [
     {
         id: 'lau', titulo: 'Cargar productos hablándole a Lau', icono: Bot, duracion: '5 min', para: 'Quien carga productos',
         resumen: 'Le adjuntás la foto, le dictás los datos y crea el producto. Lo que falta lo pregunta con botones.',
-        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos', 'stock', 'tiempo real', 'en vivo', 'cuanto queda', 'que se vendio'],
-        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['en-vivo', 'Stock y ventas en vivo'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
+        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos', 'stock', 'tiempo real', 'en vivo', 'cuanto queda', 'que se vendio', 'precio', 'margen', 'comision', 'costo', 'packaging'],
+        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['en-vivo', 'Stock y ventas en vivo'], ['precio', 'El precio sale solo'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
         Contenido: Lau,
     },
     {

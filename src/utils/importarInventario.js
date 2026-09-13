@@ -170,7 +170,9 @@ export const fotosDeFila = (f, nombreProducto, grupos) => {
 const mismaLista = (a, b) =>
     normalizarTexto((a || []).join('|')) === normalizarTexto((b || []).join('|'));
 
-export const planearImportacion = (filas, inventario = [], archivosFotos = []) => {
+// `cotizar(costo, categoria)` → { precio } | null: si la planilla trae costo y
+// no precio, el precio se calcula con lo configurado (Configuración → Precios).
+export const planearImportacion = (filas, inventario = [], archivosFotos = [], { cotizar } = {}) => {
     const grupos = agruparFotos(archivosFotos);
     const usados = new Set();
     const altas = [];
@@ -235,11 +237,19 @@ export const planearImportacion = (filas, inventario = [], archivosFotos = []) =
         fotos.forEach((x) => usados.add(nombreDe(x)));
 
         if (!existente) {
-            if (precio === null || precio <= 0) {
-                errores.push({ fila: nro, nombre, motivo: 'Producto nuevo sin precio: no se puede crear' });
+            const avisos = faltan.map((x) => `No encontré la foto "${x}" entre los archivos`);
+            let precioFinal = precio;
+            if ((precioFinal === null || precioFinal <= 0) && costo !== null && costo > 0 && typeof cotizar === 'function') {
+                const r = cotizar(costo, categoria);
+                if (r?.precio > 0) {
+                    precioFinal = r.precio;
+                    avisos.push(`Precio calculado desde el costo ($${costo.toLocaleString('es-AR')}): $${r.precio.toLocaleString('es-AR')}`);
+                }
+            }
+            if (precioFinal === null || precioFinal <= 0) {
+                errores.push({ fila: nro, nombre, motivo: 'Producto nuevo sin precio ni costo: no se puede crear' });
                 return;
             }
-            const avisos = faltan.map((x) => `No encontré la foto "${x}" entre los archivos`);
             // Con foto se publica salvo que la planilla diga Borrador. Sin foto
             // no hay forma de publicarlo: entra como borrador.
             const publicar = fotos.length > 0 && estado !== false;
@@ -255,7 +265,7 @@ export const planearImportacion = (filas, inventario = [], archivosFotos = []) =
                 datos: {
                     name: nombre,
                     category: categoria || '',
-                    price: precio,
+                    price: precioFinal,
                     ...(costo !== null ? { cost: costo } : {}),
                     stock: stock === null ? 0 : stock,
                     sizes: talles && talles.length ? talles : ['S', 'M'],

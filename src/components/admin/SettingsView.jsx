@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Lock, Settings, Mail, Bot, AlertTriangle, Send, Bell, CreditCard, Truck, Activity, Image as ImageIcon, MessageSquare, Save, Eye, EyeOff, RefreshCw, Download, Upload, Phone, BarChart3 } from 'lucide-react';
+import { Lock, Settings, Mail, Bot, AlertTriangle, Send, Bell, CreditCard, Truck, Activity, Calculator, Image as ImageIcon, MessageSquare, Save, Eye, EyeOff, RefreshCw, Download, Upload, Phone, BarChart3 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useConfirm } from '../ui/ConfirmDialog';
 import { SalesConfig } from './SalesConfig';
 import { ShippingSettings } from './ShippingSettings';
+import { PreciosSettings } from './PreciosSettings';
 import { SettingsHealthPanel } from './SettingsHealthPanel';
 
 const SECTIONS = [
@@ -12,6 +13,7 @@ const SECTIONS = [
     { id: 'marca', label: 'Marca & Contacto', icon: MessageSquare },
     { id: 'pagos', label: 'Pagos', icon: CreditCard },
     { id: 'envios', label: 'Envíos', icon: Truck },
+    { id: 'precios', label: 'Precios', icon: Calculator },
     { id: 'notificaciones', label: 'Notificaciones', icon: Bell },
     { id: 'ia', label: 'Inteligencia Artificial', icon: Bot },
     { id: 'tienda', label: 'Tienda & Sistema', icon: Settings },
@@ -230,6 +232,9 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
 
                     {/* ENVIOS */}
                     {section === 'envios' && <ShippingSettings />}
+
+                    {/* PRECIOS */}
+                    {section === 'precios' && <PreciosSettings />}
 
                     {/* NOTIFICACIONES */}
                     {section === 'notificaciones' && (
