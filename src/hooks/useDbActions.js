@@ -231,6 +231,13 @@ export const useDbActions = ({
       setIsMaintenance(newVal);
       try {
         await setDoc(doc(db, "config", "store_settings"), { maintenance: newVal }, { merge: true });
+        // Al abrir la tienda por primera vez, la liquidación empieza a contar
+        // los días desde hoy: lo cargado antes de abrir no "lleva sin venderse".
+        if (!newVal && !siteConfig?.precios?.liquidacion?.desde) {
+          try {
+            await setDoc(doc(db, "config", "site_content"), { precios: { ...(siteConfig?.precios || {}), liquidacion: { ...(siteConfig?.precios?.liquidacion || {}), desde: new Date().toISOString().slice(0, 10) } } }, { merge: true });
+          } catch { /* no es grave: se puede poner a mano en Configuración → Precios */ }
+        }
         addToast(`Mantenimiento ${newVal ? 'ACTIVADO' : 'DESACTIVADO'}`, 'success');
       } catch (error) {
         console.error("Error toggling maintenance:", error);

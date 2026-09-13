@@ -10,7 +10,8 @@ import { celdasDesdeExcel, leerVentasDeCeldas, planearVentas, notaDesdeNombre, i
 import { planearImportacion, filasDesdeExcel } from '../../utils/importarInventario';
 import { aplicarPlanDeProductos, resumirPlanDeProductos } from '../../utils/aplicarImportacion';
 import { responderDirecto, avisoNuevaVenta, avisoCambiosDeStock, fotoDeStock, ventasDesde, nombreCliente } from '../../utils/lauDirecto';
-import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, precioSugerido, explicarPrecio, avisoMargenBajo, fotoDeCostos } from '../../utils/comision';
+import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, precioSugerido, explicarPrecio, avisoMargenBajo, fotoDeCostos, interpretarConfigPrecios, aplicarConfigPrecios, describirConfigPrecios } from '../../utils/comision';
+import { candidatosLiquidacion, configLiquidacion, resumirLiquidacion, esPedidoDeLiquidacion, descuentoPedido } from '../../utils/liquidacion';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
@@ -203,6 +204,8 @@ const actionLabel = (a) => {
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
         case 'toggle_maintenance': return `Mantenimiento → ${A.on ? 'ACTIVAR' : 'desactivar'}`;
         case 'import_sales': return `Registrar venta de ${A.cliente}: ${A.prendas} prenda${A.prendas === 1 ? '' : 's'} por $${Number(A.total || 0).toLocaleString('es-AR')} (${A.canal}, ${A.fecha})`;
+        case 'set_pricing': return `Configurar precios: ${A.detalle}`;
+        case 'liquidar': return `Liquidar ${A.n} producto${A.n === 1 ? '' : 's'} (−${A.descuento}%, nunca bajo el costo): ${A.nombres}`;
         case 'import_products': return `Cargar ${A.nuevos} producto${A.nuevos === 1 ? '' : 's'} nuevo${A.nuevos === 1 ? '' : 's'} (${A.conFoto} con foto) y actualizar ${A.cambios} desde ${A.archivo}`;
         default: return `${a.tool} ${JSON.stringify(A)}`;
     }
@@ -252,12 +255,14 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             const low = (inventory || []).filter(p => !(p.variants?.length) && Number(p.stock) > 0 && Number(p.stock) <= threshold);
             const out = (inventory || []).filter(p => !(p.variants?.length) && Number(p.stock) === 0 && p.active !== false);
             const toShip = (orders || []).filter(o => ['approved', 'paid', 'pending'].includes(o.status)).length;
-            if (!ordersToday.length && !low.length && !out.length && !toShip) return;
+            const liq = isMaintenance ? [] : candidatosLiquidacion(inventory || [], orders || [], { siteConfig, paymentConfig });
+            if (!ordersToday.length && !low.length && !out.length && !toShip && !liq.length) return;
             const lines = ['📊 ¡Hola! Resumen de hoy:'];
             lines.push(ordersToday.length ? `• 💰 ${ordersToday.length} venta(s) por $${revToday.toLocaleString('es-AR')}.` : '• Todavía no hubo ventas hoy.');
             if (toShip) lines.push(`• 📦 ${toShip} pedido(s) pendientes de enviar.`);
             if (out.length) lines.push(`• ⛔ SIN stock (reponer): ${out.slice(0, 6).map(p => p.name).join(', ')}${out.length > 6 ? '…' : ''}.`);
             if (low.length) lines.push(`• ⚠️ Poco stock: ${low.slice(0, 6).map(p => `${p.name} (${p.stock})`).join(', ')}${low.length > 6 ? '…' : ''}.`);
+            if (liq.length) lines.push(`• 🏷️ ${liq.length} producto${liq.length === 1 ? ' lleva' : 's llevan'} más de ${configLiquidacion(siteConfig).dias} días sin venderse: decime "liquidación" y te propongo precios.`);
             lines.push('Pedime lo que necesites 💛');
             localStorage.setItem('lau_briefing', today);
             setMessages(prev => [...prev, { role: 'ai', text: lines.join('\n') }]);
@@ -984,6 +989,48 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         }
     };
 
+    // Liquidación inteligente: lo que lleva más de N días sin venderse, con
+    // descuento pero nunca bajo el costo + MP. Se confirma antes de tocar nada.
+    const liquidar = async (text) => {
+        push({ role: 'user', text });
+        const cfg = configLiquidacion(siteConfig);
+        const descuento = descuentoPedido(text) || cfg.descuento;
+        const cands = candidatosLiquidacion(inventory, orders, { siteConfig, paymentConfig, descuento });
+        push({ role: 'ai', text: resumirLiquidacion(cands, { ...cfg, descuento }) });
+        if (!cands.length) return;
+        const ok = await askConfirm([{ tool: 'liquidar', args: { n: cands.length, descuento, nombres: cands.slice(0, 6).map(c => c.producto.name).join(', ') + (cands.length > 6 ? '…' : '') } }]);
+        if (!ok) { push({ role: 'system', text: 'Cancelado por vos. No toqué ningún precio.' }); return; }
+        setLoading(true);
+        let n = 0;
+        try {
+            for (const c of cands) {
+                setBusyMsg(`Bajando ${c.producto.name}…`);
+                const p = c.producto;
+                const original = Number(p.compareAtPrice) > Number(p.price) ? Number(p.compareAtPrice) : Number(p.price);
+                await updateProduct(p.id, { price: c.nuevo, compareAtPrice: original, badges: { ...(p.badges || {}), isOnSale: true } }, { silencioso: true });
+                n++;
+            }
+            push({ role: 'ai', text: `✅ ${n} producto${n === 1 ? '' : 's'} en liquidación, con el precio anterior tachado. Cuando se vendan o quieras volver: "quitá la oferta del jean oxford".` });
+            logAiAction?.('copilot', text, 'ok');
+        } catch (e) {
+            push({ role: 'system', text: `Bajé ${n} y falló uno: ${e?.message || e}` });
+        } finally { setLoading(false); setBusyMsg(''); }
+    };
+
+    // Configuración → Precios, pero hablándole.
+    const configurarPrecios = async (text, cambios) => {
+        push({ role: 'user', text });
+        const detalle = describirConfigPrecios(cambios);
+        const ok = await askConfirm([{ tool: 'set_pricing', args: { detalle } }]);
+        if (!ok) { push({ role: 'system', text: 'Cancelado por vos. No cambié nada.' }); return; }
+        try {
+            await updateSiteConfig({ precios: aplicarConfigPrecios(siteConfig, cambios) });
+            const ej = precioSugerido(20000, { siteConfig: { precios: aplicarConfigPrecios(siteConfig, cambios) }, paymentConfig });
+            push({ role: 'ai', text: `✅ Guardado: ${detalle}.${ej ? ` Ejemplo: una prenda que te cuesta $20.000 ahora sale a $${ej.precio.toLocaleString('es-AR')}.` : ''} Lo ves y lo cambiás cuando quieras en Configuración → Precios.` });
+            logAiAction?.('copilot', text, 'ok');
+        } catch (e) { push({ role: 'system', text: `No pude guardar: ${e?.message || e}` }); }
+    };
+
     const handleSend = async (overrideText) => {
         const text = (typeof overrideText === 'string' ? overrideText : input).trim();
         if (planilla && !loading) { setInput(''); await importarPlanilla(planilla, text); return; }
@@ -991,6 +1038,12 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         // "¿cuánto queda del vestido negro?", "¿qué se vendió hoy?": se contesta
         // al instante con los datos en pantalla, sin pasar por la IA.
         if (text && !files.length && !pendingPhotosRef.current.length) {
+            const nombresCat = (categories || []).map(c => c.name);
+            const cambios = interpretarConfigPrecios(text, nombresCat);
+            // "liquidación" / "liquidá con 30%": propone y, si confirma, aplica.
+            if (esPedidoDeLiquidacion(text) && !cambios?.liquidacion?.dias) { setInput(''); await liquidar(text); return; }
+            // "poné el margen en 110%", "packaging 800", "liquidación a los 60 días con 25%".
+            if (cambios) { setInput(''); await configurarPrecios(text, cambios); return; }
             const cotizar = (costo, cat) => explicarPrecio(precioSugerido(costo, { categoria: cat, siteConfig, paymentConfig }));
             const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name) });
             if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }

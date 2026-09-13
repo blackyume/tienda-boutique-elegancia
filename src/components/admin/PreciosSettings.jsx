@@ -3,6 +3,7 @@ import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
 import { Calculator, Save } from 'lucide-react';
 import { configPrecios, comisionMP, precioSugerido, PRECIOS_DEFAULT } from '../../utils/comision';
+import { configLiquidacion } from '../../utils/liquidacion';
 import { formatMoney } from '../../utils/helpers';
 
 // Configuración → Precios: lo que hace que "me costó 24000" salga con precio
@@ -10,12 +11,16 @@ import { formatMoney } from '../../utils/helpers';
 export const PreciosSettings = () => {
     const { siteConfig, updateSiteConfig, paymentConfig, categories, addToast } = useStore();
     const guardado = useMemo(() => configPrecios(siteConfig), [siteConfig]);
+    const liqGuardada = useMemo(() => configLiquidacion(siteConfig), [siteConfig]);
     const [form, setForm] = useState({
         margen: String(guardado.margen),
         packaging: guardado.packaging ? String(guardado.packaging) : '',
         flete: guardado.flete ? String(guardado.flete) : '',
         redondeo: guardado.redondeo,
         margenPorCategoria: Object.fromEntries(Object.entries(guardado.margenPorCategoria).map(([k, v]) => [k, String(v)])),
+        liqDias: String(liqGuardada.dias),
+        liqDescuento: String(liqGuardada.descuento),
+        liqDesde: liqGuardada.desde ? new Date(liqGuardada.desde).toISOString().slice(0, 10) : '',
     });
     const [guardando, setGuardando] = useState(false);
     const [costoEjemplo, setCostoEjemplo] = useState('20000');
@@ -27,7 +32,8 @@ export const PreciosSettings = () => {
     const borrador = useMemo(() => {
         const porCat = {};
         for (const [k, v] of Object.entries(form.margenPorCategoria)) if (Number(v) > 0) porCat[k] = Number(v);
-        return { precios: { margen: Number(form.margen) || PRECIOS_DEFAULT.margen, packaging: Number(form.packaging) || 0, flete: Number(form.flete) || 0, redondeo: Number(form.redondeo), margenPorCategoria: porCat } };
+        const liquidacion = { dias: Number(form.liqDias) || 45, descuento: Number(form.liqDescuento) || 20, ...(form.liqDesde ? { desde: form.liqDesde } : {}) };
+        return { precios: { margen: Number(form.margen) || PRECIOS_DEFAULT.margen, packaging: Number(form.packaging) || 0, flete: Number(form.flete) || 0, redondeo: Number(form.redondeo), margenPorCategoria: porCat, liquidacion } };
     }, [form]);
     const ejemplo = precioSugerido(costoEjemplo, { siteConfig: borrador, paymentConfig });
 
@@ -105,6 +111,26 @@ export const PreciosSettings = () => {
                     </div>
                 </div>
             )}
+
+            <div className={cardCls}>
+                <h3 className="font-bold mb-1 text-slate-800 dark:text-white">Liquidación inteligente</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Lo que lleva muchos días sin venderse, Lau te propone bajarlo (nunca por debajo del costo + comisión). Vos confirmás. Decile "liquidación" o "¿qué no se está vendiendo?".</p>
+                <div className="grid sm:grid-cols-3 gap-5">
+                    <div>
+                        <label className={labelCls}>Días sin venderse</label>
+                        <input type="number" min="7" max="365" value={form.liqDias} onChange={(e) => setForm({ ...form, liqDias: e.target.value })} className={inputCls + ' font-mono'} />
+                    </div>
+                    <div>
+                        <label className={labelCls}>Descuento propuesto (%)</label>
+                        <input type="number" min="5" max="80" step="5" value={form.liqDescuento} onChange={(e) => setForm({ ...form, liqDescuento: e.target.value })} className={inputCls + ' font-mono'} />
+                    </div>
+                    <div>
+                        <label className={labelCls}>Contar desde (apertura)</label>
+                        <input type="date" value={form.liqDesde} onChange={(e) => setForm({ ...form, liqDesde: e.target.value })} className={inputCls} />
+                        <p className="text-[10px] text-slate-400 mt-1">Los días antes de abrir la tienda no cuentan.</p>
+                    </div>
+                </div>
+            </div>
 
             <div className={cardCls}>
                 <h3 className="font-bold mb-3 text-slate-800 dark:text-white">Probalo</h3>

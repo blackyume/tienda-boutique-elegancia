@@ -155,3 +155,86 @@ export const avisoMargenBajo = (antes, inventario = [], { siteConfig, paymentCon
 };
 
 export const fotoDeCostos = (inventario = []) => new Map(inventario.map((p) => [String(p.id), { cost: Number(p.cost) || 0, price: Number(p.price) || 0 }]));
+
+// ---------------------------------------------------------------------------
+// Configurar los precios hablándole a Lau, sin pasar por Configuración:
+// "poné el margen en 110%", "packaging 800", "flete 500 por prenda",
+// "redondeá a 500", "camperas 80% de margen", "liquidación a los 60 días con 25%".
+// ---------------------------------------------------------------------------
+
+const norm = (s) => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+const numeroCerca = (t, re) => {
+    const m = t.match(re);
+    if (!m) return null;
+    const n = Number(String(m[1]).replace(/\./g, '').replace(',', '.'));
+    return Number.isFinite(n) ? n : null;
+};
+
+/**
+ * Devuelve los cambios que pide el mensaje ({ margen, packaging, flete,
+ * redondeo, margenPorCategoria: {cat: %}, liquidacion: {dias, descuento} })
+ * o null si el mensaje no configura nada. "me costó X" no es configurar.
+ */
+export const interpretarConfigPrecios = (texto, categorias = []) => {
+    const t = norm(texto).replace(/[¿?¡!;:]+/g, ' ');
+    if (!t || /\b(cost[oó]|costaron|pague|pagu[eé]|salio|salieron|me sal)\b/.test(t)) return null;
+    const cambios = {};
+    const pct = '(\\d{1,3}(?:[.,]\\d+)?)\\s*(?:%|por ?ciento)?';
+    const plata = '\\$?\\s*(\\d{1,3}(?:\\.\\d{3})+|\\d+)';
+
+    // Margen por categoría: "camperas 80% de margen", "margen para remeras 120%".
+    for (const nombre of categorias) {
+        const c = norm(nombre);
+        if (!c || !t.includes(c)) continue;
+        const re1 = new RegExp(`${c}[^\\d%]{0,25}?${pct}`);
+        const re2 = new RegExp(`margen[^\\d%]{0,25}?${pct}[^a-z]{0,10}(?:en|para|a|de)?\\s*(?:la|las|los)?\\s*${c}`);
+        const m = t.match(re1) || t.match(re2);
+        if (m && /margen/.test(t)) {
+            const v = Number(String(m[1]).replace(',', '.'));
+            if (v > 0) { cambios.margenPorCategoria = { ...(cambios.margenPorCategoria || {}), [c]: v }; }
+        }
+    }
+    // Margen general (si no fue por categoría).
+    if (!cambios.margenPorCategoria) {
+        const v = numeroCerca(t, new RegExp(`margen[^\\d]{0,30}?${pct}`)) ?? numeroCerca(t, new RegExp(`${pct}\\s*(?:de|del)?\\s*margen`));
+        if (v > 0 && v <= 500) cambios.margen = v;
+    }
+    const pack = numeroCerca(t, new RegExp(`(?:packaging|empaque|bolsas?|embalaje)[^\\d]{0,30}?${plata}`));
+    if (pack != null && pack >= 0) cambios.packaging = pack;
+    const flete = numeroCerca(t, new RegExp(`(?:flete|envio del proveedor|transporte)[^\\d]{0,30}?${plata}`));
+    if (flete != null && flete >= 0) cambios.flete = flete;
+    const red = numeroCerca(t, /redonde\w*[^\d]{0,30}?(1000|500|100|99)\b/);
+    if (red != null) cambios.redondeo = red;
+    if (/liquid/.test(t)) {
+        const dias = numeroCerca(t, /(\d{1,3})\s*dias?/);
+        const desc = numeroCerca(t, new RegExp(`(?:con|del?|al)\\s*${pct}`)) ?? numeroCerca(t, /(\d{1,2})\s*%/);
+        if (dias > 0 || desc > 0) cambios.liquidacion = { ...(dias > 0 ? { dias } : {}), ...(desc > 0 && desc < 90 ? { descuento: desc } : {}) };
+    }
+    return Object.keys(cambios).length ? cambios : null;
+};
+
+/** Aplica los cambios sobre lo guardado y devuelve el objeto `precios` completo para guardar. */
+export const aplicarConfigPrecios = (siteConfig, cambios) => {
+    const actual = configPrecios(siteConfig);
+    const liq = { ...(siteConfig?.precios?.liquidacion || {}), ...(cambios.liquidacion || {}) };
+    return {
+        margen: cambios.margen ?? actual.margen,
+        packaging: cambios.packaging ?? actual.packaging,
+        flete: cambios.flete ?? actual.flete,
+        redondeo: cambios.redondeo ?? actual.redondeo,
+        margenPorCategoria: { ...actual.margenPorCategoria, ...(cambios.margenPorCategoria || {}) },
+        liquidacion: liq,
+    };
+};
+
+export const describirConfigPrecios = (cambios) => {
+    const $ = (n) => `$${Math.round(n).toLocaleString('es-AR')}`;
+    const L = [];
+    if (cambios.margen != null) L.push(`margen ${cambios.margen}% sobre el costo`);
+    for (const [c, v] of Object.entries(cambios.margenPorCategoria || {})) L.push(`margen ${v}% en ${c}`);
+    if (cambios.packaging != null) L.push(`packaging ${$(cambios.packaging)} por prenda`);
+    if (cambios.flete != null) L.push(`flete ${$(cambios.flete)} por prenda`);
+    if (cambios.redondeo != null) L.push(cambios.redondeo === 99 ? 'precios terminados en 99' : `redondeo a los ${$(cambios.redondeo)}`);
+    if (cambios.liquidacion) L.push(`liquidación${cambios.liquidacion.dias ? ` a los ${cambios.liquidacion.dias} días` : ''}${cambios.liquidacion.descuento ? ` con ${cambios.liquidacion.descuento}%` : ''}`);
+    return L.join(' · ');
+};

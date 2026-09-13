@@ -247,6 +247,10 @@ const Lau = ({ abrir }) => (
                 <><strong>Excel:</strong> columna <Cod>costo</Cod> sin <Cod>precio</Cod> → el precio se calcula al importar (lo ves en la vista previa).</>,
                 <><strong>Editar producto:</strong> el botón de margen con el campo vacío usa el configurado.</>,
             ]} />
+            <P>Todo eso también se lo podés decir a Lau en vez de ir a Configuración: <em>“poné el margen en 110%”</em>, <em>“las bolsas me cuestan 650”</em>, <em>“flete 500 por prenda”</em>, <em>“redondeá a 500”</em>, <em>“camperas 80% de margen”</em>. Te muestra qué entendió, confirmás, y queda guardado.</P>
+            <Aviso tipo="tip" titulo="Liquidación inteligente">
+                Decile <em>“liquidación”</em> (o <em>“¿qué no se está vendiendo?”</em>): busca lo que lleva más de 45 días sin venderse, propone −20% <strong>sin bajar nunca del costo + comisión</strong>, y si confirmás lo deja en oferta con el precio anterior tachado. <em>“liquidá con 30%”</em> para otro descuento; <em>“liquidación a los 60 días con 25%”</em> para cambiar la regla. Y en el resumen del día te avisa cuando hay algo para liquidar.
+            </Aviso>
             <Aviso tipo="dato" titulo="La comisión de Mercado Pago no se carga">
                 Se mide sola de tus ventas: lo que MP cobró menos lo que te depositó. Hasta la primera venta usa un estimado (6,29% + IVA ≈ 7,6%). Y si reponés una prenda más cara y el precio ya no cubre tu margen, Lau te avisa y te propone el precio nuevo.
             </Aviso>
