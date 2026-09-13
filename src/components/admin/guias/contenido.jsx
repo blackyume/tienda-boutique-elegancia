@@ -75,6 +75,7 @@ const CargaMasiva = () => (
             <P>Necesitás dos cosas: <strong>un Excel</strong> con una fila por producto y <strong>una carpeta con las fotos</strong>. Los soltás juntos en el panel, mirás la vista previa, confirmás. Las fotos van a cada producto <strong>por el nombre del archivo</strong>: si el archivo se llama como el producto, se emparejan solos.</P>
             <P>La plantilla del Excel se descarga desde acá: <Link href="/docs/plantilla-productos.xlsx">plantilla-productos.xlsx</Link>. Tiene tres productos de ejemplo (borralos) y una segunda hoja que explica cada columna.</P>
             <Aviso tipo="dato">Las fotos vienen como las sacaste, con la modelo y su fondo. <strong>No hay que retocarlas ni pasarlas por ningún programa.</strong></Aviso>
+            <Aviso tipo="tip">También se lo podés tirar a Lau: clip 📎, elegís el Excel y las fotos juntos, Enter. Te muestra el resumen y confirmás. Es exactamente lo mismo que el paso 3 de esta guía.</Aviso>
         </Seccion>
 
         <Seccion id="fotos" titulo="1. Las fotos: el archivo se llama como el producto">
@@ -186,7 +187,7 @@ const Lau = ({ abrir }) => (
                 <IlusLau />
             </Figura>
             <Pasos>
-                <Paso>Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto). Al lado hay un botón <K>Cargar producto paso a paso</K>: hace lo mismo pero te lleva de la mano, pregunta por pregunta. Usá el que te resulte cómodo.</Paso>
+                <Paso>Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto). Arriba del cuadro de texto hay un botón dorado <K>Cargar producto (paso a paso)</K>: hace lo mismo pero te lleva de la mano, pregunta por pregunta. Usá el que te resulte cómodo.</Paso>
                 <Paso>
                     Escribí lo que sabés. Puede ser desprolijo, Lau lo entiende:
                     <div className="space-y-2 pt-1">
@@ -209,6 +210,15 @@ const Lau = ({ abrir }) => (
                 </Paso>
             </Pasos>
             <Aviso tipo="dato">Si adjuntás varias fotos, primero te pregunta: <strong>¿mismo producto o productos distintos?</strong> Mismo producto = una galería. Distintos = te guía uno por uno.</Aviso>
+        </Seccion>
+
+        <Seccion id="planillas" titulo="Tirale una planilla y ella la carga">
+            <P>Con el mismo clip 📎 podés adjuntar un <strong>Excel</strong>. Lau lo lee sola, sin inteligencia artificial de por medio, te muestra qué entendió y te pide confirmar:</P>
+            <Lista items={[
+                <><strong>La plantilla de productos</strong> (con las fotos adjuntas en el mismo mensaje): crea los productos, sube las fotos y los publica. Es lo mismo que <Ruta pasos={['Inventario', 'Importar Excel']} />, pero desde el chat.</>,
+                <><strong>Tu planilla de ventas</strong> (una columna por clienta): registra cada clienta como una venta. Podés agregarle texto: <em>“ventas del 5/9 por instagram”</em>, <em>“descontá el stock”</em>.</>,
+            ]} />
+            <Aviso tipo="tip">Para esto no hace falta la llave de Gemini: aunque Lau diga “IA no configurada”, las planillas las lee igual.</Aviso>
         </Seccion>
 
         <Seccion id="frases" titulo="Frases que entiende">
@@ -259,7 +269,7 @@ const VentasFuera = ({ abrir }) => (
     <>
         <Seccion id="por-que" titulo="Por qué anotarlas en la tienda">
             <P>Lo que vendés por WhatsApp, en el local o en una feria no pasa por el checkout, pero conviene que quede en el panel: así <strong>Ventas</strong> y el <strong>Dashboard</strong> muestran lo que vendiste de verdad, y el stock no miente. Cada venta queda como un pedido <Cod>MAN-…</Cod> en Pedidos, igual que uno de la tienda.</P>
-            <P>Hay dos formas: de a una hablándole a Lau, o muchas de golpe desde tu planilla.</P>
+            <P>Hay tres formas: de a una hablándole a Lau, o muchas de golpe con tu planilla: se la adjuntás a Lau con el clip 📎 (lo más fácil), o la soltás en Admin → Ventas.</P>
         </Seccion>
 
         <Seccion id="lau" titulo="De a una: decíselo a Lau">
@@ -282,6 +292,8 @@ const VentasFuera = ({ abrir }) => (
         </Seccion>
 
         <Seccion id="importar" titulo="Importar la planilla">
+            <P><strong>Por Lau:</strong> abrí el chat, tocá el clip 📎, elegí el Excel, Enter. Te muestra las clientas y los totales y te pide confirmar. Si querés otra fecha o canal, escribilo junto: <em>“ventas del 5/9 en el local”</em>.</P>
+            <P><strong>Por el panel</strong>, que es lo mismo con más botones:</P>
             <Pasos>
                 <Paso>Entrá a <Ruta pasos={['Admin', 'Ventas', '⤴ Importar ventas']} />.</Paso>
                 <Paso>Soltá el Excel. Aparece la <strong>vista previa</strong>: una tarjeta por clienta con sus prendas y el total, y arriba cuántas clientas, cuántas prendas y cuánto suma.</Paso>
@@ -628,7 +640,7 @@ export const GUIAS = [
         id: 'lau', titulo: 'Cargar productos hablándole a Lau', icono: Bot, duracion: '5 min', para: 'Quien carga productos',
         resumen: 'Le adjuntás la foto, le dictás los datos y crea el producto. Lo que falta lo pregunta con botones.',
         palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos'],
-        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
+        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
         Contenido: Lau,
     },
     {

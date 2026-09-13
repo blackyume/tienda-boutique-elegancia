@@ -33,8 +33,14 @@ pip install pillow numpy scipy rembg
 
 ## Lo que se hizo el 12/09
 
+- **Lau lee planillas.** El clip 📎 del chat ahora abre el selector de
+  archivos (antes abría el wizard, y las fotos no se podían adjuntar). Un
+  `.xlsx` no pasa por la IA: si tiene columna Cliente es de ventas, si no es
+  la plantilla de productos (con las fotos del mismo mensaje). Resumen +
+  confirmación + aplica. Lógica compartida con los modales en
+  `utils/aplicarImportacion.js` y `utils/importarVentas.js`.
 - **Importar ventas por fuera desde la planilla del dueño** (Admin → Ventas →
-  Importar ventas). Lee `WAKANDA 09-26.xlsx` tal cual: una columna por
+  Importar ventas, o adjuntándosela a Lau). Lee `WAKANDA 09-26.xlsx` tal cual: una columna por
   clienta. Cada clienta queda como pedido `MAN-…` pagado, con fecha del nombre
   del archivo. No duplica si se vuelve a soltar. Guía nueva en Admin → Guías:
   "Anotar las ventas de WhatsApp y del local". **El dueño tiene que soltar el

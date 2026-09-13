@@ -12,7 +12,8 @@ import { normalizarTexto } from './importarInventario';
 //     Al final "TOTAL $ 47,403" y "PAGADO". Es el formato de WAKANDA 09-26.
 //
 //  B) Tabla con cabecera (Cliente, Producto, Talle, Color, Precio, Cantidad…),
-//     por si alguna vez lo pasan a filas.
+//     por si alguna vez lo pasan a filas. Sin columna Cliente no es una
+//     planilla de ventas: es la plantilla de productos, que va por otro lado.
 //
 // Cada clienta se convierte en UN pedido manual (como los que crea Lau con
 // "vendí 2 jeans por WhatsApp"), con sus prendas adentro.
@@ -107,7 +108,7 @@ const detectarCabecera = (fila) => {
         if (!n) return;
         for (const [campo, alias] of Object.entries(ALIAS_COL)) if (alias.includes(n) && mapa[campo] == null) mapa[campo] = i;
     });
-    return mapa.name != null && mapa.price != null ? mapa : null;
+    return mapa.name != null && mapa.price != null && mapa.cliente != null ? mapa : null;
 };
 
 const leerTabla = (celdas, mapa) => {
@@ -261,4 +262,46 @@ export const celdasDesdeExcel = async (buffer) => {
     });
     for (let i = 0; i < celdas.length; i++) if (!celdas[i]) celdas[i] = [];
     return celdas;
+};
+
+/**
+ * Lo que el dueño escribe junto a la planilla cuando se la manda a Lau:
+ * "fecha 5/9/2026, por instagram" → {fecha:'2026-09-05', canal:'Instagram'}.
+ * Lo que no diga sale del nombre del archivo (fecha) o es WhatsApp (canal).
+ */
+export const interpretarMensajeDePlanilla = (texto = '', nombreArchivo = '', hoy = new Date()) => {
+    const s = String(texto || '');
+    let fecha = null;
+    const m = s.match(/(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?/);
+    if (m) {
+        const d = parseInt(m[1], 10), mes = parseInt(m[2], 10);
+        let anio = m[3] ? parseInt(m[3], 10) : hoy.getFullYear();
+        if (anio < 100) anio += 2000;
+        if (d >= 1 && d <= 31 && mes >= 1 && mes <= 12) fecha = `${anio}-${String(mes).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+    if (!fecha) fecha = fechaDesdeNombre(nombreArchivo, hoy);
+    const canales = [['instagram', 'Instagram'], ['feria', 'Feria'], ['local', 'Local'], ['whatsapp', 'WhatsApp'], ['wasap', 'WhatsApp'], ['wsp', 'WhatsApp']];
+    const bajo = s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const canal = (canales.find(([k]) => bajo.includes(k)) || [null, 'WhatsApp'])[1];
+    const descontarStock = /descont|resta|baj[aá] (el )?stock/.test(bajo);
+    return { fecha, canal, descontarStock };
+};
+
+/** Resumen en texto de un plan, para que Lau lo muestre antes de confirmar. */
+export const resumirPlanDeVentas = (plan, { fecha, canal, avisos = [] } = {}) => {
+    const $ = (n) => `$${Number(n).toLocaleString('es-AR')}`;
+    const f = fecha ? fecha.split('-').reverse().join('/') : '';
+    const lineas = [];
+    if (plan.nuevos.length) {
+        lineas.push(`Leí la planilla: ${plan.nuevos.length} ${plan.nuevos.length === 1 ? 'clienta' : 'clientas'}, ${plan.prendas} ${plan.prendas === 1 ? 'prenda' : 'prendas'}, ${$(plan.totalNuevos)} en total.`);
+        for (const p of plan.nuevos) {
+            lineas.push(`• ${p.customer.nombre} — ${$(p.total)}${p.status === 'approved' ? '' : ' (pendiente de pago)'}`);
+            for (const i of p.items) lineas.push(`   ${i.quantity > 1 ? `${i.quantity}× ` : ''}${i.name}${[i.size && `talle ${i.size}`, i.color].filter(Boolean).length ? ` · ${[i.size && `talle ${i.size}`, i.color].filter(Boolean).join(' · ')}` : ''} — ${$(i.price * i.quantity)}${i.enInventario ? ' ✓ en inventario' : ''}`);
+        }
+        lineas.push(`Fecha ${f} · canal ${canal}. Si querés otra fecha, decime "fecha 5/9/2026" y volvé a adjuntar.`);
+    }
+    if (plan.repetidas.length) lineas.push(`Ya estaban registradas con esta fecha: ${plan.repetidas.map(p => p.customer.nombre).join(', ')}. No las repito.`);
+    for (const a of avisos) lineas.push(`⚠️ ${a}`);
+    if (!plan.nuevos.length && !plan.repetidas.length) lineas.push('No encontré ventas en esa planilla. Si es una lista de productos para cargar, va por Inventario → Importar Excel.');
+    return lineas.join('\n');
 };

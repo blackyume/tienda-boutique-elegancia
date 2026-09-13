@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { aPrecio, leerVentasDeCeldas, planearVentas, fechaDesdeNombre, notaDesdeNombre, claveDeVenta } from '../src/utils/importarVentas';
+import { aPrecio, leerVentasDeCeldas, planearVentas, fechaDesdeNombre, notaDesdeNombre, claveDeVenta, interpretarMensajeDePlanilla, resumirPlanDeVentas } from '../src/utils/importarVentas';
 
 // La planilla del dueño, tal cual la arma: una columna por clienta, bloques
 // de cuatro líneas por prenda, TOTAL y PAGADO al final. Los nombres son de
@@ -141,5 +141,32 @@ describe('fecha y nota desde el nombre del archivo', () => {
         expect(fechaDesdeNombre('ventas 3-2027.xlsx')).toBe('2027-03-01');
         expect(fechaDesdeNombre('ventas.xlsx', new Date('2026-09-12T15:00:00Z'))).toBe('2026-09-12');
         expect(notaDesdeNombre('WAKANDA 09-26.xlsx')).toBe('WAKANDA 09-26');
+    });
+});
+
+describe('interpretarMensajeDePlanilla · lo que le escribís a Lau junto al archivo', () => {
+    it('sin texto: fecha del nombre del archivo y WhatsApp', () => {
+        expect(interpretarMensajeDePlanilla('', 'WAKANDA 09-26.xlsx')).toEqual({ fecha: '2026-09-01', canal: 'WhatsApp', descontarStock: false });
+    });
+    it('con fecha y canal en el mensaje, manda el mensaje', () => {
+        expect(interpretarMensajeDePlanilla('son ventas del 5/9/2026 por instagram', 'x.xlsx')).toMatchObject({ fecha: '2026-09-05', canal: 'Instagram' });
+        expect(interpretarMensajeDePlanilla('vendidas en el local el 12/9', 'x.xlsx', new Date('2026-09-12'))).toMatchObject({ fecha: '2026-09-12', canal: 'Local' });
+    });
+    it('"descontá el stock" activa el descuento', () => {
+        expect(interpretarMensajeDePlanilla('cargalas y descontá el stock', 'x.xlsx').descontarStock).toBe(true);
+    });
+});
+
+describe('resumirPlanDeVentas', () => {
+    it('lista clientas, prendas, total y la fecha; y avisa lo repetido', () => {
+        const { ventas } = leerVentasDeCeldas(PLANILLA);
+        const plan = planearVentas(ventas, { fecha: '2026-09-01', canal: 'WhatsApp' });
+        const txt = resumirPlanDeVentas(plan, { fecha: '2026-09-01', canal: 'WhatsApp' });
+        expect(txt).toContain('2 clientas, 4 prendas, $49.903');
+        expect(txt).toContain('• CLIENTA UNO — $24.002');
+        expect(txt).toContain('• CLIENTA DOS — $25.901 (pendiente de pago)');
+        expect(txt).toContain('Fecha 01/09/2026 · canal WhatsApp');
+        const vacio = resumirPlanDeVentas(planearVentas([], {}), {});
+        expect(vacio).toContain('No encontré ventas');
     });
 });

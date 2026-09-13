@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Paperclip, X, Loader2, User, AlertTriangle, Check, Trash2, BookOpen, PackagePlus } from 'lucide-react';
+import { Send, Sparkles, Paperclip, X, Loader2, User, AlertTriangle, Check, Trash2, BookOpen, PackagePlus, FileSpreadsheet } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ProductWizard } from './ProductWizard';
 import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { isSensitive, buildSnapshot, buildAgentMessages, parsePlan } from '../../utils/aiCopilot';
 import { generateShippingLabel } from '../../utils/shippingLabel';
 import { getTotalStock, getVariantStock } from '../../utils/variants';
+import { celdasDesdeExcel, leerVentasDeCeldas, planearVentas, notaDesdeNombre, interpretarMensajeDePlanilla, resumirPlanDeVentas } from '../../utils/importarVentas';
+import { planearImportacion, filasDesdeExcel } from '../../utils/importarInventario';
+import { aplicarPlanDeProductos, resumirPlanDeProductos } from '../../utils/aplicarImportacion';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const MAX_STEPS = 5;
@@ -195,6 +198,8 @@ const actionLabel = (a) => {
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
         case 'toggle_maintenance': return `Mantenimiento → ${A.on ? 'ACTIVAR' : 'desactivar'}`;
+        case 'import_sales': return `Registrar venta de ${A.cliente}: ${A.prendas} prenda${A.prendas === 1 ? '' : 's'} por $${Number(A.total || 0).toLocaleString('es-AR')} (${A.canal}, ${A.fecha})`;
+        case 'import_products': return `Cargar ${A.nuevos} producto${A.nuevos === 1 ? '' : 's'} nuevo${A.nuevos === 1 ? '' : 's'} (${A.conFoto} con foto) y actualizar ${A.cambios} desde ${A.archivo}`;
         default: return `${a.tool} ${JSON.stringify(A)}`;
     }
 };
@@ -218,6 +223,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const [busyMsg, setBusyMsg] = useState('');
     const [files, setFiles] = useState([]);
     const [previews, setPreviews] = useState([]);
+    const [planilla, setPlanilla] = useState(null); // .xlsx de ventas por fuera
     // Fotos ya subidas+analizadas, pendientes de decidir qué hacer (publicar/borrador/venta).
     // Se mantienen entre mensajes para que el flujo guiado no pierda las URLs.
     const pendingPhotosRef = useRef([]);
@@ -865,8 +871,69 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         push({ role: 'system', text: 'Llegué al límite de pasos. Si quedó algo a medias, pedímelo de nuevo más puntual.' });
     };
 
+    // Una planilla de productos (la plantilla) con las fotos adjuntas: es la
+    // carga masiva, pero desde el chat. Misma lógica que Inventario → Importar.
+    const importarProductos = async (archivo, buffer, fotos) => {
+        const filas = await filasDesdeExcel(buffer);
+        const plan = planearImportacion(filas, inventory, fotos);
+        push({ role: 'ai', text: `Es una planilla de productos.\n${resumirPlanDeProductos(plan)}` });
+        if (!plan.altas.length && !plan.cambios.length) return;
+        const conFoto = plan.altas.filter(a => a.fotos.length).length;
+        setBusyMsg('');
+        const ok = await askConfirm([{ tool: 'import_products', args: { nuevos: plan.altas.length, conFoto, cambios: plan.cambios.length, archivo: archivo.name } }]);
+        if (!ok) { push({ role: 'system', text: 'Cancelado por vos. No cargué nada.' }); return; }
+        const r = await aplicarPlanDeProductos(plan, { uploadImage, addProduct, updateProduct, onAvance: setBusyMsg });
+        push({ role: 'ai', text: `✅ Listo: ${plan.altas.length} nuevo${plan.altas.length === 1 ? '' : 's'} y ${plan.cambios.length} actualizado${plan.cambios.length === 1 ? '' : 's'}.${r.fallados ? ` ${r.fallados} fallaron.` : ''}${r.sinSubir ? ` ${r.sinSubir} quedaron en borrador porque la foto no se pudo subir: subísela desde Inventario.` : ''} Los ves en Inventario.` });
+    };
+
+    // Una planilla no necesita IA: se lee tal cual, se muestra el resumen y
+    // se aplica con la misma confirmación que cualquier escritura. Si tiene
+    // columna Cliente es de ventas; si no, es la plantilla de productos.
+    const importarPlanilla = async (archivo, text) => {
+        setPlanilla(null);
+        const fotos = files;
+        setFiles([]); setPreviews([]);
+        setLoading(true);
+        push({ role: 'user', text: `${text ? text + ' ' : ''}(planilla adjunta: ${archivo.name}${fotos.length ? ` + ${fotos.length} foto${fotos.length === 1 ? '' : 's'}` : ''})` });
+        try {
+            setBusyMsg('Leyendo la planilla…');
+            const buffer = await archivo.arrayBuffer();
+            const celdas = await celdasDesdeExcel(buffer);
+            const { ventas, avisos } = leerVentasDeCeldas(celdas);
+            if (!ventas.length) { await importarProductos(archivo, buffer, fotos); return; }
+            const { fecha, canal, descontarStock } = interpretarMensajeDePlanilla(text, archivo.name);
+            const plan = planearVentas(ventas, { inventario: inventory, pedidos: orders, fecha, canal, nota: notaDesdeNombre(archivo.name), descontarStock });
+            push({ role: 'ai', text: resumirPlanDeVentas(plan, { fecha, canal, avisos }) });
+            if (!plan.nuevos.length) return;
+            setBusyMsg('');
+            const ok = await askConfirm(plan.nuevos.map(p => ({ tool: 'import_sales', args: { cliente: p.customer.nombre, prendas: p.items.reduce((a, i) => a + i.quantity, 0), total: p.total, canal, fecha: fecha.split('-').reverse().join('/') } })));
+            if (!ok) { push({ role: 'system', text: 'Cancelado por vos. No registré nada.' }); return; }
+            let n = 0;
+            for (const p of plan.nuevos) {
+                setBusyMsg(`Registrando ${p.customer.nombre}…`);
+                const items = p.items.map(({ enInventario, ...i }) => i);
+                await createOrder({ ...p, items });
+                if (descontarStock) {
+                    for (const i of p.items) {
+                        const prod = i.enInventario && inventory.find(x => String(x.id) === String(i.id));
+                        if (prod && typeof prod.stock === 'number') await updateProduct(prod.id, { stock: Math.max(0, prod.stock - i.quantity) });
+                    }
+                }
+                n++;
+            }
+            push({ role: 'ai', text: `✅ Listo: ${n} venta${n === 1 ? '' : 's'} registrada${n === 1 ? '' : 's'} (${plan.nuevos.map(p => p.id).join(', ')}). Ya cuentan en Ventas y en el Dashboard; en Pedidos las ves con "Datos y envío".${descontarStock ? ' Descontué el stock de las prendas que están en el inventario.' : ''}` });
+            logAiAction?.('copilot', `planilla ${archivo.name}`, 'ok');
+        } catch (e) {
+            push({ role: 'system', text: `No pude leer la planilla: ${e?.message || e}` });
+            logAiAction?.('copilot', `planilla ${archivo.name}`, 'error');
+        } finally {
+            setLoading(false); setBusyMsg('');
+        }
+    };
+
     const handleSend = async (overrideText) => {
         const text = (typeof overrideText === 'string' ? overrideText : input).trim();
+        if (planilla && !loading) { setInput(''); await importarPlanilla(planilla, text); return; }
         if ((!text && !files.length) || loading) return;
         if (!aiConfigured) { push({ role: 'system', text: 'Configurá una key de Cerebras (o Gemini) en Admin → Configuración para activarme.' }); return; }
 
@@ -924,8 +991,13 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
     const onPick = (e) => {
         const picked = Array.from(e.target.files || []); if (!picked.length) return;
-        setFiles(prev => [...prev, ...picked].slice(0, 12));
-        setPreviews(prev => [...prev, ...picked.map(f => URL.createObjectURL(f))].slice(0, 12));
+        const xlsx = picked.find(f => /\.xlsx$/i.test(f.name));
+        if (xlsx) setPlanilla(xlsx);
+        const imgs = picked.filter(f => f.type.startsWith('image/'));
+        if (imgs.length) {
+            setFiles(prev => [...prev, ...imgs].slice(0, 12));
+            setPreviews(prev => [...prev, ...imgs.map(f => URL.createObjectURL(f))].slice(0, 12));
+        }
         e.target.value = '';
     };
 
@@ -1179,6 +1251,14 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
             <div className="relative shrink-0 border-t border-white/10 bg-white/[0.03] backdrop-blur-xl p-4 [@media(max-height:780px)]:p-2.5">
                 <div className="max-w-3xl mx-auto">
+                    {planilla && (
+                        <div className="flex items-center gap-2 mb-2.5 px-3 py-2 rounded-xl bg-[#E8C65E]/10 border border-[#E8C65E]/40 text-sm text-white/90 w-fit max-w-full">
+                            <FileSpreadsheet className="w-4 h-4 text-[#E8C65E] shrink-0" />
+                            <span className="truncate">{planilla.name}</span>
+                            <span className="text-white/40 text-xs shrink-0">· planilla de ventas, Enter para leerla</span>
+                            <button onClick={() => setPlanilla(null)} className="p-0.5 rounded-full hover:bg-white/10 shrink-0"><X className="w-3.5 h-3.5 text-white/70" /></button>
+                        </div>
+                    )}
                     {previews.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-2.5">
                             {previews.map((src, i) => (
@@ -1197,8 +1277,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         <PackagePlus className="w-4 h-4" /> Cargar producto (paso a paso)
                     </button>
                     <div className="flex items-end gap-1 bg-white/[0.06] border border-white/15 rounded-2xl pl-1.5 pr-1.5 py-1.5 transition-colors focus-within:border-[#E8C65E]/60 focus-within:bg-white/[0.08]">
-                        <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={onPick} />
-                        <button onClick={() => setWizardOpen(true)} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#E8C65E] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Cargar producto paso a paso"><Paperclip className="w-5 h-5" /></button>
+                        <input ref={fileRef} type="file" accept="image/*,.xlsx" multiple className="hidden" onChange={onPick} />
+                        <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#E8C65E] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Adjuntar fotos o una planilla de ventas (.xlsx)"><Paperclip className="w-5 h-5" /></button>
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
@@ -1208,7 +1288,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             disabled={loading}
                             className="flex-1 resize-none bg-transparent border-0 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-0 max-h-32"
                         />
-                        <button onClick={() => handleSend()} disabled={loading || (!input.trim() && !files.length)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#E8C65E] to-[#B38728] text-[#11100D] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
+                        <button onClick={() => handleSend()} disabled={loading || (!input.trim() && !files.length && !planilla)} className="p-2.5 rounded-xl bg-gradient-to-br from-[#E8C65E] to-[#B38728] text-[#11100D] disabled:opacity-40 disabled:saturate-50 hover:brightness-110 transition shrink-0">
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                         </button>
                     </div>

@@ -41,8 +41,14 @@ Listo, no se toca más.
 ## Cargar un producto
 
 1. Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto).
-   Al lado hay un botón **"Cargar producto paso a paso"**: hace lo mismo pero
-   te lleva de la mano pregunta por pregunta. Usá el que te resulte cómodo.
+   Arriba del cuadro de texto hay un botón dorado **"Cargar producto (paso a
+   paso)"**: hace lo mismo pero te lleva de la mano pregunta por pregunta.
+   Usá el que te resulte cómodo.
+
+   Con el mismo clip podés adjuntar un **Excel**: la plantilla de productos
+   (con las fotos en el mismo mensaje) o tu planilla de ventas por fuera. Lau
+   la lee sola, te muestra qué entendió y te pide confirmar. Para eso no hace
+   falta la llave de Gemini.
 2. Escribí lo que sabés. Puede ser desprolijo, Lau lo entiende:
 
    > jean oxford azul, talles 36 38 40 42, tengo 5, sale 46500, publicalo

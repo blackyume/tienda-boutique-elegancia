@@ -3,6 +3,7 @@ import { X, Upload, FileSpreadsheet, AlertTriangle, Plus, RefreshCw, Check, Imag
 import { Button } from '../ui/Button';
 import { useStore } from '../../context/StoreContext';
 import { planearImportacion, filasDesdeCsv, filasDesdeExcel } from '../../utils/importarInventario';
+import { aplicarPlanDeProductos } from '../../utils/aplicarImportacion';
 import { formatMoney } from '../../utils/helpers';
 
 const Contador = ({ icono: Icono, n, texto, color }) => (
@@ -99,52 +100,10 @@ export const ImportarInventarioModal = ({ onClose }) => {
         }
     }, [addToast]);
 
-    // Sube las fotos de un ítem y devuelve los campos de imagen listos. Una
-    // URL que ya venía en la planilla no se vuelve a subir.
-    const subirFotos = async (lista, etiqueta) => {
-        const urls = [];
-        for (let i = 0; i < lista.length; i += 1) {
-            const f = lista[i];
-            setAvance(`${etiqueta} · foto ${i + 1} de ${lista.length}`);
-            const url = typeof f === 'string' ? f : await uploadImage(f, 'products', { silencioso: true });
-            if (url) urls.push(url);
-        }
-        if (!urls.length) return null;
-        return { image: urls[0], media: urls.map((u) => ({ type: 'image', url: u })) };
-    };
-
     const aplicar = async () => {
         if (!plan) return;
         setAplicando(true);
-        const total = plan.altas.length + plan.cambios.length;
-        let hechos = 0;
-        let fallados = 0;
-        let sinSubir = 0;
-
-        for (const alta of plan.altas) {
-            try {
-                const imagenes = alta.fotos.length ? await subirFotos(alta.fotos, alta.nombre) : null;
-                if (alta.fotos.length && !imagenes) sinSubir += 1;
-                // Si ninguna foto llegó a Cloudinary, no se publica: quedaría un
-                // producto visible sin imagen.
-                const datos = imagenes ? { ...alta.datos, ...imagenes } : { ...alta.datos, active: false };
-                await addProduct(datos, { silencioso: true });
-            } catch { fallados += 1; }
-            hechos += 1;
-            setAvance(`${hechos} de ${total}`);
-        }
-        for (const cambio of plan.cambios) {
-            try {
-                const imagenes = cambio.fotos?.length ? await subirFotos(cambio.fotos, cambio.nombre) : null;
-                if (cambio.fotos?.length && !imagenes) sinSubir += 1;
-                const campos = imagenes ? { ...cambio.campos, ...imagenes } : { ...cambio.campos };
-                if (cambio.fotos?.length && !imagenes) delete campos.active;
-                await updateProduct(cambio.id, campos, { silencioso: true });
-            } catch { fallados += 1; }
-            hechos += 1;
-            setAvance(`${hechos} de ${total}`);
-        }
-
+        const { total, fallados, sinSubir } = await aplicarPlanDeProductos(plan, { uploadImage, addProduct, updateProduct, onAvance: setAvance });
         setAplicando(false);
         if (fallados) addToast(`${total - fallados} listos, ${fallados} fallaron`, 'error');
         else addToast(`Importación lista: ${plan.altas.length} nuevos y ${plan.cambios.length} actualizados`, 'success');
