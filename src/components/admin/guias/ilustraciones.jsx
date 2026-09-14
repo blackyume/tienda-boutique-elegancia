@@ -4,26 +4,28 @@ import React from 'react';
 // para que se vean bien en claro y en oscuro sin duplicar nada. Todas usan
 // viewBox de 720 de ancho y escalan al contenedor.
 
-const ORO = '#E8C65E';
-const ORO_OSCURO = '#B38728';
+export const ORO = '#E8C65E';
+export const ORO_OSCURO = '#B38728';
+export const VERDE = '#10b981';
+export const ROJO = '#ef4444';
 
 // Clases repetidas. "papel" es una tarjeta, "linea" un borde, "texto" tipografía.
-const papel = 'fill-white dark:fill-[#1f1f1f]';
-const papelSuave = 'fill-slate-50 dark:fill-white/5';
-const linea = 'stroke-slate-300 dark:stroke-slate-600';
-const texto = 'fill-slate-800 dark:fill-slate-100';
-const textoSuave = 'fill-slate-500 dark:fill-slate-400';
-const fuente = { fontFamily: 'ui-sans-serif, system-ui, sans-serif' };
-const mono = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' };
+export const papel = 'fill-white dark:fill-[#1f1f1f]';
+export const papelSuave = 'fill-slate-50 dark:fill-white/5';
+export const linea = 'stroke-slate-300 dark:stroke-slate-600';
+export const texto = 'fill-slate-800 dark:fill-slate-100';
+export const textoSuave = 'fill-slate-500 dark:fill-slate-400';
+export const fuente = { fontFamily: 'ui-sans-serif, system-ui, sans-serif' };
+export const mono = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' };
 
-const Svg = ({ alto, children, label }) => (
+export const Svg = ({ alto, children, label }) => (
     <svg viewBox={`0 0 720 ${alto}`} role="img" aria-label={label} className="w-full h-auto" style={fuente}>
         {children}
     </svg>
 );
 
 /** Flecha horizontal o vertical con punta. */
-const Flecha = ({ x1, y1, x2, y2, color = ORO_OSCURO }) => {
+export const Flecha = ({ x1, y1, x2, y2, color = ORO_OSCURO }) => {
     const ang = Math.atan2(y2 - y1, x2 - x1);
     const l = 9;
     const px = x2 - l * Math.cos(ang), py = y2 - l * Math.sin(ang);

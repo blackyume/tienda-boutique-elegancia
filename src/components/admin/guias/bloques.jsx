@@ -159,3 +159,65 @@ export const Link = ({ href, children }) => (
         {children || href}
     </a>
 );
+
+/**
+ * Toda la guía de un vistazo: tarjetas grandes con un dibujo, dos o tres
+ * palabras y (opcional) una línea más. Va siempre al principio.
+ * pasos: [{ icono: '📎', titulo: 'Tocá el clip', detalle: 'y elegí la foto' }]
+ */
+export const Resumen = ({ titulo = 'Toda la guía en un vistazo', pasos = [] }) => (
+    <div className="rounded-2xl border border-[#E8C65E]/40 bg-[#E8C65E]/[0.07] p-4 sm:p-5">
+        <p className="text-[11px] font-black uppercase tracking-widest text-[#8a6a1a] dark:text-[#E8C65E] mb-3">{titulo}</p>
+        <ol className="grid gap-3 sm:gap-4" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${pasos.length > 4 ? 120 : 150}px, 1fr))` }}>
+            {pasos.map((p, i) => (
+                <li key={i} className="relative rounded-xl bg-white dark:bg-[#1f1f1f] border border-slate-200 dark:border-slate-700 px-3 pt-5 pb-3 text-center shadow-sm">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-black text-black shadow"
+                        style={{ background: 'linear-gradient(135deg, #BF953F, #FCF6BA 50%, #B38728)' }}>{i + 1}</span>
+                    <div className="text-[34px] leading-none mt-1" aria-hidden="true">{p.icono}</div>
+                    <p className="font-bold text-[14px] text-slate-900 dark:text-white mt-2 leading-tight">{p.titulo}</p>
+                    {p.detalle && <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">{p.detalle}</p>}
+                </li>
+            ))}
+        </ol>
+    </div>
+);
+
+/** Un número grande con su explicación: "$11.200 · por cada visita". */
+export const Numero = ({ valor, etiqueta, nota, tono = 'oro' }) => {
+    const cls = { oro: 'text-[#8a6a1a] dark:text-[#E8C65E]', verde: 'text-emerald-600 dark:text-emerald-400', rojo: 'text-red-500' }[tono] || '';
+    return (
+        <div className="flex-1 min-w-[150px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1f1f1f] p-4">
+            <p className={`text-2xl sm:text-3xl font-black leading-none ${cls}`}>{valor}</p>
+            <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100 mt-2">{etiqueta}</p>
+            {nota && <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">{nota}</p>}
+        </div>
+    );
+};
+
+/** Fila de Numeros. */
+export const Numeros = ({ children }) => <div className="flex flex-wrap gap-3">{children}</div>;
+
+/** Dos columnas: lo que está bien (verde) y lo que está mal (rojo). */
+export const BienMal = ({ bien = [], mal = [], tituloBien = 'Así sí', tituloMal = 'Así no' }) => (
+    <div className="grid sm:grid-cols-2 gap-3">
+        <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/[0.06] p-4">
+            <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">✓ {tituloBien}</p>
+            <ul className="space-y-1.5">{bien.map((b, i) => <li key={i} className="text-[14px] text-slate-800 dark:text-slate-100 leading-snug">{b}</li>)}</ul>
+        </div>
+        <div className="rounded-xl border border-red-400/40 bg-red-500/[0.06] p-4">
+            <p className="text-[11px] font-black uppercase tracking-widest text-red-500 mb-2">✗ {tituloMal}</p>
+            <ul className="space-y-1.5">{mal.map((m, i) => <li key={i} className="text-[14px] text-slate-800 dark:text-slate-100 leading-snug">{m}</li>)}</ul>
+        </div>
+    </div>
+);
+
+/** Quién hace este paso: 'vos' | 'solo' | 'correo' | 'clienta'. Va al lado de un título de paso. */
+export const Quien = ({ quien = 'vos' }) => {
+    const e = {
+        vos: ['VOS', 'bg-[#E8C65E] text-black'],
+        solo: ['SE HACE SOLO', 'bg-emerald-500 text-white'],
+        correo: ['EL CORREO', 'bg-blue-600 text-white'],
+        clienta: ['LA CLIENTA', 'bg-purple-500 text-white'],
+    }[quien] || ['VOS', 'bg-[#E8C65E] text-black'];
+    return <span className={`inline-block align-middle ml-2 px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider ${e[1]}`}>{e[0]}</span>;
+};
