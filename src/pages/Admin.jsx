@@ -616,8 +616,8 @@ export const Admin = () => {
                         </div>
 
                         {/* TABLE */}
-                        <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
-                            <table className="w-full text-left text-sm">
+                        <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
+                            <table className="w-full text-left text-sm min-w-[720px]">
                                 <thead className="bg-slate-50/50 dark:bg-[#161616] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
                                     <tr>
                                         <th className="p-4 pl-6 w-1/3">Producto</th>

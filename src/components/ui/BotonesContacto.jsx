@@ -66,7 +66,7 @@ export const BotonesContacto = () => {
         <div
             onMouseEnter={() => setShowTip(true)}
             onMouseLeave={() => setShowTip(false)}
-            className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 group flex flex-col items-end gap-3 transition-all duration-700 ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
+            className={`fixed ${location.pathname.startsWith('/product/') ? 'bottom-24' : 'bottom-4'} sm:bottom-6 right-4 sm:right-6 z-50 group flex flex-col items-end gap-3 transition-all duration-700 ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
         >
             <div className={`origin-bottom-right transition-all duration-400 ${showTip ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}`}>
                 <div className="relative bg-slate-900/95 backdrop-blur-xl border border-[#E8C65E]/30 px-4 py-3 rounded-xl rounded-br-none shadow-[0_8px_32px_rgba(0,0,0,0.45)] max-w-[220px]">

@@ -148,7 +148,8 @@ export const Botones = ({ opciones = [] }) => (
 /** Marco para una ilustración, con su epígrafe. */
 export const Figura = ({ titulo, children }) => (
     <figure className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#161616] overflow-hidden">
-        <div className="p-4 sm:p-6">{children}</div>
+        <div className="p-3 sm:p-6 overflow-x-auto"><div className="min-w-[560px] sm:min-w-0">{children}</div></div>
+        <p className="sm:hidden px-4 pb-2 text-[11px] text-slate-400">← deslizá para ver el dibujo completo →</p>
         {titulo && <figcaption className="px-5 py-3 text-[13px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-white/[0.02]">{titulo}</figcaption>}
     </figure>
 );

@@ -343,3 +343,10 @@ img {
     #guia-impresa { position: absolute; left: 0; top: 0; width: 100%; padding: 0 12mm; }
     #guia-impresa .print\:hidden { display: none !important; }
 }
+
+/* Pantallas chicas: las etiquetas micro (9-10px) suben a 11px para que se
+   lean en el celular, y la página nunca se desplaza de costado. */
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+@media (max-width: 640px) {
+    .text-\[9px\], .text-\[9\.5px\], .text-\[10px\] { font-size: 11px !important; }
+}

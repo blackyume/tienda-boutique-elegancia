@@ -87,7 +87,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-500 pointer-events-none" />
 
                     {/* Badges */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                    <div className="absolute top-3 left-3 right-14 flex flex-col items-start gap-1.5 z-10">
                         {fresh && !outOfStock && (
                             <span className="bg-cielo-gold text-black text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
                                 Nuevo
@@ -104,8 +104,8 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             </span>
                         )}
                         {!outOfStock && lowStock && (
-                            <span className="bg-[#0A0908]/90 backdrop-blur text-cielo-gold border border-cielo-gold/50 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
-                                Últimas unidades
+                            <span className="bg-[#0A0908]/90 backdrop-blur text-cielo-gold border border-cielo-gold/50 text-[9px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] px-2 sm:px-2.5 py-1 whitespace-nowrap">
+                                <span className="sm:hidden">Últimas</span><span className="hidden sm:inline">Últimas unidades</span>
                             </span>
                         )}
                     </div>
@@ -116,7 +116,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                         onClick={toggleWishlist}
                         aria-label={isWished ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                         aria-pressed={isWished}
-                        className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/40 backdrop-blur border border-white/10 flex items-center justify-center hover:border-cielo-gold/50 transition-all duration-300 hover:scale-110"
+                        className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-black/40 backdrop-blur border border-white/10 flex items-center justify-center hover:border-cielo-gold/50 transition-all duration-300 hover:scale-110"
                     >
                         <Heart
                             className={`w-3.5 h-3.5 transition-colors ${isWished ? 'fill-rose-400 text-rose-400' : 'text-white/70 hover:text-white'}`}
@@ -144,7 +144,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             {product.category}
                         </span>
                     )}
-                    <h3 className="font-serif text-[15px] text-white/90 group-hover:text-white transition-colors line-clamp-1 leading-snug">
+                    <h3 className="font-serif text-[14px] sm:text-[15px] text-white/90 group-hover:text-white transition-colors line-clamp-2 sm:line-clamp-1 leading-snug min-h-[2.6em] sm:min-h-0">
                         {product.name}
                     </h3>
 

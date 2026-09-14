@@ -152,7 +152,7 @@ export const Shop = () => {
                 </div>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col md:flex-row gap-8">
+            <div className="max-w-[1400px] 2xl:max-w-[1720px] mx-auto px-4 md:px-8 py-10 flex flex-col md:flex-row gap-8">
                 {/* Sidebar desktop */}
                 <aside className="hidden md:block w-64 flex-shrink-0 space-y-8 sticky top-32 h-fit">
                     <div>
@@ -282,19 +282,19 @@ export const Shop = () => {
                     <div className="flex flex-wrap justify-between items-center gap-3 mb-4 border-b border-slate-100 dark:border-white/5 pb-4">
                         <p className="text-sm font-serif text-slate-500">{filtered.length} Productos</p>
 
-                        <div className="flex gap-3 items-center">
+                        <div className="flex gap-3 items-center min-w-0 max-w-full">
                             <button
-                                className="md:hidden flex items-center gap-2 text-sm font-bold uppercase"
+                                className="md:hidden flex items-center gap-2 text-sm font-bold uppercase shrink-0 min-h-[44px]"
                                 onClick={() => setIsMobileFilterOpen(true)}
                             >
                                 <SlidersHorizontal className="w-4 h-4" /> Filtros
                             </button>
 
-                            <div className="relative">
+                            <div className="relative min-w-0 flex-1">
                                 <select
                                     value={sortOption}
                                     onChange={(e) => setSortOption(e.target.value)}
-                                    className="appearance-none bg-transparent border border-slate-200 dark:border-slate-700 rounded-md pl-3 pr-8 py-2 text-sm font-bold uppercase tracking-widest hover:border-cielo-gold cursor-pointer"
+                                    className="appearance-none w-full max-w-full bg-transparent border border-slate-200 dark:border-slate-700 rounded-md pl-3 pr-8 py-2 min-h-[44px] text-[13px] sm:text-sm font-bold uppercase tracking-wide sm:tracking-widest hover:border-cielo-gold cursor-pointer truncate"
                                 >
                                     <option value="relevant">Más relevantes</option>
                                     <option value="newest">Novedades</option>
@@ -331,7 +331,7 @@ export const Shop = () => {
                         <ProductGridSkeleton count={9} />
                     ) : paged.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-10">
+                            <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-3 sm:gap-x-4 md:gap-x-6 gap-y-8 sm:gap-y-10">
                                 {paged.map((p, idx) => (
                                     <ProductCard key={p.id} product={p} priority={idx < 3} />
                                 ))}

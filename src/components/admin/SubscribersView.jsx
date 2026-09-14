@@ -120,8 +120,8 @@ export const SubscribersView = () => {
                     </div>
 
                     {/* Tabla */}
-                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                        <table className="w-full text-sm">
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
+                        <table className="w-full text-sm min-w-[560px]">
                             <thead>
                                 <tr className="bg-slate-50 dark:bg-white/5 text-left text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400">
                                     <th className="px-4 py-3 font-bold">Email</th>

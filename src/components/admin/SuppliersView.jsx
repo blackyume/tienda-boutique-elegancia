@@ -123,7 +123,7 @@ export const SuppliersView = () => {
             </div>
 
             {/* STATS */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <div className="bg-white dark:bg-[#1a1a1a] p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
                     <span className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white">{stats.total}</span>
                     <p className="text-[10px] sm:text-xs text-slate-400 uppercase font-bold mt-1">Total</p>

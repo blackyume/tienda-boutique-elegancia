@@ -105,7 +105,7 @@ export const SalesView = ({ salesLog }) => {
             </div>
 
             {/* Resumen */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                 <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
                     <p className="text-[10px] uppercase tracking-widest text-slate-400">Ventas</p>
                     <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{filtered.length}</p>
