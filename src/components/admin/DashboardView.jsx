@@ -217,8 +217,8 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                 {/* HEADER & STATUS */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold dark:text-white text-slate-900 tracking-wider">Centro de Comando</h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Visión general del negocio.</p>
+                        <h1 className="text-3xl font-bold dark:text-white text-slate-900 tracking-wider">Inicio</h1>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Cómo va la tienda hoy.</p>
                     </div>
 
                     <div className="flex flex-col items-end gap-4">
@@ -326,7 +326,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                             <ActionButton icon={Users} label="Clientes" onClick={() => onNavigate('customers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
                             <ActionButton icon={Package} label="Inventario" onClick={() => onNavigate('inventory')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
 
-                            <ActionButton icon={Palette} label="CMS / Diseño" onClick={() => onNavigate('cms')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
+                            <ActionButton icon={Palette} label="Diseño de la tienda" onClick={() => onNavigate('cms')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
                             <ActionButton icon={Percent} label="Cupones" onClick={() => onNavigate('coupons')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
                             <ActionButton icon={Truck} label="Proveedores" onClick={() => onNavigate('suppliers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
                             <div className="col-span-2 sm:col-span-1">

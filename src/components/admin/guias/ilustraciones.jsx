@@ -359,7 +359,7 @@ export const IlusLau = () => (
 
 /** El menú del panel con una entrada resaltada, para decir "acá". */
 export const IlusMenu = ({ resaltar = 'Inventario', nota }) => {
-    const items = ['Dashboard', 'Inventario', 'Pedidos', 'Clientes', 'Ventas', 'Asistente Lau', 'CMS / Diseño', 'Guías', 'Configuración'];
+    const items = ['Inicio', 'Lau', 'Pedidos', 'Inventario', 'Ventas y ganancia', 'Clientas', 'Cupones y ofertas', 'Diseño de la tienda', 'Guías', 'Configuración'];
     return (
         <Svg alto={40 + items.length * 30} label={`Dónde está ${resaltar} en el menú del panel`}>
             <rect x="30" y="10" width="220" height={20 + items.length * 30} rx="14" className={papel} />

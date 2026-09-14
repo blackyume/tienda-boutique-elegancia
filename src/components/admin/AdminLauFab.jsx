@@ -24,7 +24,7 @@ export const AdminLauFab = () => {
                 <button
                     onClick={() => setOpen(true)}
                     aria-label="Abrir asistente Lau"
-                    title="Asistente Lau"
+                    title="Lau"
                     className="fixed bottom-6 left-6 z-[55] group flex items-center gap-2 transition-transform duration-300 hover:scale-105 active:scale-95"
                 >
                     <span className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_30px_-8px_rgba(232,198,94,0.65)] overflow-hidden"

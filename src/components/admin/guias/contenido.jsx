@@ -63,13 +63,15 @@ const Empezar = ({ abrir }) => (
             <Tabla
                 cabecera={['Sección', 'Para qué sirve', 'Quién la usa']}
                 filas={[
-                    [<strong>Dashboard</strong>, 'Cómo va el día: ventas, visitas, pedidos por enviar, qué se está agotando. Acá está el interruptor de mantenimiento.', 'Dueño'],
-                    [<strong>Inventario</strong>, 'Los productos: crear, editar, publicar u ocultar. Importar y exportar Excel.', 'Quien carga productos'],
+                    [<strong>Inicio</strong>, 'Cómo va el día: ventas, visitas, pedidos por enviar, qué se está agotando. Acá está el interruptor de mantenimiento.', 'Dueño'],
+                    [<strong>Lau</strong>, 'El chat que hace todo: carga productos, cambia precios, anota ventas, te avisa lo que pasa.', 'Los dos'],
                     [<strong>Pedidos</strong>, 'Las compras. La dirección de la clienta y el botón “Marcar Enviado”.', 'Dueño'],
-                    [<strong>Clientes</strong>, 'Quién compró qué y cuántas veces.', 'Dueño'],
-                    [<strong>Ventas</strong>, 'Cuánto vendiste y cuánto ganaste, por período.', 'Dueño'],
-                    [<strong>Asistente Lau</strong>, 'El chat que hace todo: carga productos, cambia precios, anota ventas, te avisa lo que pasa.', 'Los dos'],
-                    [<strong>CMS / Diseño</strong>, 'Textos, banners, categorías, redes sociales.', 'Dueño'],
+                    [<strong>Inventario</strong>, 'Los productos: crear, editar, publicar u ocultar. Importar y exportar Excel.', 'Quien carga productos'],
+                    [<strong>Ventas y ganancia</strong>, 'Cuánto vendiste y cuánto ganaste, por período. Y las ventas por fuera.', 'Dueño'],
+                    [<strong>Clientas · Reseñas · Carritos sin terminar · Newsletter</strong>, 'Quién compró, qué escribieron, quién dejó el carrito a medias, quién dejó su email.', 'Dueño'],
+                    [<strong>Cupones y ofertas</strong>, 'Descuentos y promociones.', 'Dueño'],
+                    [<strong>Diseño de la tienda</strong>, 'Textos, portadas, categorías, redes sociales.', 'Dueño'],
+                    [<strong>Gastos · Proveedores · Simulador de precios</strong>, 'Los números: lo que pagás, a quién le comprás, y probar precios sin cargar nada.', 'Dueño'],
                     [<strong>Guías</strong>, 'Esto que estás leyendo.', 'Los dos'],
                     [<strong>Configuración</strong>, 'WhatsApp, pagos, precios de envío, precio automático, llaves de IA.', 'Dueño'],
                 ]}
@@ -134,7 +136,7 @@ const CargaMasiva = () => (
                 cabecera={['Columna', 'Qué va', 'Obligatoria']}
                 filas={[
                     [<strong>Producto</strong>, 'El nombre. Es lo que ve la clienta y lo que empareja la foto.', 'Sí'],
-                    [<strong>Categoría</strong>, <>Tiene que existir en <Ruta pasos={['Admin', 'CMS / Diseño', 'Categorías']} />, escrita igual.</>, 'No'],
+                    [<strong>Categoría</strong>, <>Tiene que existir en <Ruta pasos={['Admin', 'Diseño de la tienda', 'Categorías']} />, escrita igual.</>, 'No'],
                     [<strong>Precio venta</strong>, <>Lo que paga la clienta. Acepta <Cod>46500</Cod>, <Cod>46.500</Cod> o <Cod>$ 46.500</Cod>. <strong>Si la dejás vacía y ponés Costo, el precio se calcula solo</strong> con tu margen.</>, 'Precio o Costo'],
                     [<strong>Costo</strong>, 'Lo que te costó. Con esto el panel calcula la ganancia (y el precio, si no lo ponés).', 'Precio o Costo'],
                     [<strong>Stock</strong>, 'Cuántos tenés. Número entero. Vacío = 0.', 'No'],
@@ -206,7 +208,7 @@ const Lau = ({ abrir }) => (
 
         <Seccion id="que-es" titulo="Qué es Lau">
             <P>Lau es el chat del panel. <strong>Le hablás como a una empleada y ella hace.</strong> Carga productos, cambia precios, anota ventas, te dice cuánto stock queda y te avisa cuando entra una venta.</P>
-            <P>Está en dos lugares: en el menú, <Ruta pasos={['Admin', 'Asistente Lau']} />; y navegando la tienda como admin, el botón dorado <strong>abajo a la izquierda</strong>. Las clientas no lo ven.</P>
+            <P>Está en dos lugares: en el menú, <Ruta pasos={['Admin', 'Lau']} />; y navegando la tienda como admin, el botón dorado <strong>abajo a la izquierda</strong>. Las clientas no lo ven.</P>
             <P>Para <strong>1 a 10 productos</strong> es lo más rápido. Para una colección entera conviene el Excel (<Ir abrir={abrir} a="carga-masiva">esa guía está acá</Ir>), que también se lo podés dar a ella.</P>
         </Seccion>
 
@@ -343,7 +345,7 @@ const VentasFuera = ({ abrir }) => (
         ]} />
 
         <Seccion id="por-que" titulo="Por qué anotarlas en la tienda">
-            <P>Lo que vendés por WhatsApp, en el local o en una feria no pasa por la tienda. Si lo anotás en el panel, <strong>Ventas</strong> y el <strong>Dashboard</strong> muestran lo que vendiste de verdad, y el stock no miente.</P>
+            <P>Lo que vendés por WhatsApp, en el local o en una feria no pasa por la tienda. Si lo anotás en el panel, <strong>Ventas</strong> y <strong>Inicio</strong> muestran lo que vendiste de verdad, y el stock no miente.</P>
             <P>Cada venta queda como un pedido <Cod>MAN-…</Cod> en Pedidos, igual que uno de la tienda.</P>
         </Seccion>
 
@@ -374,7 +376,7 @@ const VentasFuera = ({ abrir }) => (
                 <Paso>Entrá a <Ruta pasos={['Admin', 'Ventas', '⤴ Importar ventas']} />.</Paso>
                 <Paso>Soltá el Excel. Aparece la <strong>vista previa</strong>: una tarjeta por clienta con sus prendas y el total.</Paso>
                 <Paso>Revisá la <strong>fecha</strong> y el <strong>canal</strong> (WhatsApp, Local, Feria…). Si las prendas están en el inventario con el mismo nombre, podés tildar <K>Descontar stock</K>.</Paso>
-                <Paso><K>Registrar ventas</K>. Listo: ya figuran en Ventas y en el Dashboard.</Paso>
+                <Paso><K>Registrar ventas</K>. Listo: ya figuran en Ventas y en Inicio.</Paso>
             </Pasos>
             <Aviso tipo="dato">Si volvés a cargar la misma planilla con la misma fecha, <strong>no se duplica</strong>: te avisa que esas ventas ya estaban.</Aviso>
         </Seccion>
@@ -777,11 +779,11 @@ const Abrir = ({ abrir }) => (
         </Seccion>
 
         <Seccion id="abrir" titulo="Apagar el mantenimiento">
-            <Figura titulo="El interruptor está en el Dashboard. Se apaga al instante; no hay que publicar nada.">
+            <Figura titulo="El interruptor está en Inicio. Se apaga al instante; no hay que publicar nada.">
                 <IlusInterruptor />
             </Figura>
             <Pasos>
-                <Paso>Entrá a <Ruta pasos={['Admin', 'Dashboard']} />.</Paso>
+                <Paso>Entrá a <Ruta pasos={['Admin', 'Inicio']} />.</Paso>
                 <Paso>Tocá el interruptor de <K>Mantenimiento</K> para que quede apagado.</Paso>
                 <Paso>Abrí la tienda desde el celular como clienta: tiene que verse el catálogo, no “EN RENOVACIÓN”.</Paso>
             </Pasos>

@@ -48,11 +48,43 @@ const TabLoader = () => (
 );
 
 
-const TAB_LABELS = {
-    dashboard: 'Dashboard', inventory: 'Inventario', orders: 'Pedidos', customers: 'Clientes',
-    sales: 'Ventas', assistant: 'Asistente Lau', cms: 'CMS / Diseño', coupons: 'Cupones',
-    suppliers: 'Proveedores', abandoned: 'Carritos Abandonados', reviews: 'Reseñas',
-    calculator: 'Historial de Costos', expenses: 'Gastos', subscribers: 'Suscriptores', guides: 'Guías', settings: 'Configuración'
+// El menú del panel, en el orden en que se usa: primero lo de todos los días,
+// después clientas, promoción, números, y al final ayuda y configuración.
+// Cada entrada lleva una línea que dice para qué sirve, en criollo.
+const MENU = [
+    { grupo: 'Todos los días', items: [
+        { id: 'dashboard', label: 'Inicio', hint: 'Cómo va el día' },
+        { id: 'assistant', label: 'Lau', hint: 'Pedile lo que sea' },
+        { id: 'orders', label: 'Pedidos', hint: 'Qué hay que enviar' },
+        { id: 'inventory', label: 'Inventario', hint: 'Los productos' },
+        { id: 'sales', label: 'Ventas y ganancia', hint: 'Cuánto vendiste' },
+    ] },
+    { grupo: 'Clientas', items: [
+        { id: 'customers', label: 'Clientas', hint: 'Quién compró qué' },
+        { id: 'reviews', label: 'Reseñas', hint: 'Aprobar lo que escriben' },
+        { id: 'abandoned', label: 'Carritos sin terminar', hint: 'Recordarles que vuelvan' },
+        { id: 'subscribers', label: 'Newsletter', hint: 'Quién dejó su email' },
+    ] },
+    { grupo: 'Promocionar', items: [
+        { id: 'coupons', label: 'Cupones y ofertas', hint: 'Descuentos' },
+        { id: 'cms', label: 'Diseño de la tienda', hint: 'Textos, fotos, categorías' },
+    ] },
+    { grupo: 'Números', items: [
+        { id: 'expenses', label: 'Gastos', hint: 'Lo que pagás, para la ganancia' },
+        { id: 'suppliers', label: 'Proveedores', hint: 'Agenda de a quién le comprás' },
+        { id: 'calculator', label: 'Simulador de precios', hint: 'Probar precios sin cargar nada' },
+    ] },
+    { grupo: 'Ayuda', items: [
+        { id: 'guides', label: 'Guías', hint: 'Cómo se hace cada cosa' },
+        { id: 'settings', label: 'Configuración', hint: 'Pagos, envíos, precios, llaves' },
+    ] },
+];
+const TAB_LABELS = Object.fromEntries(MENU.flatMap(g => g.items.map(i => [i.id, i.label])));
+const ICONOS_MENU = {
+    dashboard: LayoutDashboard, assistant: Bot, orders: Package, inventory: Tag, sales: TrendingUp,
+    customers: Users, reviews: CheckIcon, abandoned: ShoppingCartIcon, subscribers: Mail,
+    coupons: Ticket, cms: Blocks, expenses: Wallet, suppliers: Building2, calculator: Calculator,
+    guides: BookOpen, settings: Settings,
 };
 
 export const Admin = () => {
@@ -60,6 +92,12 @@ export const Admin = () => {
     const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers, paymentConfig } = useStore();
     const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
+    // Los numeritos rojos del menú: sólo lo que espera algo de vos.
+    const contadoresMenu = {
+        orders: orders.filter(o => o.status === 'pending').length,
+        reviews: (reviews || []).filter(r => !r.approved).length,
+        abandoned: (abandonedCarts || []).filter(c => !c.recovered).length,
+    };
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [isImportOpen, setIsImportOpen] = useState(false);
@@ -476,29 +514,23 @@ export const Admin = () => {
                         <X className="w-5 h-5" />
                     </button>
                 </div>
-                <nav className="flex-1 p-4 space-y-1 overflow-y-auto" onClick={() => setSidebarOpen(false)}>
-                    <SidebarItem icon={LayoutDashboard} label="Dashboard" active={adminTab === 'dashboard'} onClick={() => setAdminTab('dashboard')} />
-                    <SidebarItem icon={Tag} label="Inventario" active={adminTab === 'inventory'} onClick={() => setAdminTab('inventory')} />
-                    <SidebarItem icon={Package} label="Pedidos" active={adminTab === 'orders'} onClick={() => setAdminTab('orders')} count={orders.filter(o => o.status === 'pending').length} />
-                    <SidebarItem icon={Users} label="Clientes" active={adminTab === 'customers'} onClick={() => setAdminTab('customers')} />
-                    <SidebarItem icon={TrendingUp} label="Ventas" active={adminTab === 'sales'} onClick={() => setAdminTab('sales')} />
-
-                    <div className="h-px bg-slate-200 dark:bg-slate-800 my-2" />
-                    <SidebarItem icon={Bot} label="Asistente Lau" active={adminTab === 'assistant'} onClick={() => setAdminTab('assistant')} />
-                    <SidebarItem icon={Blocks} label="CMS / Diseño" active={adminTab === 'cms'} onClick={() => setAdminTab('cms')} />
-                    <SidebarItem icon={Ticket} label="Cupones" active={adminTab === 'coupons'} onClick={() => setAdminTab('coupons')} />
-                    <SidebarItem icon={Building2} label="Proveedores" active={adminTab === 'suppliers'} onClick={() => setAdminTab('suppliers')} />
-                    <SidebarItem icon={ShoppingCartIcon} label="Carritos Abandonados" active={adminTab === 'abandoned'} onClick={() => setAdminTab('abandoned')} count={(abandonedCarts || []).filter(c => !c.recovered).length} />
-                    <SidebarItem icon={CheckIcon} label="Reseñas" active={adminTab === 'reviews'} onClick={() => setAdminTab('reviews')} count={(reviews || []).filter(r => !r.approved).length} />
-                    <SidebarItem icon={Mail} label="Suscriptores" active={adminTab === 'subscribers'} onClick={() => setAdminTab('subscribers')} count={(newsletterSubscribers || []).length} />
-                    <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Herramientas</p>
-                    <SidebarItem icon={Wallet} label="Gastos" active={adminTab === 'expenses'} onClick={() => setAdminTab('expenses')} />
-                    <SidebarItem icon={Calculator} label="Historial de Costos" active={adminTab === 'calculator'} onClick={() => setAdminTab('calculator')} />
-
-                    <div className="my-6 border-t border-slate-100 dark:border-slate-800"></div>
-                    <p className="px-2 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-2">Sistema</p>
-                    <SidebarItem icon={BookOpen} label="Guías" active={adminTab === 'guides'} onClick={() => setAdminTab('guides')} />
-                    <SidebarItem icon={Settings} label="Configuración" active={adminTab === 'settings'} onClick={() => setAdminTab('settings')} />
+                <nav className="flex-1 p-3 overflow-y-auto" onClick={() => setSidebarOpen(false)}>
+                    {MENU.map((g, gi) => (
+                        <div key={g.grupo} className={gi ? 'mt-4' : ''}>
+                            <p className="px-3 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1">{g.grupo}</p>
+                            {g.items.map(it => (
+                                <SidebarItem
+                                    key={it.id}
+                                    icon={ICONOS_MENU[it.id]}
+                                    label={it.label}
+                                    hint={it.hint}
+                                    active={adminTab === it.id}
+                                    onClick={() => setAdminTab(it.id)}
+                                    count={contadoresMenu[it.id] || 0}
+                                />
+                            ))}
+                        </div>
+                    ))}
                 </nav>
                 <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#161616] space-y-2">
                     <button
@@ -861,13 +893,16 @@ export const Admin = () => {
 
 // --- SUBCOMPONENTS (Clean & extracted) ---
 
-const SidebarItem = ({ icon: Icon, label, active, onClick, count }) => (
-    <button onClick={onClick} className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-medium transition-all duration-200 group ${active ? 'bg-[#E8C65E] text-white shadow-lg shadow-[#E8C65E]/30' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-        <div className="flex items-center gap-3">
-            <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-slate-400 group-hover:text-[#E8C65E] transition-colors'}`} />
-            <span className="inline">{label}</span>
+const SidebarItem = ({ icon: Icon, label, hint, active, onClick, count }) => (
+    <button onClick={onClick} title={hint} className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 group ${active ? 'bg-[#E8C65E] text-black shadow-lg shadow-[#E8C65E]/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+        <div className="flex items-center gap-3 min-w-0">
+            <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-black' : 'text-slate-400 group-hover:text-[#E8C65E] transition-colors'}`} />
+            <span className="min-w-0 text-left">
+                <span className="block font-semibold leading-tight truncate">{label}</span>
+                {hint && <span className={`block text-[10.5px] leading-tight truncate ${active ? 'text-black/70' : 'text-slate-400 dark:text-slate-500'}`}>{hint}</span>}
+            </span>
         </div>
-        {count > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center inline-block shadow-sm">{count}</span>}
+        {count > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center inline-block shadow-sm shrink-0">{count}</span>}
     </button>
 );
 

@@ -360,7 +360,7 @@ export const IlusLogin = () => (
         </Pantalla>
         <Flecha x1={340} y1={120} x2={390} y2={120} />
         <Pantalla x={400} y={10} w={290} h={220} titulo="EL PANEL">
-            {['Dashboard', 'Inventario', 'Pedidos', 'Ventas', 'Asistente Lau', 'Guías'].map((it, i) => (
+            {['Inicio', 'Lau', 'Pedidos', 'Inventario', 'Ventas', 'Guías'].map((it, i) => (
                 <g key={it} transform={`translate(16 ${12 + i * 27})`}>
                     <rect width="120" height="22" rx="6" className={i === 5 ? '' : papelSuave} fill={i === 5 ? ORO : undefined} />
                     <text x="10" y="15" fontSize="10" fontWeight={i === 5 ? 900 : 600} fill={i === 5 ? '#111' : undefined} className={i === 5 ? '' : textoSuave}>{it}</text>

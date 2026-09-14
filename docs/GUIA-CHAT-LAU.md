@@ -34,7 +34,7 @@ Listo, no se toca más.
 
 ## Dónde está Lau
 
-- En el panel: menú de la izquierda → **Asistente Lau**.
+- En el panel: menú de la izquierda → **Lau**.
 - Navegando la tienda como admin: el botón dorado flotante **abajo a la
   izquierda**. Las clientas no lo ven.
 
