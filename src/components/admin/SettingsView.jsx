@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Lock, Settings, Mail, Bot, AlertTriangle, Send, Bell, CreditCard, Truck, Activity, Calculator, Image as ImageIcon, MessageSquare, Save, Eye, EyeOff, RefreshCw, Download, Upload, Phone, BarChart3 } from 'lucide-react';
+import { Lock, Settings, Mail, Bot, AlertTriangle, Send, Bell, CreditCard, Truck, Activity, Calculator, Image as ImageIcon, MessageSquare, Save, Eye, EyeOff, RefreshCw, Download, Upload, Phone, BarChart3, Instagram } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useConfirm } from '../ui/ConfirmDialog';
 import { SalesConfig } from './SalesConfig';
@@ -28,6 +28,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
     const [isTestingKey, setIsTestingKey] = useState(false);
     const [tgTestMsg, setTgTestMsg] = useState('');
     const [isSendingTg, setIsSendingTg] = useState(false);
+    const [probandoIg, setProbandoIg] = useState(false);
     const [pushTitle, setPushTitle] = useState('');
     const [pushBody, setPushBody] = useState('');
     const [pushUrl, setPushUrl] = useState('/shop');
@@ -74,6 +75,17 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
             addToast('Mensaje enviado al canal', 'success'); setTgTestMsg('');
         } catch (err) { addToast(err.message || 'Error al enviar', 'error'); }
         finally { setIsSendingTg(false); }
+    };
+
+    const handleProbarInstagram = async () => {
+        setProbandoIg(true);
+        try {
+            const { probarInstagram } = await import('../../utils/instagram');
+            const r = await probarInstagram(siteConfig);
+            await updateSiteConfig({ instagram: { ...(siteConfig?.instagram || {}), conectado: { username: r.username, fecha: new Date().toISOString() } } });
+            addToast(`Instagram conectado: @${r.username}`, 'success');
+        } catch (err) { addToast(err.message || 'No se pudo conectar con Instagram', 'error'); }
+        finally { setProbandoIg(false); }
     };
 
     const handleTestKey = async () => {
@@ -284,6 +296,30 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                 <div className="flex gap-2">
                                     <input type="text" value={tgTestMsg} onChange={(e) => setTgTestMsg(e.target.value)} placeholder="🎉 20% OFF — sólo hoy" className={inputCls + ' flex-1'} />
                                     <Button onClick={handleTestTelegram} isLoading={isSendingTg} className="bg-sky-600 hover:bg-sky-700 text-white text-xs px-6 py-2.5 rounded-lg">Publicar</Button>
+                                </div>
+                            </div>
+
+                            <div className={cardCls + ' border-l-4 border-l-pink-500'}>
+                                <h3 className="font-bold mb-1 flex items-center gap-2 text-slate-800 dark:text-white"><Instagram className="w-5 h-5 text-pink-500" /> Instagram (publicar desde el panel y con Lau)</h3>
+                                <p className="text-[11px] text-slate-400 mb-4">Lau publica la foto de un producto con texto en tu cuenta ("publicá el jean en Instagram"). Hace falta una cuenta profesional y una llave de Meta: el trámite está en <strong>Guías → Publicar en Instagram con Lau</strong>.</p>
+                                <div className="bg-pink-50 dark:bg-pink-900/10 p-4 rounded-xl border border-pink-100 dark:border-pink-900/30 mb-4 text-xs text-pink-800 dark:text-pink-300 space-y-1">
+                                    <p><strong>En Vercel:</strong> <code>INSTAGRAM_ACCESS_TOKEN</code> (la llave) y opcionalmente <code>INSTAGRAM_ADMIN_SECRET</code>. Redeploy. La llave vence a los 60 días y el servidor la renueva solo.</p>
+                                    {siteConfig?.instagram?.conectado?.username && (
+                                        <p className="text-emerald-700 dark:text-emerald-300 font-bold">✓ Conectado como @{siteConfig.instagram.conectado.username} · probado el {new Date(siteConfig.instagram.conectado.fecha).toLocaleDateString('es-AR')}</p>
+                                    )}
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-4 items-end">
+                                    <div>
+                                        <label className={labelCls}>Admin Secret (opcional)</label>
+                                        <div className="flex gap-2">
+                                            <input type="password" defaultValue={siteConfig?.instagram?.secret || ''} className={inputCls + ' flex-1'} id="igSecretInput" placeholder="••••••" />
+                                            <Button onClick={() => { updateSiteConfig({ instagram: { ...(siteConfig?.instagram || {}), secret: document.getElementById('igSecretInput').value } }); addToast('Secret guardado', 'success'); }} className="bg-slate-800 text-white text-xs px-4 rounded-lg">Guardar</Button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={labelCls}>Probar la conexión (no publica nada)</label>
+                                        <Button onClick={handleProbarInstagram} isLoading={probandoIg} className="bg-pink-600 hover:bg-pink-700 text-white text-xs px-6 py-2.5 rounded-lg w-full md:w-auto">Probar conexión</Button>
+                                    </div>
                                 </div>
                             </div>
 

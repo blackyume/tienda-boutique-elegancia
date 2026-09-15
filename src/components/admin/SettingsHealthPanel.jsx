@@ -34,6 +34,7 @@ export const SettingsHealthPanel = ({ onJump }) => {
         { id: 'mail', ok: Boolean(siteConfig?.emailjs?.serviceId && siteConfig?.emailjs?.templateId && siteConfig?.emailjs?.publicKey), label: 'EmailJS (recibos)', okHint: 'Envío de correos OK', badHint: 'Faltan credenciales — sin esto no se envían recibos', goto: 'notificaciones' },
         { id: 'push', ok: Boolean(siteConfig?.push?.vapidKey && siteConfig?.push?.adminSecret), label: 'Notificaciones Push (FCM)', okHint: 'Push web activo', badHint: 'Falta VAPID key o admin secret', goto: 'notificaciones' },
         { id: 'tg',   ok: Boolean(siteConfig?.telegram?.secret), label: 'Telegram (opcional)', okHint: 'Secret configurado', badHint: 'Opcional. Si lo usás en Vercel pegá el secret', goto: 'notificaciones' },
+        { id: 'ig',   ok: Boolean(siteConfig?.instagram?.conectado?.username), label: 'Instagram (publicar con Lau)', okHint: `Conectado como @${siteConfig?.instagram?.conectado?.username}`, badHint: 'Opcional. Trámite en Guías → Publicar en Instagram con Lau', goto: 'notificaciones' },
         { id: 'wa',   ok: Boolean(siteConfig?.whatsappNumber), label: 'WhatsApp Business', okHint: `Número ${siteConfig?.whatsappNumber}`, badHint: 'Falta número — el botón de WA no funcionará', goto: 'marca' },
         { id: 'ga',   ok: Boolean(siteConfig?.gaMeasurementId), label: 'Google Analytics 4', okHint: `ID ${siteConfig?.gaMeasurementId}`, badHint: 'Sin medición de tráfico web', goto: 'marca' },
     ];

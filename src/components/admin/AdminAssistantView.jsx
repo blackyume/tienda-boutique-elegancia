@@ -12,6 +12,7 @@ import { aplicarPlanDeProductos, resumirPlanDeProductos } from '../../utils/apli
 import { responderDirecto, avisoNuevaVenta, avisoCambiosDeStock, fotoDeStock, ventasDesde, nombreCliente } from '../../utils/lauDirecto';
 import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, precioSugerido, explicarPrecio, avisoMargenBajo, fotoDeCostos, interpretarConfigPrecios, aplicarConfigPrecios, describirConfigPrecios } from '../../utils/comision';
 import { candidatosLiquidacion, configLiquidacion, resumirLiquidacion, esPedidoDeLiquidacion, descuentoPedido } from '../../utils/liquidacion';
+import { captionDeProducto, fotoDeProducto, publicarEnInstagram } from '../../utils/instagram';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
@@ -203,6 +204,7 @@ const actionLabel = (a) => {
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
         case 'toggle_maintenance': return `Mantenimiento → ${A.on ? 'ACTIVAR' : 'desactivar'}`;
+        case 'post_instagram': return `Publicar en Instagram: ${A.productId}${A.caption ? ` — «${String(A.caption).slice(0, 80)}${String(A.caption).length > 80 ? '…' : ''}»` : ' (texto armado por Lau: nombre, precio y hashtags)'}`;
         case 'import_sales': return `Registrar venta de ${A.cliente}: ${A.prendas} prenda${A.prendas === 1 ? '' : 's'} por $${Number(A.total || 0).toLocaleString('es-AR')} (${A.canal}, ${A.fecha})`;
         case 'set_pricing': return `Configurar precios: ${A.detalle}`;
         case 'liquidar': return `Liquidar ${A.n} producto${A.n === 1 ? '' : 's'} (−${A.descuento}%, nunca bajo el costo): ${A.nombres}`;
@@ -843,6 +845,14 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 if (!Object.keys(cfg).length) return 'No había cambios para la home.';
                 await updateSiteConfig(cfg);
                 return `Home actualizada (${Object.keys(cfg).join(', ')}).`;
+            }
+            case 'post_instagram': {
+                const p = findProduct(A.productId); if (!p) return 'No encontré ese producto.';
+                const imageUrl = fotoDeProducto(p);
+                if (!imageUrl) return `"${p.name}" no tiene foto: Instagram no acepta publicaciones sin foto. Cargale una primero.`;
+                const caption = captionDeProducto(p, { extra: A.caption });
+                const r = await publicarEnInstagram({ caption, imageUrl }, siteConfig);
+                return `Publicado en Instagram${r.username ? ` (@${r.username})` : ''}${r.permalink ? `: ${r.permalink}` : '.'}`;
             }
             case 'toggle_maintenance': {
                 const want = Boolean(A.on);

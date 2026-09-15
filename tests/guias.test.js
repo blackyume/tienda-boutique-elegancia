@@ -12,8 +12,8 @@ import { TARIFAS_DE_LA_CASA } from '../src/utils/envios';
 const render = (g) => renderToStaticMarkup(React.createElement(g.Contenido, { abrir: () => { } }));
 
 describe('guías del panel', () => {
-    it('hay nueve y los ids no se repiten', () => {
-        expect(GUIAS.length).toBe(9);
+    it('hay diez y los ids no se repiten', () => {
+        expect(GUIAS.length).toBe(10);
         expect(new Set(GUIAS.map(g => g.id)).size).toBe(GUIAS.length);
     });
 

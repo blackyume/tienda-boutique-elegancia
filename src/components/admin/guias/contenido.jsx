@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key -- las celdas y los items van como datos en arrays; Tabla y Lista les ponen key al renderizar */
 import React from 'react';
-import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket, Receipt } from 'lucide-react';
+import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket, Receipt, Instagram } from 'lucide-react';
 import { Seccion, P, K, Cod, Ruta, Pasos, Paso, Lista, Aviso, Tabla, Mensaje, Botones, Figura, Link, Resumen, Numero, Numeros, BienMal, Quien } from './bloques';
 import {
     IlusNombresFotos, IlusExcel, IlusImportar, IlusRetiroCosto,
@@ -10,6 +10,7 @@ import {
     IlusCaminoEnvio, IlusPedidoPanel, IlusMiCorreoNuevoEnvio, IlusPaquete, IlusMarcarEnviado, IlusDiasRetiro,
     IlusDomicilioSucursal, IlusQuienPaga, IlusCheckoutEnvio, IlusCambiarTarifa, IlusLogin, IlusLlaveViaje,
     IlusInterruptor, IlusPruebaCompra, IlusCostoAPrecio, IlusClip,
+    IlusCaminoInstagram, IlusCuentaProfesional, IlusLlaveMeta, IlusPostInstagram,
 } from './ilustracionesMas';
 import { TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../../../utils/envios';
 
@@ -318,6 +319,7 @@ const Lau = ({ abrir }) => (
                 <><strong>Gastos:</strong> “gasté 20000 en packaging” → lo resta de la ganancia.</>,
                 <><strong>Ofertas:</strong> “poné 15% off en camperas el finde”, “quitá la oferta del jean”.</>,
                 <><strong>Resumen:</strong> “cómo va el negocio”, “qué repongo”.</>,
+                <><strong>Instagram:</strong> “publicá el jean oxford en instagram” → sale con foto, precio y hashtags. Antes hay un trámite de 30 minutos en Meta → <Ir abrir={abrir} a="instagram">guía</Ir>.</>,
             ]} />
             <P>Todo lo que cambia algo en la tienda <strong>te pide confirmación</strong> antes. Y no borra en masa: si le decís “borrá todo”, te pide confirmar uno por uno. También es a propósito.</P>
         </Seccion>
@@ -809,6 +811,149 @@ const Abrir = ({ abrir }) => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Índice
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// 10. Publicar en Instagram con Lau
+// ─────────────────────────────────────────────────────────────────────────────
+const InstagramGuia = () => (
+    <>
+        <Resumen pasos={[
+            { icono: '📱', titulo: 'Cuenta profesional', detalle: 'en la app, 2 minutos' },
+            { icono: '🧑‍💻', titulo: 'Una app en Meta', detalle: 'developers.facebook.com' },
+            { icono: '🔑', titulo: 'Generar la llave', detalle: 'y copiarla' },
+            { icono: '☁️', titulo: 'Pegarla en Vercel', detalle: 'y Redeploy' },
+            { icono: '💬', titulo: 'Decirle a Lau', detalle: '"publicá el jean en insta"' },
+        ]} />
+
+        <Seccion id="que" titulo="Qué hace y qué no">
+            <P>Con esto Lau <strong>publica en tu Instagram</strong>: le decís qué producto y, si querés, con qué texto; ella te muestra la foto y el texto, confirmás, y aparece en tu cuenta. También hay un botón rosa <K>Publicar en Instagram</K> en cada fila de <Ruta pasos={['Inventario']} />.</P>
+            <Figura titulo="Vos hacés dos cosas: pedirlo y confirmar. El resto se hace solo.">
+                <IlusCaminoInstagram />
+            </Figura>
+            <BienMal
+                bien={[
+                    'Una foto en el feed con texto: el producto, el precio, los talles y hashtags.',
+                    'El texto que vos le dictes, tal cual lo escribiste.',
+                    'Publicar desde el celular, hablándole a Lau.',
+                ]}
+                mal={[
+                    'Historias, reels ni carruseles de varias fotos (Instagram no lo deja desde acá, por ahora).',
+                    'Responder mensajes ni comentarios.',
+                    'Publicar sola sin que confirmes: siempre te pregunta.',
+                ]}
+            />
+            <Aviso tipo="dato" titulo="Esto no hace falta para vender">
+                La tienda funciona igual sin Instagram conectado. Y los <strong>links de tus redes</strong> que se ven en la tienda (el ícono de Instagram del pie, "Escribinos") se cambian en <Ruta pasos={['Diseño de la tienda', 'Redes']} />, sin ningún trámite.
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="antes" titulo="Por qué hay un trámite">
+            <P>Instagram sólo deja que un programa publique en una cuenta si <strong>la dueña lo autoriza con una llave</strong>. Esa llave la da Meta (la empresa de Instagram y Facebook) desde su sitio para programadores. Es gratis, es una sola vez, y tarda <strong>30 a 40 minutos</strong>. Como lo de MiCorreo: un rato de registro y después no se toca más.</P>
+            <Tabla
+                cabecera={['Qué tener a mano', 'Para qué']}
+                filas={[
+                    [<strong>El usuario y la contraseña de tu Instagram</strong>, 'Para pasar la cuenta a profesional y para autorizar la llave.'],
+                    [<strong>Una cuenta de Facebook</strong>, 'Para entrar al sitio de programadores de Meta. Sirve la tuya personal; no se publica nada ahí.'],
+                    [<strong>Tu teléfono</strong>, 'Meta manda un código por SMS la primera vez.'],
+                    [<strong>La cuenta de Vercel de la tienda</strong>, 'Ahí se pega la llave, como con Zipnova.'],
+                ]}
+            />
+        </Seccion>
+
+        <Seccion id="profesional" titulo="Paso 1 — Pasar tu Instagram a cuenta profesional">
+            <P>Es un interruptor dentro de la app de Instagram. <strong>Gratis y sin cambiar nada</strong> de lo que ya tenés.</P>
+            <Figura titulo="Configuración → Tipo de cuenta y herramientas → Cambiar a cuenta profesional → Empresa.">
+                <IlusCuentaProfesional />
+            </Figura>
+            <Pasos>
+                <Paso>En la app de Instagram, en tu perfil, tocá las <K>☰</K> de arriba a la derecha → <K>Configuración y actividad</K>.</Paso>
+                <Paso>Bajá hasta <K>Tipo de cuenta y herramientas</K> → <K>Cambiar a cuenta profesional</K>.</Paso>
+                <Paso>Elegí <strong>Empresa</strong> y la categoría <strong>Tienda de ropa</strong>. Si pregunta por conectar con Facebook, podés <strong>Omitir</strong>: no hace falta.</Paso>
+            </Pasos>
+            <Aviso tipo="tip">Si tu cuenta ya dice "Empresa" o "Creador" debajo del nombre en el perfil, este paso ya está.</Aviso>
+        </Seccion>
+
+        <Seccion id="meta" titulo="Paso 2 — Crear la app en Meta for Developers">
+            <P>"App" suena a mucho, pero es sólo un <strong>permiso con nombre</strong>: le decís a Meta "la tienda va a publicar en mi cuenta". Se hace desde la computadora.</P>
+            <Pasos>
+                <Paso>Entrá a <Link href="https://developers.facebook.com">developers.facebook.com</Link> → <K>Empezar</K> (o "Get started") → iniciá sesión con tu Facebook. Aceptá los términos y verificá el teléfono con el código que te manda.</Paso>
+                <Paso><Ruta pasos={['Mis apps', 'Crear app']} />. Si pregunta por el caso de uso, elegí el de <strong>Instagram</strong> (puede decir "Gestionar todo en Instagram" o "Crear una app con la API de Instagram"). Si en cambio pide tipo, elegí <strong>Empresa</strong> (Business).</Paso>
+                <Paso>Nombre de la app: <Cod>La Boutique Lau</Cod>. Email: el de la tienda. <K>Crear app</K>.</Paso>
+                <Paso>En el menú de la izquierda de la app, buscá <strong>Instagram</strong> (si no está, <K>Agregar producto</K> → Instagram → <K>Configurar</K>).</Paso>
+            </Pasos>
+            <Aviso tipo="ojo">
+                Meta cambia los nombres de los botones seguido. Si algo no dice exactamente lo de acá, buscá la palabra <strong>Instagram</strong> y la palabra <strong>token</strong>: ese es el camino.
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="llave" titulo="Paso 3 — Generar la llave (lo más importante)">
+            <Figura titulo="En Instagram → 'Configuración de la API con inicio de sesión de Instagram' → Generar token. La llave se copia y va a Vercel.">
+                <IlusLlaveMeta />
+            </Figura>
+            <Pasos>
+                <Paso>Dentro de <strong>Instagram</strong> en tu app, entrá a <K>Configuración de la API con inicio de sesión de Instagram</K> ("API setup with Instagram business login").</Paso>
+                <Paso>En <strong>1. Generar tokens de acceso</strong>, tocá <K>Agregar cuenta</K> e iniciá sesión con <strong>tu Instagram</strong> (el de la tienda). Aceptá los permisos que pide: son para leer tu perfil y publicar.</Paso>
+                <Paso>Al lado de tu cuenta aparece <K>Generar token</K>. Tocalo. Te vuelve a pedir la contraseña de Instagram y te muestra una tira larga de letras que empieza con <Cod>IGAA…</Cod>.</Paso>
+                <Paso><K>Copiar</K>. <strong>Se muestra una sola vez.</strong> Si la perdés, se genera otra y listo, pero no la dejes en ningún lado a la vista.</Paso>
+            </Pasos>
+            <Aviso tipo="ojo" titulo="La llave es la contraseña de tu Instagram">
+                Con ella cualquiera puede publicar en tu cuenta. No la mandes por WhatsApp, no la pegues en un chat (tampoco en el de Lau), no la guardes en una nota del celular. <strong>Sólo en Vercel</strong>, Paso 4.
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="vercel" titulo="Paso 4 — Pegarla en Vercel y probar">
+            <Pasos>
+                <Paso>Entrá a <Link href="https://vercel.com">vercel.com</Link> con la cuenta del proyecto <em>tienda-boutique-elegancia</em>.</Paso>
+                <Paso><Ruta pasos={['Settings', 'Environment Variables', 'Add']} />: Key <Cod>INSTAGRAM_ACCESS_TOKEN</Cod>, Value: la llave. <K>Save</K>.</Paso>
+                <Paso><strong>Redeploy</strong>: <Ruta pasos={['Deployments', '⋯ del último', 'Redeploy']} />. Sin esto la llave no se aplica. Tarda un minuto.</Paso>
+                <Paso>En el panel: <Ruta pasos={['Configuración', 'Notificaciones', 'Instagram']} /> → <K>Probar conexión</K>. Si dice <strong>"Conectado como @tu_cuenta"</strong>, listo. No publica nada: sólo saluda.</Paso>
+            </Pasos>
+            <Aviso tipo="dato" titulo="La llave vence a los 60 días, pero la tienda la renueva sola">
+                Meta da llaves que duran 60 días. El servidor de la tienda la renueva todas las semanas antes de que venza, así que <strong>no tenés que volver a hacer esto</strong>. Sólo si un día Lau te dice "la llave de Instagram venció", repetís el Paso 3 y el Paso 4.
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="usar" titulo="Paso 5 — Usarlo con Lau">
+            <Figura titulo="Así queda la publicación. Con la foto principal del producto y el texto que arma Lau (o el tuyo).">
+                <IlusPostInstagram />
+            </Figura>
+            <Mensaje de="vos">publicá el jean oxford en instagram</Mensaje>
+            <Mensaje de="lau">{'Publicar en Instagram: Jean Oxford Tiro Alto (texto armado por Lau: nombre, precio y hashtags). ¿Confirmás?'}</Mensaje>
+            <Botones opciones={['Confirmar', 'Cancelar']} />
+            <Mensaje de="lau">{'Publicado en Instagram (@laboutiquedelaelegancia): instagram.com/p/…'}</Mensaje>
+            <P>Con tu propio texto:</P>
+            <Mensaje de="vos">subí el vestido negro a insta con este texto: Llegó el vestido que estabas esperando 🖤 Ideal para la noche. Consultá talles por mensaje.</Mensaje>
+            <P>Lau usa <strong>ese texto tal cual</strong> y abajo agrega el precio, la dirección de la tienda y los hashtags.</P>
+            <Tabla
+                cabecera={['Frase', 'Qué pasa']}
+                filas={[
+                    ['"publicá X en instagram" / "subilo a insta" / "postealo"', 'Publica la foto principal de X con nombre, descripción, precio, talles y hashtags.'],
+                    ['"... con este texto: ..."', 'Usa tu texto en vez del que arma ella.'],
+                    ['Botón rosa en Inventario', 'Lo mismo, sin escribir: te pregunta y publica.'],
+                ]}
+            />
+            <Aviso tipo="tip" titulo="Poné el link de la tienda en tu bio">
+                Instagram no deja links en el texto de las publicaciones. Por eso dice "link en la bio". Una sola vez: en tu perfil → <K>Editar perfil</K> → <K>Enlaces</K> → pegá <Cod>la-boutique-de-la-elegancia.web.app</Cod>.
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="trabas" titulo="Si te trabás">
+            <Tabla
+                cabecera={['Pasa esto', 'Hacé esto']}
+                filas={[
+                    ['Lau dice "Instagram no está conectado todavía"', 'Falta la llave en Vercel o el Redeploy. Paso 4.'],
+                    ['Lau dice "la llave venció o no sirve"', 'Generá otra (Paso 3) y pegala en Vercel (Paso 4). Pasa si cambiaste la contraseña de Instagram.'],
+                    ['"Probar conexión" da error de permisos', 'Al generar la llave no aceptaste todos los permisos. Generá otra y aceptá todo.'],
+                    ['"Instagram rechazó la foto"', 'La foto del producto no se pudo convertir. Probá con otra foto principal desde el editor del producto.'],
+                    ['"Se publicó demasiado seguido"', 'Instagram deja 25 por día desde acá. Esperá a mañana.'],
+                    ['El producto no tiene foto', 'Instagram no acepta publicaciones sin foto. Cargale una y volvé a pedirlo.'],
+                    ['No encuentro el botón en Meta', 'Buscá "Instagram" en el menú de la app y después la palabra "token". Los nombres cambian, el camino no.'],
+                ]}
+            />
+            <P className="text-xs">Fuentes: <Link href="https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login">API de Instagram con inicio de sesión de Instagram</Link> · <Link href="https://developers.facebook.com/docs/instagram-platform/content-publishing">publicación de contenido</Link> (límite de 25 por día, JPEG, proporción 4:5 a 1.91:1).</P>
+        </Seccion>
+    </>
+);
+
 export const GUIAS = [
     {
         id: 'empezar', titulo: 'Entrar al panel y moverse', icono: LogIn, duracion: '3 min', para: 'Los dos',
@@ -872,6 +1017,13 @@ export const GUIAS = [
         palabras: ['abrir', 'mantenimiento', 'compra de prueba', 'mercado pago', 'checklist', 'dashboard', 'dia a dia', 'interruptor'],
         secciones: [['estado', 'Qué está listo'], ['antes', 'Antes de abrir'], ['prueba', 'Compra de prueba'], ['abrir', 'Apagar mantenimiento'], ['dia-a-dia', 'El día a día']],
         Contenido: Abrir,
+    },
+    {
+        id: 'instagram', titulo: 'Publicar en Instagram con Lau', icono: Instagram, duracion: '8 min', para: 'Dueño',
+        resumen: 'Un trámite de 30 minutos en Meta, una sola vez, y después le decís a Lau "publicá el jean en Instagram" y sale con foto, precio y hashtags.',
+        palabras: ['instagram', 'insta', 'redes', 'publicar', 'postear', 'meta', 'token', 'llave', 'cuenta profesional', 'facebook', 'developers', 'vercel', 'hashtags', 'bio'],
+        secciones: [['que', 'Qué hace'], ['antes', 'Por qué hay un trámite'], ['profesional', '1. Cuenta profesional'], ['meta', '2. La app en Meta'], ['llave', '3. La llave'], ['vercel', '4. Vercel y probar'], ['usar', '5. Usarlo con Lau'], ['trabas', 'Si te trabás']],
+        Contenido: InstagramGuia,
     },
 ];
 

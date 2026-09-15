@@ -493,3 +493,164 @@ export const IlusClip = () => (
         ))}
     </Svg>
 );
+
+// --- Instagram -----------------------------------------------------------------
+
+/** Marco de un celular: pantalla angosta con muesca arriba. */
+const Celular = ({ x, y, w = 170, h = 300, children }) => (
+    <g transform={`translate(${x} ${y})`}>
+        <rect width={w} height={h} rx="22" className="fill-slate-800 dark:fill-slate-200" />
+        <rect x="6" y="6" width={w - 12} height={h - 12} rx="18" className={papel} />
+        <rect x={w / 2 - 22} y="6" width="44" height="12" rx="6" className="fill-slate-800 dark:fill-slate-200" />
+        <g transform="translate(6 24)">{children}</g>
+    </g>
+);
+
+/** El camino de una publicación: de la frase a Lau al post en Instagram. */
+export const IlusCaminoInstagram = () => {
+    const pasos = [
+        ['💬', 'Le decís a Lau', '"publicá el jean"', 'vos'],
+        ['👀', 'Lau te muestra', 'foto y texto', 'solo'],
+        ['✅', 'Confirmás', 'un toque', 'vos'],
+        ['☁️', 'El servidor', 'se lo manda a Meta', 'solo'],
+        ['📸', 'Aparece', 'en tu Instagram', 'solo'],
+    ];
+    const w = 118, sep = 138;
+    return (
+        <Svg alto={175} label="Cómo llega una publicación a Instagram: dos toques tuyos, el resto se hace solo">
+            {pasos.map(([e, a, b, q], i) => {
+                const x = 14 + i * sep;
+                return (
+                    <g key={i} transform={`translate(${x} 16)`}>
+                        <rect width={w} height="122" rx="14" className={q === 'vos' ? 'fill-[#E8C65E]/15' : 'fill-emerald-500/10'} />
+                        <rect width={w} height="122" rx="14" fill="none" stroke={q === 'vos' ? ORO : VERDE} strokeWidth="1.4" />
+                        <circle cx="14" cy="14" r="10" fill={ORO} />
+                        <text x="14" y="18" textAnchor="middle" fontSize="11" fontWeight="900" fill="#111">{i + 1}</text>
+                        <Emoji x={w / 2} y={60} size={30}>{e}</Emoji>
+                        <text x={w / 2} y="82" textAnchor="middle" fontSize="11" fontWeight="800" className={texto}>{a}</text>
+                        <text x={w / 2} y="96" textAnchor="middle" fontSize="10" className={textoSuave}>{b}</text>
+                        <Quien x={w / 2} y={102} quien={q} />
+                        {i < pasos.length - 1 && <Flecha x1={w + 1} y1={60} x2={sep - 2} y2={60} />}
+                    </g>
+                );
+            })}
+            <g transform="translate(14 152)">
+                <rect width="14" height="14" rx="4" fill={ORO} /><text x="20" y="11" fontSize="10.5" className={texto}>Lo hacés vos: una frase y un toque</text>
+                <rect x="260" width="14" height="14" rx="4" fill={VERDE} /><text x="280" y="11" fontSize="10.5" className={texto}>Se hace solo</text>
+            </g>
+        </Svg>
+    );
+};
+
+/** Pasar la cuenta de Instagram a profesional, en el celular. */
+export const IlusCuentaProfesional = () => (
+    <Svg alto={290} label="En la app de Instagram: Configuración, Tipo de cuenta, Cambiar a cuenta profesional, Empresa">
+        <Celular x={40} y={10} w={180} h={270}>
+            <text x="84" y="16" textAnchor="middle" fontSize="9" fontWeight="800" letterSpacing="1" className={textoSuave}>CONFIGURACIÓN</text>
+            {['Tu actividad', 'Notificaciones', 'Tipo de cuenta y herramientas', 'Privacidad'].map((t, i) => (
+                <g key={t} transform={`translate(10 ${30 + i * 30})`}>
+                    <rect width="148" height="24" rx="6" className={papelSuave} />
+                    {i === 2 && <rect x="-3" y="-3" width="154" height="30" rx="8" fill="none" stroke={ROJO} strokeWidth="2.5" strokeDasharray="6 4" />}
+                    <text x="8" y="16" fontSize={i === 2 ? 8.5 : 9.5} fontWeight={i === 2 ? 800 : 500} className={texto}>{t}</text>
+                    <text x="140" y="16" fontSize="10" className={textoSuave}>›</text>
+                </g>
+            ))}
+            <text x="84" y="175" textAnchor="middle" fontSize="8.5" className={textoSuave}>1° tocá acá</text>
+        </Celular>
+        <Flecha x1={230} y1={145} x2={280} y2={145} />
+        <Celular x={290} y={10} w={180} h={270}>
+            <text x="84" y="16" textAnchor="middle" fontSize="8" fontWeight="800" letterSpacing="0.5" className={textoSuave}>TIPO DE CUENTA Y HERRAMIENTAS</text>
+            <g transform="translate(10 30)">
+                <rect width="148" height="24" rx="6" className={papelSuave} />
+                <text x="8" y="16" fontSize="8.5" fontWeight="800" className={texto}>Cambiar a cuenta profesional</text>
+                <rect x="-3" y="-3" width="154" height="30" rx="8" fill="none" stroke={ROJO} strokeWidth="2.5" strokeDasharray="6 4" />
+            </g>
+            <text x="84" y="80" textAnchor="middle" fontSize="8.5" className={textoSuave}>2° tocá acá</text>
+            <text x="84" y="118" textAnchor="middle" fontSize="9" fontWeight="800" className={texto}>¿Qué tipo?</text>
+            <Boton x={14} y={128} w={140} h={26} tipo="oro" fontSize={10.5} resaltar>Empresa</Boton>
+            <Boton x={14} y={168} w={140} h={26} tipo="borde" fontSize={10.5}>Creador</Boton>
+            <text x="84" y="220" textAnchor="middle" fontSize="8.5" className={textoSuave}>3° elegí Empresa</text>
+            <text x="84" y="234" textAnchor="middle" fontSize="8.5" className={textoSuave}>y la categoría "Tienda de ropa"</text>
+        </Celular>
+        <g transform="translate(490 60)">
+            <rect width="215" height="150" rx="14" className="fill-emerald-500/10" />
+            <rect width="215" height="150" rx="14" fill="none" stroke={VERDE} strokeWidth="1.4" />
+            <text x="14" y="26" fontSize="11" fontWeight="900" fill="#059669">Es gratis y no cambia nada</text>
+            <text x="14" y="50" fontSize="10" className={texto}>• Tus fotos y seguidoras quedan igual.</text>
+            <text x="14" y="70" fontSize="10" className={texto}>• Se agrega un botón de contacto.</text>
+            <text x="14" y="90" fontSize="10" className={texto}>• Ves estadísticas de cada publicación.</text>
+            <text x="14" y="110" fontSize="10" className={texto}>• Se puede volver atrás cuando quieras.</text>
+            <text x="14" y="135" fontSize="9.5" fontWeight="800" className={textoSuave}>Tarda 2 minutos.</text>
+        </g>
+    </Svg>
+);
+
+/** Sacar la llave en Meta for Developers y pegarla en Vercel. */
+export const IlusLlaveMeta = () => (
+    <Svg alto={250} label="Generar la llave en Meta for Developers, copiarla y pegarla en Vercel como INSTAGRAM_ACCESS_TOKEN">
+        <Pantalla x={14} y={10} w={330} h={215} titulo="META → TU APP → INSTAGRAM">
+            <text x="20" y="18" fontSize="10" fontWeight="800" className={texto}>Configuración de la API con inicio de sesión de Instagram</text>
+            <text x="20" y="36" fontSize="9.5" className={textoSuave}>1. Generar tokens de acceso</text>
+            <rect x="20" y="46" width="290" height="30" rx="8" className={papelSuave} />
+            <Emoji x={38} y={68} size={14}>📸</Emoji>
+            <text x="52" y="66" fontSize="10" className={texto}>@laboutiquedelaelegancia</text>
+            <Boton x={200} y={50} w={104} h={22} tipo="oro" fontSize={9.5} resaltar>Generar token</Boton>
+            <rect x="20" y="92" width="290" height="34" rx="8" className={papelSuave} />
+            <text x="32" y="114" fontSize="10.5" style={mono} className={texto}>IGAAR7•••••••••••••••••••••••••</text>
+            <Boton x={20} y={138} w={80} h={24} tipo="borde" fontSize={10}>Copiar</Boton>
+            <text x="110" y="154" fontSize="9" className={textoSuave}>Se muestra UNA vez: copiala ahora.</text>
+        </Pantalla>
+        <Flecha x1={354} y1={115} x2={396} y2={115} />
+        <text x="375" y="102" textAnchor="middle" fontSize="9.5" fontWeight="800" className={textoSuave}>pegar</text>
+        <Pantalla x={406} y={10} w={300} h={215} titulo="VERCEL → SETTINGS → ENVIRONMENT VARIABLES">
+            <Campo x={20} y={14} w={260} etiqueta="KEY" valor="INSTAGRAM_ACCESS_TOKEN" />
+            <Campo x={20} y={58} w={260} etiqueta="VALUE" valor="IGAAR7•••••••••••••••••" />
+            <Boton x={20} y={104} w={80} h={26} tipo="oro" fontSize={10.5} resaltar>Save</Boton>
+            <text x="20" y="152" fontSize="9.5" fontWeight="800" className={texto}>Después: Deployments → ⋯ → Redeploy</text>
+            <text x="20" y="168" fontSize="9" className={textoSuave}>Sin el redeploy la llave no se aplica.</text>
+        </Pantalla>
+        <text x="14" y="244" fontSize="11" className="fill-red-500" fontWeight="700">La llave es la contraseña de tu Instagram: no la mandes por WhatsApp ni la pegues en un chat. Sólo en Vercel.</text>
+    </Svg>
+);
+
+/** Cómo queda la publicación que arma Lau, vista en el celular. */
+export const IlusPostInstagram = () => {
+    const puntos = [
+        ['📷', 'La foto', 'Es la principal del producto. Instagram la quiere JPEG y 4:5:', 'la tienda la convierte sola.'],
+        ['✍️', 'El texto', 'Si le dictaste uno a Lau, va ese, tal cual. Si no, arma:', 'nombre, descripción, precio, talles y hashtags.'],
+        ['🔗', 'El link', 'Instagram no deja links en el texto. Por eso dice "link en la bio":', 'poné la dirección de la tienda en tu perfil, una sola vez.'],
+        ['🔢', 'El límite', 'Instagram acepta 25 publicaciones por día desde el panel.', 'Para una tienda, sobra.'],
+    ];
+    return (
+        <Svg alto={340} label="Lo que publica Lau: la foto principal del producto y un texto con nombre, precio, talles y hashtags">
+            <Celular x={30} y={10} w={190} h={320}>
+                <g transform="translate(10 4)">
+                    <circle cx="10" cy="10" r="9" fill={ORO} />
+                    <text x="26" y="14" fontSize="9" fontWeight="800" className={texto}>laboutiquedelaelegancia</text>
+                </g>
+                <rect x="0" y="28" width="178" height="150" className={papelSuave} />
+                <rect x="0" y="28" width="178" height="150" fill="none" className={linea} strokeWidth="1" />
+                <Emoji x={89} y={115} size={44}>👖</Emoji>
+                <text x="89" y="150" textAnchor="middle" fontSize="8.5" className={textoSuave}>la foto principal, recortada 4:5</text>
+                <text x="8" y="196" fontSize="10">♡  💬  ✈️</text>
+                <text x="8" y="216" fontSize="8.5" fontWeight="800" className={texto}>✨ Jean Oxford Tiro Alto</text>
+                <text x="8" y="230" fontSize="8" className={texto}>Denim rígido, cintura alta, pierna ancha.</text>
+                <text x="8" y="248" fontSize="8" className={texto}>💰 $45.900   📏 Talles: 36 · 38 · 40 · 42</text>
+                <text x="8" y="262" fontSize="8" className={texto}>🛍️ Comprá en la-boutique… (link en la bio)</text>
+                <text x="8" y="280" fontSize="8" fill="#2563eb">#LaBoutiqueDeLaElegancia #Rafaela #Jeans</text>
+            </Celular>
+            <g transform="translate(250 30)">
+                {puntos.map(([e, t, d1, d2], i) => (
+                    <g key={t} transform={`translate(0 ${i * 72})`}>
+                        <rect width="440" height="62" rx="12" className={papelSuave} />
+                        <rect width="440" height="62" rx="12" fill="none" className={linea} strokeWidth="1" />
+                        <Emoji x={30} y={40} size={24}>{e}</Emoji>
+                        <text x="58" y="24" fontSize="11" fontWeight="900" className={texto}>{t}</text>
+                        <text x="58" y="41" fontSize="9.5" className={texto}>{d1}</text>
+                        <text x="58" y="54" fontSize="9.5" className={texto}>{d2}</text>
+                    </g>
+                ))}
+            </g>
+        </Svg>
+    );
+};

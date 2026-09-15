@@ -50,6 +50,7 @@ export const TOOLS = [
     { name: 'reject_review', sensitive: true, desc: 'Rechazar/eliminar una reseña. args: {reviewId}' },
     { name: 'update_home', sensitive: true, desc: 'Editar contenido de la home. args: {hero?:{title?,subtitle?,buttonText?,buttonLink?}, announcement?:{text?,enabled?}, marquee?}' },
     { name: 'toggle_maintenance', sensitive: true, desc: 'Activar/desactivar modo mantenimiento. args: {on(bool)}' },
+    { name: 'post_instagram', sensitive: true, desc: 'PUBLICAR en la cuenta de Instagram de la tienda: la foto principal de un producto con un texto. args: {productId, caption?(el texto que el dueño dictó, tal cual; si no dijo ninguno dejalo vacío y el sistema arma uno con nombre, descripción, precio y hashtags)}. Usalo cuando digan "publicá X en Instagram", "subilo a insta", "postealo". Si Instagram no está conectado el sistema avisa cómo hacerlo.' },
 ];
 
 const SENSITIVE = new Set(TOOLS.filter(t => t.sensitive).map(t => t.name));
@@ -126,6 +127,7 @@ Reglas:
 - EDITAR UN PRODUCTO EXISTENTE: si el dueño dice "editá/cambiá el producto X" con uno o varios datos (precio, stock, nombre, colores, talles, categoría, descripción), usá edit_product con todos esos campos juntos. Para cambiar FOTOS, decile que toque el botón dorado de carga (el wizard).
 - RESUMEN Y CONSEJOS: si pide "resumen", "cómo va el negocio", "qué me conviene", "consejos", "qué repongo", usá business_summary (te da ventas, ganancia, lo más vendido y qué reponer/destacar) y después dale 2-3 consejos concretos en tus palabras.
 - PROGRAMAR OFERTAS: si dice "poné X% off [el finde/mañana/ahora]" o "programá una oferta", usá schedule_promotion (category o "all", discount, when). Confirmá la fecha que entendiste.
+- INSTAGRAM: si el dueño pide publicar/subir/postear un producto en Instagram ("publicá el jean en insta", "subilo a instagram con este texto: ..."), usá post_instagram con el productId y, si dictó un texto, pasalo en caption tal cual (no lo reescribas). No inventes el texto: si no dijo ninguno, dejá caption vacío y el sistema lo arma. Solo se publica la foto principal del producto.
 - HOME GUIADA (paso a paso con menús): si quiere "cambiar/mejorar la home", guialo con options: preguntá QUÉ parte tocar ["Título del hero","Anuncio de arriba","Cintilla","Destacar productos"]; pedí el texto nuevo; y aplicá con update_home (o feature_products/set_badges para destacar). Mostrá lo que va a quedar antes de confirmar. No podés tocar diseño/código, sí los textos y la curaduría.`;
 
 // transcript: [{role:'user'|'assistant'|'tool'|'system', content:string}]

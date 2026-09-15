@@ -112,3 +112,9 @@ uno. También es a propósito.
 - Si dice que falló "todos los modelos", puede ser la cuota gratis de Google
   del día. Esperá o activá facturación en AI Studio (es barato: centavos por
   producto).
+
+## Publicar en Instagram
+
+- `publicá el jean oxford en instagram` → Lau muestra qué va a publicar (foto principal + nombre, precio, talles y hashtags) y pide confirmación.
+- `subí el vestido negro a insta con este texto: ...` → usa tu texto tal cual y agrega abajo el precio y los hashtags.
+- Antes hay un trámite de una sola vez en Meta (cuenta profesional + llave): está en Admin → Guías → "Publicar en Instagram con Lau".

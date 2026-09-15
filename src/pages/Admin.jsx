@@ -11,7 +11,7 @@ import {
     Image as ImageIcon, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
     Check as CheckIcon, Lock, Settings, Blocks, Bot, Ticket, Building2,
-    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen, Mail, BookOpen
+    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen, Mail, BookOpen, Instagram as InstagramIcon
 } from 'lucide-react';
 import { StatusSelector } from '../components/admin/StatusSelector';
 import { usePagination, Pagination } from '../components/ui/Pagination';
@@ -297,6 +297,22 @@ export const Admin = () => {
             addToast(err.message || "Error al publicar", "error");
         } finally {
             setPublishingTgId(null);
+        }
+    };
+
+    const [publishingIgId, setPublishingIgId] = useState(null);
+    const handlePublishInstagram = async (product) => {
+        const { captionDeProducto, fotoDeProducto, publicarEnInstagram } = await import('../utils/instagram');
+        if (!fotoDeProducto(product)) return addToast('Este producto no tiene foto: Instagram no acepta publicaciones sin foto.', 'error');
+        if (!(await confirm({ title: 'Publicar en Instagram', message: `Se publicará la foto de "${product.name}" en la cuenta de Instagram de la tienda, con el nombre, el precio y los hashtags.`, confirmText: 'Publicar' }))) return;
+        setPublishingIgId(product.id);
+        try {
+            const r = await publicarEnInstagram({ caption: captionDeProducto(product), imageUrl: fotoDeProducto(product) }, siteConfig);
+            addToast(`Publicado en Instagram${r.username ? ` (@${r.username})` : ''}`, 'success');
+        } catch (err) {
+            addToast(err.message || 'Error al publicar en Instagram', 'error');
+        } finally {
+            setPublishingIgId(null);
         }
     };
 
@@ -743,6 +759,12 @@ export const Admin = () => {
                                                                     icon={SendIcon}
                                                                     color={`text-sky-500 hover:bg-sky-50 ${publishingTgId === p.id ? 'animate-pulse' : ''}`}
                                                                     title="Publicar en Telegram"
+                                                                />
+                                                                <ActionBtn
+                                                                    onClick={() => handlePublishInstagram(p)}
+                                                                    icon={InstagramIcon}
+                                                                    color={`text-pink-500 hover:bg-pink-50 ${publishingIgId === p.id ? 'animate-pulse' : ''}`}
+                                                                    title="Publicar en Instagram"
                                                                 />
                                                                 <ActionBtn onClick={() => { setCurrentProduct({ ...p, active: p.active !== false }); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar" />
                                                                 <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-red-500 hover:bg-red-50" title="Eliminar" />

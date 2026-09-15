@@ -8,6 +8,7 @@
 //   CRON_SECRET                — opcional. Si está, valida Authorization: Bearer <secret>
 const { getDb } = require('../_firebaseAdmin');
 const { safeEqual } = require('../_rateLimit');
+const { renovarLlave } = require('../_instagram');
 
 const MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 horas
 
@@ -50,7 +51,13 @@ module.exports = async (req, res) => {
         }
         if (batchCount > 0) await batch.commit();
 
-        return res.status(200).json({ ok: true, scanned: snap.size, expired, skipped });
+        // De paso, la llave de Instagram: vence cada 60 días y acá se renueva
+        // sola (Vercel gratis permite dos crons, así que va en este).
+        let instagram;
+        try { instagram = await renovarLlave(db); } catch (e) { instagram = { error: e.message }; }
+        if (instagram.error) console.error('[cron/cleanup-orders] instagram:', instagram.error);
+
+        return res.status(200).json({ ok: true, scanned: snap.size, expired, skipped, instagram });
     } catch (err) {
         console.error('[cron/cleanup-orders] error:', err);
         return res.status(500).json({ error: err.message });
