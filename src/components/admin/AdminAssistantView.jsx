@@ -13,6 +13,7 @@ import { responderDirecto, avisoNuevaVenta, avisoCambiosDeStock, fotoDeStock, ve
 import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, precioSugerido, explicarPrecio, avisoMargenBajo, fotoDeCostos, interpretarConfigPrecios, aplicarConfigPrecios, describirConfigPrecios } from '../../utils/comision';
 import { candidatosLiquidacion, configLiquidacion, resumirLiquidacion, esPedidoDeLiquidacion, descuentoPedido } from '../../utils/liquidacion';
 import { captionDeProducto, fotoDeProducto, publicarEnInstagram } from '../../utils/instagram';
+import { interpretarCambioDeFoto, patchDeFotos } from '../../utils/fotos';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
@@ -204,6 +205,7 @@ const actionLabel = (a) => {
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
         case 'toggle_maintenance': return `Mantenimiento → ${A.on ? 'ACTIVAR' : 'desactivar'}`;
+        case 'set_photo': return `${A.mode === 'add' || A.modo === 'agregar' ? 'Sumar' : 'Cambiar'} ${A.n === 1 || !A.n ? 'la foto' : `${A.n} fotos`} de "${A.nombre || A.productId}"${A.mode === 'add' || A.modo === 'agregar' ? ' (se agregan a la galería)' : ' (reemplaza las que tiene; la primera queda de portada)'}`;
         case 'post_instagram': return `Publicar en Instagram: ${A.productId}${A.caption ? ` — «${String(A.caption).slice(0, 80)}${String(A.caption).length > 80 ? '…' : ''}»` : ' (texto armado por Lau: nombre, precio y hashtags)'}`;
         case 'import_sales': return `Registrar venta de ${A.cliente}: ${A.prendas} prenda${A.prendas === 1 ? '' : 's'} por $${Number(A.total || 0).toLocaleString('es-AR')} (${A.canal}, ${A.fecha})`;
         case 'set_pricing': return `Configurar precios: ${A.detalle}`;
@@ -755,6 +757,15 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 });
                 return `Cupón ${code} creado.`;
             }
+            case 'set_photo': {
+                const p = findProduct(A.productId); if (!p) return 'No encontré ese producto.';
+                const urls = (Array.isArray(A.imageUrls) ? A.imageUrls : [A.imageUrl]).map(u => String(u || '').trim()).filter(Boolean);
+                const patch = patchDeFotos(p, urls, A.mode === 'add' ? 'agregar' : 'reemplazar');
+                if (!patch) return 'No hay ninguna foto subida para usar. Adjuntala con el clip.';
+                await updateProduct(p.id, patch);
+                pendingPhotosRef.current = pendingPhotosRef.current.filter(f => !urls.includes(f.url));
+                return `Foto${urls.length > 1 ? 's' : ''} de "${p.name}" ${A.mode === 'add' ? 'sumada' + (urls.length > 1 ? 's' : '') + ' a la galería' : 'cambiada' + (urls.length > 1 ? 's' : '')}. Ya se ve así en la tienda.`;
+            }
             case 'create_product': {
                 const visible = A.visible !== false;
                 // Soporta una sola foto (imageUrl) o varias del mismo producto (imageUrls -> galería)
@@ -1041,6 +1052,42 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         } catch (e) { push({ role: 'system', text: `No pude guardar: ${e?.message || e}` }); }
     };
 
+    // "Cambiá la foto del jean oxford" con una foto adjunta: se hace al toque,
+    // sin IA y sin pedir ningún otro dato. Se confirma antes de pisar la foto.
+    const cambiarFoto = async (text, { modo, nombre, productos }) => {
+        if (!productos.length) {
+            push({ role: 'user', text });
+            push({ role: 'ai', text: `No encontré ningún producto que se llame "${nombre || '…'}". La foto sigue adjunta: decime el nombre como figura en Inventario.` });
+            return;
+        }
+        if (productos.length > 1) {
+            push({ role: 'user', text });
+            push({ role: 'ai', text: `¿A cuál? La foto sigue adjunta: tocá el producto.`, options: productos.slice(0, 6).map(p => `${modo === 'agregar' ? 'Agregale la foto a' : 'Cambiá la foto de'} "${p.name}"`) });
+            return;
+        }
+        const p = productos[0];
+        const batch = files, batchPreviews = previews;
+        setFiles([]); setPreviews([]);
+        push({ role: 'user', text, img: batchPreviews[0] });
+        setLoading(true);
+        try {
+            setBusyMsg(batch.length > 1 ? `Subiendo ${batch.length} fotos…` : 'Subiendo la foto…');
+            const urls = [];
+            for (const f of batch) { const u = await uploadImage(f); if (u) urls.push(u); }
+            if (!urls.length) throw new Error('No se pudo subir la foto (revisá Cloudinary en Configuración).');
+            setBusyMsg('');
+            const ok = await askConfirm([{ tool: 'set_photo', args: { productId: p.id, nombre: p.name, n: urls.length, modo } }]);
+            if (!ok) { push({ role: 'system', text: 'Cancelado por vos. La foto del producto quedó como estaba.' }); return; }
+            await updateProduct(p.id, patchDeFotos(p, urls, modo));
+            push({ role: 'ai', text: modo === 'agregar'
+                ? `✅ Listo: ${urls.length === 1 ? 'la foto se sumó' : `las ${urls.length} fotos se sumaron`} a la galería de "${p.name}".`
+                : `✅ Listo: "${p.name}" ya tiene ${urls.length === 1 ? 'la foto nueva' : `las ${urls.length} fotos nuevas`}. Se ve así en la tienda ahora mismo; nombre, precio y stock quedaron igual.`, img: urls[0] });
+            logAiAction?.('copilot', text, 'ok');
+        } catch (e) {
+            push({ role: 'system', text: `Error: ${e?.message || e}` });
+        } finally { setLoading(false); setBusyMsg(''); }
+    };
+
     const handleSend = async (overrideText) => {
         const text = (typeof overrideText === 'string' ? overrideText : input).trim();
         if (planilla && !loading) { setInput(''); await importarPlanilla(planilla, text); return; }
@@ -1057,6 +1104,10 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             const cotizar = (costo, cat) => explicarPrecio(precioSugerido(costo, { categoria: cat, siteConfig, paymentConfig }));
             const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name) });
             if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }
+        }
+        if (text && files.length) {
+            const cambio = interpretarCambioDeFoto(text, inventory);
+            if (cambio) { setInput(''); await cambiarFoto(text, cambio); return; }
         }
         if (!aiConfigured) { push({ role: 'system', text: 'Configurá una key de Cerebras (o Gemini) en Admin → Configuración para activarme.' }); return; }
 
@@ -1099,7 +1150,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         `Hay ${pendingPhotosRef.current.length} foto(s) de prenda YA subida(s), esperando que el dueño cargue los datos:\n${items}\n\n` +
                         `IMPORTANTE: NO sabés qué prenda es, ni el nombre, ni el color, ni nada — NO lo adivines ni lo deduzcas de la imagen. El dueño te va a dictar TODOS los datos (nombre, color, talle, stock, precio/costo). Pedíselos de a uno, con menús de botones cuando se pueda. ` +
                         `EMPEZÁ preguntando el NOMBRE de la prenda (eso va en texto). Después seguí el wizard pidiendo color, talle, stock y precio/costo con menús. ` +
-                        `Cuando tengas todo, preguntá qué hacer (Publicar / Borrador / Registrar venta) y ejecutá create_product (visible=true publicar, false borrador) usando la imageUrl exacta. Si te da el costo, calculá con quote_price. Si hay varias fotos, procesalas todas.`
+                        `Cuando tengas todo, preguntá qué hacer (Publicar / Borrador / Registrar venta) y ejecutá create_product (visible=true publicar, false borrador) usando la imageUrl exacta. Si te da el costo, calculá con quote_price. Si hay varias fotos, procesalas todas. ` +
+                        `EXCEPCIÓN: si el dueño dice que la foto es de un producto que YA EXISTE ("cambiá la foto del X", "esta es la foto nueva de X", "agregale esta foto a X"), NO pidas ningún dato: buscalo con query_inventory y ejecutá set_photo con la imageUrl exacta (mode replace o add).`
                 });
             }
             transcript.push({ role: 'user', content: text || 'Tengo estas prendas.' });

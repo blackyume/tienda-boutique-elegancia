@@ -87,6 +87,10 @@ una decisión, no una falla.
 
 - **Editar**: "cambiale el precio al jean oxford a 48000", "ponele stock 3 al
   top rib talle M".
+- **Cambiar sólo la foto** de un producto ya publicado: clip 📎, la foto nueva,
+  y "cambiá la foto del jean oxford". Confirmás y la reemplaza; nombre, precio
+  y stock quedan igual. "agregale esta foto al jean oxford" la suma a la
+  galería. Anda sin llave de IA.
 - **Ventas por fuera**: "vendí 2 jeans por WhatsApp a 46500" → descuenta stock
   y lo suma a las estadísticas. Te pregunta el canal con botones.
 - **Gastos**: "gasté 20000 en packaging" → lo resta de la ganancia.

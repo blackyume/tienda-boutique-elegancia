@@ -315,6 +315,7 @@ const Lau = ({ abrir }) => (
         <Seccion id="otras" titulo="Otras cosas que le podés pedir">
             <Lista items={[
                 <><strong>Editar:</strong> “cambiale el precio al jean oxford a 48000”, “ponele stock 3 al top rib talle M”.</>,
+                <><strong>Cambiar sólo la foto</strong> de un producto ya publicado: clip 📎, elegís la foto nueva y escribís “cambiá la foto del jean oxford”. Te pide confirmar y la reemplaza; nombre, precio y stock quedan igual. Con “agregale esta foto al jean oxford” la suma a la galería. Anda sin llave de IA.</>,
                 <><strong>Una venta por fuera:</strong> “vendí 2 jeans por WhatsApp a 46500” → descuenta stock y lo suma a las ventas. Te pregunta el canal con botones.</>,
                 <><strong>Gastos:</strong> “gasté 20000 en packaging” → lo resta de la ganancia.</>,
                 <><strong>Ofertas:</strong> “poné 15% off en camperas el finde”, “quitá la oferta del jean”.</>,
