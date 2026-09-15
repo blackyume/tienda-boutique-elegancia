@@ -53,10 +53,10 @@ export const Hero = () => {
     // forma nueva; lo que el dueño edite después manda igual.
     const LEGADO = { 'DE LA ELEGANCIA': 'de la Elegancia', 'EXPLORAR SHOP': 'Ver la tienda' };
     const subtitle = LEGADO[siteConfig?.hero?.subtitle] || siteConfig?.hero?.subtitle || 'de la Elegancia';
-    // El anterior ("Piezas curadas que duran temporadas, no semanas") repetía
-    // casi palabra por palabra el titular de la sección El Atelier. El hero
-    // habla de la clienta; la filosofía de marca ya se cuenta más abajo.
-    const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'Lo que te ponés cuando querés que se note.';
+    // El eslogan de la marca. Habla de la clienta y de cómo se elige acá, sin
+    // repetir el titular de la sección La Boutique, que ya cuenta el detalle.
+    const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'La elegancia no se improvisa: se elige. Prendas seleccionadas con criterio para la mujer que se viste con intención.';
+    const [, lema, resto] = tagline.match(/^(.+?[.!?])\s+(\S.*)$/s) || [];
     const buttonText = LEGADO[siteConfig?.hero?.buttonText] || siteConfig?.hero?.buttonText || 'Ver la tienda';
     const buttonLink = siteConfig?.hero?.buttonLink || 'shop';
 
@@ -172,7 +172,15 @@ export const Hero = () => {
 
                 <div className="mt-8 flex flex-col items-start gap-7 animate-fadeIn opacity-0 [animation-delay:550ms]">
                     <p className="text-sm md:text-base text-noche-300/85 max-w-md font-light leading-relaxed">
-                        {tagline}
+                        {/* La primera oración es el lema y va en serif, más grande */}
+                        {lema ? (
+                            <>
+                                <span className="block font-serif italic text-noche-100 text-lg md:text-2xl leading-snug mb-2 text-balance">
+                                    {lema}
+                                </span>
+                                {resto}
+                            </>
+                        ) : tagline}
                     </p>
 
                     <div className="flex flex-wrap items-center gap-5">
