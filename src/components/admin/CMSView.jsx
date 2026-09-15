@@ -483,6 +483,17 @@ export const CMSView = () => {
                                                 placeholder="de la Elegancia"
                                             />
                                         </div>
+                                        <div>
+                                            <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block">Frase (abajo del nombre)</label>
+                                            <textarea
+                                                value={siteConfig.hero?.tagline || ""}
+                                                onChange={(e) => updateSection('hero', 'tagline', e.target.value)}
+                                                rows={2}
+                                                className="w-full px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:border-[#E8C65E] outline-none resize-none"
+                                                placeholder="La elegancia no se improvisa: se elige. Prendas seleccionadas con criterio para la mujer que se viste con intención."
+                                            />
+                                            <p className="text-[10px] text-slate-400 mt-1">La primera oración queda grande y en cursiva; el resto, chico. Vacío = la frase de la casa.</p>
+                                        </div>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div>
                                                 <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block">Botón</label>

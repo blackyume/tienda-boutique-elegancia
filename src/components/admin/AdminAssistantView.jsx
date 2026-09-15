@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Paperclip, X, Loader2, User, AlertTriangle, Check, Trash2, BookOpen, PackagePlus, FileSpreadsheet } from 'lucide-react';
+import { Send, Sparkles, Paperclip, X, Loader2, User, AlertTriangle, Check, Trash2, BookOpen, PackagePlus, FileSpreadsheet, Mic, MicOff } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { ProductWizard } from './ProductWizard';
 import { generateText, generateProductCopy, hasAdminAI } from '../../utils/ai';
@@ -14,6 +14,7 @@ import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, pre
 import { candidatosLiquidacion, configLiquidacion, resumirLiquidacion, esPedidoDeLiquidacion, descuentoPedido } from '../../utils/liquidacion';
 import { captionDeProducto, fotoDeProducto, publicarEnInstagram } from '../../utils/instagram';
 import { interpretarCambioDeFoto, patchDeFotos } from '../../utils/fotos';
+import { interpretarAccion, opcionesDeVariante, opcionesDeProducto, describirRepetidos, accionInversa } from '../../utils/lauAcciones';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
@@ -180,10 +181,10 @@ const actionLabel = (a) => {
     const A = a.args || {};
     switch (a.tool) {
         case 'create_product': return `Publicar producto "${A.name}" — $${Number(A.price || 0).toLocaleString('es-AR')} · ${A.category || 's/categoría'} · stock ${A.stock ?? 0}${A.visible === false ? ' (borrador)' : ''}`;
-        case 'set_price': return `Cambiar precio de ${A.productId} → $${Number(A.price || 0).toLocaleString('es-AR')}`;
+        case 'set_price': return `Cambiar precio de ${A.nombre || A.productId} → $${Number(A.price || 0).toLocaleString('es-AR')}`;
         case 'set_stock': return `Cambiar stock de ${A.productId} → ${A.stock}`;
         case 'bulk_price': return `Precio masivo: ${A.category || 'TODOS'} ${A.direction === 'down' ? '−' : '+'}${A.percent}%`;
-        case 'toggle_visible': return `${A.visible ? 'Mostrar' : 'Ocultar'} producto ${A.productId}`;
+        case 'toggle_visible': return `${A.visible ? 'Mostrar' : 'Ocultar'} producto ${A.nombre || A.productId}`;
         case 'delete_product': return `ELIMINAR producto ${A.productId}`;
         case 'delete_coupon': return `ELIMINAR cupón ${A.couponId}`;
         case 'set_order_status': return `Pedido ${A.orderId} → ${A.status}${A.tracking ? ` (tracking ${A.tracking})` : ''}`;
@@ -191,9 +192,9 @@ const actionLabel = (a) => {
             const q = Number(A.quantity) || 1;
             const v = [A.size, A.color].filter(Boolean).join('/');
             const tot = A.amount != null ? Number(A.amount) : (A.unitPrice != null ? Number(A.unitPrice) * q : 0);
-            return `Registrar venta externa: ${q}× ${A.productId}${v ? ` (${v})` : ''}${tot ? ` por $${tot.toLocaleString('es-AR')}` : ''} — descuenta stock`;
+            return `Registrar venta externa: ${q}× ${A.nombre || A.productId}${v ? ` (${v})` : ''}${tot ? ` por $${tot.toLocaleString('es-AR')}` : ''} — descuenta stock`;
         }
-        case 'adjust_stock': return `Ajustar stock de ${A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
+        case 'adjust_stock': return `Ajustar stock de ${A.nombre || A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
         case 'cancel_sale': return `ANULAR venta ${A.orderId} (repone el stock)`;
         case 'record_expense': return `Registrar gasto: ${A.concept || 'Gasto'} — $${(Number(A.amount) || 0).toLocaleString('es-AR')}${A.category ? ` (${A.category})` : ''}`;
         case 'rename_category': return `Renombrar categoría "${A.from}" → "${A.to}" (y sus productos)`;
@@ -243,6 +244,11 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const listRef = useRef(null);
     const fileRef = useRef(null);
     const confirmResolver = useRef(null);
+    // La última acción directa hecha, con su inversa, para el botón "Deshacer".
+    const deshacerRef = useRef(null);
+    const [escuchando, setEscuchando] = useState(false);
+    const recRef = useRef(null);
+    const hayVoz = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
 
     useEffect(() => { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(messages.slice(-60))); } catch { /* noop */ } }, [messages]);
     useEffect(() => { listRef.current?.scrollTo(0, listRef.current.scrollHeight); }, [messages, loading, confirm]);
@@ -1088,6 +1094,69 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         } finally { setLoading(false); setBusyMsg(''); }
     };
 
+    // Precio, mostrar/ocultar, mercadería que llegó y ventas por fuera: se
+    // entienden sin IA, se confirman igual que siempre y se pueden deshacer.
+    const accionDirecta = async (text, r) => {
+        push({ role: 'user', text });
+        if (r.productos && !r.productos.length) { push({ role: 'ai', text: `No encontré ningún producto que se llame "${r.nombre || '…'}". Decímelo como figura en Inventario.` }); return; }
+        if (r.productos && r.productos.length > 1) { push({ role: 'ai', text: `¿Cuál de estos?${describirRepetidos(r.productos)}`, options: opcionesDeProducto(text, r.nombre, r.productos) }); return; }
+        if (r.sinStock) { push({ role: 'ai', text: r.motivo }); return; }
+        if (r.falta === 'variante') {
+            const ops = r.tipo === 'venta' ? r.opciones.filter(v => v.stock > 0) : r.opciones;
+            if (!ops.length) { push({ role: 'ai', text: `"${r.producto.name}" no tiene stock en ningún talle/color. Si llegó mercadería, decime "llegaron N ${r.producto.name}".` }); return; }
+            const hay = r.tipo === 'venta' ? ` Queda: ${ops.map(v => `${[v.size && `talle ${v.size}`, v.color].filter(Boolean).join(' · ')} (${v.stock})`).join(', ')}.` : '';
+            push({ role: 'ai', text: `${r.motivo ? r.motivo + ' ' : ''}¿Qué talle y color?${hay}`, options: opcionesDeVariante(text, ops) });
+            return;
+        }
+        const ok = await askConfirm([r.accion]);
+        if (!ok) { push({ role: 'system', text: 'Cancelado por vos. No cambié nada.' }); return; }
+        setLoading(true);
+        try {
+            setBusyMsg('Guardando…');
+            const out = await exec(r.accion.tool, r.accion.args);
+            const inversa = accionInversa(r.accion, r.producto, out);
+            deshacerRef.current = inversa;
+            push({ role: 'ai', text: String(out).startsWith('✅') ? out : `✅ ${out}`, options: inversa ? ['Deshacer'] : undefined });
+            logAiAction?.('copilot', text, 'ok');
+        } catch (e) {
+            push({ role: 'system', text: `Error: ${e?.message || e}` });
+        } finally { setLoading(false); setBusyMsg(''); }
+    };
+
+    const deshacer = async () => {
+        const inv = deshacerRef.current;
+        push({ role: 'user', text: 'Deshacer' });
+        if (!inv) { push({ role: 'ai', text: 'No hay nada para deshacer.' }); return; }
+        const ok = await askConfirm([{ tool: inv.tool, args: inv.args }]);
+        if (!ok) { push({ role: 'system', text: 'Cancelado por vos.' }); return; }
+        setLoading(true);
+        try {
+            const out = await exec(inv.tool, inv.args);
+            deshacerRef.current = null;
+            push({ role: 'ai', text: `↩️ Deshecho. ${out}` });
+        } catch (e) {
+            push({ role: 'system', text: `Error: ${e?.message || e}` });
+        } finally { setLoading(false); setBusyMsg(''); }
+    };
+
+    // Dictado por voz (Chrome/Edge/Safari): lo que decís queda escrito en el cuadro.
+    const dictar = () => {
+        if (escuchando) { recRef.current?.stop(); return; }
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return;
+        const rec = new SR();
+        rec.lang = 'es-AR'; rec.interimResults = false; rec.maxAlternatives = 1;
+        rec.onresult = (e) => {
+            const dicho = Array.from(e.results).map(r => r[0]?.transcript || '').join(' ').trim();
+            if (dicho) setInput(prev => `${prev ? prev + ' ' : ''}${dicho}`);
+        };
+        rec.onerror = (e) => { if (e.error !== 'aborted' && e.error !== 'no-speech') push({ role: 'system', text: e.error === 'not-allowed' ? 'El navegador no dejó usar el micrófono. Permitilo en el candadito de la barra de dirección.' : `No pude escuchar (${e.error}).` }); };
+        rec.onend = () => setEscuchando(false);
+        recRef.current = rec;
+        setEscuchando(true);
+        try { rec.start(); } catch { setEscuchando(false); }
+    };
+
     const handleSend = async (overrideText) => {
         const text = (typeof overrideText === 'string' ? overrideText : input).trim();
         if (planilla && !loading) { setInput(''); await importarPlanilla(planilla, text); return; }
@@ -1104,6 +1173,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             const cotizar = (costo, cat) => explicarPrecio(precioSugerido(costo, { categoria: cat, siteConfig, paymentConfig }));
             const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name) });
             if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }
+            if (/^deshacer$/i.test(text)) { setInput(''); await deshacer(); return; }
+            const accion = interpretarAccion(text, inventory);
+            if (accion) { setInput(''); await accionDirecta(text, accion); return; }
         }
         if (text && files.length) {
             const cambio = interpretarCambioDeFoto(text, inventory);
@@ -1329,7 +1401,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             )}
                             {m.role === 'system' ? (
                                 <div className="max-w-[88%] flex items-start gap-2 rounded-xl px-3.5 py-2 bg-white/[0.04] border border-white/10 text-white/55 text-xs font-mono whitespace-pre-wrap">
-                                    <Check className="w-3.5 h-3.5 mt-0.5 text-emerald-400/70 shrink-0" />
+                                    {/^(Error|No pude|Cancelado|✗|El navegador)/.test(m.text) ? <AlertTriangle className="w-3.5 h-3.5 mt-0.5 text-amber-400/80 shrink-0" /> : <Check className="w-3.5 h-3.5 mt-0.5 text-emerald-400/70 shrink-0" />}
                                     <span>{m.text}</span>
                                 </div>
                             ) : m.role === 'ai' ? (
@@ -1455,12 +1527,17 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     <div className="flex items-end gap-1 bg-white/[0.06] border border-white/15 rounded-2xl pl-1.5 pr-1.5 py-1.5 transition-colors focus-within:border-[#E8C65E]/60 focus-within:bg-white/[0.08]">
                         <input ref={fileRef} type="file" accept="image/*,.xlsx" multiple className="hidden" onChange={onPick} />
                         <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#E8C65E] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Adjuntar fotos o una planilla de ventas (.xlsx)"><Paperclip className="w-5 h-5" /></button>
+                        {hayVoz && (
+                            <button onClick={dictar} disabled={loading} className={`p-2.5 rounded-xl transition-colors shrink-0 disabled:opacity-40 ${escuchando ? 'text-red-400 bg-red-500/15 animate-pulse' : 'text-white/40 hover:text-[#E8C65E] hover:bg-white/5'}`} title={escuchando ? 'Escuchando… tocá para parar' : 'Dictar con la voz'}>
+                                {escuchando ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                            </button>
+                        )}
                         <textarea
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                             rows={1}
-                            placeholder="Escribile a Lau…"
+                            placeholder={escuchando ? 'Te escucho…' : 'Escribile a Lau…'}
                             disabled={loading}
                             className="flex-1 resize-none bg-transparent border-0 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-0 max-h-32"
                         />

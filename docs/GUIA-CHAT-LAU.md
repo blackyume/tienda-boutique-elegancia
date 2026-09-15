@@ -83,6 +83,17 @@ nada. Vos se lo decís. Está hecho así para que nunca publique un "jean azul"
 que era una campera negra. Si te parece que "debería darse cuenta", no: es
 una decisión, no una falla.
 
+## Sin la llave de IA (anda igual)
+
+- `vendí el jean oxford por whatsapp` / `vendí 2 tops rib a 14.800` /
+  `vendí el short por 30.000 en el local` → pregunta talle y color con botones,
+  confirma, descuenta stock y la anota. "a X" por unidad, "por X" total.
+- `llegaron 10 sweater lanilla` / `me llegaron 3 jean oxford 40 azul` → suma stock.
+- `ponele 48000 al sweater lanilla` / `el jean chupín a 45.000` → cambia el precio.
+- `ocultá el gamulán` / `mostrá la cartera` → visibilidad en la tienda.
+- `deshacer` (o el botón después de cada acción) → revierte lo último.
+- Micrófono al lado del clip: dictás y queda escrito.
+
 ## Otras cosas que le podés pedir
 
 - **Editar**: "cambiale el precio al jean oxford a 48000", "ponele stock 3 al

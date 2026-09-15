@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key -- las celdas y los items van como datos en arrays; Tabla y Lista les ponen key al renderizar */
 import React from 'react';
-import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket, Receipt, Instagram } from 'lucide-react';
+import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket, Receipt, Instagram, LayoutDashboard, Ticket, Palette } from 'lucide-react';
 import { Seccion, P, K, Cod, Ruta, Pasos, Paso, Lista, Aviso, Tabla, Mensaje, Botones, Figura, Link, Resumen, Numero, Numeros, BienMal, Quien } from './bloques';
 import {
     IlusNombresFotos, IlusExcel, IlusImportar, IlusRetiroCosto,
@@ -12,6 +12,7 @@ import {
     IlusInterruptor, IlusPruebaCompra, IlusCostoAPrecio, IlusClip,
     IlusCaminoInstagram, IlusCuentaProfesional, IlusLlaveMeta, IlusPostInstagram,
 } from './ilustracionesMas';
+import { IlusInicio, IlusLauSinIA, IlusOferta, IlusDiseno } from './ilustracionesInicio';
 import { TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../../../utils/envios';
 
 // Las guías del panel. Están escritas para que las siga alguien que nunca
@@ -205,6 +206,7 @@ const Lau = ({ abrir }) => (
             { icono: '✍️', titulo: 'Escribí lo que sabés', detalle: 'como te salga' },
             { icono: '🔘', titulo: 'Contestá los botones', detalle: 'lo que falte, lo pregunta' },
             { icono: '✅', titulo: 'Confirmar', detalle: 'recién ahí se guarda' },
+            { icono: '↩️', titulo: 'Deshacer', detalle: 'si te equivocaste' },
         ]} />
 
         <Seccion id="que-es" titulo="Qué es Lau">
@@ -272,6 +274,33 @@ const Lau = ({ abrir }) => (
             <P>Al volver a abrirla te cuenta lo que entró mientras no estabas. Y con el panel cerrado, el navegador manda una notificación por cada pedido (la primera vez te pide permiso).</P>
         </Seccion>
 
+        <Seccion id="sin-llave" titulo="Lo que hace sin la llave de IA">
+            <P>Las cosas de todos los días Lau las entiende <strong>sola</strong>, sin inteligencia artificial: funcionan aunque no haya llave, y son instantáneas. Siempre te muestra qué va a hacer y espera tu <strong>Confirmar</strong>.</P>
+            <Figura titulo="Una venta por WhatsApp anotada por chat. Lau pregunta el talle con botones, pide confirmar, y deja un Deshacer por si era otra.">
+                <IlusLauSinIA />
+            </Figura>
+            <Tabla
+                cabecera={['Decís', 'Hace']}
+                filas={[
+                    ['“vendí el jean oxford por whatsapp” · “vendí 2 tops rib a 14.800” · “vendí el short por 30.000 en el local”', 'Anota la venta por fuera: descuenta el stock (te pregunta talle y color con botones), la suma a las ventas y queda como pedido. “a X” es por unidad; “por X” es el total; sin precio usa el de la tienda.'],
+                    ['“llegaron 10 sweater lanilla” · “me llegaron 3 jean oxford 40 azul”', 'Suma unidades al stock (con talle y color si el producto los tiene).'],
+                    ['“ponele 48000 al sweater lanilla” · “el jean chupín a 45.000”', 'Cambia el precio.'],
+                    ['“ocultá el gamulán” · “mostrá la cartera de cuero”', 'Lo saca de la tienda o lo vuelve a poner, sin borrar nada.'],
+                    ['📎 + “cambiá la foto del jean oxford” · “agregale esta foto al top rib”', 'Reemplaza la foto (o la suma a la galería). Nombre, precio y stock quedan igual.'],
+                    ['“deshacer” (o el botón que aparece después de cada acción)', 'Revierte lo último: vuelve el precio, repone el stock, anula la venta.'],
+                    ['“¿cuánto queda del jean?” · “¿qué se vendió hoy?” · “me costó 24000” · “liquidación”', 'Responde al instante (ver las secciones de al lado).'],
+                ]}
+            />
+            <Lista items={[
+                <><strong>Si hay dos con el mismo nombre</strong>, te muestra un botón por cada uno con su precio: tocás el que es.</>,
+                <><strong>Si no le alcanza el stock</strong> (“vendí 3” y quedan 2), no anota nada y te dice cuántos quedan: primero “llegaron 1”, después la venta.</>,
+                <><strong>Micrófono 🎤</strong> al lado del clip: tocás, hablás, y lo que dijiste queda escrito en el cuadro para que lo mandes. Anda en Chrome, Edge y Safari; la primera vez el navegador pide permiso.</>,
+            ]} />
+            <Aviso tipo="dato" titulo="Qué sí necesita la llave">
+                Cargar un producto por chat (la IA arma la ficha), generar descripciones, ofertas programadas, el resumen con consejos, y todo lo que no esté en la tabla. Para cargar productos sin llave está el botón dorado <K>Cargar producto (paso a paso)</K> y el Excel.
+            </Aviso>
+        </Seccion>
+
         <Seccion id="precio" titulo="El precio sale solo">
             <Figura titulo="Del costo al precio. Los números del medio los configurás una vez; después sólo decís cuánto te costó.">
                 <IlusCostoAPrecio />
@@ -316,6 +345,7 @@ const Lau = ({ abrir }) => (
             <Lista items={[
                 <><strong>Editar:</strong> “cambiale el precio al jean oxford a 48000”, “ponele stock 3 al top rib talle M”.</>,
                 <><strong>Cambiar sólo la foto</strong> de un producto ya publicado: clip 📎, elegís la foto nueva y escribís “cambiá la foto del jean oxford”. Te pide confirmar y la reemplaza; nombre, precio y stock quedan igual. Con “agregale esta foto al jean oxford” la suma a la galería. Anda sin llave de IA.</>,
+                <><strong>Ofertas y cupones</strong> → <Ir abrir={abrir} a="ofertas">guía</Ir>. <strong>Textos y fotos de la home</strong> → <Ir abrir={abrir} a="diseno">guía</Ir>.</>,
                 <><strong>Una venta por fuera:</strong> “vendí 2 jeans por WhatsApp a 46500” → descuenta stock y lo suma a las ventas. Te pregunta el canal con botones.</>,
                 <><strong>Gastos:</strong> “gasté 20000 en packaging” → lo resta de la ganancia.</>,
                 <><strong>Ofertas:</strong> “poné 15% off en camperas el finde”, “quitá la oferta del jean”.</>,
@@ -955,6 +985,171 @@ const InstagramGuia = () => (
     </>
 );
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 11. El Inicio del panel
+// ─────────────────────────────────────────────────────────────────────────────
+const InicioGuia = ({ abrir }) => (
+    <>
+        <Resumen pasos={[
+            { icono: '⚠️', titulo: 'Avisos', detalle: 'si hay algo, está arriba' },
+            { icono: '📬', titulo: 'Hoy', detalle: 'qué espera tu respuesta' },
+            { icono: '♡', titulo: 'Favoritos', detalle: 'qué reponer antes' },
+            { icono: '📊', titulo: 'Visitas y stock', detalle: 'cómo viene la mano' },
+        ]} />
+
+        <Seccion id="idea" titulo="Para qué sirve">
+            <P>El <strong>Inicio</strong> es lo primero que ves al entrar. Está armado para una sola cosa: que en <strong>un minuto</strong> sepas si hay algo que atender hoy, sin recorrer todo el panel.</P>
+            <Figura titulo="Cada bloque tiene su número. Abajo, qué es cada uno.">
+                <IlusInicio />
+            </Figura>
+        </Seccion>
+
+        <Seccion id="bloques" titulo="Qué es cada bloque">
+            <Lista items={[
+                <><strong>1. Avisos.</strong> Sólo aparecen cuando hay algo que mirar: la conexión con Instagram que va a vencer, Lau sin llave. Tocás el aviso y te lleva a arreglarlo. Si no hay nada, no hay barra.</>,
+                <><strong>2. Hoy.</strong> Cuatro contadores: <strong>Por enviar</strong> (pagados y sin despachar), <strong>Pagos por confirmar</strong> (esperando la plata o coordinando por WhatsApp), <strong>Carritos de hoy</strong> (empezaron a comprar y no terminaron, últimas 24 h) y <strong>Reseñas por aprobar</strong>. Se pintan de dorado cuando hay algo. Tocás y vas.</>,
+                <><strong>3. Lo más guardado en favoritos.</strong> Las prendas que más clientas guardaron con el corazón en los últimos 30 días, con el stock que te queda al lado. Es la lista de <strong>qué reponer antes de que se venda</strong>. Con “Editar” cargás stock ahí mismo.</>,
+                <><strong>4. Visitas por día.</strong> Dos semanas, una barra por día, el pico en oro. Sirve para ver si un posteo o una historia movió gente. Tus propias visitas no cuentan.</>,
+                <><strong>5. Stock.</strong> Cuántos productos tienen stock, cuántos van por las últimas unidades y cuántos se agotaron. Abajo, si hay productos <strong>ocultos</strong> (que las clientas no ven).</>,
+                <><strong>6. Stock bajo.</strong> Los productos por debajo del umbral, con el talle y color más flojo. El lápiz abre el producto para reponer; el ojo lo oculta de la tienda hasta que llegue.</>,
+            ]} />
+        </Seccion>
+
+        <Seccion id="rutina" titulo="La rutina de la mañana">
+            <Pasos>
+                <Paso>Mirás <strong>Hoy</strong>. Si “Por enviar” está en dorado, seguí la <Ir abrir={abrir} a="pedido-envio">guía del envío</Ir>.</Paso>
+                <Paso>Si hay <strong>Pagos por confirmar</strong>, entrás a Pedidos: los de WhatsApp los cerrás vos cuando te pagan.</Paso>
+                <Paso>Un vistazo a <strong>Stock bajo</strong> y a <strong>Favoritos</strong>: lo que está flojo y encima lo guardan muchas, se repone primero.</Paso>
+                <Paso>Listo. Lo demás (ventas del mes, ganancia) está en <Ruta pasos={['Ventas y ganancia']} /> y te lo cuenta Lau si le preguntás “¿cómo va el negocio?”.</Paso>
+            </Pasos>
+            <Aviso tipo="dato" titulo="Antes de la primera venta">
+                Mientras no haya ventas, en vez de los números de ingresos vas a ver “Todavía no hubo ventas” con las visitas del período, y arriba “Primeros pasos”, que te va marcando lo que falta para abrir. Cuando entre la primera venta, el Inicio cambia solo.
+            </Aviso>
+        </Seccion>
+    </>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 12. Ofertas, cupones y liquidación
+// ─────────────────────────────────────────────────────────────────────────────
+const OfertasGuia = ({ abrir }) => (
+    <>
+        <Resumen pasos={[
+            { icono: '🏷️', titulo: 'Oferta', detalle: 'baja el precio, se ve tachado' },
+            { icono: '🎟️', titulo: 'Cupón', detalle: 'un código para descontar al pagar' },
+            { icono: '📉', titulo: 'Liquidación', detalle: 'Lau elige qué bajar, nunca a pérdida' },
+            { icono: '🗓️', titulo: 'Programada', detalle: 'se activa sola el día que digas' },
+        ]} />
+
+        <Seccion id="cual" titulo="Oferta o cupón: cuál conviene">
+            <Figura titulo="Izquierda: una oferta, la ve todo el mundo. Derecha: un cupón, lo usa quien tiene el código.">
+                <IlusOferta />
+            </Figura>
+            <Tabla
+                cabecera={['Querés…', 'Usá']}
+                filas={[
+                    ['Que una prenda (o toda una categoría) se vea más barata para todas', 'Oferta'],
+                    ['Premiar a alguien: una amiga, un sorteo, las que se anotaron al newsletter', 'Cupón'],
+                    ['Mover lo que hace meses no se vende', 'Liquidación (Lau)'],
+                    ['Un descuento para el finde, que arranque solo el sábado', 'Oferta programada'],
+                ]}
+            />
+        </Seccion>
+
+        <Seccion id="oferta" titulo="Poner una oferta">
+            <P>Lo más rápido es decírselo a Lau:</P>
+            <Mensaje de="vos">poné el jean oxford 20% off</Mensaje>
+            <Mensaje de="lau">Poner JEANS ELASTIZADO OXFORD en oferta −20%: $46.500 → $37.200, con el precio anterior tachado. ¿Confirmás?</Mensaje>
+            <Lista items={[
+                <>Toda una categoría: <em>“15% off en camperas”</em>. Toda la tienda: <em>“10% off en todo”</em>.</>,
+                <>Para que arranque sola: <em>“20% off en camperas el sábado a las 10”</em> → queda programada y se aplica ese día (mientras la tienda esté abierta).</>,
+                <>Para sacarla: <em>“quitá la oferta del jean oxford”</em>. Vuelve el precio de antes.</>,
+                <>Sin Lau: en <Ruta pasos={['Inventario']} />, el lápiz del producto → precio de oferta.</>,
+            ]} />
+            <Aviso tipo="dato">Una oferta <strong>no toca el costo</strong>: la ganancia de esa prenda baja, y en Ventas lo ves. Si querés bajar sin perder plata, usá la liquidación: esa mira el costo.</Aviso>
+        </Seccion>
+
+        <Seccion id="cupon" titulo="Crear un cupón">
+            <Pasos>
+                <Paso><Ruta pasos={['Cupones y ofertas', 'Nuevo cupón']} />. O a Lau: <em>“creá el cupón PRIMAVERA10 con 10%”</em>.</Paso>
+                <Paso>Elegís <strong>código</strong> (lo que la clienta escribe), <strong>porcentaje</strong> o <strong>monto fijo</strong>, y si querés: compra mínima, cuántas veces se puede usar, hasta qué fecha.</Paso>
+                <Paso>Se lo pasás por WhatsApp o Instagram. Ella lo escribe en el checkout y el descuento aparece antes de pagar.</Paso>
+            </Pasos>
+            <BienMal
+                bien={['PRIMAVERA10 · 10% · vence en 15 días · una vez por clienta', 'AMIGA · $5.000 · sólo con compra mínima de $40.000']}
+                mal={['DESCUENTO · 50% · sin vencimiento ni límite: se lo pasan entre todas y queda para siempre']}
+            />
+        </Seccion>
+
+        <Seccion id="liquidacion" titulo="Liquidación: que Lau elija">
+            <Mensaje de="vos">liquidación</Mensaje>
+            <Mensaje de="lau">{'Hay 4 productos con más de 45 días sin venderse. Propongo −20%, sin bajar nunca del costo + comisión:\n• Short algodón Santi $16.500 → $13.200\n• Musculosa modal tirita $8.700 → $7.000\n…\n¿Aplico?'}</Mensaje>
+            <Lista items={[
+                <>Otro descuento: <em>“liquidá con 30%”</em>. Otra regla: <em>“liquidación a los 60 días con 25%”</em>.</>,
+                <>Nunca vende a pérdida: si el descuento pisa el costo, esa prenda baja sólo hasta el costo.</>,
+                <>Cuando se vende, sacás la oferta como cualquier otra: <em>“quitá la oferta del short”</em>.</>,
+            ]} />
+            <P>En el resumen del día Lau te avisa sola cuando hay algo para liquidar. Y cómo se calculan los precios y los márgenes, en la <Ir abrir={abrir} a="lau">guía de Lau</Ir>, sección “El precio sale solo”.</P>
+        </Seccion>
+    </>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 13. Diseño de la tienda
+// ─────────────────────────────────────────────────────────────────────────────
+const DisenoGuia = ({ abrir }) => (
+    <>
+        <Resumen pasos={[
+            { icono: '🖼️', titulo: 'Portada', detalle: 'fotos, título y frase' },
+            { icono: '📣', titulo: 'Barra de arriba', detalle: 'el aviso dorado' },
+            { icono: '🗂️', titulo: 'Categorías', detalle: 'las fichas con foto' },
+            { icono: '👀', titulo: 'Mirá la tienda', detalle: 'cada cambio, al instante' },
+        ]} />
+
+        <Seccion id="donde" titulo="Dónde se cambia cada cosa">
+            <P>Todo lo que ve la clienta en la home se edita desde <Ruta pasos={['Diseño de la tienda']} />. Sin código, sin esperar: guardás y ya está online.</P>
+            <Figura titulo="La home y, al costado, en qué pestaña se edita cada parte.">
+                <IlusDiseno />
+            </Figura>
+        </Seccion>
+
+        <Seccion id="portada" titulo="La portada">
+            <P>Pestaña <K>Portada &amp; Textos</K>:</P>
+            <Lista items={[
+                <><strong>Título y subtítulo:</strong> “LA BOUTIQUE” y “de la Elegancia”. Mejor no tocarlos: son la marca.</>,
+                <><strong>Frase (tagline):</strong> la que va abajo del nombre. Si escribís una oración corta y después el resto (<em>“La elegancia no se improvisa: se elige. Prendas…”</em>), la primera queda grande en cursiva y el resto chico.</>,
+                <><strong>Texto del botón:</strong> “Ver la tienda”. Corto, un verbo.</>,
+                <><strong>Portadas del carrusel:</strong> las fotos grandes que van rotando. <K>Sumar portada</K>, y con las flechas las ordenás. Fotos verticales de la modelo, sin texto encima: el texto lo pone la tienda.</>,
+            ]} />
+            <Aviso tipo="tip" titulo="Con Lau también">
+                <em>“cambiá la frase de la portada por: …”</em> o <em>“poné en el botón Ver colección”</em>. Te muestra el cambio y confirmás.
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="barra" titulo="La barra de arriba y el popup">
+            <P>Pestaña <K>Anuncios &amp; Popups</K>:</P>
+            <Lista items={[
+                <><strong>Barra de anuncios:</strong> la franja dorada de arriba de todo. Hoy dice “Compra segura | Envíos a todo el país | Nueva colección 2026”. Cambiala cuando haya algo mejor que decir (“Envío gratis desde $80.000 hasta el domingo”). Se puede apagar.</>,
+                <><strong>Popup promocional:</strong> el cartel que salta al entrar. Sirve para un cupón de bienvenida; si no hay nada que ofrecer, mejor apagado: molesta.</>,
+                <><strong>Cintilla (marquee):</strong> una tira que se desplaza. Está apagada; si la prendés, el texto se edita al lado.</>,
+            ]} />
+        </Seccion>
+
+        <Seccion id="categorias" titulo="Las categorías">
+            <P>Pestaña <K>Categorías</K>: cada categoría tiene nombre y foto, y en la home se ve como una ficha. Las categorías salen de los productos: si cargás una prenda con categoría “Vestidos” y no existe, se crea. Acá le ponés la foto.</P>
+            <BienMal
+                bien={['Una foto por categoría con la prenda puesta, misma luz en todas', 'Nombres cortos: Jeans, Camperas, Tops']}
+                mal={['Categorías de un solo producto (“Gamulán”): mejor meterlo en Camperas', 'Fotos con fondos distintos entre ficha y ficha']}
+            />
+        </Seccion>
+
+        <Seccion id="mirar" titulo="Mirar cómo quedó">
+            <P>Abajo a la izquierda del panel, <K>Ir a la tienda</K>. Mirala también desde el celular: la mayoría de las clientas entra desde el teléfono. Si algo quedó raro, volvés a Diseño de la tienda y lo corregís; no hay que “publicar” nada, cada cambio sale al instante.</P>
+            <P>Las fotos de los productos no se cambian acá sino en <Ruta pasos={['Inventario']} /> o diciéndole a Lau <em>“cambiá la foto del jean oxford”</em> con la foto adjunta (<Ir abrir={abrir} a="lau">guía de Lau</Ir>).</P>
+        </Seccion>
+    </>
+);
+
 export const GUIAS = [
     {
         id: 'empezar', titulo: 'Entrar al panel y moverse', icono: LogIn, duracion: '3 min', para: 'Los dos',
@@ -962,6 +1157,13 @@ export const GUIAS = [
         palabras: ['login', 'entrar', 'google', 'cuenta', 'menu', 'mantenimiento', 'renovacion', 'buscador'],
         secciones: [['entrar', 'Entrar'], ['menu', 'El menú'], ['buscador', 'Buscador rápido'], ['siguiente', 'Qué guía sigo']],
         Contenido: Empezar,
+    },
+    {
+        id: 'inicio', titulo: 'El Inicio: qué mirar cada mañana', icono: LayoutDashboard, duracion: '3 min', para: 'Dueño',
+        resumen: 'Avisos, lo que espera tu respuesta hoy, qué reponer, cómo vienen las visitas y el stock. Un minuto y sabés si hay algo que hacer.',
+        palabras: ['inicio', 'dashboard', 'panel', 'hoy', 'por enviar', 'favoritos', 'visitas', 'stock bajo', 'avisos', 'resumen', 'mañana'],
+        secciones: [['idea', 'Para qué sirve'], ['bloques', 'Qué es cada bloque'], ['rutina', 'La rutina de la mañana']],
+        Contenido: InicioGuia,
     },
     {
         id: 'carga-masiva', titulo: 'Cargar productos con Excel y fotos', icono: FileSpreadsheet, duracion: '10 min', para: 'Quien carga productos',
@@ -973,8 +1175,8 @@ export const GUIAS = [
     {
         id: 'lau', titulo: 'Lau: la que hace todo por vos', icono: Bot, duracion: '6 min', para: 'Los dos',
         resumen: 'Le hablás y ella carga productos, lee tus planillas, te dice el stock y las ventas en vivo, calcula los precios y liquida lo que no se vende.',
-        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos', 'stock', 'tiempo real', 'en vivo', 'cuanto queda', 'que se vendio', 'precio', 'margen', 'comision', 'costo', 'packaging', 'liquidacion'],
-        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['en-vivo', 'Stock y ventas en vivo'], ['precio', 'El precio sale solo'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
+        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos', 'stock', 'tiempo real', 'en vivo', 'cuanto queda', 'que se vendio', 'precio', 'margen', 'comision', 'costo', 'packaging', 'liquidacion', 'sin llave', 'voz', 'microfono', 'dictar', 'deshacer', 'ocultar', 'llegaron', 'cambiar foto'],
+        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['en-vivo', 'Stock y ventas en vivo'], ['sin-llave', 'Sin la llave de IA'], ['precio', 'El precio sale solo'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
         Contenido: Lau,
     },
     {
@@ -983,6 +1185,20 @@ export const GUIAS = [
         palabras: ['ventas', 'planilla', 'excel', 'whatsapp', 'local', 'feria', 'importar ventas', 'pagado', 'clienta', 'wakanda'],
         secciones: [['por-que', 'Por qué anotarlas'], ['lau', 'De a una: Lau'], ['planilla', 'Tu planilla'], ['importar', 'Cargar la planilla']],
         Contenido: VentasFuera,
+    },
+    {
+        id: 'ofertas', titulo: 'Ofertas, cupones y liquidación', icono: Ticket, duracion: '5 min', para: 'Dueño',
+        resumen: 'Cuándo conviene una oferta y cuándo un cupón, cómo se ponen en un mensaje a Lau, y la liquidación que nunca vende a pérdida.',
+        palabras: ['oferta', 'descuento', 'cupon', 'codigo', 'liquidacion', 'promo', 'promocion', 'programada', 'finde', 'off', 'tachado', 'sorteo'],
+        secciones: [['cual', 'Oferta o cupón'], ['oferta', 'Poner una oferta'], ['cupon', 'Crear un cupón'], ['liquidacion', 'Liquidación']],
+        Contenido: OfertasGuia,
+    },
+    {
+        id: 'diseno', titulo: 'Cambiar textos y fotos de la tienda', icono: Palette, duracion: '5 min', para: 'Dueño',
+        resumen: 'La portada, la frase, el botón, la barra dorada de arriba, el popup y las fichas de categoría: dónde se cambia cada cosa y qué queda bien.',
+        palabras: ['diseño', 'home', 'portada', 'hero', 'frase', 'eslogan', 'slogan', 'tagline', 'boton', 'barra', 'anuncio', 'popup', 'cintilla', 'marquee', 'categorias', 'fotos', 'textos', 'cms'],
+        secciones: [['donde', 'Dónde se cambia'], ['portada', 'La portada'], ['barra', 'Barra y popup'], ['categorias', 'Categorías'], ['mirar', 'Mirar cómo quedó']],
+        Contenido: DisenoGuia,
     },
     {
         id: 'pedido-envio', titulo: 'Del pedido al envío: que pasen a buscar', icono: PackageCheck, duracion: '12 min', para: 'Dueño',

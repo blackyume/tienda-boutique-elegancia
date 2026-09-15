@@ -49,7 +49,7 @@ export const TOOLS = [
     { name: 'delete_product', sensitive: true, desc: 'Eliminar producto. args: {productId}' },
     { name: 'delete_coupon', sensitive: true, desc: 'Eliminar cupón. args: {couponId}' },
     { name: 'reject_review', sensitive: true, desc: 'Rechazar/eliminar una reseña. args: {reviewId}' },
-    { name: 'update_home', sensitive: true, desc: 'Editar contenido de la home. args: {hero?:{title?,subtitle?,buttonText?,buttonLink?}, announcement?:{text?,enabled?}, marquee?}' },
+    { name: 'update_home', sensitive: true, desc: 'Editar contenido de la home. args: {hero?:{title?,subtitle?,tagline?(la frase abajo del nombre),buttonText?,buttonLink?}, announcement?:{text?,enabled?}, marquee?}' },
     { name: 'toggle_maintenance', sensitive: true, desc: 'Activar/desactivar modo mantenimiento. args: {on(bool)}' },
     { name: 'post_instagram', sensitive: true, desc: 'PUBLICAR en la cuenta de Instagram de la tienda: la foto principal de un producto con un texto. args: {productId, caption?(el texto que el dueño dictó, tal cual; si no dijo ninguno dejalo vacío y el sistema arma uno con nombre, descripción, precio y hashtags)}. Usalo cuando digan "publicá X en Instagram", "subilo a insta", "postealo". Si Instagram no está conectado el sistema avisa cómo hacerlo.' },
 ];
