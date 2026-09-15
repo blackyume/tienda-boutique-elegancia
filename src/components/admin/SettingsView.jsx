@@ -193,7 +193,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             </div>
 
                             <div className={cardCls}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><AlertTriangle className="w-5 h-5 text-amber-500" /> Alerta de Stock Bajo</h3>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><AlertTriangle className="w-5 h-5 text-[#E8C65E]" /> Alerta de Stock Bajo</h3>
                                 <label className={labelCls}>Umbral (unidades)</label>
                                 <div className="flex gap-2">
                                     <input type="number" min="0" step="1" defaultValue={siteConfig?.lowStockThreshold ?? 5} className={inputCls + ' flex-1'} id="lowStockInput" />
@@ -208,8 +208,8 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                     {section === 'pagos' && (
                         <div className={cardCls}>
                             <h3 className="font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white"><CreditCard className="w-5 h-5 text-[#009EE3]" /> Mercado Pago</h3>
-                            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50 mb-6">
-                                <p className="text-xs text-blue-800 dark:text-blue-300">Conectá tu cuenta. Las credenciales se obtienen en el <a href="https://www.mercadopago.com.ar/developers/panel" target="_blank" rel="noopener noreferrer" className="underline font-bold">Panel de Desarrolladores</a>.</p>
+                            <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-6">
+                                <p className="text-xs text-slate-600 dark:text-slate-300">Conectá tu cuenta. Las credenciales se obtienen en el <a href="https://www.mercadopago.com.ar/developers/panel" target="_blank" rel="noopener noreferrer" className="underline font-bold">Panel de Desarrolladores</a>.</p>
                             </div>
                             <div className="space-y-5">
                                 <div>
@@ -251,9 +251,9 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                     {/* NOTIFICACIONES */}
                     {section === 'notificaciones' && (
                         <>
-                            <div className={cardCls + ' border-l-4 border-l-amber-500'}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bell className="w-5 h-5 text-amber-500" /> Push Web (FCM)</h3>
-                                <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-900/30 mb-4 text-xs text-amber-800 dark:text-amber-300 space-y-2">
+                            <div className={cardCls + ' border-l-4 border-l-[#E8C65E]/70'}>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bell className="w-5 h-5 text-[#E8C65E]" /> Push Web (FCM)</h3>
+                                <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 text-xs text-slate-600 dark:text-slate-300 space-y-2">
                                     <p><strong>Setup:</strong></p>
                                     <ol className="list-decimal ml-5 space-y-1">
                                         <li>Firebase Console → Cloud Messaging → Web Push certificates → Generate. Copiá la <strong>VAPID key</strong>.</li>
@@ -273,14 +273,14 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                         <input type="text" value={pushTitle} onChange={(e) => setPushTitle(e.target.value)} placeholder="Título" className={inputCls} />
                                         <textarea rows={2} value={pushBody} onChange={(e) => setPushBody(e.target.value)} placeholder="Mensaje" className={inputCls + ' resize-y'} />
                                         <input type="text" value={pushUrl} onChange={(e) => setPushUrl(e.target.value)} placeholder="/shop" className={inputCls} />
-                                        <Button onClick={handleSendPush} isLoading={isSendingPush} className="bg-amber-600 hover:bg-amber-700 text-white text-xs px-6 py-2.5 rounded-lg w-full"><Bell className="w-4 h-4 mr-2 inline" /> Enviar a todos</Button>
+                                        <Button onClick={handleSendPush} isLoading={isSendingPush} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 text-xs px-6 py-2.5 rounded-lg w-full"><Bell className="w-4 h-4 mr-2 inline" /> Enviar a todos</Button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className={cardCls + ' border-l-4 border-l-sky-500'}>
-                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Send className="w-5 h-5 text-sky-500" /> Telegram (canal)</h3>
-                                <div className="bg-sky-50 dark:bg-sky-900/10 p-4 rounded-xl border border-sky-100 dark:border-sky-900/30 mb-4 text-xs text-sky-800 dark:text-sky-300 space-y-2">
+                            <div className={cardCls + ' border-l-4 border-l-[#E8C65E]/70'}>
+                                <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Send className="w-5 h-5 text-[#E8C65E]" /> Telegram (canal)</h3>
+                                <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 text-xs text-slate-600 dark:text-slate-300 space-y-2">
                                     <p><strong>Setup:</strong> creá un bot con @BotFather, agregalo como admin del canal, en Vercel poné <code>TELEGRAM_BOT_TOKEN</code>, <code>TELEGRAM_CHAT_ID</code> y opcionalmente <code>TELEGRAM_ADMIN_SECRET</code>. Redeploy.</p>
                                 </div>
                                 <div className="grid md:grid-cols-2 gap-4 mb-4">
@@ -295,14 +295,14 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                 <label className={labelCls}>Publicar al canal (test)</label>
                                 <div className="flex gap-2">
                                     <input type="text" value={tgTestMsg} onChange={(e) => setTgTestMsg(e.target.value)} placeholder="🎉 20% OFF — sólo hoy" className={inputCls + ' flex-1'} />
-                                    <Button onClick={handleTestTelegram} isLoading={isSendingTg} className="bg-sky-600 hover:bg-sky-700 text-white text-xs px-6 py-2.5 rounded-lg">Publicar</Button>
+                                    <Button onClick={handleTestTelegram} isLoading={isSendingTg} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 text-xs px-6 py-2.5 rounded-lg">Publicar</Button>
                                 </div>
                             </div>
 
-                            <div className={cardCls + ' border-l-4 border-l-pink-500'}>
-                                <h3 className="font-bold mb-1 flex items-center gap-2 text-slate-800 dark:text-white"><Instagram className="w-5 h-5 text-pink-500" /> Instagram (publicar desde el panel y con Lau)</h3>
+                            <div className={cardCls + ' border-l-4 border-l-[#E8C65E]/70'}>
+                                <h3 className="font-bold mb-1 flex items-center gap-2 text-slate-800 dark:text-white"><Instagram className="w-5 h-5 text-[#E8C65E]" /> Instagram (publicar desde el panel y con Lau)</h3>
                                 <p className="text-[11px] text-slate-400 mb-4">Lau publica la foto de un producto con texto en tu cuenta ("publicá el jean en Instagram"). Hace falta una cuenta profesional y una llave de Meta: el trámite está en <strong>Guías → Publicar en Instagram con Lau</strong>.</p>
-                                <div className="bg-pink-50 dark:bg-pink-900/10 p-4 rounded-xl border border-pink-100 dark:border-pink-900/30 mb-4 text-xs text-pink-800 dark:text-pink-300 space-y-1">
+                                <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 text-xs text-slate-600 dark:text-slate-300 space-y-1">
                                     <p><strong>En Vercel:</strong> <code>INSTAGRAM_ACCESS_TOKEN</code> (la llave) y opcionalmente <code>INSTAGRAM_ADMIN_SECRET</code>. Redeploy. La llave vence a los 60 días y el servidor la renueva solo.</p>
                                     {siteConfig?.instagram?.conectado?.username && (
                                         <p className="text-emerald-700 dark:text-emerald-300 font-bold">✓ Conectado como @{siteConfig.instagram.conectado.username} · probado el {new Date(siteConfig.instagram.conectado.fecha).toLocaleDateString('es-AR')}</p>
@@ -318,13 +318,13 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                     </div>
                                     <div>
                                         <label className={labelCls}>Probar la conexión (no publica nada)</label>
-                                        <Button onClick={handleProbarInstagram} isLoading={probandoIg} className="bg-pink-600 hover:bg-pink-700 text-white text-xs px-6 py-2.5 rounded-lg w-full md:w-auto">Probar conexión</Button>
+                                        <Button onClick={handleProbarInstagram} isLoading={probandoIg} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 text-xs px-6 py-2.5 rounded-lg w-full md:w-auto">Probar conexión</Button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className={cardCls + ' border-l-4 border-l-blue-500'}>
-                                <h3 className="font-bold mb-1 flex items-center gap-2 text-slate-800 dark:text-white"><Mail className="w-5 h-5 text-blue-500" /> EmailJS (emails al cliente)</h3>
+                            <div className={cardCls + ' border-l-4 border-l-[#E8C65E]/70'}>
+                                <h3 className="font-bold mb-1 flex items-center gap-2 text-slate-800 dark:text-white"><Mail className="w-5 h-5 text-[#E8C65E]" /> EmailJS (emails al cliente)</h3>
                                 <p className="text-[11px] text-slate-400 mb-4">Confirmación de pedido (al comprar) y aviso de envío (al despachar). Cargá las credenciales de tu cuenta de EmailJS.</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
@@ -335,13 +335,13 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                         <div><label className={labelCls}>Template — Carrito abandonado <span className="text-slate-400 normal-case">(opcional)</span></label><input type="text" defaultValue={siteConfig?.emailjs?.abandonedTemplateId || ''} className={inputCls + ' font-mono'} id="emailjsAbandonedTemplateId" placeholder="template_xxx" /></div>
                                         <Button onClick={() => { updateSiteConfig({ emailjs: { serviceId: document.getElementById('emailjsServiceId').value, templateId: document.getElementById('emailjsTemplateId').value, shippedTemplateId: document.getElementById('emailjsShippedTemplateId').value, abandonedTemplateId: document.getElementById('emailjsAbandonedTemplateId').value, publicKey: document.getElementById('emailjsPublicKey').value } }); addToast('EmailJS guardado', 'success'); }} className="w-full bg-slate-800 text-white text-xs py-3 rounded-lg">Guardar credenciales</Button>
                                     </div>
-                                    <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                                        <label className="text-xs font-bold uppercase text-blue-800 dark:text-blue-400 mb-2 block">Probar envío</label>
+                                    <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <label className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 block">Probar envío</label>
                                         <div className="flex gap-2">
                                             <input type="email" value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="tu@email.com" className={inputCls + ' flex-1'} />
-                                            <Button onClick={handleTestEmail} isLoading={isTestingEmail} className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 rounded-lg">Enviar</Button>
+                                            <Button onClick={handleTestEmail} isLoading={isTestingEmail} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 text-xs px-4 rounded-lg">Enviar</Button>
                                         </div>
-                                        <p className="text-[10px] text-blue-400 mt-2">Envía un recibo de prueba a esta dirección.</p>
+                                        <p className="text-[10px] text-slate-400 mt-2">Envía un recibo de prueba a esta dirección.</p>
                                     </div>
                                 </div>
                             </div>
@@ -350,10 +350,10 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
 
                     {/* IA */}
                     {section === 'ia' && (
-                        <div className={cardCls + ' border-l-4 border-l-purple-500'}>
-                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bot className="w-5 h-5 text-purple-500" /> Inteligencia Artificial</h3>
-                            <div className="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-900/30 mb-4">
-                                <p className="text-sm text-purple-800 dark:text-purple-300"><strong>Motor:</strong> Cerebras (texto · Lau y copy). <strong>Visión:</strong> Gemini primario, NVIDIA NIM como fallback. El asistente del cliente usa Gemini.</p>
+                        <div className={cardCls + ' border-l-4 border-l-[#E8C65E]/70'}>
+                            <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bot className="w-5 h-5 text-[#E8C65E]" /> Inteligencia Artificial</h3>
+                            <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-4">
+                                <p className="text-sm text-slate-600 dark:text-slate-300"><strong>Motor:</strong> Cerebras (texto · Lau y copy). <strong>Visión:</strong> Gemini primario, NVIDIA NIM como fallback. El asistente del cliente usa Gemini.</p>
                             </div>
 
                             <div className="bg-gradient-to-br from-[#E8C65E]/10 to-transparent p-4 rounded-xl border border-[#E8C65E]/30 mb-4">
@@ -382,7 +382,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             </div>
 
                             <div className="flex gap-3 mt-4">
-                                <Button onClick={() => { updateAiConfig({ cerebrasKey: document.getElementById('cerebrasKey')?.value || '', cerebrasModel: document.getElementById('cerebrasModel')?.value || '', adminKeys: document.getElementById('aiAdminKeys')?.value || '', customerKeys: document.getElementById('aiCustomerKeys')?.value || '', nvidiaKey: document.getElementById('nvidiaKey')?.value || '', nvidiaModel: document.getElementById('nvidiaModel')?.value || '' }); addToast('Llaves guardadas', 'success'); }} className="bg-purple-600 hover:bg-purple-700 text-white text-xs px-6 py-2.5 rounded-lg shadow-lg shadow-purple-500/20">Guardar Keys</Button>
+                                <Button onClick={() => { updateAiConfig({ cerebrasKey: document.getElementById('cerebrasKey')?.value || '', cerebrasModel: document.getElementById('cerebrasModel')?.value || '', adminKeys: document.getElementById('aiAdminKeys')?.value || '', customerKeys: document.getElementById('aiCustomerKeys')?.value || '', nvidiaKey: document.getElementById('nvidiaKey')?.value || '', nvidiaModel: document.getElementById('nvidiaModel')?.value || '' }); addToast('Llaves guardadas', 'success'); }} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 text-xs px-6 py-2.5 rounded-lg">Guardar Keys</Button>
                                 <Button onClick={handleTestKey} isLoading={isTestingKey} className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-6 py-2.5 rounded-lg border border-slate-700">Probar (Gemini admin)</Button>
                             </div>
                         </div>
@@ -439,9 +439,9 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                                             if (await confirm({ title: '⚠️ Migración', message: 'Sube TODOS los datos locales a Firebase. Puede sobrescribir datos reales. Irreversible.', confirmText: 'Subir y sobrescribir', danger: true })) migrateData(localInv, localOrd, localCat);
                                         }} className="bg-red-600 hover:bg-red-700 text-white w-full py-2.5 rounded-xl font-bold text-xs">SUBIR DATOS LOCALES A NUBE</Button>
                                     </div>
-                                    <div className="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
-                                        <p className="font-bold text-xs text-blue-800 dark:text-blue-400 mb-3">Forzar recarga en clientes</p>
-                                        <Button onClick={async () => { if (await confirm({ title: 'Notificar actualización', message: 'Se mostrará un cartel a todos los clientes para que recarguen.', confirmText: 'Notificar' })) updateSystemVersion(); }} className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-xl font-bold text-xs">NOTIFICAR ACTUALIZACIÓN</Button>
+                                    <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <p className="font-bold text-xs text-slate-600 dark:text-slate-300 mb-3">Forzar recarga en clientes</p>
+                                        <Button onClick={async () => { if (await confirm({ title: 'Notificar actualización', message: 'Se mostrará un cartel a todos los clientes para que recarguen.', confirmText: 'Notificar' })) updateSystemVersion(); }} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 w-full py-2.5 rounded-xl font-bold text-xs">NOTIFICAR ACTUALIZACIÓN</Button>
                                     </div>
                                     <div className="p-4 bg-orange-50 dark:bg-orange-900/10 rounded-xl border border-orange-100 dark:border-orange-900/30">
                                         <p className="font-bold text-xs text-orange-800 dark:text-orange-400 mb-3">Limpieza de imágenes huérfanas</p>

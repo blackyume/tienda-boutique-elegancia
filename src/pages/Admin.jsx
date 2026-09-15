@@ -532,8 +532,8 @@ export const Admin = () => {
                 </div>
                 <nav className="flex-1 p-3 overflow-y-auto" onClick={() => setSidebarOpen(false)}>
                     {MENU.map((g, gi) => (
-                        <div key={g.grupo} className={gi ? 'mt-4' : ''}>
-                            <p className="px-3 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-1">{g.grupo}</p>
+                        <div key={g.grupo} className={gi ? 'mt-2 [@media(min-height:960px)]:mt-4' : ''}>
+                            <p className="px-3 text-[10px] font-bold uppercase text-slate-400 tracking-widest mb-0.5 [@media(min-height:960px)]:mb-1">{g.grupo}</p>
                             {g.items.map(it => (
                                 <SidebarItem
                                     key={it.id}
@@ -548,7 +548,7 @@ export const Admin = () => {
                         </div>
                     ))}
                 </nav>
-                <div className="p-4 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#161616] space-y-2">
+                <div className="p-3 border-t dark:border-slate-800 bg-slate-50 dark:bg-[#161616] space-y-1">
                     <button
                         onClick={() => window.dispatchEvent(new Event('admin:open-command-palette'))}
                         className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E8C65E] w-full justify-start p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-[#E8C65E]/40 transition-colors"
@@ -557,12 +557,14 @@ export const Admin = () => {
                         <span className="inline flex-1 text-left">Buscar</span>
                         <kbd className="text-[9px] font-bold text-slate-400 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5">⌘K</kbd>
                     </button>
-                    <a href="/" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E8C65E] w-full justify-start p-2 transition-colors">
-                        <LinkIcon className="w-4 h-4" /> <span className="inline">Ir a la Tienda</span>
-                    </a>
-                    <button onClick={logout} className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-red-600 w-full justify-start p-2 transition-colors">
-                        <LogOut className="w-4 h-4" /> <span className="inline">Cerrar Sesión</span>
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <a href="/" className="flex-1 flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E8C65E] p-2 transition-colors">
+                            <LinkIcon className="w-4 h-4" /> <span className="inline">Ir a la tienda</span>
+                        </a>
+                        <button onClick={logout} className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-red-600 p-2 transition-colors" title="Cerrar sesión">
+                            <LogOut className="w-4 h-4" /> <span className="inline">Salir</span>
+                        </button>
+                    </div>
                 </div>
             </aside>
 
@@ -583,14 +585,14 @@ export const Admin = () => {
                                 <h1 className="text-3xl font-luxury font-bold dark:text-white text-slate-900 tracking-wider">Inventario Exclusivo</h1>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Gestiona tu colección premium.</p>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <Button onClick={exportInventory} className="!bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-5 py-3 rounded-none text-xs uppercase tracking-[0.2em] hover:!border-[#E8C65E] hover:!text-[#E8C65E] transition-all">
-                                    ⤓ Exportar Excel
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+                                <Button onClick={exportInventory} className="flex-1 sm:flex-none !bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-4 sm:px-5 py-3 rounded-none text-[11px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] whitespace-nowrap hover:!border-[#E8C65E] hover:!text-[#E8C65E] transition-all">
+                                    ⤓ Exportar
                                 </Button>
-                                <Button onClick={() => setIsImportOpen(true)} className="!bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-5 py-3 rounded-none text-xs uppercase tracking-[0.2em] hover:!border-[#E8C65E] hover:!text-[#E8C65E] transition-all">
+                                <Button onClick={() => setIsImportOpen(true)} className="flex-1 sm:flex-none !bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-4 sm:px-5 py-3 rounded-none text-[11px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] whitespace-nowrap hover:!border-[#E8C65E] hover:!text-[#E8C65E] transition-all">
                                     ⤴ Importar Excel
                                 </Button>
-                                <Button onClick={openNewProduct} className="bg-black hover:bg-[#E8C65E] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#E8C65E] text-xs uppercase tracking-[0.2em] transition-all transform hover:-translate-y-1">
+                                <Button onClick={openNewProduct} className="w-full sm:w-auto bg-black hover:bg-[#E8C65E] text-white shadow-xl shadow-black/10 px-6 py-3 rounded-none border border-[#E8C65E] text-xs uppercase tracking-[0.2em] whitespace-nowrap transition-all transform hover:-translate-y-1">
                                     + Nuevo Diseño
                                 </Button>
                             </div>
@@ -618,15 +620,15 @@ export const Admin = () => {
                             </div>
 
                             {/* FILTERS */}
-                            <div className="flex gap-2 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0 scrollbar-hide">
-                                <div className="relative">
+                            <div className="flex flex-wrap gap-2 w-full lg:w-auto lg:flex-nowrap">
+                                <div className="relative flex-1 lg:flex-none min-w-[140px]">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                         <Filter className="h-3.5 w-3.5" />
                                     </div>
                                     <select
                                         value={selectedCategory}
                                         onChange={(e) => setSelectedCategory(e.target.value)}
-                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#E8C65E] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors min-w-[140px]"
+                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#E8C65E] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors w-full min-w-[140px]"
                                     >
                                         <option value="Todos">Todas las Cats</option>
                                         {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -634,14 +636,14 @@ export const Admin = () => {
                                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
                                 </div>
 
-                                <div className="relative">
+                                <div className="relative flex-1 lg:flex-none min-w-[160px]">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                         <SlidersHorizontal className="h-3.5 w-3.5" />
                                     </div>
                                     <select
                                         value={sortOrder}
                                         onChange={(e) => setSortOrder(e.target.value)}
-                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#E8C65E] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors min-w-[160px]"
+                                        className="pl-9 pr-8 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 outline-none focus:border-[#E8C65E] appearance-none cursor-pointer font-medium hover:bg-slate-50 transition-colors w-full min-w-[160px]"
                                     >
                                         <option value="newest">Más Recientes</option>
                                         <option value="price-asc">Menor Precio</option>
@@ -663,8 +665,49 @@ export const Admin = () => {
                             </div>
                         </div>
 
-                        {/* TABLE */}
-                        <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
+                        {/* TARJETAS (celular) */}
+                        <div className="md:hidden space-y-3">
+                            {filteredInventory.length === 0 ? (
+                                <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl"><EmptyState icon={PackageOpen} title="Sin productos" subtitle={searchTerm || selectedCategory !== 'Todos' || filterLowStock ? 'Ningún producto coincide con los filtros aplicados.' : 'Empezá agregando tu primer diseño con el botón “+ Nuevo Diseño”.'} /></div>
+                            ) : invPage.pageItems.map(p => {
+                                const total = getTotalStock(p);
+                                const stockCls = total === 0 ? 'text-red-500' : total <= lowStockThreshold ? 'text-amber-500' : 'text-slate-700 dark:text-slate-200';
+                                return (
+                                    <div key={p.id} className={`bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-3 ${p.active === false ? 'opacity-70' : ''}`}>
+                                        <div className="flex gap-3">
+                                            <div className="w-16 h-20 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
+                                                {p.image ? <img src={p.image} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon className="w-5 h-5" /></div>}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-bold text-slate-800 dark:text-white leading-snug line-clamp-2">{p.name}</p>
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 mt-1">{p.category}</span>
+                                                <div className="flex items-baseline justify-between gap-3 mt-2">
+                                                    <span className="font-bold text-slate-900 dark:text-white">{formatMoney(p.price)}</span>
+                                                    <span className={`text-sm font-bold ${stockCls}`}>{total === 0 ? 'Sin stock' : `${total} u.`}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                                            <button
+                                                onClick={(e) => toggleVisibility(p, e)}
+                                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border ${p.active !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-900/50' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700'}`}
+                                            >
+                                                {p.active !== false ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Oculto</>}
+                                            </button>
+                                            <div className="flex gap-0.5">
+                                                <ActionBtn onClick={() => copyProductLink(p.id)} icon={LinkIcon} color="text-blue-500 hover:bg-blue-50" title="Copiar Link" />
+                                                <ActionBtn onClick={() => handlePublishInstagram(p)} icon={InstagramIcon} color={`text-pink-500 hover:bg-pink-50 ${publishingIgId === p.id ? 'animate-pulse' : ''}`} title="Publicar en Instagram" />
+                                                <ActionBtn onClick={() => { setCurrentProduct({ ...p, active: p.active !== false }); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar" />
+                                                <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-red-500 hover:bg-red-50" title="Eliminar" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* TABLE (pantallas medianas y grandes) */}
+                        <div className="hidden md:block bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-x-auto">
                             <table className="w-full text-left text-sm min-w-[720px]">
                                 <thead className="bg-slate-50/50 dark:bg-[#161616] text-slate-500 font-luxury uppercase text-[10px] tracking-widest border-b border-slate-200 dark:border-slate-800">
                                     <tr>
@@ -916,12 +959,12 @@ export const Admin = () => {
 // --- SUBCOMPONENTS (Clean & extracted) ---
 
 const SidebarItem = ({ icon: Icon, label, hint, active, onClick, count }) => (
-    <button onClick={onClick} title={hint} className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 group ${active ? 'bg-[#E8C65E] text-black shadow-lg shadow-[#E8C65E]/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+    <button onClick={onClick} title={hint} className={`w-full flex items-center justify-between px-3 py-1.5 [@media(min-height:960px)]:py-2 rounded-xl text-sm font-medium transition-all duration-200 group ${active ? 'bg-[#E8C65E] text-black shadow-lg shadow-[#E8C65E]/30' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
         <div className="flex items-center gap-3 min-w-0">
             <Icon className={`w-5 h-5 shrink-0 ${active ? 'text-black' : 'text-slate-400 group-hover:text-[#E8C65E] transition-colors'}`} />
             <span className="min-w-0 text-left">
                 <span className="block font-semibold leading-tight truncate">{label}</span>
-                {hint && <span className={`block text-[10.5px] leading-tight truncate ${active ? 'text-black/70' : 'text-slate-400 dark:text-slate-500'}`}>{hint}</span>}
+                {hint && <span className={`hidden [@media(min-height:960px)]:block text-[10.5px] leading-tight truncate ${active ? 'text-black/70' : 'text-slate-400 dark:text-slate-500'}`}>{hint}</span>}
             </span>
         </div>
         {count > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center inline-block shadow-sm shrink-0">{count}</span>}
@@ -929,12 +972,12 @@ const SidebarItem = ({ icon: Icon, label, hint, active, onClick, count }) => (
 );
 
 const StatSmall = ({ label, value, icon: Icon, color, hint }) => (
-    <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4 transition-transform hover:scale-[1.02]" title={hint}>
-        <div className={`p-3 rounded-xl ${color}`}><Icon className="w-5 h-5" /></div>
-        <div>
+    <div className="bg-white dark:bg-[#1a1a1a] p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3 sm:gap-4 min-w-0 transition-transform hover:scale-[1.02]" title={hint}>
+        <div className={`hidden sm:block p-3 rounded-xl shrink-0 ${color}`}><Icon className="w-5 h-5" /></div>
+        <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">{label}</p>
-            <p className="text-xl font-bold dark:text-white">{value}</p>
-            {hint && <p className="text-[10px] text-slate-400 leading-tight mt-0.5">{hint}</p>}
+            <p className="text-base sm:text-xl font-bold dark:text-white break-words">{typeof value === 'string' ? value.replace(/^\$\s+/, '$') : value}</p>
+            {hint && <p className="hidden sm:block text-[10px] text-slate-400 leading-tight mt-0.5">{hint}</p>}
         </div>
     </div>
 );

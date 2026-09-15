@@ -68,7 +68,7 @@ export const StatCard = ({ label, value, sub, icon: Icon, theme, spark }) => {
             <div className="flex justify-between items-start mb-4">
                 <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">{label}</p>
-                    <h3 className="text-3xl font-serif font-medium text-slate-900 dark:text-white tracking-tight">{value}</h3>
+                    <h3 className="text-3xl font-serif font-medium text-slate-900 dark:text-white tracking-tight">{typeof value === 'string' ? value.replace(/^\$\s+/, '$') : value}</h3>
                 </div>
                 <div className={`p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 group-hover:text-[#E8C65E] transition-colors duration-300`}>
                     <Icon className="w-5 h-5" />

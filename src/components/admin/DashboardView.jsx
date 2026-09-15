@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Package, Users, Wallet, TrendingUp, ShoppingCart, Plus, Search, MessageSquare, Settings, Lock, Calendar, Download, Activity, Trophy, Percent, Truck, Radio, Palette } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
-import { RealTimeClock, StatCard, ActionButton } from './AdminShared';
+import { StatCard, ActionButton } from './AdminShared';
 import { LowStockPanel } from './LowStockPanel';
 import { OnboardingPanel } from './OnboardingPanel';
 import { getLiveVisitors } from '../../utils/presence';
@@ -217,7 +217,13 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                 {/* HEADER & STATUS */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold dark:text-white text-slate-900 tracking-wider">Inicio</h1>
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <h1 className="text-3xl font-bold dark:text-white text-slate-900 tracking-wider">Inicio</h1>
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${isMaintenance ? 'border-red-500/40 text-red-500 bg-red-500/10' : 'border-emerald-500/40 text-emerald-500 bg-emerald-500/10'}`}>
+                                <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                                {isMaintenance ? 'En mantenimiento' : 'Abierta'}
+                            </span>
+                        </div>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Cómo va la tienda hoy.</p>
                     </div>
 
@@ -239,16 +245,6 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                 <Download className="w-3 h-3" /> Exportar
                             </button>
                         </div>
-
-                        <div className="flex items-center gap-4">
-                            <RealTimeClock />
-                            <div className="flex items-center gap-2">
-                                <span className={`w-2 h-2 rounded-full animate-pulse ${isMaintenance ? 'bg-red-500' : 'bg-emerald-500'}`}></span>
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                                    {isMaintenance ? 'MANTENIMIENTO' : 'ONLINE'}
-                                </span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -261,18 +257,34 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                 />
 
                 {/* KPI GRID */}
+                {orders.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1a1a1a] p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-5">
+                        <span className="w-14 h-14 rounded-full bg-[#E8C65E]/15 flex items-center justify-center shrink-0">
+                            <Wallet className="w-7 h-7 text-[#E8C65E]" />
+                        </span>
+                        <div className="flex-1">
+                            <p className="font-bold text-slate-900 dark:text-white text-lg">Todavía no hubo ventas</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                Cuando entre la primera, acá vas a ver los ingresos, los pedidos, el ticket promedio y cuántas visitas terminan en compra. Mientras tanto: {visitCount > 0 ? <strong className="text-slate-700 dark:text-slate-200">{visitCount} visitas</strong> : 'sin visitas'} en el período.
+                            </p>
+                        </div>
+                        {isMaintenance && (
+                            <button onClick={toggleMaintenance} className="shrink-0 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg bg-[#E8C65E] text-black hover:opacity-90 transition-opacity">Abrir la tienda</button>
+                        )}
+                    </div>
+                ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                     <StatCard
                         label="Ingresos (Periodo)"
                         value={formatMoney(salesInteractions.totalRevenue)}
-                        sub={<span className="flex items-center gap-1">
-                            {periodComparison.revenueChange !== 0 && (
+                        sub={periodComparison.revenueChange !== 0 && (
+                            <span className="flex items-center gap-1">
                                 <span className={periodComparison.revenueChange > 0 ? 'text-emerald-500' : 'text-red-500'}>
                                     {periodComparison.revenueChange > 0 ? '↑' : '↓'} {Math.abs(periodComparison.revenueChange)}%
                                 </span>
-                            )}
-                            <span className="text-slate-400">vs período anterior</span>
-                        </span>}
+                                <span className="text-slate-400">vs período anterior</span>
+                            </span>
+                        )}
                         icon={Wallet}
                         theme="emerald"
                         spark={periodComparison.revenueSeries}
@@ -280,14 +292,14 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                     <StatCard
                         label="Pedidos"
                         value={salesInteractions.count}
-                        sub={<span className="flex items-center gap-1">
-                            {periodComparison.ordersChange !== 0 && (
+                        sub={periodComparison.ordersChange !== 0 && (
+                            <span className="flex items-center gap-1">
                                 <span className={periodComparison.ordersChange > 0 ? 'text-emerald-500' : 'text-red-500'}>
                                     {periodComparison.ordersChange > 0 ? '↑' : '↓'} {Math.abs(periodComparison.ordersChange)}%
                                 </span>
-                            )}
-                            <span className="text-slate-400">vs anterior</span>
-                        </span>}
+                                <span className="text-slate-400">vs anterior</span>
+                            </span>
+                        )}
                         icon={ShoppingCart}
                         theme="blue"
                         spark={periodComparison.ordersSeries}
@@ -295,14 +307,14 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                     <StatCard
                         label="Ticket Promedio"
                         value={formatMoney(periodComparison.avgTicketCurrent)}
-                        sub={<span className="flex items-center gap-1">
-                            {periodComparison.ticketChange !== 0 && (
+                        sub={periodComparison.ticketChange !== 0 && (
+                            <span className="flex items-center gap-1">
                                 <span className={periodComparison.ticketChange > 0 ? 'text-emerald-500' : 'text-red-500'}>
                                     {periodComparison.ticketChange > 0 ? '↑' : '↓'} {Math.abs(periodComparison.ticketChange)}%
                                 </span>
-                            )}
-                            <span className="text-slate-400">vs anterior</span>
-                        </span>}
+                                <span className="text-slate-400">vs anterior</span>
+                            </span>
+                        )}
                         icon={TrendingUp}
                         theme="orange"
                     />
@@ -314,6 +326,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         theme="purple"
                     />
                 </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* CHARTS COLUMN */}

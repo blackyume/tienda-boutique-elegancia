@@ -1,18 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Check, Sparkles, ArrowRight, PartyPopper } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, PartyPopper, ChevronDown, X } from 'lucide-react';
 
 // Panel de "Primeros pasos" para la puesta en marcha de la tienda.
-// Se muestra mientras falte completar algún paso; cuando está todo listo,
-// muestra un mensaje de felicitación discreto (o se oculta).
+// Compacto: una línea de cabecera con el progreso, y abajo sólo lo que
+// falta (lo hecho se resume en una línea). Se puede plegar, y cuando está
+// todo listo queda una sola línea que se cierra con la X y no vuelve.
+
+const CLAVE_PLEGADO = 'lbde-primeros-pasos-plegado';
+const CLAVE_CERRADO = 'lbde-primeros-pasos-cerrado';
+const leer = (k) => { try { return localStorage.getItem(k) === '1'; } catch { return false; } };
+const guardar = (k, v) => { try { v ? localStorage.setItem(k, '1') : localStorage.removeItem(k); } catch { /* sin storage */ } };
+
 export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance, isMaintenance }) => {
     const { inventory, paymentConfig, siteConfig, shippingRates } = useStore();
+    const [plegado, setPlegado] = useState(() => leer(CLAVE_PLEGADO));
+    const [cerrado, setCerrado] = useState(() => leer(CLAVE_CERRADO));
 
     const steps = [
         {
             key: 'prod',
             label: 'Cargá tu primer producto',
-            desc: 'Subí una prenda con foto, precio y stock. Podés pedírselo a Lau con una foto.',
+            corto: 'producto',
+            desc: 'Una prenda con foto, precio y stock. Podés pedírselo a Lau con una foto.',
             done: (inventory?.length || 0) > 0,
             cta: 'Crear producto',
             action: onCreateProduct,
@@ -20,7 +30,8 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
         {
             key: 'pay',
             label: 'Conectá Mercado Pago',
-            desc: 'Para cobrar online de forma segura (tarjeta, débito, cuotas).',
+            corto: 'Mercado Pago',
+            desc: 'Para cobrar online (tarjeta, débito, cuotas).',
             done: !!(paymentConfig?.accessToken),
             cta: 'Configurar',
             action: () => onNavigate('settings'),
@@ -28,7 +39,8 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
         {
             key: 'ship',
             label: 'Configurá envíos y tus datos',
-            desc: 'Tarifas de Correo Argentino y los datos del remitente (para las etiquetas).',
+            corto: 'envíos',
+            desc: 'Tarifas del Correo y los datos del remitente para las etiquetas.',
             done: !!(shippingRates && Object.keys(shippingRates).length) && !!(siteConfig?.remitente?.address),
             cta: 'Configurar',
             action: () => onNavigate('settings'),
@@ -36,7 +48,8 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
         {
             key: 'mail',
             label: 'Activá los emails',
-            desc: 'Confirmación de compra y aviso de envío automáticos al cliente.',
+            corto: 'emails',
+            desc: 'Confirmación de compra y aviso de envío automáticos.',
             done: !!(siteConfig?.emailjs?.serviceId),
             cta: 'Configurar',
             action: () => onNavigate('settings'),
@@ -44,76 +57,83 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
         {
             key: 'open',
             label: 'Abrí la tienda',
-            desc: 'Apagá el modo mantenimiento cuando esté todo listo para vender.',
+            corto: 'tienda abierta',
+            desc: 'Apagá el modo mantenimiento cuando esté todo listo.',
             done: !isMaintenance,
             cta: 'Abrir tienda',
             action: toggleMaintenance,
         },
     ];
 
-    const doneCount = steps.filter(s => s.done).length;
-    const pct = Math.round((doneCount / steps.length) * 100);
+    const hechos = steps.filter(s => s.done);
+    const faltan = steps.filter(s => !s.done);
+    const pct = Math.round((hechos.length / steps.length) * 100);
 
-    // Todo completo → felicitación compacta.
-    if (doneCount === steps.length) {
+    if (cerrado) return null;
+
+    // Todo completo → una línea, que se cierra y no vuelve.
+    if (faltan.length === 0) {
         return (
-            <div className="rounded-2xl p-5 flex items-center gap-4 border border-emerald-500/30 bg-emerald-500/[0.06]">
-                <PartyPopper className="w-6 h-6 text-emerald-400 shrink-0" />
-                <div>
-                    <p className="font-bold text-slate-900 dark:text-white">¡Tienda lista para vender! 🎉</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Completaste todos los pasos. Ahora a difundir y vender.</p>
-                </div>
+            <div className="rounded-xl px-4 py-3 flex items-center gap-3 border border-emerald-500/30 bg-emerald-500/[0.06]">
+                <PartyPopper className="w-5 h-5 text-emerald-400 shrink-0" />
+                <p className="flex-1 text-sm text-slate-700 dark:text-slate-200"><strong>Tienda lista para vender.</strong> Los cinco primeros pasos están hechos.</p>
+                <button onClick={() => { setCerrado(true); guardar(CLAVE_CERRADO, true); }} className="p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-white" title="Cerrar" aria-label="Cerrar">
+                    <X className="w-4 h-4" />
+                </button>
             </div>
         );
     }
 
+    const alternar = () => { setPlegado(p => { guardar(CLAVE_PLEGADO, !p); return !p; }); };
+
     return (
         <div className="rounded-2xl overflow-hidden border border-[#E8C65E]/30 bg-white dark:bg-[#1a1a1a] shadow-sm">
-            {/* Header dorado */}
-            <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-white/5" style={{ background: 'linear-gradient(100deg, rgba(232,198,94,0.12), transparent)' }}>
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                    <div className="flex items-center gap-3">
-                        <span className="w-10 h-10 rounded-full bg-[#E8C65E]/15 flex items-center justify-center">
-                            <Sparkles className="w-5 h-5 text-[#E8C65E]" />
+            {/* Cabecera: una línea con el progreso; toca para plegar */}
+            <button onClick={alternar} className="w-full text-left px-4 sm:px-5 py-3 flex items-center gap-3" style={{ background: 'linear-gradient(100deg, rgba(232,198,94,0.12), transparent)' }} aria-expanded={!plegado}>
+                <span className="w-8 h-8 rounded-full bg-[#E8C65E]/15 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4 h-4 text-[#E8C65E]" />
+                </span>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold text-slate-900 dark:text-white leading-tight">Primeros pasos</h3>
+                        <span className="text-xs font-black text-[#E8C65E]">{hechos.length} de {steps.length}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {faltan.length === 1 ? 'Falta uno: ' : `Faltan ${faltan.length}: `}{faltan.map(s => s.corto).join(', ')}
                         </span>
-                        <div>
-                            <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">Primeros pasos</h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Completá esto para dejar tu tienda lista para vender.</p>
-                        </div>
                     </div>
-                    <div className="text-right">
-                        <span className="text-2xl font-black text-[#E8C65E]">{doneCount}/{steps.length}</span>
-                        <p className="text-[10px] uppercase tracking-widest text-slate-400">completados</p>
+                    <div className="mt-1.5 w-full max-w-md h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #BF953F, #FCF6BA, #B38728)' }} />
                     </div>
                 </div>
-                {/* Barra de progreso */}
-                <div className="mt-4 w-full h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #BF953F, #FCF6BA, #B38728)' }} />
-                </div>
-            </div>
+                <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${plegado ? '-rotate-90' : ''}`} />
+            </button>
 
-            {/* Lista de pasos */}
-            <div className="divide-y divide-slate-100 dark:divide-white/5">
-                {steps.map((s, i) => (
-                    <div key={s.key} className={`flex items-center gap-4 p-4 sm:px-6 ${s.done ? 'opacity-60' : ''}`}>
-                        <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${s.done ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-300'}`}>
-                            {s.done ? <Check className="w-4 h-4" /> : i + 1}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-bold ${s.done ? 'line-through text-slate-400' : 'text-slate-800 dark:text-white'}`}>{s.label}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.desc}</p>
-                        </div>
-                        {!s.done && (
+            {!plegado && (
+                <div className="border-t border-slate-100 dark:border-white/5">
+                    {faltan.map((s) => (
+                        <div key={s.key} className="flex items-center gap-3 px-4 sm:px-5 py-2.5 border-b border-slate-100 dark:border-white/5 last:border-b-0">
+                            <span className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300">
+                                {steps.indexOf(s) + 1}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-bold text-slate-800 dark:text-white leading-tight">{s.label}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden sm:block">{s.desc}</p>
+                            </div>
                             <button
                                 onClick={s.action}
-                                className="shrink-0 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-lg bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 transition-opacity"
+                                className="shrink-0 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 transition-opacity"
                             >
                                 {s.cta} <ArrowRight className="w-3.5 h-3.5" />
                             </button>
-                        )}
-                    </div>
-                ))}
-            </div>
+                        </div>
+                    ))}
+                    {hechos.length > 0 && (
+                        <p className="px-4 sm:px-5 py-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 bg-slate-50/60 dark:bg-white/[0.02]">
+                            <Check className="w-3.5 h-3.5 text-emerald-500" /> Ya hecho: {hechos.map(s => s.corto).join(', ')}.
+                        </p>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
