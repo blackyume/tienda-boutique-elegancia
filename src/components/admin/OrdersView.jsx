@@ -40,7 +40,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
         <div className="max-w-7xl mx-auto p-6 md:p-8 animate-fadeIn">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-bold dark:text-white">Gestión de Pedidos</h1>
+                    <h1 className="text-3xl font-bold dark:text-white">Pedidos</h1>
                     <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg flex items-center border border-slate-200 dark:border-slate-700">
                         <button onClick={() => setViewMode('list')} className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-black dark:text-white' : 'text-slate-400'}`} title="Vista Lista"><LayoutList className="w-5 h-5" /></button>
                         <button onClick={() => setViewMode('board')} className={`p-2 rounded-md transition-all ${viewMode === 'board' ? 'bg-white dark:bg-slate-700 shadow-sm text-black dark:text-white' : 'text-slate-400'}`} title="Vista Tablero"><KanbanSquare className="w-5 h-5" /></button>
@@ -71,7 +71,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                         <EmptyState
                             icon={PackageOpen}
                             title={filter === 'all' ? 'Todavía no hay pedidos' : 'Sin pedidos en este estado'}
-                            subtitle={filter === 'all' ? 'Cuando entre la primera venta vas a verla acá en tiempo real.' : 'Probá cambiar el filtro para ver otros pedidos.'}
+                            subtitle={filter === 'all' ? 'Cuando una clienta compre, el pedido aparece acá al instante, con sus datos y el envío listo para cargar en el Correo. También podés registrar una venta hecha por fuera desde Ventas → Importar ventas.' : 'Probá cambiar el filtro para ver otros pedidos.'}
                         />
                     ) : (
                         ordPage.pageItems.map(o => (

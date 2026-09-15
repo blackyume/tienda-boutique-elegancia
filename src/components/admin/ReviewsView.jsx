@@ -51,6 +51,7 @@ export const ReviewsView = () => {
                     <div className="p-12 text-center text-slate-400">
                         <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-30" />
                         <p>Sin reseñas {filter === 'pending' ? 'pendientes' : filter === 'approved' ? 'aprobadas' : ''}.</p>
+                        {reviews.length === 0 && <p className="text-xs mt-2 max-w-sm mx-auto text-slate-400/80">Sólo puede opinar quien compró. Cuando una clienta deje una reseña, aparece acá para que la apruebes antes de que se vea en la tienda.</p>}
                     </div>
                 ) : (
                     <div className="divide-y divide-slate-100 dark:divide-slate-800">

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { formatMoney } from '../../utils/helpers';
 import { Users, Mail, Phone, Calendar, ShoppingBag, BadgeCheck } from 'lucide-react';
 import { usePagination, Pagination } from '../ui/Pagination';
+import { EmptyState } from '../ui/EmptyState';
 
 export const CustomersView = ({ orders }) => {
 
@@ -15,7 +16,7 @@ export const CustomersView = ({ orders }) => {
             if (!customerMap[email]) {
                 customerMap[email] = {
                     id: email,
-                    name: `${cust.nombre || 'Cliente'} ${cust.apellido || ''}`.trim(),
+                    name: `${cust.nombre || 'Clienta'} ${cust.apellido || ''}`.trim(),
                     email: email,
                     phone: cust.telefono || '—',
                     totalSpent: 0,
@@ -43,14 +44,10 @@ export const CustomersView = ({ orders }) => {
         <div className="max-w-7xl mx-auto p-6 lg:p-10 pb-24 animate-fadeIn">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold dark:text-white text-slate-900 tracking-wider">Cartera de Clientes</h1>
+                    <h1 className="text-3xl font-bold dark:text-white text-slate-900 tracking-wider">Clientas</h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">
-                        {customers.length} clientes registrados históricamente.
+                        {customers.length === 0 ? 'Quién compró qué, y cuánto.' : `${customers.length} ${customers.length === 1 ? 'clienta' : 'clientas'} · se arma solo con cada pedido.`}
                     </p>
-                </div>
-                <div className="bg-[#E8C65E]/10 text-[#E8C65E] px-4 py-2 rounded-xl flex items-center gap-2 border border-[#E8C65E]/20">
-                    <Users className="w-5 h-5" />
-                    <span className="font-bold text-sm">CRM Activo</span>
                 </div>
             </div>
 
@@ -112,9 +109,12 @@ export const CustomersView = ({ orders }) => {
             <Pagination page={custPage.page} setPage={custPage.setPage} totalPages={custPage.totalPages} total={custPage.total} pageSize={PAGE} />
 
             {customers.length === 0 && (
-                <div className="text-center py-20 bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
-                    <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                    <p className="text-slate-500 font-bold">Aún no tienes clientes registrados.</p>
+                <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <EmptyState
+                        icon={Users}
+                        title="Todavía no compró nadie"
+                        subtitle="Con cada pedido se arma sola la ficha de la clienta: qué compró, cuánto gastó, su teléfono y su ciudad. No hay nada que cargar."
+                    />
                 </div>
             )}
         </div>

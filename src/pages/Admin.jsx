@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { useConfirm } from '../components/ui/ConfirmDialog';
 import { EmptyState } from '../components/ui/EmptyState';
 import { CommandPalette } from '../components/admin/CommandPalette';
+import { LogoSVG } from '../components/layout/LogoSVG';
 import { formatMoney } from '../utils/helpers';
 import {
     LayoutDashboard, Package, Tag, LogOut, Edit2, Trash2, X,
@@ -522,10 +523,7 @@ export const Admin = () => {
             {/* SIDEBAR / DRAWER */}
             <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#1a1a1a] border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-xl lg:shadow-sm shrink-0 transform transition-transform duration-300 ease-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center">
-                        <img src="/assets/logo-seal.png?v=5" alt="La Boutique Logo" className="w-10 h-10 object-contain" />
-                        <span className="block ml-3 font-cinzel font-bold text-lg text-slate-800 dark:text-white tracking-widest uppercase">La Boutique</span>
-                    </div>
+                    <LogoSVG to="/" width={190} className="[&>svg]:max-w-full [&>svg]:h-auto" />
                     <button onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú" className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
                         <X className="w-5 h-5" />
                     </button>
@@ -582,8 +580,8 @@ export const Admin = () => {
                     <div className="max-w-7xl mx-auto p-6 lg:p-10 pb-24">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                             <div>
-                                <h1 className="text-3xl font-luxury font-bold dark:text-white text-slate-900 tracking-wider">Inventario Exclusivo</h1>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">Gestiona tu colección premium.</p>
+                                <h1 className="text-3xl font-bold dark:text-white text-slate-900 tracking-wider">Inventario</h1>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-light tracking-wide">{inventory.length} productos · {inventory.filter(p => p.active === false).length} ocultos</p>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
                                 <Button onClick={exportInventory} className="flex-1 sm:flex-none !bg-white dark:!bg-[#1a1a1a] !text-slate-700 dark:!text-slate-200 border border-slate-200 dark:border-slate-700 px-4 sm:px-5 py-3 rounded-none text-[11px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] whitespace-nowrap hover:!border-[#E8C65E] hover:!text-[#E8C65E] transition-all">
@@ -600,10 +598,10 @@ export const Admin = () => {
 
                         {/* STATS RAPIDAS */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                            <StatSmall label="Ganancia Potencial" value={formatMoney(metrics.potentialProfit)} icon={TrendingUp} color="text-[#E8C65E] bg-orange-50 dark:bg-orange-900/20" hint={`Si vendés todo por la tienda, ya descontada la comisión de MP (${comisionMP(paymentConfig)}%)`} />
-                            <StatSmall label="Valor Inventario" value={formatMoney(metrics.totalValue)} icon={DollarSign} color="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" hint="Lo que cobrarías vendiendo todo al precio de la tienda" />
-                            <StatSmall label="Inversión" value={formatMoney(metrics.invested)} icon={Wallet} color="text-blue-600 bg-blue-50 dark:bg-blue-900/20" hint="Costo + envío + packaging de todo el stock" />
-                            <StatSmall label="Total Prendas" value={metrics.totalStock} icon={Tag} color="text-purple-600 bg-purple-50 dark:bg-purple-900/20" />
+                            <StatSmall label="Ganancia Potencial" value={formatMoney(metrics.potentialProfit)} icon={TrendingUp} color="text-[#E8C65E] bg-[#E8C65E]/10" hint={`Si vendés todo por la tienda, ya descontada la comisión de MP (${comisionMP(paymentConfig)}%)`} />
+                            <StatSmall label="Valor Inventario" value={formatMoney(metrics.totalValue)} icon={DollarSign} color="text-[#E8C65E] bg-[#E8C65E]/10" hint="Lo que cobrarías vendiendo todo al precio de la tienda" />
+                            <StatSmall label="Inversión" value={formatMoney(metrics.invested)} icon={Wallet} color="text-[#E8C65E] bg-[#E8C65E]/10" hint="Costo + envío + packaging de todo el stock" />
+                            <StatSmall label="Total Prendas" value={metrics.totalStock} icon={Tag} color="text-[#E8C65E] bg-[#E8C65E]/10" />
                         </div>
 
                         {/* FILTERS TOOLBAR */}
@@ -695,10 +693,10 @@ export const Admin = () => {
                                                 {p.active !== false ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Oculto</>}
                                             </button>
                                             <div className="flex gap-0.5">
-                                                <ActionBtn onClick={() => copyProductLink(p.id)} icon={LinkIcon} color="text-blue-500 hover:bg-blue-50" title="Copiar Link" />
-                                                <ActionBtn onClick={() => handlePublishInstagram(p)} icon={InstagramIcon} color={`text-pink-500 hover:bg-pink-50 ${publishingIgId === p.id ? 'animate-pulse' : ''}`} title="Publicar en Instagram" />
-                                                <ActionBtn onClick={() => { setCurrentProduct({ ...p, active: p.active !== false }); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar" />
-                                                <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-red-500 hover:bg-red-50" title="Eliminar" />
+                                                <ActionBtn onClick={() => copyProductLink(p.id)} icon={LinkIcon} color="text-slate-400 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10" title="Copiar link" />
+                                                <ActionBtn onClick={() => handlePublishInstagram(p)} icon={InstagramIcon} color={`text-slate-400 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10 ${publishingIgId === p.id ? 'animate-pulse text-[#E8C65E]' : ''}`} title="Publicar en Instagram" />
+                                                <ActionBtn onClick={() => { setCurrentProduct({ ...p, active: p.active !== false }); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-400 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10" title="Editar" />
+                                                <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" title="Eliminar" />
                                             </div>
                                         </div>
                                     </div>
@@ -796,21 +794,21 @@ export const Admin = () => {
                                                         {/* ACCIONES */}
                                                         <td className="p-4 text-right pr-6">
                                                             <div className="flex justify-end gap-1">
-                                                                <ActionBtn onClick={() => copyProductLink(p.id)} icon={LinkIcon} color="text-blue-500 hover:bg-blue-50" title="Copiar Link" />
+                                                                <ActionBtn onClick={() => copyProductLink(p.id)} icon={LinkIcon} color="text-slate-400 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10" title="Copiar link" />
                                                                 <ActionBtn
                                                                     onClick={() => handlePublishTelegram(p)}
                                                                     icon={SendIcon}
-                                                                    color={`text-sky-500 hover:bg-sky-50 ${publishingTgId === p.id ? 'animate-pulse' : ''}`}
+                                                                    color={`text-slate-400 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10 ${publishingTgId === p.id ? 'animate-pulse text-[#E8C65E]' : ''}`}
                                                                     title="Publicar en Telegram"
                                                                 />
                                                                 <ActionBtn
                                                                     onClick={() => handlePublishInstagram(p)}
                                                                     icon={InstagramIcon}
-                                                                    color={`text-pink-500 hover:bg-pink-50 ${publishingIgId === p.id ? 'animate-pulse' : ''}`}
+                                                                    color={`text-slate-400 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10 ${publishingIgId === p.id ? 'animate-pulse text-[#E8C65E]' : ''}`}
                                                                     title="Publicar en Instagram"
                                                                 />
-                                                                <ActionBtn onClick={() => { setCurrentProduct({ ...p, active: p.active !== false }); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700" title="Editar" />
-                                                                <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-red-500 hover:bg-red-50" title="Eliminar" />
+                                                                <ActionBtn onClick={() => { setCurrentProduct({ ...p, active: p.active !== false }); setIsProductModalOpen(true); }} icon={Edit2} color="text-slate-400 hover:text-[#E8C65E] hover:bg-[#E8C65E]/10" title="Editar" />
+                                                                <ActionBtn onClick={() => handleDeleteProduct(p.id)} icon={Trash2} color="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" title="Eliminar" />
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -876,6 +874,11 @@ export const Admin = () => {
                     lowStockThreshold={lowStockThreshold}
                     activeSessions={activeSessions}
                     visitStatsHourly={visitStatsHourly}
+                    abandonedCarts={abandonedCarts}
+                    reviews={reviews}
+                    inventory={inventory}
+                    siteConfig={siteConfig}
+                    aiConfig={aiConfig}
                     onCreateProduct={() => {
                         setCurrentProduct({
                             name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",
@@ -889,7 +892,7 @@ export const Admin = () => {
                 {adminTab === 'assistant' && <AdminAssistantView orders={orders} inventory={inventory} onClose={() => setAdminTab('dashboard')} />}
                 {adminTab === 'orders' && <OrdersView orders={orders} updateOrderStatus={updateOrderStatus} />}
                 {adminTab === 'customers' && <CustomersView orders={orders} />}
-                {adminTab === 'sales' && <SalesView salesLog={salesLog} />}
+                {adminTab === 'sales' && <SalesView salesLog={salesLog} metrics={metrics} />}
                 {
                     adminTab === 'calculator' && <SimulationsView
                         onSaveToProduct={(data) => {

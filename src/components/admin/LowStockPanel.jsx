@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AlertTriangle, ChevronRight, ChevronDown, Package, Edit2, EyeOff, Eye } from 'lucide-react';
+import { tituloDeProducto } from '../../utils/nombres';
 
 export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditProduct, onToggleVisible, compact = false }) => {
     const [expanded, setExpanded] = useState(null);
@@ -67,9 +68,15 @@ export const LowStockPanel = ({ items, threshold, onNavigateInventory, onEditPro
                                             : <div className="w-full h-full flex items-center justify-center text-slate-300"><Package className="w-4 h-4" /></div>}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{product.name}</p>
-                                        <p className="text-[10px] text-slate-400 uppercase tracking-wider">
-                                            {isAggregate ? 'Sin variantes' : `${variants.length} variante${variants.length > 1 ? 's' : ''} baja${variants.length > 1 ? 's' : ''}`}
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white leading-snug line-clamp-2">{tituloDeProducto(product.name)}</p>
+                                        <p className="text-[11px] text-slate-400 mt-0.5">
+                                            {isAggregate
+                                                ? 'Sin talles ni colores cargados'
+                                                : (() => {
+                                                    const peor = [...variants].sort((a, b) => a.stock - b.stock)[0];
+                                                    const etiqueta = [peor?.size, peor?.color].filter(Boolean).join(' · ');
+                                                    return <>{etiqueta ? <>{etiqueta}: <strong className={peor.stock === 0 ? 'text-red-500' : 'text-amber-500'}>{peor.stock}</strong></> : null}{variants.length > 1 && <span className="opacity-70"> · {variants.length} variantes bajas</span>}</>;
+                                                })()}
                                         </p>
                                     </div>
                                     <div className="text-right shrink-0">

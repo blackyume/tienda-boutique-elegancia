@@ -1,15 +1,17 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Package, Users, Wallet, TrendingUp, ShoppingCart, Plus, Search, MessageSquare, Settings, Lock, Calendar, Download, Activity, Trophy, Percent, Truck, Radio, Palette } from 'lucide-react';
+import { Package, Wallet, TrendingUp, ShoppingCart, Calendar, Download, Activity, Trophy, Heart, Truck, CreditCard, MessageSquare, AlertTriangle, ChevronRight, BarChart3 } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
-import { StatCard, ActionButton } from './AdminShared';
+import { StatCard } from './AdminShared';
 import { LowStockPanel } from './LowStockPanel';
 import { OnboardingPanel } from './OnboardingPanel';
 import { getLiveVisitors } from '../../utils/presence';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
+import { pendientesDeHoy, favoritosTop, visitasPorDia, resumenStock, avisosDeLlaves } from '../../utils/inicio';
+import { tituloDeProducto } from '../../utils/nombres';
 import { OrdersNeedingReviewPanel } from './OrdersNeedingReviewPanel';
 // xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
 
-export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [] }) => {
+export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [], abandonedCarts = [], reviews = [], inventory = [], siteConfig, aiConfig }) => {
 
     // Re-render cada 15s para actualizar el corte de sesiones "vivas"
     const [, tick] = useState(0);
@@ -20,23 +22,15 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
 
     const liveVisitors = useMemo(() => getLiveVisitors(activeSessions), [activeSessions]);
 
-    // Últimas 48 horas de tráfico, rellenando buckets vacíos en 0.
-    const visitChartData = useMemo(() => {
-        const map = new Map(visitStatsHourly.map(v => [v.id, v.count || 0]));
-        const now = new Date();
-        const points = [];
-        for (let i = 47; i >= 0; i--) {
-            const d = new Date(now.getTime() - i * 3600_000);
-            const bucket = `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, '0')}${String(d.getUTCDate()).padStart(2, '0')}${String(d.getUTCHours()).padStart(2, '0')}`;
-            points.push({
-                hour: d.toLocaleString('es-AR', { hour: '2-digit', day: '2-digit', month: '2-digit' }),
-                visitors: map.get(bucket) || 0
-            });
-        }
-        return points;
-    }, [visitStatsHourly]);
+    // Visitas por día de las últimas dos semanas: alcanza para ver si un posteo movió gente.
+    const visitasDiarias = useMemo(() => visitasPorDia(visitStatsHourly, 14), [visitStatsHourly]);
+    const visitas14 = visitasDiarias.reduce((acc, p) => acc + p.visitas, 0);
+    const picoVisitas = visitasDiarias.reduce((m, p) => (p.visitas > m.visitas ? p : m), visitasDiarias[0] || { visitas: 0 });
 
-    const totalVisitorsLast48h = visitChartData.reduce((acc, p) => acc + p.visitors, 0);
+    const hoy = useMemo(() => pendientesDeHoy({ orders, abandonedCarts, reviews }), [orders, abandonedCarts, reviews]);
+    const favoritos = useMemo(() => favoritosTop(wishlistData, inventory), [wishlistData, inventory]);
+    const stock = useMemo(() => resumenStock(inventory), [inventory]);
+    const avisos = useMemo(() => avisosDeLlaves({ siteConfig, aiConfig }), [siteConfig, aiConfig]);
 
     const [dateRange, setDateRange] = useState('30'); // 7, 30, all
     const [showComparison, setShowComparison] = useState(true); // Toggle comparación temporal
@@ -168,26 +162,6 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
         };
     }, [orders, dateRange]);
 
-    // --- WISHLIST INSIGHTS ---
-    const wishlistInsights = useMemo(() => {
-        if (!wishlistData || wishlistData.length === 0) return { topWished: [], totalWishlistAdds: 0 };
-
-        const productCounts = {};
-        wishlistData.forEach(event => {
-            if (event.action === 'add') {
-                if (!productCounts[event.productId]) {
-                    productCounts[event.productId] = { name: event.productName, count: 0, productId: event.productId };
-                }
-                productCounts[event.productId].count++;
-            }
-        });
-
-        const topWished = Object.values(productCounts).sort((a, b) => b.count - a.count).slice(0, 5);
-        const totalWishlistAdds = wishlistData.filter(e => e.action === 'add').length;
-
-        return { topWished, totalWishlistAdds };
-    }, [wishlistData]);
-
     const handleExport = async () => {
         const XLSX = await import('xlsx');
         const data = filteredOrders.map(o => ({
@@ -213,6 +187,28 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                     orders={orders}
                     onNavigateOrders={() => onNavigate('orders')}
                 />
+
+                {avisos.length > 0 && (
+                    <div className="space-y-2">
+                        {avisos.map(a => (
+                            <button
+                                key={a.id}
+                                type="button"
+                                onClick={() => onNavigate(a.goto)}
+                                className={`w-full text-left flex items-start gap-3 p-4 rounded-2xl border transition-colors ${a.nivel === 'alto'
+                                    ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/40 hover:bg-red-100/60 dark:hover:bg-red-900/20'
+                                    : 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-900/40 hover:bg-amber-100/60 dark:hover:bg-amber-900/20'}`}
+                            >
+                                <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${a.nivel === 'alto' ? 'text-red-500' : 'text-amber-500'}`} />
+                                <span className="flex-1 min-w-0">
+                                    <span className="block text-sm font-bold text-slate-800 dark:text-white">{a.titulo}</span>
+                                    <span className="block text-xs text-slate-600 dark:text-slate-300 mt-0.5">{a.detalle}</span>
+                                </span>
+                                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 mt-1" />
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 {/* HEADER & STATUS */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -332,52 +328,105 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                     {/* CHARTS COLUMN */}
                     <div className="lg:col-span-2 space-y-8">
 
-                        {/* ACCESOS DIRECTOS */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            <ActionButton icon={Plus} label="Nuevo Producto" onClick={onCreateProduct} color="bg-slate-800 text-white hover:bg-black border-transparent" />
-                            <ActionButton icon={Search} label="Ver Pedidos" onClick={() => onNavigate('orders')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
-                            <ActionButton icon={Users} label="Clientes" onClick={() => onNavigate('customers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
-                            <ActionButton icon={Package} label="Inventario" onClick={() => onNavigate('inventory')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
-
-                            <ActionButton icon={Palette} label="Diseño de la tienda" onClick={() => onNavigate('cms')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
-                            <ActionButton icon={Percent} label="Cupones" onClick={() => onNavigate('coupons')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
-                            <ActionButton icon={Truck} label="Proveedores" onClick={() => onNavigate('suppliers')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
-                            <div className="col-span-2 sm:col-span-1">
-                                <ActionButton
-                                    icon={MessageSquare}
-                                    label="CENTRO DE COMANDO IA"
-                                    onClick={() => onNavigate('assistant')}
-                                    color="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 text-white border-purple-500/50 hover:shadow-purple-500/20 shadow-lg animate-pulse-slow"
-                                />
+                        {/* HOY: lo que hay que atender */}
+                        <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex items-center justify-between mb-5">
+                                <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                    <Activity className="w-4 h-4 text-[#E8C65E]" /> Hoy
+                                </h3>
+                                <span className="text-xs text-slate-400">
+                                    {hoy.porEnviar + hoy.porConfirmar + hoy.carritos + hoy.resenas === 0 ? 'Nada pendiente' : 'Lo que espera una respuesta tuya'}
+                                </span>
                             </div>
-                            <ActionButton icon={Settings} label="Configuración" onClick={() => onNavigate('settings')} color="bg-white dark:bg-[#1a1a1a] text-slate-600 dark:text-white hover:text-[#E8C65E] hover:border-[#E8C65E]" />
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                                {[
+                                    { n: hoy.porEnviar, label: 'Por enviar', hint: 'Pagados, sin despachar', icon: Truck, tab: 'orders' },
+                                    { n: hoy.porConfirmar, label: 'Pagos por confirmar', hint: 'Esperando pago o coordinación', icon: CreditCard, tab: 'orders' },
+                                    { n: hoy.carritos, label: 'Carritos de hoy', hint: 'Sin terminar en las últimas 24 h', icon: ShoppingCart, tab: 'abandoned' },
+                                    { n: hoy.resenas, label: 'Reseñas por aprobar', hint: 'No se ven hasta que las apruebes', icon: MessageSquare, tab: 'reviews' },
+                                ].map(({ n, label, hint, icon: Icon, tab }) => (
+                                    <button
+                                        key={label}
+                                        type="button"
+                                        onClick={() => onNavigate(tab)}
+                                        className={`text-left p-4 rounded-xl border transition-all group ${n > 0
+                                            ? 'border-[#E8C65E]/50 bg-[#E8C65E]/5 hover:bg-[#E8C65E]/10'
+                                            : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-slate-700'}`}
+                                    >
+                                        <div className="flex items-center justify-between mb-2">
+                                            <Icon className={`w-4 h-4 ${n > 0 ? 'text-[#E8C65E]' : 'text-slate-400'}`} />
+                                            <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-[#E8C65E] transition-colors" />
+                                        </div>
+                                        <p className={`text-3xl font-black leading-none ${n > 0 ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>{n}</p>
+                                        <p className="text-xs font-bold text-slate-700 dark:text-slate-200 mt-2">{label}</p>
+                                        <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">{hint}</p>
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
-                        {/* CHART: VISITANTES ÚLTIMAS 48H */}
+                        {/* FAVORITOS: lo que más guardan las clientas */}
                         <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between mb-5">
                                 <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                                    <Radio className="w-4 h-4 text-emerald-500" /> Tráfico (últimas 48h)
+                                    <Heart className="w-4 h-4 text-[#E8C65E]" /> Lo más guardado en favoritos
                                 </h3>
-                                <span className="text-xs text-slate-400">{totalVisitorsLast48h} sesiones únicas</span>
+                                <span className="text-xs text-slate-400">Últimos 30 días</span>
+                            </div>
+                            {favoritos.length === 0 ? (
+                                <p className="text-sm text-slate-400 py-4 text-center">Cuando las clientas empiecen a guardar prendas con el corazón, acá vas a ver cuáles, y cuánto stock te queda de cada una.</p>
+                            ) : (
+                                <div className="space-y-2">
+                                    {favoritos.map((f, i) => (
+                                        <div key={f.productId} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50">
+                                            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i === 0 ? 'bg-[#E8C65E] text-black' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>{i + 1}</span>
+                                            <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
+                                                {f.product?.image && <img src={f.product.image} alt="" className="w-full h-full object-cover" />}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{tituloDeProducto(f.name)}</p>
+                                                <p className="text-[11px] text-slate-400">{f.count} {f.count === 1 ? 'vez guardado' : 'veces guardado'}</p>
+                                            </div>
+                                            <div className="text-right shrink-0">
+                                                {f.stock === null
+                                                    ? <span className="text-[11px] text-slate-400">ya no está</span>
+                                                    : <span className={`text-sm font-black ${f.stock === 0 ? 'text-red-500' : f.stock <= 2 ? 'text-amber-500' : 'text-slate-700 dark:text-slate-200'}`}>{f.stock}<span className="text-[10px] ml-0.5 opacity-70">u.</span></span>}
+                                                {f.product && onEditProduct && (
+                                                    <button onClick={() => onEditProduct(f.product)} className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-[#E8C65E] transition-colors">Editar</button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* VISITAS POR DÍA (14 días) */}
+                        <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+                                <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                    <BarChart3 className="w-4 h-4 text-[#E8C65E]" /> Visitas por día
+                                </h3>
+                                <span className="text-xs text-slate-400">
+                                    {visitas14} en 14 días{picoVisitas.visitas > 0 && <> · pico el {picoVisitas.label} ({picoVisitas.visitas})</>}
+                                </span>
                             </div>
                             <div className="h-[200px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={visitChartData}>
-                                        <defs>
-                                            <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.6} />
-                                                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.4} />
-                                        <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} interval={Math.floor(visitChartData.length / 8)} />
-                                        <YAxis hide={true} />
-                                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} formatter={(v) => [`${v} visitantes`, '']} />
-                                        <Area type="monotone" dataKey="visitors" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorVisitors)" />
-                                    </AreaChart>
+                                    <BarChart data={visitasDiarias} barCategoryGap="30%">
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.3} />
+                                        <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} interval={1} />
+                                        <YAxis hide={true} allowDecimals={false} />
+                                        <Tooltip cursor={{ fill: 'rgba(232,198,94,0.08)' }} contentStyle={{ borderRadius: '12px', border: 'none', background: '#1a1a1a', color: '#fff' }} formatter={(v) => [`${v} visitas`, '']} labelFormatter={(l) => `Día ${l}`} />
+                                        <Bar dataKey="visitas" radius={[4, 4, 0, 0]}>
+                                            {visitasDiarias.map((p) => (
+                                                <Cell key={p.fecha} fill={p.fecha === picoVisitas.fecha && p.visitas > 0 ? '#E8C65E' : 'rgba(232,198,94,0.45)'} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
                                 </ResponsiveContainer>
                             </div>
+                            {visitas14 === 0 && <p className="text-xs text-slate-400 text-center mt-3">Todavía no hay visitas medidas. Las tuyas no cuentan.</p>}
                         </div>
 
                         {/* CHART: VENTAS SEMANALES */}
@@ -476,19 +525,31 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                             </div>
                         </div>
 
-                        {/* STOCK LEVEL */}
-                        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#121212] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
-                            <div className="relative z-10">
-                                <h3 className="font-bold text-lg mb-1">Estado del Stock</h3>
-                                <p className="text-slate-400 text-xs mb-6">Resumen de inventario actual</p>
-                                <div className="flex items-end gap-2 mb-2">
-                                    <span className="text-4xl font-black">{metrics.totalStock}</span>
-                                    <span className="text-sm font-medium opacity-70 mb-1">/ Prendas Totales</span>
+                        {/* ESTADO DEL STOCK */}
+                        <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2"><Package className="w-4 h-4 text-[#E8C65E]" /> Stock</h3>
+                                <span className="text-xs text-slate-400">{metrics.totalStock} prendas · {stock.total} productos</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                                <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 py-3">
+                                    <p className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{stock.conStock}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700/80 dark:text-emerald-400/80 mt-0.5">Con stock</p>
                                 </div>
-                                <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                                    <div className="h-full bg-[#E8C65E]" style={{ width: '100%' }}></div>
+                                <div className="rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 py-3">
+                                    <p className="text-2xl font-black text-amber-700 dark:text-amber-400">{stock.ultimas}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700/80 dark:text-amber-400/80 mt-0.5">Últimas u.</p>
+                                </div>
+                                <div className="rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 py-3">
+                                    <p className="text-2xl font-black text-red-600 dark:text-red-400">{stock.agotados}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-red-600/80 dark:text-red-400/80 mt-0.5">Agotados</p>
                                 </div>
                             </div>
+                            {stock.ocultos > 0 && (
+                                <button onClick={() => onNavigate('inventory')} className="mt-3 w-full text-left text-[11px] text-slate-400 hover:text-[#E8C65E] transition-colors">
+                                    {stock.ocultos} {stock.ocultos === 1 ? 'producto oculto que las clientas no ven' : 'productos ocultos que las clientas no ven'} →
+                                </button>
+                            )}
                         </div>
 
                         {/* LOW STOCK ALERTS */}
@@ -529,14 +590,16 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                             </div>
                         </div>
 
-                        {/* CATEGORY LEADER (NEW) */}
-                        <div className="bg-[#E8C65E] text-white p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                        {/* CATEGORÍA LÍDER — sólo con ventas */}
+                        {salesInteractions.categoryData.length > 0 && (
+                        <div className="bg-[#E8C65E] text-black p-6 rounded-2xl shadow-lg flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-bold uppercase opacity-80 mb-1">Categoría Líder</p>
                                 <h3 className="text-2xl font-black">{salesInteractions.bestCategory}</h3>
                             </div>
                             <Trophy className="w-8 h-8 opacity-50" />
                         </div>
+                        )}
                     </div>
                 </div>
             </div>

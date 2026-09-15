@@ -18,7 +18,7 @@ const SaleThumb = ({ src, name }) => {
     return <img src={src} alt={name} loading="lazy" onError={() => setErr(true)} className="w-12 h-14 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shrink-0" />;
 };
 
-export const SalesView = ({ salesLog }) => {
+export const SalesView = ({ salesLog, metrics }) => {
     const [search, setSearch] = useState('');
     const [range, setRange] = useState('all');
     const [importando, setImportando] = useState(false);
@@ -68,7 +68,7 @@ export const SalesView = ({ salesLog }) => {
         <div className="max-w-6xl mx-auto p-6 lg:p-8">
             {importando && <Suspense fallback={null}><ImportarVentasModal onClose={() => setImportando(false)} /></Suspense>}
             <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
-                <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><TrendingUp className="w-6 h-6 text-[#E8C65E]" /> Registro de Ventas</h1>
+                <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2"><TrendingUp className="w-6 h-6 text-[#E8C65E]" /> Ventas y ganancia</h1>
                 <div className="flex items-center gap-2 flex-wrap">
                     <div className="relative">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -105,6 +105,24 @@ export const SalesView = ({ salesLog }) => {
             </div>
 
             {/* Resumen */}
+            {(salesLog || []).length === 0 && metrics ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Ventas</p>
+                    <p className="text-xl font-black text-slate-400 mt-1">Todavía ninguna</p>
+                </div>
+                <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Ganancia potencial del stock</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{formatMoney(metrics.potentialProfit)}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Si vendés todo al precio de la tienda, ya descontada la comisión de MP.</p>
+                </div>
+                <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Margen promedio</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{metrics.totalValue > 0 ? `${Math.round(metrics.potentialProfit / metrics.totalValue * 100)} %` : '—'}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">De cada $100 que cobrás, lo que te queda limpio.</p>
+                </div>
+            </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
                 <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
                     <p className="text-[10px] uppercase tracking-widest text-slate-400">Ventas</p>
@@ -119,12 +137,13 @@ export const SalesView = ({ salesLog }) => {
                     <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{formatMoney(totalGanancia)}</p>
                 </div>
             </div>
+            )}
 
             <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-x-auto shadow-sm">
                 {filtered.length === 0 ? (
                     <div className="py-20 text-center text-slate-400">
                         <p className="text-sm">{(salesLog || []).length === 0 ? 'Todavía no hay ventas registradas.' : 'No hay ventas que coincidan con la búsqueda.'}</p>
-                        <p className="text-xs mt-1 text-slate-400/70">{(salesLog || []).length === 0 ? 'Cuando se concrete la primera venta, vas a verla acá.' : 'Probá con otro término o cambiá el filtro de fecha.'}</p>
+                        <p className="text-xs mt-1 text-slate-400/70">{(salesLog || []).length === 0 ? 'Cada venta de la tienda entra sola. Las que hacés por fuera (WhatsApp, local) las cargás con "Importar ventas" o le decís a Lau "vendí el jean a Ana".' : 'Probá con otro término o cambiá el filtro de fecha.'}</p>
                     </div>
                 ) : (
                     <table className="w-full text-sm text-left min-w-[640px]">
