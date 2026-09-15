@@ -79,7 +79,7 @@ export const Home = () => {
             {validCategories.length > 0 && <section id="categories" className="py-14 md:py-20 px-6 bg-[#11100D] relative">
                 <Reveal className="max-w-[1400px] mx-auto">
                     <div className="flex justify-between items-end mb-12">
-                        <SectionHeader align="left" eyebrow="Categorías" title="Curaduría exclusiva" />
+                        <SectionHeader align="left" eyebrow="Categorías" title="Por tipo de prenda" />
                         <Link
                             to="/shop"
                             className="hidden md:inline-flex items-center gap-2 px-5 py-3 border border-white/20 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-white/5 rounded-sm shrink-0"
@@ -103,11 +103,7 @@ export const Home = () => {
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-[1.07] grayscale-[20%] group-hover:grayscale-0"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10 opacity-70 group-hover:opacity-55 transition-opacity duration-700" />
-
-                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
-                                    <span className="px-3 py-1 bg-white/90 text-black text-[9px] font-bold uppercase tracking-widest rounded-sm">Ver todo</span>
-                                </div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-noche-950 via-noche-950/40 to-noche-950/10 opacity-70 group-hover:opacity-55 transition-opacity duration-700" />
 
                                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
                                     {/* Dos renglones reservados: sin esto, una categoría de nombre
@@ -116,8 +112,8 @@ export const Home = () => {
                                         <h3 className="text-lg md:text-2xl font-serif text-white drop-shadow-lg leading-tight">{cat.name}</h3>
                                     </div>
                                     <div className="w-8 h-[1px] bg-white/40 mb-3 group-hover:w-20 transition-all duration-700 ease-out" />
-                                    <p className="text-xs uppercase tracking-widest text-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center gap-2 transform translate-y-3 group-hover:translate-y-0 delay-100">
-                                        Explorar <ArrowRight className="w-3 h-3 text-white/70" />
+                                    <p className="text-xs uppercase tracking-widest text-noche-300 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center gap-2 transform translate-y-3 group-hover:translate-y-0 delay-100">
+                                        Ver {cat.name.toLowerCase()} <ArrowRight className="w-3 h-3 text-cielo-gold/80" />
                                     </p>
                                 </div>
                             </Link>

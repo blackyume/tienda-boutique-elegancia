@@ -26,7 +26,7 @@ export const Features = () => {
                                     <Icon className="w-8 h-8" strokeWidth={1.5} />
                                 </div>
                                 <h4 className="font-serif text-lg text-white mb-2 tracking-wide group-hover:text-cielo-gold transition-colors">{item.title}</h4>
-                                <p className="text-sm text-slate-400 font-light leading-relaxed">{item.desc}</p>
+                                <p className="text-sm text-noche-300/75 font-light leading-relaxed">{item.desc}</p>
                             </div>
                         );
                     })}

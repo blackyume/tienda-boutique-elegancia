@@ -130,7 +130,7 @@ export const Navbar = ({ onOpenCart }) => {
                         <div className={`hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.15em] transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-90'}`}>
                             <div className="relative group" onMouseEnter={() => setIsShopMenuOpen(true)} onMouseLeave={() => setIsShopMenuOpen(false)}>
                                 <button className="flex items-center gap-1 text-white hover:text-cielo-gold transition-colors py-4">
-                                    Shop <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
+                                    Tienda <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
                                 </button>
 
                                 {/* MEGA MENU — el pt-3 es un puente invisible para que no se cierre
@@ -171,7 +171,8 @@ export const Navbar = ({ onOpenCart }) => {
                             <svg className="absolute top-1/2 right-7 w-2 h-2 text-cielo-gold/80 group-hover:animate-sparkle-burst" style={{ animationDelay: '200ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                         </div>
 
-                        <LogoSVG to="/" width={scrolled ? 150 : 200} />
+                        {/* En el celular el logo va más chico: a 200px pisaba el ícono de la cuenta. */}
+                        <LogoSVG to="/" width={scrolled ? 150 : 200} className="max-w-[150px] sm:max-w-none [&>svg]:max-w-full [&>svg]:h-auto" />
                     </Link>
 
 

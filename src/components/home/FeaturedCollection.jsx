@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { tituloDeProducto } from '../../utils/nombres';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { ArrowRight, Eye } from 'lucide-react';
@@ -47,7 +48,7 @@ const HeroCard = ({ item, onQuickView }) => (
                 {item.category}
             </p>
             <h3 className="font-serif text-2xl md:text-3xl text-white leading-tight mb-3 line-clamp-2">
-                {item.name}
+                {tituloDeProducto(item.name)}
             </h3>
 
             {/* Separator */}
@@ -112,7 +113,7 @@ const SmallCard = ({ item, onQuickView }) => (
 
         <div className="absolute inset-x-0 bottom-0 z-20 p-3 md:p-5">
             <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] md:tracking-[0.35em] text-cielo-gold/70 mb-1 md:mb-1.5 font-semibold">{item.category}</p>
-            <h3 className="font-serif text-sm md:text-lg text-white leading-snug mb-1.5 md:mb-2 line-clamp-2">{item.name}</h3>
+            <h3 className="font-serif text-sm md:text-lg text-white leading-snug mb-1.5 md:mb-2 line-clamp-2">{tituloDeProducto(item.name)}</h3>
             <div className="flex items-center justify-between">
                 <span className="text-sm md:text-base text-white/90 font-light">{formatMoney(item.price)}</span>
                 {item.colors?.length > 0 && (
@@ -175,9 +176,9 @@ export const FeaturedCollection = ({ onQuickView }) => {
                                 Selección limitada
                             </span>
                         </div>
-                        <h2 className="font-cinzel font-bold text-white leading-none"
-                            style={{ fontSize: 'clamp(2rem, 5vw, 4rem)' }}>
-                            Colección Destacada
+                        <h2 className="font-serif text-noche-100 leading-none"
+                            style={{ fontSize: 'clamp(2.25rem, 5vw, 4rem)' }}>
+                            Colección destacada
                         </h2>
                     </div>
                     <Link

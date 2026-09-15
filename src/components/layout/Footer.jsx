@@ -1,11 +1,11 @@
 import { LogoSVGFooter } from './LogoSVG';
 import React, { useState } from 'react';
-import { Instagram, ArrowRight, Mail, Send } from 'lucide-react';
+import { Instagram, Mail, Send, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
+import { whatsappDeConfig } from '../../utils/contacto';
 import { RegretModal } from './RegretModal';
 import { BrandStrip } from '../ui/BrandBadges';
-import { subscribeNewsletter } from '../../utils/newsletter';
 
 // Cuenta oficial de Instagram (default si no hay nada cargado en config).
 const OFFICIAL_IG = 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
@@ -22,7 +22,7 @@ const SocialBtn = ({ href, children }) => (
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-white/55 hover:text-cielo-gold hover:border-cielo-gold/50 transition-all duration-300"
+        className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-noche-300/80 hover:text-cielo-gold hover:border-cielo-gold/50 transition-all duration-300"
     >
         {children}
     </a>
@@ -31,16 +31,7 @@ const SocialBtn = ({ href, children }) => (
 export const Footer = () => {
     const { setIsSizeGuideOpen, siteConfig } = useStore();
     const [isRegretOpen, setIsRegretOpen] = useState(false);
-    const [email, setEmail] = useState('');
-    const [subStatus, setSubStatus] = useState('idle');
 
-    const submitFooterEmail = async () => {
-        if (!email || subStatus === 'loading') return;
-        setSubStatus('loading');
-        const ok = await subscribeNewsletter(email, 'footer');
-        if (ok) { setEmail(''); setSubStatus('success'); }
-        else setSubStatus('idle');
-    };
 
     return (
         <footer className="bg-cielo-dark text-white border-t border-white/[0.05] mt-auto">
@@ -55,10 +46,9 @@ export const Footer = () => {
                     {/* Brand — 3 cols */}
                     <div className="md:col-span-3">
                         <LogoSVGFooter width={240} className="mb-6 opacity-95" />
-                        <p className="text-white/55 text-sm font-light leading-relaxed mb-8 max-w-xs">
-                            Moda atemporal dise&ntilde;ada para la mujer moderna.
-                            Cada pieza cuenta una historia de lujo silencioso,
-                            hecha con intenci&oacute;n desde Rafaela para el mundo.
+                        <p className="text-noche-300/80 text-sm font-light leading-relaxed mb-8 max-w-xs">
+                            Moda femenina elegida con criterio.
+                            Rafaela, Santa Fe. Env&iacute;os a todo el pa&iacute;s.
                         </p>
                         <div className="flex gap-3">
                             {/* Instagram: siempre visible, apunta a la cuenta oficial */}
@@ -84,7 +74,7 @@ export const Footer = () => {
                                 { to: '/about', label: 'Quiénes Somos' },
                             ].map(({ to, label }) => (
                                 <li key={label}>
-                                    <Link to={to} className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
+                                    <Link to={to} className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
                                         <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                         <span>{label}</span>
                                     </Link>
@@ -108,7 +98,7 @@ export const Footer = () => {
                                     {to ? (
                                         <Link
                                             to={to}
-                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -116,7 +106,7 @@ export const Footer = () => {
                                     ) : (
                                         <button
                                             onClick={action}
-                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group text-left"
+                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group text-left"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             {label}
@@ -140,7 +130,7 @@ export const Footer = () => {
                                     {to ? (
                                         <Link
                                             to={to}
-                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -150,7 +140,7 @@ export const Footer = () => {
                                             href={href}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-sm text-white/55 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -161,7 +151,7 @@ export const Footer = () => {
                             <li>
                                 <button
                                     onClick={() => setIsRegretOpen(true)}
-                                    className="text-sm text-white/55 hover:text-rose-400 transition-colors duration-200 flex items-center gap-2 group text-left"
+                                    className="text-sm text-noche-300/80 hover:text-rose-400 transition-colors duration-200 flex items-center gap-2 group text-left"
                                 >
                                     <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-rose-400/60 transition-all duration-300" />
                                     Bot&oacute;n Arrepentimiento
@@ -170,48 +160,32 @@ export const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Newsletter — 3 cols */}
+                    {/* Contacto — 3 cols */}
                     <div className="md:col-span-3">
-                        <FooterHeading>Newsletter</FooterHeading>
-                        <p className="text-sm text-white/55 font-light mb-5 leading-relaxed">
-                            Novedades, lanzamientos y acceso prioritario a nuevas colecciones.
+                        <FooterHeading>Contacto</FooterHeading>
+                        <p className="text-sm text-noche-300/80 font-light mb-5 leading-relaxed">
+                            Dudas con un talle, un pedido o un env&iacute;o: escribinos, contesta una persona.
                         </p>
-                        <div className="relative">
-                            <div className="flex items-center border border-white/10 hover:border-cielo-gold/30 focus-within:border-cielo-gold/50 transition-colors duration-300 bg-white/[0.03]">
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') submitFooterEmail(); }}
-                                    placeholder="tu@email.com"
-                                    className="flex-1 min-w-0 bg-transparent px-4 py-3 text-sm text-white placeholder-white/20 outline-none"
-                                />
-                                <button
-                                    onClick={submitFooterEmail}
-                                    disabled={subStatus === 'loading'}
-                                    className="px-4 py-3 text-white/55 hover:text-cielo-gold transition-colors disabled:opacity-50"
-                                    aria-label="Suscribirse"
-                                >
-                                    <ArrowRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                        <p className="text-2xs mt-3 tracking-wide">
-                            {subStatus === 'success'
-                                ? <span className="text-cielo-gold">¡Listo! Vas a recibir las novedades. 💛</span>
-                                : <span className="text-white/50">Sin spam. Cancelar cuando quieras.</span>}
-                        </p>
-
-                        {/* Contact */}
-                        <div className="mt-8 space-y-3">
+                        <div className="space-y-3">
+                            <a
+                                href={whatsappDeConfig(siteConfig, 'Hola! Tengo una consulta.')}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 text-sm text-noche-300/80 hover:text-white transition-colors group"
+                            >
+                                <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-cielo-gold/50 flex items-center justify-center group-hover:text-cielo-gold transition-all">
+                                    <MessageCircle className="w-3.5 h-3.5" />
+                                </span>
+                                WhatsApp
+                            </a>
                             {(siteConfig?.social?.telegram || siteConfig?.telegram) && (
                                 <a
                                     href={`https://t.me/${String(siteConfig?.social?.telegram || siteConfig?.telegram).replace(/^@/, '').replace(/^t\.me\//, '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-3 text-sm text-white/55 hover:text-white transition-colors group"
+                                    className="flex items-center gap-3 text-sm text-noche-300/80 hover:text-white transition-colors group"
                                 >
-                                    <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-sky-400/40 flex items-center justify-center group-hover:text-sky-400 transition-all">
+                                    <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-cielo-gold/50 flex items-center justify-center group-hover:text-cielo-gold transition-all">
                                         <Send className="w-3.5 h-3.5" />
                                     </span>
                                     Telegram
@@ -219,9 +193,9 @@ export const Footer = () => {
                             )}
                             <a
                                 href={`mailto:${siteConfig?.contact?.email || 'hola@laboutique.com.ar'}`}
-                                className="flex items-center gap-3 text-sm text-white/55 hover:text-white transition-colors group"
+                                className="flex items-center gap-3 text-sm text-noche-300/80 hover:text-white transition-colors group"
                             >
-                                <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-blue-400/40 flex items-center justify-center group-hover:text-blue-400 transition-all">
+                                <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-cielo-gold/50 flex items-center justify-center group-hover:text-cielo-gold transition-all">
                                     <Mail className="w-3.5 h-3.5" />
                                 </span>
                                 Email
@@ -235,16 +209,16 @@ export const Footer = () => {
 
                 {/* Medios de pago y envío */}
                 <div className="flex flex-col items-center gap-3 mb-10">
-                    <span className="text-2xs uppercase tracking-[0.25em] text-white/50">Medios de pago y envío</span>
+                    <span className="text-2xs uppercase tracking-[0.25em] text-noche-300/70">Medios de pago y envío</span>
                     <BrandStrip />
                 </div>
 
                 {/* Bottom bar */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <span className="text-2xs text-white/50 tracking-[0.2em] uppercase">
+                    <span className="text-2xs text-noche-300/70 tracking-[0.2em] uppercase">
                         &copy; 2026 La Boutique de la Elegancia &nbsp;&middot;&nbsp; Todos los derechos reservados
                     </span>
-                    <span className="text-2xs text-white/50 tracking-[0.25em] uppercase">
+                    <span className="text-2xs text-noche-300/70 tracking-[0.25em] uppercase">
                         Moda femenina &nbsp;&middot;&nbsp; Hecho en Argentina
                     </span>
                 </div>

@@ -59,7 +59,7 @@ export const CountdownBanner = () => {
                         <Clock className="w-3.5 h-3.5" /> Cuenta regresiva
                     </div>
                     <h3 className="text-3xl md:text-4xl font-serif text-white leading-tight">{title}</h3>
-                    <p className="mt-2 text-slate-400 text-sm max-w-xl font-light">{desc}</p>
+                    <p className="mt-2 text-noche-300/75 text-sm max-w-xl font-light">{desc}</p>
 
                     <div className="mt-8 flex flex-wrap gap-3 md:gap-5">
                         {[

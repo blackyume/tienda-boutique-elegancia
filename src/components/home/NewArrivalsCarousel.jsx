@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { tituloDeProducto } from '../../utils/nombres';
 import { ArrowLeft, ArrowRight, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatMoney, getColorHex, optimizeImage } from '../../utils/helpers';
@@ -57,7 +58,7 @@ const ArrivalCard = ({ product, onQuickView }) => {
                     </p>
                 )}
                 <h3 className="font-serif text-white text-base leading-snug mb-2 line-clamp-2 group-hover:text-cielo-gold/90 transition-colors duration-300">
-                    {product.name}
+                    {tituloDeProducto(product.name)}
                 </h3>
                 <div className="flex items-center justify-between">
                     <span className="text-white/85 font-light">{formatMoney(product.price)}</span>
@@ -95,12 +96,12 @@ export const NewArrivalsCarousel = ({ products, onQuickView }) => {
                     <div className="flex items-center gap-3 mb-4">
                         <span className="h-px w-10 bg-cielo-gold/50" />
                         <span className="text-[10px] uppercase tracking-[0.4em] font-semibold text-cielo-gold/70">
-                            Recién llegado
+                            Novedades
                         </span>
                     </div>
-                    <h2 className="font-cinzel font-bold text-white leading-none"
-                        style={{ fontSize: 'clamp(1.8rem, 4vw, 3.5rem)' }}>
-                        New Arrivals
+                    <h2 className="font-serif text-noche-100 leading-none"
+                        style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)' }}>
+                        Recién llegado
                     </h2>
                 </div>
 

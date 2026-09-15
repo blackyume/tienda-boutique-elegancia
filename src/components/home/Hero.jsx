@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, Truck, CreditCard, ShieldCheck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { resolveHeroImage, PORTADA_PROPIA } from '../../utils/helpers';
 import { armarSlides } from '../../utils/portadas';
@@ -49,12 +49,15 @@ export const Hero = () => {
 
     const heroImage = resolveHeroImage(siteConfig);
     const title = siteConfig?.hero?.title || 'LA BOUTIQUE';
-    const subtitle = siteConfig?.hero?.subtitle || 'de la Elegancia';
+    // Los textos viejos que quedaron guardados en el CMS se muestran con la
+    // forma nueva; lo que el dueño edite después manda igual.
+    const LEGADO = { 'DE LA ELEGANCIA': 'de la Elegancia', 'EXPLORAR SHOP': 'Ver la tienda' };
+    const subtitle = LEGADO[siteConfig?.hero?.subtitle] || siteConfig?.hero?.subtitle || 'de la Elegancia';
     // El anterior ("Piezas curadas que duran temporadas, no semanas") repetía
     // casi palabra por palabra el titular de la sección El Atelier. El hero
     // habla de la clienta; la filosofía de marca ya se cuenta más abajo.
     const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'Lo que te ponés cuando querés que se note.';
-    const buttonText = siteConfig?.hero?.buttonText || 'Explorar Shop';
+    const buttonText = LEGADO[siteConfig?.hero?.buttonText] || siteConfig?.hero?.buttonText || 'Ver la tienda';
     const buttonLink = siteConfig?.hero?.buttonLink || 'shop';
 
     const primaryAction = (e) => {
@@ -103,11 +106,11 @@ export const Hero = () => {
                 className="absolute inset-0 z-[1] pointer-events-none"
                 style={{
                     background: `linear-gradient(180deg,
-                        rgba(2,6,23,0.75) 0%,
-                        rgba(2,6,23,0.20) 30%,
-                        rgba(2,6,23,0.10) 50%,
-                        rgba(2,6,23,0.60) 75%,
-                        rgba(2,6,23,0.97) 100%
+                        rgba(17,16,13,0.75) 0%,
+                        rgba(17,16,13,0.20) 30%,
+                        rgba(17,16,13,0.10) 50%,
+                        rgba(17,16,13,0.60) 75%,
+                        rgba(17,16,13,0.97) 100%
                     )`
                 }}
             />
@@ -119,10 +122,10 @@ export const Hero = () => {
                 className="absolute inset-0 z-[1] pointer-events-none"
                 style={{
                     background: `linear-gradient(100deg,
-                        rgba(2,6,23,0.85) 0%,
-                        rgba(2,6,23,0.55) 32%,
-                        rgba(2,6,23,0.12) 58%,
-                        rgba(2,6,23,0) 75%
+                        rgba(17,16,13,0.85) 0%,
+                        rgba(17,16,13,0.55) 32%,
+                        rgba(17,16,13,0.12) 58%,
+                        rgba(17,16,13,0) 75%
                     )`
                 }}
             />
@@ -143,7 +146,7 @@ export const Hero = () => {
                 <div className="flex items-center gap-3 mb-8 animate-fadeIn">
                     <span className="h-px w-12 bg-cielo-gold/60" />
                     <span className="text-2xs uppercase tracking-[0.25em] md:tracking-[0.45em] font-semibold text-cielo-gold">
-                        Colección 2026 · Edición de autor
+                        Colección 2026 · Rafaela
                     </span>
                 </div>
 
@@ -155,7 +158,7 @@ export const Hero = () => {
                 </h1>
 
                 <p
-                    className="font-serif italic font-light text-white/75 mt-3 animate-fadeIn opacity-0 [animation-delay:300ms]"
+                    className="font-serif italic font-light text-noche-100/85 mt-3 animate-fadeIn opacity-0 [animation-delay:300ms]"
                     style={{ fontSize: 'clamp(1.25rem, 3vw, 2.5rem)' }}
                 >
                     {subtitle}
@@ -168,7 +171,7 @@ export const Hero = () => {
                 </div>
 
                 <div className="mt-8 flex flex-col items-start gap-7 animate-fadeIn opacity-0 [animation-delay:550ms]">
-                    <p className="text-sm md:text-base text-white/60 max-w-md font-light leading-relaxed">
+                    <p className="text-sm md:text-base text-noche-300/85 max-w-md font-light leading-relaxed">
                         {tagline}
                     </p>
 
@@ -183,38 +186,13 @@ export const Hero = () => {
                             <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-1" />
                             <span className="absolute inset-0 bg-white/40 translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700" />
                         </Link>
-                        <button
-                            onClick={() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="group inline-flex items-center gap-2 text-white/50 hover:text-white text-2xs uppercase tracking-[0.3em] font-semibold transition-colors"
-                        >
-                            <span className="relative">
-                                Ver colección
-                                <span className="absolute -bottom-0.5 left-0 w-0 group-hover:w-full h-px bg-cielo-gold transition-all duration-500" />
-                            </span>
-                        </button>
                     </div>
                 </div>
 
-                <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-2 animate-fadeIn opacity-0 [animation-delay:750ms]">
-                    <span className="flex items-center gap-2 text-2xs text-white/35 tracking-wide">
-                        <Truck className="w-3.5 h-3.5 text-cielo-gold/50" strokeWidth={1.5} />
-                        Envíos a todo el país
-                    </span>
-                    <span className="w-px h-3 bg-white/10" />
-                    <span className="flex items-center gap-2 text-2xs text-white/35 tracking-wide">
-                        <CreditCard className="w-3.5 h-3.5 text-cielo-gold/50" strokeWidth={1.5} />
-                        Pago en cuotas
-                    </span>
-                    <span className="w-px h-3 bg-white/10" />
-                    <span className="flex items-center gap-2 text-2xs text-white/35 tracking-wide">
-                        <ShieldCheck className="w-3.5 h-3.5 text-cielo-gold/50" strokeWidth={1.5} />
-                        Compra protegida
-                    </span>
-                </div>
             </div>
 
             <div className="absolute bottom-10 right-8 z-10 hidden lg:flex flex-col items-center gap-3 opacity-40">
-                <span className="text-[9px] uppercase tracking-[0.4em] text-white/60 [writing-mode:vertical-rl]">Scroll</span>
+                <span className="text-[9px] uppercase tracking-[0.4em] text-noche-300/85 [writing-mode:vertical-rl]">Scroll</span>
                 <div className="w-px h-12 bg-gradient-to-b from-cielo-gold/60 to-transparent" />
             </div>
         </section>

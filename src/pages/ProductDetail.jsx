@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { tituloDeProducto } from '../utils/nombres';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { formatMoney, getColorHex, optimizeImage } from '../utils/helpers';
@@ -246,7 +247,7 @@ export const ProductDetail = () => {
                     </div>
 
                     <h1 className="text-3xl md:text-5xl font-luxury leading-tight mb-4">
-                        {product.name}
+                        {tituloDeProducto(product.name)}
                     </h1>
 
                     <div className="flex items-center gap-4 mb-3 flex-wrap">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { tituloDeProducto } from '../../utils/nombres';
 import { Link } from 'react-router-dom';
 import { Instagram, ExternalLink } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
@@ -61,7 +62,7 @@ export const InstagramFeed = () => {
                                 />
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
                                     <span className="text-[10px] uppercase tracking-widest text-white font-bold leading-tight line-clamp-2">
-                                        {item.name}
+                                        {tituloDeProducto(item.name)}
                                     </span>
                                 </div>
                             </Link>

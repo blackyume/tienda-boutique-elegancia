@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { tituloDeProducto } from '../../utils/nombres';
 import { X, Trash2, ShoppingBag, ArrowRight, Truck, Minus, Plus } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { formatMoney } from '../../utils/helpers';
@@ -35,7 +36,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
 
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-               <h2 className="text-2xl font-cinzel text-cielo-gold">Shopping Bag <span className="text-sm font-sans text-slate-400 font-normal">({cartCount})</span></h2>
+               <h2 className="text-2xl font-cinzel text-cielo-gold">Tu bolsa <span className="text-sm font-sans text-slate-400 font-normal">({cartCount})</span></h2>
                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors group">
                   <X className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
                </button>
@@ -82,7 +83,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                         <div className="flex-1 flex flex-col justify-between py-1">
                            <div>
                               <div className="flex justify-between items-start mb-1">
-                                 <h3 className="font-cinzel text-white text-lg leading-tight pr-4">{item.name}</h3>
+                                 <h3 className="font-serif text-white text-lg leading-tight pr-4">{tituloDeProducto(item.name)}</h3>
                                  <button onClick={() => removeFromCart(item.key)} className="text-slate-500 hover:text-red-400 transition-colors p-1"><Trash2 className="w-4 h-4" /></button>
                               </div>
                               <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{item.color} | {item.size}</p>

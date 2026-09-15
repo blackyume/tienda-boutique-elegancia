@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { tituloDeProducto } from '../../utils/nombres';
 import { useNavigate } from 'react-router-dom';
 import { X, Heart, Check, Ruler, Share2, ChevronDown, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -171,7 +172,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                         </button>
                     </div>
 
-                    <h2 className="text-3xl font-serif text-slate-900 dark:text-white mb-2 leading-tight">{product.name}</h2>
+                    <h2 className="text-3xl font-serif text-slate-900 dark:text-white mb-2 leading-tight">{tituloDeProducto(product.name)}</h2>
                     <p className="text-2xl text-slate-800 dark:text-slate-200 font-light mb-6">{formatMoney(product.price)}</p>
                     <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed font-light text-sm tracking-wide">{product.description || "Sin descripción disponible."}</p>
 

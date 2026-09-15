@@ -9,22 +9,22 @@ import { SectionHeader } from './SectionHeader';
 const steps = [
     {
         icon: Search,
-        title: 'Curaduría',
-        desc: 'Cada pieza está elegida a mano, no por catálogo. Filtrá por categoría, talle y color y encontrá lo tuyo.',
+        title: 'Elegís',
+        desc: 'Filtrá por tipo de prenda, talle y color. Si dudás con el talle, escribinos: te ayudamos a elegir.',
         to: '/shop',
-        cta: 'Explorar el shop',
+        cta: 'Ver la tienda',
     },
     {
         icon: CreditCard,
-        title: 'Pago protegido',
-        desc: 'Tarjeta, débito o Mercado Pago con cuotas. Datos siempre cifrados, compra sin sobresaltos.',
+        title: 'Pagás protegida',
+        desc: 'Tarjeta, débito o Mercado Pago en cuotas. Tus datos viajan cifrados y nosotros nunca los vemos.',
         to: '/faq',
         cta: 'Cómo se paga',
     },
     {
         icon: Package,
-        title: 'En tu puerta',
-        desc: 'Envíos a todo el país con seguimiento en tiempo real desde tu cuenta. Empaque cuidado, como un regalo.',
+        title: 'Te llega',
+        desc: 'Correo Argentino a tu casa o a la sucursal, con el número de seguimiento por email. Empaque cuidado, como un regalo.',
         to: '/envios',
         cta: 'Envíos y tiempos',
     },
@@ -35,9 +35,9 @@ export const HowItWorks = () => {
         <section className="relative py-14 md:py-20 px-6 bg-[#11100D] overflow-hidden">
             <div className="max-w-6xl mx-auto relative z-10">
                 <SectionHeader
-                    eyebrow="La experiencia LBE"
-                    title="Comprar, sin fricción"
-                    subtitle="Curaduría, pago protegido y entrega en todo el país. Vos elegís — del resto nos ocupamos nosotros."
+                    eyebrow="Comprar en La Boutique"
+                    title="Así funciona"
+                    subtitle="Elegís, pagás protegida y te llega a tu casa. Del resto nos ocupamos nosotros."
                     className="mb-20"
                 />
 
@@ -69,11 +69,11 @@ export const HowItWorks = () => {
                                 </div>
 
                                 {/* Text */}
-                                <h3 className="text-2xl font-cinzel text-white mb-3 group-hover:text-cielo-gold transition-colors duration-300">
+                                <h3 className="text-2xl font-serif text-noche-100 mb-3 group-hover:text-cielo-gold transition-colors duration-300">
                                     {step.title}
                                 </h3>
                                 <div className="w-8 h-px bg-cielo-gold/40 mx-auto mb-4 group-hover:w-16 transition-all duration-500" />
-                                <p className="text-slate-400 text-sm font-light leading-relaxed max-w-xs mx-auto">
+                                <p className="text-noche-300/75 text-sm font-light leading-relaxed max-w-xs mx-auto">
                                     {step.desc}
                                 </p>
                                 <span className="mt-5 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] font-bold text-cielo-gold/80 group-hover:text-cielo-gold transition-colors">

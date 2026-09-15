@@ -13,11 +13,11 @@ export const SectionHeader = ({ eyebrow, title, subtitle, align = 'center', clas
                     <span className="h-px w-8 bg-cielo-gold/50 flex-shrink-0" />
                 </div>
             )}
-            <h2 className={`font-serif leading-tight text-white ${titleClassName}`}>
+            <h2 className={`font-serif leading-tight text-noche-100 ${titleClassName}`}>
                 {title}
             </h2>
             {subtitle && (
-                <p className={`mt-5 text-sm md:text-base font-light leading-relaxed text-white/55 ${centered ? 'mx-auto' : ''} max-w-xl`}>
+                <p className={`mt-5 text-sm md:text-base font-light leading-relaxed text-noche-300/85 ${centered ? 'mx-auto' : ''} max-w-xl`}>
                     {subtitle}
                 </p>
             )}

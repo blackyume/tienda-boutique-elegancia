@@ -1,4 +1,5 @@
 import React, { memo, useState } from 'react';
+import { tituloDeProducto } from '../../utils/nombres';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { formatMoney, getColorHex } from '../../utils/helpers';
 import { getTotalStock } from '../../utils/variants';
@@ -25,7 +26,9 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
 
     const totalStock = getTotalStock(product);
     const outOfStock = totalStock <= 0;
-    const lowStock = !outOfStock && totalStock <= 5;
+    // Con 1 o 2 unidades sí es una última oportunidad; con 5 lo tiene casi
+    // todo el catálogo y el cartel deja de decir algo.
+    const lowStock = !outOfStock && totalStock <= 2;
     const discount = discountPct(product);
     const fresh = isNew(product);
 
@@ -145,7 +148,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                         </span>
                     )}
                     <h3 className="font-serif text-[14px] sm:text-[15px] text-white/90 group-hover:text-white transition-colors line-clamp-2 sm:line-clamp-1 leading-snug min-h-[2.6em] sm:min-h-0">
-                        {product.name}
+                        {tituloDeProducto(product.name)}
                     </h3>
 
                     <div className="mt-2 flex items-baseline justify-center gap-2">

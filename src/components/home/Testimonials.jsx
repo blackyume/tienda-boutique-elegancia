@@ -65,7 +65,7 @@ export const Testimonials = () => {
                                     <Star key={s} className="w-3.5 h-3.5 fill-cielo-gold text-cielo-gold" />
                                 ))}
                             </div>
-                            <p className="text-sm text-slate-300 font-light leading-relaxed mb-5 italic">"{t.text}"</p>
+                            <p className="text-sm text-noche-300 font-light leading-relaxed mb-5 italic">"{t.text}"</p>
                             <div className="pt-4 border-t border-white/5">
                                 <p className="text-sm text-white font-serif">{t.name}</p>
                                 {t.location && (

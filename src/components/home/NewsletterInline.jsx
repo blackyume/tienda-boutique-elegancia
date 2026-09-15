@@ -21,9 +21,9 @@ export const NewsletterInline = () => {
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,198,94,0.05),transparent_60%)] pointer-events-none" />
             <Reveal className="relative max-w-3xl mx-auto text-center">
                 <SectionHeader
-                    eyebrow="Lista de espera"
-                    title={<>Acceso <span className="italic text-cielo-gold">anticipado</span> a los drops</>}
-                    subtitle="Suscribite y recibí cupones privados, editoriales exclusivos y el aviso anticipado de cada nueva colección."
+                    eyebrow="Novedades por email"
+                    title={<>Enterate <span className="italic text-cielo-gold">antes</span> de cada lanzamiento</>}
+                    subtitle="Dejá tu email y recibí el aviso de cada colección nueva antes que nadie, y cupones sólo para suscriptas."
                 />
 
                 {status === 'success' ? (
