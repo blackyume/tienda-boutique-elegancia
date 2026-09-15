@@ -600,9 +600,9 @@ export const Admin = () => {
 
                         {/* STATS RAPIDAS */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                            <StatSmall label="Valor Inventario" value={formatMoney(metrics.totalValue)} icon={DollarSign} color="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" />
-                            <StatSmall label="Inversión" value={formatMoney(metrics.invested)} icon={Wallet} color="text-blue-600 bg-blue-50 dark:bg-blue-900/20" hint="Costo + envío + packaging de todo el stock" />
                             <StatSmall label="Ganancia Potencial" value={formatMoney(metrics.potentialProfit)} icon={TrendingUp} color="text-[#E8C65E] bg-orange-50 dark:bg-orange-900/20" hint={`Si vendés todo por la tienda, ya descontada la comisión de MP (${comisionMP(paymentConfig)}%)`} />
+                            <StatSmall label="Valor Inventario" value={formatMoney(metrics.totalValue)} icon={DollarSign} color="text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20" hint="Lo que cobrarías vendiendo todo al precio de la tienda" />
+                            <StatSmall label="Inversión" value={formatMoney(metrics.invested)} icon={Wallet} color="text-blue-600 bg-blue-50 dark:bg-blue-900/20" hint="Costo + envío + packaging de todo el stock" />
                             <StatSmall label="Total Prendas" value={metrics.totalStock} icon={Tag} color="text-purple-600 bg-purple-50 dark:bg-purple-900/20" />
                         </div>
 
