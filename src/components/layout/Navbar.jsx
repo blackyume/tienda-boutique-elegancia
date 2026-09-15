@@ -5,6 +5,33 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { useState, useEffect, useRef } from 'react';
 
+// Estrellita de cuatro puntas que titila alrededor del logo. Cada una tiene su
+// tamaño, color y desfasaje para que no parpadeen todas juntas.
+const Chispa = ({ pos, size, color, delay }) => (
+    <svg
+        className={`absolute ${pos} ${size} ${color} animate-sparkle-subtle`}
+        style={{ animationDelay: `${delay}ms` }}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+    >
+        <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+    </svg>
+);
+
+const CHISPAS = [
+    { pos: 'top-2 right-6', size: 'w-2.5 h-2.5', color: 'text-white', delay: 0 },
+    { pos: 'top-3 left-6', size: 'w-2 h-2', color: 'text-cielo-gold', delay: 500 },
+    { pos: 'bottom-3 right-8', size: 'w-1.5 h-1.5', color: 'text-white/80', delay: 1000 },
+    { pos: 'bottom-2 left-8', size: 'w-2 h-2', color: 'text-cielo-gold', delay: 1500 },
+    { pos: '-top-1 left-1/2', size: 'w-2 h-2', color: 'text-white/90', delay: 2200 },
+    { pos: 'top-1/2 -left-3 hidden sm:block', size: 'w-2.5 h-2.5', color: 'text-cielo-gold/90', delay: 800 },
+    { pos: 'top-1/2 -right-3 hidden sm:block', size: 'w-2 h-2', color: 'text-white/85', delay: 1900 },
+    { pos: '-bottom-1 left-1/3', size: 'w-1.5 h-1.5', color: 'text-cielo-gold', delay: 300 },
+    { pos: '-bottom-1 right-1/4', size: 'w-2 h-2', color: 'text-white/80', delay: 2600 },
+    { pos: 'top-1 right-1/4', size: 'w-1.5 h-1.5', color: 'text-cielo-gold/80', delay: 1200 },
+    { pos: 'bottom-1 left-1/4', size: 'w-1.5 h-1.5', color: 'text-white/70', delay: 2000 },
+];
+
 export const Navbar = ({ onOpenCart }) => {
     const { cart, categories, user, logout, isAdmin, siteConfig, inventory } = useStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -156,12 +183,9 @@ export const Navbar = ({ onOpenCart }) => {
                     <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group flex items-center justify-center">
                         <div className="absolute inset-0 bg-cielo-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                        {/* Sparkles - Always On (Subtle) */}
+                        {/* Estrellitas siempre encendidas, alrededor del logo (ver CHISPAS) */}
                         <div className="absolute inset-0 pointer-events-none">
-                            <svg className="absolute top-2 right-6 w-2.5 h-2.5 text-white animate-sparkle-subtle" style={{ animationDelay: '0ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            <svg className="absolute top-3 left-6 w-2 h-2 text-cielo-gold animate-sparkle-subtle" style={{ animationDelay: '500ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            <svg className="absolute bottom-3 right-8 w-1.5 h-1.5 text-white/80 animate-sparkle-subtle" style={{ animationDelay: '1000ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            <svg className="absolute bottom-2 left-8 w-2 h-2 text-cielo-gold animate-sparkle-subtle" style={{ animationDelay: '1500ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            {CHISPAS.map((c, i) => <Chispa key={i} {...c} />)}
                         </div>
 
                         {/* Sparkles - Hover Burst */}
@@ -169,10 +193,12 @@ export const Navbar = ({ onOpenCart }) => {
                             <svg className="absolute top-2 right-8 w-3 h-3 text-cielo-gold group-hover:animate-sparkle-burst" style={{ animationDelay: '0ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                             <svg className="absolute bottom-2 left-6 w-3 h-3 text-white group-hover:animate-sparkle-burst" style={{ animationDelay: '100ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                             <svg className="absolute top-1/2 right-7 w-2 h-2 text-cielo-gold/80 group-hover:animate-sparkle-burst" style={{ animationDelay: '200ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            <svg className="absolute -top-1 left-1/3 w-2 h-2 text-white/90 group-hover:animate-sparkle-burst" style={{ animationDelay: '150ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
+                            <svg className="absolute -bottom-1 right-1/3 w-2.5 h-2.5 text-cielo-gold group-hover:animate-sparkle-burst" style={{ animationDelay: '250ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
                         </div>
 
                         {/* En el celular el logo va más chico: a 200px pisaba el ícono de la cuenta. */}
-                        <LogoSVG to="/" width={scrolled ? 150 : 200} className="max-w-[150px] sm:max-w-none [&>svg]:max-w-full [&>svg]:h-auto" />
+                        <LogoSVG to="/" width={scrolled ? 180 : 240} className="max-w-[150px] sm:max-w-none [&>svg]:max-w-full [&>svg]:h-auto" />
                     </Link>
 
 
