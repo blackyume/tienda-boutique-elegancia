@@ -78,3 +78,21 @@ export const parseJsonFromResponse = (text) => {
 };
 
 // generateProductCopy se movió a utils/ai.js (Cerebras primario + fallback).
+
+/**
+ * El error que devuelve Google (o Cerebras), traducido a qué está mal y qué
+ * hacer. Para mostrárselo al dueño en vez del JSON.
+ */
+export const explicarErrorIA = (e) => {
+    const m = String(e?.message || e || '');
+    const donde = 'Revisala en Admin → Configuración → IA.';
+    if (/ACCESS_TOKEN_TYPE_UNSUPPORTED|Expected OAuth|invalid authentication credentials/i.test(m)) {
+        return `La llave de Gemini que está cargada no es una API key: Google esperaba otra cosa. La correcta empieza con "AIza" y se saca en aistudio.google.com/apikey → Create API key. ${donde}`;
+    }
+    if (/API_KEY_INVALID|API key not valid|api key.*invalid/i.test(m)) return `La llave de Gemini no es válida (está mal copiada o se borró). Generá una nueva en aistudio.google.com/apikey: empieza con "AIza". ${donde}`;
+    if (/PERMISSION_DENIED|403/.test(m)) return `Google rechazó la llave (permiso denegado). Puede estar restringida a otro sitio o deshabilitada. Generá una nueva en aistudio.google.com/apikey. ${donde}`;
+    if (/RESOURCE_EXHAUSTED|429|quota|rate limit/i.test(m)) return 'Gemini está saturado o se pasó el límite gratuito de hoy. Esperá un minuto y volvé a intentar; si sigue, mañana se renueva.';
+    if (/not found|404|is not supported|deprecated/i.test(m)) return 'El modelo de Gemini que se intentó usar ya no existe. Avisale a quien te mantiene la tienda que actualice la lista de modelos.';
+    if (/Failed to fetch|NetworkError|network|ECONN|timeout/i.test(m)) return 'No pude conectar con Google. Revisá tu internet y probá de nuevo.';
+    return `Error: ${m}`;
+};

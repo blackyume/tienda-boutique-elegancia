@@ -89,7 +89,7 @@ const ICONOS_MENU = {
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers, paymentConfig } = useStore();
+    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers, paymentConfig, expenses = [] } = useStore();
     const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
     // Los numeritos rojos del menú: sólo lo que espera algo de vos.
@@ -880,6 +880,8 @@ export const Admin = () => {
                     inventory={inventory}
                     siteConfig={siteConfig}
                     aiConfig={aiConfig}
+                    salesLog={salesLog}
+                    expenses={expenses}
                     onCreateProduct={() => {
                         setCurrentProduct({
                             name: '', price: "", cost: "", shippingCost: "", packagingCost: "", feePercent: "", stock: "",

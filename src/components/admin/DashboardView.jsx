@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Package, Wallet, TrendingUp, ShoppingCart, Calendar, Download, Activity, Trophy, Heart, Truck, CreditCard, MessageSquare, AlertTriangle, ChevronRight, BarChart3 } from 'lucide-react';
 import { formatMoney } from '../../utils/helpers';
 import { StatCard } from './AdminShared';
+import { gastosDelPeriodo, totalGastos } from '../../utils/gastos';
 import { LowStockPanel } from './LowStockPanel';
 import { OnboardingPanel } from './OnboardingPanel';
 import { getLiveVisitors } from '../../utils/presence';
@@ -11,7 +12,7 @@ import { tituloDeProducto } from '../../utils/nombres';
 import { OrdersNeedingReviewPanel } from './OrdersNeedingReviewPanel';
 // xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
 
-export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [], abandonedCarts = [], reviews = [], inventory = [], siteConfig, aiConfig }) => {
+export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [], abandonedCarts = [], reviews = [], inventory = [], siteConfig, aiConfig, salesLog = [], expenses = [] }) => {
 
     // Re-render cada 15s para actualizar el corte de sesiones "vivas"
     const [, tick] = useState(0);
@@ -33,6 +34,13 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
     const avisos = useMemo(() => avisosDeLlaves({ siteConfig, aiConfig }), [siteConfig, aiConfig]);
 
     const [dateRange, setDateRange] = useState('30'); // 7, 30, all
+    // Ganancia neta del período: la bruta de cada venta (precio − costo − MP) menos los gastos cargados.
+    const gananciaNeta = useMemo(() => {
+        const corte = dateRange === 'all' ? 0 : Date.now() - parseInt(dateRange) * 864e5;
+        const bruta = (salesLog || []).reduce((a, s) => a + ((s.date ? new Date(s.date).getTime() : 0) >= corte ? (Number(s.profit) || 0) : 0), 0);
+        const gastos = totalGastos(gastosDelPeriodo(expenses, dateRange));
+        return { bruta, gastos, neta: bruta - gastos };
+    }, [salesLog, expenses, dateRange]);
     const [showComparison, setShowComparison] = useState(true); // Toggle comparación temporal
 
     // --- BI DATA PROCESSING ---
@@ -269,7 +277,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         )}
                     </div>
                 ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
                     <StatCard
                         label="Ingresos (Periodo)"
                         value={formatMoney(salesInteractions.totalRevenue)}
@@ -313,6 +321,13 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                         )}
                         icon={TrendingUp}
                         theme="orange"
+                    />
+                    <StatCard
+                        label="Ganancia neta"
+                        value={formatMoney(gananciaNeta.neta)}
+                        sub={gananciaNeta.gastos > 0 ? `Bruta ${formatMoney(gananciaNeta.bruta)} − gastos ${formatMoney(gananciaNeta.gastos)}` : 'Sin gastos cargados en el período'}
+                        icon={Wallet}
+                        theme={gananciaNeta.neta >= 0 ? 'emerald' : 'orange'}
                     />
                     <StatCard
                         label="Tasa Conversión"

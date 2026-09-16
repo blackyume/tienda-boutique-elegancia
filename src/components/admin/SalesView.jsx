@@ -3,6 +3,8 @@ import { Search, Calendar, TrendingUp, Package, Download, Upload } from 'lucide-
 
 const ImportarVentasModal = lazy(() => import('./ImportarVentasModal').then(m => ({ default: m.ImportarVentasModal })));
 import { formatMoney } from '../../utils/helpers';
+import { useStore } from '../../context/StoreContext';
+import { gastosDelPeriodo, totalGastos } from '../../utils/gastos';
 
 // Miniatura con fallback: si no hay imagen o se rompe (ej: producto borrado),
 // muestra un placeholder prolijo en vez de un cuadro vacío.
@@ -19,9 +21,12 @@ const SaleThumb = ({ src, name }) => {
 };
 
 export const SalesView = ({ salesLog, metrics }) => {
+    const { expenses = [] } = useStore();
     const [search, setSearch] = useState('');
     const [range, setRange] = useState('all');
     const [importando, setImportando] = useState(false);
+    // Los gastos del mismo período: la ganancia neta es la bruta menos esto.
+    const gastos = useMemo(() => totalGastos(gastosDelPeriodo(expenses, range)), [expenses, range]);
 
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
@@ -123,7 +128,7 @@ export const SalesView = ({ salesLog, metrics }) => {
                 </div>
             </div>
             ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
                 <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
                     <p className="text-[10px] uppercase tracking-widest text-slate-400">Ventas</p>
                     <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{filtered.length}</p>
@@ -133,8 +138,19 @@ export const SalesView = ({ salesLog, metrics }) => {
                     <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{formatMoney(totalVendido)}</p>
                 </div>
                 <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
-                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Ganancia</p>
-                    <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{formatMoney(totalGanancia)}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">Ganancia bruta</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white mt-1">{formatMoney(totalGanancia)}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Ventas − costo de las prendas − comisión de MP.</p>
+                </div>
+                <div className="bg-white dark:bg-[#1a1a1a] border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400">− Gastos</p>
+                    <p className={`text-xl font-black mt-1 ${gastos > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`}>{formatMoney(gastos)}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">{gastos > 0 ? 'Publicidad, bolsas, envíos, servicios.' : 'Sin gastos cargados en el período.'}</p>
+                </div>
+                <div className="bg-white dark:bg-[#1a1a1a] border-2 border-[#E8C65E]/60 rounded-xl p-4">
+                    <p className="text-[10px] uppercase tracking-widest text-[#B8932E] dark:text-[#E8C65E]">= Ganancia neta</p>
+                    <p className={`text-xl font-black mt-1 ${totalGanancia - gastos >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>{formatMoney(totalGanancia - gastos)}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Lo que te queda de verdad.</p>
                 </div>
             </div>
             )}

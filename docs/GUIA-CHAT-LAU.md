@@ -100,6 +100,11 @@ una decisión, no una falla.
   guarda el costo en ese producto y propone el precio con un botón.
 - Antes de confirmar una venta por fuera te dice cuánto te queda limpio y te
   avisa con ⚠ si quedás abajo del costo.
+- `gasté 20000 en publicidad` / `pagué 8000 de bolsas ayer` / `invertí 15000 en
+  un sorteo de instagram el 12` → anota el gasto (rubro y fecha solos), se
+  resta de la ganancia neta en Ventas y en el Inicio. `¿cuánto gasté este
+  mes?` / `gastos de la semana` → resumen por rubro.
+- `cargá un producto` → abre el paso a paso.
 - `deshacer` (o el botón después de cada acción) → revierte lo último.
 - Micrófono al lado del clip: dictás y queda escrito.
 

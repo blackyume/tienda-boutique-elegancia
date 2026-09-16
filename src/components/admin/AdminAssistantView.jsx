@@ -15,6 +15,9 @@ import { candidatosLiquidacion, configLiquidacion, resumirLiquidacion, esPedidoD
 import { captionDeProducto, fotoDeProducto, publicarEnInstagram } from '../../utils/instagram';
 import { interpretarCambioDeFoto, patchDeFotos } from '../../utils/fotos';
 import { interpretarAccion, opcionesDeVariante, opcionesDeProducto, describirRepetidos, accionInversa } from '../../utils/lauAcciones';
+import { interpretarGasto, responderGastos, etiquetaDeCategoria } from '../../utils/gastos';
+import { explicarErrorIA } from '../../utils/gemini';
+import { buscarProductos } from '../../utils/lauDirecto';
 
 const HISTORY_KEY = 'lau_copilot_v4';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
@@ -198,7 +201,7 @@ const actionLabel = (a) => {
         }
         case 'adjust_stock': return `Ajustar stock de ${A.nombre || A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
         case 'cancel_sale': return `ANULAR venta ${A.orderId} (repone el stock)`;
-        case 'record_expense': return `Registrar gasto: ${A.concept || 'Gasto'} — $${(Number(A.amount) || 0).toLocaleString('es-AR')}${A.category ? ` (${A.category})` : ''}`;
+        case 'record_expense': return `Registrar gasto: ${A.concept || 'Gasto'} — $${(Number(A.amount) || 0).toLocaleString('es-AR')}${A.category ? ` (${etiquetaDeCategoria(A.category)})` : ''}${Number(A.date) > 0 && new Date(Number(A.date)).toDateString() !== new Date().toDateString() ? ` · ${new Date(Number(A.date)).toLocaleDateString('es-AR')}` : ''}`;
         case 'rename_category': return `Renombrar categoría "${A.from}" → "${A.to}" (y sus productos)`;
         case 'delete_category': return `ELIMINAR categoría "${A.name}"`;
         case 'delete_expense': return `ELIMINAR gasto ${A.expenseId}`;
@@ -544,8 +547,10 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 if (amount <= 0) return 'Decime el monto del gasto (ej: "gasté $80000 en tela").';
                 const concept = A.concept ? String(A.concept) : 'Gasto';
                 const category = A.category ? String(A.category) : 'otros';
-                const id = await addExpense({ amount, concept, category, date: Date.now() });
-                return id ? `Gasto registrado: ${concept} — $${amount.toLocaleString('es-AR')} (${category}). Se va a restar de tu ganancia neta.` : 'No se pudo registrar el gasto.';
+                const date = Number(A.date) > 0 ? Number(A.date) : Date.now();
+                const id = await addExpense({ amount, concept, category, date });
+                const cuando = new Date(date).toDateString() === new Date().toDateString() ? '' : ` del ${new Date(date).toLocaleDateString('es-AR')}`;
+                return id ? `Gasto registrado${cuando}: ${concept} — $${amount.toLocaleString('es-AR')} (${etiquetaDeCategoria(category)}). Ya se resta de la ganancia neta en Ventas y en el Inicio. [${id}]` : 'No se pudo registrar el gasto.';
             }
             case 'query_expenses': {
                 const range = A.range || '30d';
@@ -1101,12 +1106,31 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 : `✅ Listo: "${p.name}" ya tiene ${urls.length === 1 ? 'la foto nueva' : `las ${urls.length} fotos nuevas`}. Se ve así en la tienda ahora mismo; nombre, precio y stock quedaron igual.`, img: urls[0] });
             logAiAction?.('copilot', text, 'ok');
         } catch (e) {
-            push({ role: 'system', text: `Error: ${e?.message || e}` });
+            push({ role: 'system', text: explicarErrorIA(e) });
         } finally { setLoading(false); setBusyMsg(''); }
     };
 
     // Precio, mostrar/ocultar, mercadería que llegó y ventas por fuera: se
     // entienden sin IA, se confirman igual que siempre y se pueden deshacer.
+    // "gasté 20000 en publicidad": se anota sin IA, con confirmar y Deshacer.
+    const gastoDirecto = async (text, g) => {
+        push({ role: 'user', text });
+        const accion = { tool: 'record_expense', args: g };
+        const ok = await askConfirm([accion]);
+        if (!ok) { push({ role: 'system', text: 'Cancelado por vos. No anoté nada.' }); return; }
+        setLoading(true);
+        try {
+            setBusyMsg('Guardando…');
+            const out = await exec('record_expense', g);
+            const id = (String(out).match(/\[([A-Za-z0-9_-]{6,})\]$/) || [])[1];
+            deshacerRef.current = id ? { tool: 'delete_expense', args: { expenseId: id }, resumen: `Borrar el gasto "${g.concept}"` } : null;
+            push({ role: 'ai', text: `✅ ${String(out).replace(/\s*\[[A-Za-z0-9_-]+\]$/, '')}`, options: id ? ['Deshacer'] : undefined });
+            logAiAction?.('copilot', text, 'ok');
+        } catch (e) {
+            push({ role: 'system', text: explicarErrorIA(e) });
+        } finally { setLoading(false); setBusyMsg(''); }
+    };
+
     const accionDirecta = async (text, r) => {
         push({ role: 'user', text });
         if (r.productos && !r.productos.length) { push({ role: 'ai', text: `No encontré ningún producto que se llame "${r.nombre || '…'}". Decímelo como figura en Inventario.` }); return; }
@@ -1148,7 +1172,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             }
             logAiAction?.('copilot', text, 'ok');
         } catch (e) {
-            push({ role: 'system', text: `Error: ${e?.message || e}` });
+            push({ role: 'system', text: explicarErrorIA(e) });
         } finally { setLoading(false); setBusyMsg(''); }
     };
 
@@ -1164,7 +1188,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             deshacerRef.current = null;
             push({ role: 'ai', text: `↩️ Deshecho. ${out}` });
         } catch (e) {
-            push({ role: 'system', text: `Error: ${e?.message || e}` });
+            push({ role: 'system', text: explicarErrorIA(e) });
         } finally { setLoading(false); setBusyMsg(''); }
     };
 
@@ -1204,6 +1228,16 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             const accion = interpretarAccion(text, inventory, { comision });
             // "el sweater me costó 20000": guarda el costo de ESE producto (antes que la cotización suelta).
             if (accion?.tipo === 'costo') { setInput(''); await accionDirecta(text, accion); return; }
+            if (/^(quiero |dale |hola )?(carg[aá]|cargar|subi[r]?|sub[ií]|agreg[aá]r?|crea[r]?|cre[aá]|nuevo|nueva)\s+(un |una |el |la |otro |otra )?(producto|prenda|articulo|artículo)\s*(nuevo|nueva)?[.!]?$/i.test(text.trim())) {
+                setInput(''); push({ role: 'user', text });
+                push({ role: 'ai', text: 'Dale. Te abro el paso a paso: foto, nombre, categoría, colores y talles, stock, costo → precio. Si preferís hacerlo por chat, mandame la foto con el clip y decime "me costó X".' });
+                setWizardOpen(true);
+                return;
+            }
+            const gastosResp = responderGastos(text, expenses);
+            if (gastosResp) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: gastosResp }); logAiAction?.('copilot', text, 'ok'); return; }
+            const gasto = interpretarGasto(text, { esProducto: (c) => buscarProductos(inventory, c).length > 0 });
+            if (gasto) { setInput(''); await gastoDirecto(text, gasto); return; }
             const efectivo = (p) => { const ef = precioEfectivo(p.price, comision); return `"${p.name}" está a $${Number(p.price || 0).toLocaleString('es-AR')} en la tienda. En efectivo o transferencia no pagás la comisión de MP (${comision}%): podés cobrarlo $${ef.toLocaleString('es-AR')} y ganás lo mismo. Más abajo de eso, ya sale de tu ganancia.`; };
             const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name), efectivo });
             if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }
@@ -1263,7 +1297,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             await agentLoop(transcript, { inventory, orders, categories, coupons, reviews, isMaintenance, siteConfig });
             logAiAction?.('copilot', text || '(imagen)', 'ok');
         } catch (e) {
-            push({ role: 'system', text: `Error: ${e?.message || e}` });
+            push({ role: 'system', text: explicarErrorIA(e) });
         } finally {
             setLoading(false); setBusyMsg('');
         }
