@@ -12,61 +12,6 @@ const Chip = ({ x, y, w, label, on = false, punto }) => (
     </g>
 );
 
-/** Los dos caminos: el botón "Cargar producto" (sin llave) y el chat con foto (con llave). */
-export const IlusDosCaminos = () => (
-    <Svg alto={250} label="Dos maneras de cargar: el botón Cargar producto, paso a paso y sin llave, o mandarle la foto por chat con la llave de Gemini">
-        {/* Camino 1 */}
-        <rect x="16" y="10" width="336" height="230" rx="14" className={papelSuave} />
-        <text x="32" y="34" fontSize="9" fontWeight="900" letterSpacing="2" fill={ORO_OSCURO}>CAMINO 1 · EL BOTÓN</text>
-        <text x="32" y="52" fontSize="12" fontWeight="800" className={texto}>Paso a paso, con botones</text>
-        <text x="32" y="67" fontSize="10" className={textoSuave}>Anda siempre, sin llave de IA.</text>
-        {/* cabecera del chat */}
-        <g transform="translate(32 80)">
-            <rect width="304" height="44" rx="10" className={papel} />
-            <rect width="304" height="44" rx="10" fill="none" className={linea} />
-            <circle cx="22" cy="22" r="12" fill={ORO} />
-            <text x="22" y="26" textAnchor="middle" fontSize="10" fontWeight="900" fill="#111">✦</text>
-            <text x="42" y="26" fontSize="10" fontWeight="900" letterSpacing="2" className={texto}>LAU</text>
-            <rect x="126" y="10" width="112" height="24" rx="12" fill={ORO} opacity="0.18" stroke={ORO} strokeWidth="2" />
-            <text x="182" y="26" textAnchor="middle" fontSize="9.5" fontWeight="800" fill={ORO_OSCURO}>📦 Cargar producto</text>
-            <text x="270" y="26" textAnchor="middle" fontSize="9.5" fontWeight="800" fill={ORO_OSCURO}>📖 Guía</text>
-        </g>
-        <Flecha x1={184} y1={128} x2={184} y2={148} />
-        {/* pasos */}
-        {[['📷', 'Foto'], ['✏️', 'Nombre'], ['🗂️', 'Categoría'], ['🎨', 'Talles'], ['🔢', 'Stock'], ['🧵', 'Ficha'], ['💵', 'Precio'], ['✅', 'Publicar']].map(([e, l], i) => (
-            <g key={l} transform={`translate(${32 + i * 38} 154)`}>
-                <rect width="34" height="50" rx="8" className={papel} />
-                <rect width="34" height="50" rx="8" fill="none" className={linea} />
-                <text x="17" y="22" textAnchor="middle" fontSize="13">{e}</text>
-                <text x="17" y="42" textAnchor="middle" fontSize="7.5" fontWeight="700" className={textoSuave}>{l}</text>
-            </g>
-        ))}
-        <text x="184" y="226" textAnchor="middle" fontSize="10" className={textoSuave}>8 pantallitas. Tocás, escribís poco, Continuar.</text>
-
-        {/* Camino 2 */}
-        <rect x="368" y="10" width="336" height="230" rx="14" className={papelSuave} />
-        <text x="384" y="34" fontSize="9" fontWeight="900" letterSpacing="2" fill={ORO_OSCURO}>CAMINO 2 · POR CHAT</text>
-        <text x="384" y="52" fontSize="12" fontWeight="800" className={texto}>Foto + un mensaje</text>
-        <text x="384" y="67" fontSize="10" className={textoSuave}>Necesita la llave de Gemini (Configuración → IA).</text>
-        <g transform="translate(430 80)">
-            <rect width="258" height="70" rx="14" fill={ORO} />
-            <rect x="12" y="12" width="46" height="46" rx="8" fill="white" opacity="0.8" />
-            <path d="M18 50l12-14 8 8 7-6 11 12z" fill={ORO_OSCURO} />
-            <text x="68" y="28" fontSize="10.5" fontWeight="700" fill="#111">📎 vestido-lino.jpg</text>
-            <text x="68" y="44" fontSize="10.5" fill="#111">cargá esta prenda, me costó</text>
-            <text x="68" y="59" fontSize="10.5" fill="#111">20000, talles S M L, tengo 6</text>
-        </g>
-        <g transform="translate(384 160)">
-            <rect width="250" height="54" rx="14" className={papel} />
-            <rect width="250" height="54" rx="14" fill="none" className={linea} />
-            <text x="14" y="17" fontSize="8.5" fontWeight="900" fill={ORO_OSCURO} letterSpacing="2">LAU</text>
-            <text x="14" y="33" fontSize="10.5" className={texto}>Miré la foto: vestido de lino blanco.</text>
-            <text x="14" y="47" fontSize="10.5" className={texto}>¿Categoría?  <tspan fill={ORO_OSCURO} fontWeight="800">Vestidos</tspan>  <tspan fill={ORO_OSCURO} fontWeight="800">Otra…</tspan></text>
-        </g>
-        <text x="536" y="230" textAnchor="middle" fontSize="10" className={textoSuave}>Lo que falta lo pregunta con botones. Nada se guarda sin Confirmar.</text>
-    </Svg>
-);
-
 /** La pantalla del paso a paso, en el paso de talles y colores. */
 export const IlusWizard = () => (
     <Svg alto={320} label="La pantalla de Cargar producto: barra de progreso arriba, vista previa de la prenda, los botones de colores y talles, y Continuar">

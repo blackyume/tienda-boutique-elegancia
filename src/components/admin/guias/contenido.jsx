@@ -14,7 +14,7 @@ import {
 } from './ilustracionesMas';
 import { IlusInicio, IlusLauSinIA, IlusOferta, IlusDiseno } from './ilustracionesInicio';
 import { IlusWebVsEfectivo, IlusHastaDondeBajar, IlusVentaEfectivo, IlusCostoPorChat, IlusFichaCompleta, IlusGastos } from './ilustracionesPrecios';
-import { IlusDosCaminos, IlusWizard, IlusStockGrilla } from './ilustracionesLau';
+import { IlusWizard, IlusStockGrilla } from './ilustracionesLau';
 import { TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../../../utils/envios';
 
 // Las guías del panel. Están escritas para que las siga alguien que nunca
@@ -218,17 +218,20 @@ const Lau = ({ abrir }) => (
         </Seccion>
 
         <Seccion id="cargar" titulo="Cargar un producto">
-            <Figura titulo="Dos caminos, la misma ficha. El botón anda siempre; el chat con foto necesita la llave de Gemini.">
-                <IlusDosCaminos />
-            </Figura>
-            <P><strong>Camino 1: el botón <K>Cargar producto</K></strong>, arriba a la derecha del chat, al lado de Guía. Ocho pantallas, una pregunta por pantalla, casi todo con botones: foto, nombre, categoría, colores y talles, stock, tela y cuidados, precio, revisar y publicar. Anda sin llave de IA.</P>
+            <P>Hay <strong>dos maneras</strong> y las dos terminan en la misma ficha:</P>
+            <Lista items={[
+                <><strong>1 · Con el botón, paso a paso.</strong> Tocás <K>Cargar producto</K> (arriba a la derecha del chat, al lado de Guía) y contestás ocho preguntas cortas, una por pantalla, casi todo con botones: foto, nombre, categoría, colores y talles, stock, tela, precio, revisar y publicar. <strong>Anda siempre</strong>, sin llave de IA.</>,
+                <><strong>2 · Por chat, con una foto.</strong> Tocás el clip 📎, elegís la foto y escribís lo que sabés. Lau mira la foto, escribe la descripción sola y pregunta lo que falte con botones. Más rápido, pero <strong>necesita la llave de Gemini</strong> (<Ruta pasos={['Configuración', 'Inteligencia Artificial']} />).</>,
+            ]} />
+            <Aviso tipo="dato" titulo="¿Cuál uso?">Sin llave de IA, la 1. Con llave, la 2 es más rápida. Por las dos se pregunta lo mismo y la prenda queda igual de completa.</Aviso>
+            <P><strong>Así es el paso a paso (manera 1).</strong></P>
             <Figura titulo="La pantalla del paso a paso, en el paso de colores y talles. La barra dorada de arriba dice cuánto falta.">
                 <IlusWizard />
             </Figura>
             <Figura titulo="El paso del stock: una casilla por cada talle y color. Así la tienda sabe qué se agotó.">
                 <IlusStockGrilla />
             </Figura>
-            <P><strong>Camino 2: por chat, con foto.</strong> Necesita la llave de Gemini (<Ruta pasos={['Configuración', 'Inteligencia Artificial']} />).</P>
+            <P><strong>Así es por chat (manera 2).</strong></P>
             <Figura titulo="Foto + lo que sabés del producto. Lo que falta, Lau lo pregunta con botones. Nada se guarda hasta que confirmás.">
                 <IlusLau />
             </Figura>

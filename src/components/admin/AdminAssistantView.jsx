@@ -18,7 +18,7 @@ import { interpretarAccion, opcionesDeVariante, opcionesDeProducto, describirRep
 import { interpretarGasto, responderGastos, etiquetaDeCategoria } from '../../utils/gastos';
 import { explicarErrorIA } from '../../utils/gemini';
 import { normalizarCuidados, detallesPorPlantilla, revisarFicha, interpretarMedidas, MEDIDAS } from '../../utils/ficha';
-import { IlusDosCaminos, IlusWizard, IlusStockGrilla } from './guias/ilustracionesLau';
+import { IlusWizard, IlusStockGrilla } from './guias/ilustracionesLau';
 import { IlusLau } from './guias/ilustraciones';
 import { IlusFichaCompleta } from './guias/ilustracionesPrecios';
 import { buscarProductos } from '../../utils/lauDirecto';
@@ -1445,7 +1445,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             </div>
 
             {showGuide && (
-                <div className="absolute inset-0 z-[70] bg-[#11100D]/97 backdrop-blur-xl flex flex-col animate-fadeIn">
+                <div className="absolute inset-0 z-[70] bg-[#11100D] flex flex-col animate-fadeIn">
                     <div className="shrink-0 border-b border-white/10 bg-white/[0.03]">
                         <div className="max-w-3xl mx-auto flex items-center justify-between px-5 h-[72px] [@media(max-height:780px)]:h-14">
                             <div className="flex items-center gap-2.5">
@@ -1464,36 +1464,61 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                 Hablale a Lau <span className="text-[#E8C65E] font-semibold">como a una empleada</span>, con tus palabras. No tenés que escribir exacto. Acá abajo está <span className="text-white/80">todo lo que podés hacer</span>, bien fácil. Tocá cualquier ejemplo y se escribe solo. Lo importante (publicar, borrar, precios) <span className="text-white/80">siempre te pregunta antes</span>.
                             </p>
 
-                            {/* CÓMO CARGAR UN PRODUCTO — con dibujos, los dos caminos */}
-                            <div className="rounded-2xl border border-[#E8C65E]/25 bg-gradient-to-b from-[#E8C65E]/[0.08] to-transparent p-5 space-y-6">
+                            {/* CÓMO CARGAR UN PRODUCTO — dos maneras, explicadas de a una */}
+                            <div className="space-y-5">
                                 <div>
-                                    <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2"><span className="text-xl">🛍️</span> Cargar un producto</h3>
-                                    <p className="text-white/50 text-xs">Hay dos caminos y los dos terminan en la misma ficha completa. Elegí el que te quede cómodo.</p>
-                                </div>
-                                <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusDosCaminos /></div>
-                                <div className="grid sm:grid-cols-2 gap-2.5">
-                                    <button
-                                        onClick={() => { setShowGuide(false); setWizardOpen(true); }}
-                                        className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#11100D] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition"
-                                    >
-                                        <PackagePlus className="w-4 h-4" /> Camino 1 · Cargar paso a paso
-                                    </button>
-                                    <button
-                                        onClick={() => { setInput('cargá esta prenda, me costó 20000, talles S M L, tengo 6'); setShowGuide(false); }}
-                                        className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#E8C65E] border border-[#E8C65E]/50 hover:bg-[#E8C65E]/10 transition"
-                                    >
-                                        <Paperclip className="w-4 h-4" /> Camino 2 · Por chat, con foto
-                                    </button>
+                                    <h3 className="text-white font-bold text-lg flex items-center gap-2"><span className="text-2xl">🛍️</span> Cargar un producto</h3>
+                                    <p className="text-white/55 text-sm mt-1">Hay <span className="text-white">dos maneras</span>. Las dos terminan en la misma ficha. Elegí una:</p>
                                 </div>
 
-                                <div>
-                                    <h4 className="text-white font-semibold text-sm mb-1">Camino 1: así es la pantalla</h4>
-                                    <p className="text-white/50 text-xs mb-3">Una pregunta por pantalla, casi todo con botones. La barra dorada de arriba te dice cuánto falta.</p>
-                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusWizard /></div>
+                                <div className="grid md:grid-cols-2 gap-3">
+                                    {/* Manera 1: el botón */}
+                                    <div className="rounded-2xl border border-[#E8C65E]/40 bg-[#E8C65E]/[0.07] p-5 flex flex-col">
+                                        <span className="self-start text-[10px] font-bold uppercase tracking-[0.2em] text-[#11100D] bg-[#E8C65E] px-2 py-0.5 rounded-full">Anda siempre</span>
+                                        <h4 className="text-white font-bold text-lg mt-3">1 · Con el botón, paso a paso</h4>
+                                        <p className="text-white/50 text-xs mt-0.5 mb-4">No necesita la llave de IA. Vos tocás botones y escribís poco.</p>
+                                        <ol className="space-y-2.5 text-sm text-white/80 flex-1">
+                                            <li className="flex gap-2.5"><span className="w-6 h-6 rounded-full bg-[#E8C65E] text-[#11100D] text-xs font-black flex items-center justify-center shrink-0">1</span><span>Tocá <strong className="text-[#E8C65E]">Cargar producto</strong>, arriba a la derecha del chat.</span></li>
+                                            <li className="flex gap-2.5"><span className="w-6 h-6 rounded-full bg-[#E8C65E] text-[#11100D] text-xs font-black flex items-center justify-center shrink-0">2</span><span>Contestá <strong className="text-white">8 preguntas cortas</strong>, una por pantalla: foto, nombre, categoría, colores y talles, stock, tela, precio.</span></li>
+                                            <li className="flex gap-2.5"><span className="w-6 h-6 rounded-full bg-[#E8C65E] text-[#11100D] text-xs font-black flex items-center justify-center shrink-0">3</span><span>Revisás el resumen y tocás <strong className="text-white">Publicar</strong>. Hasta ahí no se guarda nada.</span></li>
+                                        </ol>
+                                        <button
+                                            onClick={() => { setShowGuide(false); setWizardOpen(true); }}
+                                            className="mt-5 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-[#11100D] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition"
+                                        >
+                                            <PackagePlus className="w-4 h-4" /> Empezar ahora
+                                        </button>
+                                    </div>
+
+                                    {/* Manera 2: por chat */}
+                                    <div className="rounded-2xl border border-white/15 bg-white/[0.03] p-5 flex flex-col">
+                                        <span className={`self-start text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${aiConfigured ? 'text-emerald-300 border-emerald-400/50 bg-emerald-400/10' : 'text-white/50 border-white/20'}`}>{aiConfigured ? 'Llave de IA cargada' : 'Necesita la llave de IA'}</span>
+                                        <h4 className="text-white font-bold text-lg mt-3">2 · Por chat, con una foto</h4>
+                                        <p className="text-white/50 text-xs mt-0.5 mb-4">Lau mira la foto y escribe la descripción sola. Más rápido, pero necesita la llave de Gemini.</p>
+                                        <ol className="space-y-2.5 text-sm text-white/80 flex-1">
+                                            <li className="flex gap-2.5"><span className="w-6 h-6 rounded-full border border-white/30 text-white text-xs font-black flex items-center justify-center shrink-0">1</span><span>Tocá el clip <Paperclip className="w-3.5 h-3.5 inline -mt-0.5" /> abajo y elegí la foto de la prenda.</span></li>
+                                            <li className="flex gap-2.5"><span className="w-6 h-6 rounded-full border border-white/30 text-white text-xs font-black flex items-center justify-center shrink-0">2</span><span>Escribí lo que sabés, desprolijo: <em className="text-white">"me costó 20000, talles S M L, tengo 6"</em>.</span></li>
+                                            <li className="flex gap-2.5"><span className="w-6 h-6 rounded-full border border-white/30 text-white text-xs font-black flex items-center justify-center shrink-0">3</span><span>Lo que falte te lo pregunta <strong className="text-white">con botones</strong>. Al final, <strong className="text-white">Confirmar</strong>.</span></li>
+                                        </ol>
+                                        <button
+                                            onClick={() => { setInput('cargá esta prenda, me costó 20000, talles S M L, tengo 6'); setShowGuide(false); }}
+                                            className="mt-5 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-[#E8C65E] border border-[#E8C65E]/50 hover:bg-[#E8C65E]/10 transition"
+                                        >
+                                            <Paperclip className="w-4 h-4" /> Dejarme la frase escrita
+                                        </button>
+                                        {!aiConfigured && <p className="text-[11px] text-white/40 mt-2 text-center">La llave se carga en Configuración → Inteligencia Artificial.</p>}
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <h4 className="text-white font-semibold text-sm mb-2.5">Las 8 pantallas, en orden</h4>
+                                <div className="rounded-xl bg-white/[0.03] border border-white/10 px-4 py-3 text-sm text-white/70">
+                                    <strong className="text-white">¿Cuál uso?</strong> Si no tenés la llave de IA, la 1. Si la tenés, la 2 es más rápida. Por las dos se pregunta lo mismo y la prenda queda igual de completa.
+                                </div>
+
+                                {/* La pantalla del paso a paso, con notas */}
+                                <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+                                    <h4 className="text-white font-bold text-base">Así es el paso a paso (manera 1)</h4>
+                                    <p className="text-white/50 text-xs mt-0.5 mb-4">Una pregunta por pantalla. La barra dorada de arriba te dice cuánto falta. Nada se publica hasta la última pantalla.</p>
+                                    <div className="rounded-xl bg-[#11100D] border border-white/10 p-2 sm:p-4 mb-5"><IlusWizard /></div>
                                     <div className="grid sm:grid-cols-2 gap-2.5">
                                         {LOAD_STEPS.map((s, i) => (
                                             <div key={i} className="flex items-start gap-3 bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5">
@@ -1506,24 +1531,15 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                             </div>
                                         ))}
                                     </div>
+                                    <p className="text-white/50 text-xs mt-4 mb-2"><strong className="text-white/80">El stock (pantalla 5)</strong> es una casilla por cada talle y color. Con eso la tienda sabe qué se agotó y Lau descuenta el justo cuando le decís "vendí…".</p>
+                                    <div className="rounded-xl bg-[#11100D] border border-white/10 p-2 sm:p-4"><IlusStockGrilla /></div>
                                 </div>
 
-                                <div>
-                                    <h4 className="text-white font-semibold text-sm mb-1">El paso del stock, que es el que más confunde</h4>
-                                    <p className="text-white/50 text-xs mb-3">Una casilla por cada talle y color. Con eso la tienda sabe qué se agotó y Lau descuenta el justo cuando le decís "vendí…".</p>
-                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusStockGrilla /></div>
-                                </div>
-
-                                <div>
-                                    <h4 className="text-white font-semibold text-sm mb-1">Lo que la clienta ve después</h4>
-                                    <p className="text-white/50 text-xs mb-3">Los números son lo que se pregunta al cargar. Tela, cuidados y medidas son opcionales, pero una ficha completa vende más. Nada se inventa: si no lo decís, no va.</p>
-                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusFichaCompleta /></div>
-                                </div>
-
-                                <div>
-                                    <h4 className="text-white font-semibold text-sm mb-1">Camino 2: por chat, con la llave de Gemini</h4>
-                                    <p className="text-white/50 text-xs mb-3">Tocás el clip 📎, elegís la foto y escribís lo que sabés, desprolijo. Lau mira la foto, arma nombre y descripción, y lo que falta lo pregunta con botones. Sin llave (Configuración → Inteligencia Artificial), usá el camino 1.</p>
-                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3 mb-2.5"><IlusLau /></div>
+                                {/* El chat con foto */}
+                                <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+                                    <h4 className="text-white font-bold text-base">Así es por chat (manera 2)</h4>
+                                    <p className="text-white/50 text-xs mt-0.5 mb-4">Foto + lo que sabés. Lo que falta, Lau lo pregunta con botones. Nada se guarda hasta que tocás Confirmar.</p>
+                                    <div className="rounded-xl bg-[#11100D] border border-white/10 p-2 sm:p-4 mb-3"><IlusLau /></div>
                                     <div className="flex flex-col gap-2">
                                         {['cargá esta prenda, me costó 20000, talles S M L, tengo 6', 'jean oxford azul, talles 36 38 40 42, tengo 5, me costó 21000, publicalo', 'cargá este vestido: lino 100%, lavar a mano, talle M mide 92 de busto'].map((cmd) => (
                                             <button
@@ -1536,6 +1552,13 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                             </button>
                                         ))}
                                     </div>
+                                </div>
+
+                                {/* Lo que ve la clienta */}
+                                <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+                                    <h4 className="text-white font-bold text-base">Lo que la clienta ve después</h4>
+                                    <p className="text-white/50 text-xs mt-0.5 mb-4">Los números son lo que se pregunta al cargar. Tela, cuidados y medidas son opcionales, pero una ficha completa vende más. Nada se inventa: si no lo decís, no va.</p>
+                                    <div className="rounded-xl bg-[#11100D] border border-white/10 p-2 sm:p-4"><IlusFichaCompleta /></div>
                                 </div>
                             </div>
 
