@@ -1,21 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 
-export const RealTimeClock = () => {
+// Fecha y hora completas, con segundero. `compact` es la versión de la barra
+// del celular (dos líneas chicas); la normal va en el menú lateral.
+const capitalizar = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+export const RealTimeClock = ({ compact = false }) => {
     const [time, setTime] = useState(new Date());
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+    const hora = time.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const fecha = capitalizar(time.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+    if (compact) {
+        return (
+            <div className="ml-auto text-right leading-tight" aria-live="off">
+                <p className="text-sm font-mono font-bold text-[#E8C65E] tabular-nums tracking-wider">{hora}</p>
+                <p className="text-[9px] text-slate-500 dark:text-slate-400 whitespace-nowrap">{fecha}</p>
+            </div>
+        );
+    }
     return (
-        <div className="text-right hidden md:block mb-2">
-            <p className="text-xl font-mono font-bold text-slate-800 dark:text-white tracking-widest flex items-center justify-end gap-2">
-                <Clock className="w-5 h-5 text-[#E8C65E] animate-pulse" />
-                {time.toLocaleTimeString()}
+        <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800" aria-live="off">
+            <p className="text-2xl font-mono font-black text-[#E8C65E] tabular-nums tracking-[0.15em] flex items-center gap-2">
+                <Clock className="w-5 h-5 shrink-0" />
+                {hora}
             </p>
-            <p className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 tracking-[0.2em]">
-                {time.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
+            <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 tracking-wide mt-0.5">{fecha}</p>
         </div>
     );
 };

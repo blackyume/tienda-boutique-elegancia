@@ -5,6 +5,7 @@ import { useConfirm } from '../components/ui/ConfirmDialog';
 import { EmptyState } from '../components/ui/EmptyState';
 import { CommandPalette } from '../components/admin/CommandPalette';
 import { LogoSVG } from '../components/layout/LogoSVG';
+import { RealTimeClock } from '../components/admin/AdminShared';
 import { formatMoney } from '../utils/helpers';
 import {
     LayoutDashboard, Package, Tag, LogOut, Edit2, Trash2, X,
@@ -528,6 +529,7 @@ export const Admin = () => {
                         <X className="w-5 h-5" />
                     </button>
                 </div>
+                <RealTimeClock />
                 <nav className="flex-1 p-3 overflow-y-auto" onClick={() => setSidebarOpen(false)}>
                     {MENU.map((g, gi) => (
                         <div key={g.grupo} className={gi ? 'mt-2 [@media(min-height:960px)]:mt-4' : ''}>
@@ -573,7 +575,8 @@ export const Admin = () => {
                     <button onClick={() => setSidebarOpen(true)} aria-label="Abrir menú" className="p-2 -ml-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                         <Menu className="w-5 h-5" />
                     </button>
-                    <span className="font-cinzel font-bold text-sm uppercase tracking-widest text-slate-800 dark:text-white">{TAB_LABELS[adminTab] || 'Admin'}</span>
+                    <span className="font-cinzel font-bold text-sm uppercase tracking-widest text-slate-800 dark:text-white truncate">{TAB_LABELS[adminTab] || 'Admin'}</span>
+                    <RealTimeClock compact />
                 </header>
                 {/* INVENTARIO */}
                 {adminTab === 'inventory' && (
