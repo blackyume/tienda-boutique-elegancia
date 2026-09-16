@@ -106,8 +106,8 @@ export const avisosDeLlaves = ({ siteConfig, aiConfig } = {}, ahora = Date.now()
             avisos.push({ id: 'ig', nivel: 'medio', titulo: 'Instagram: revisá la conexión', detalle: `Hace ${dias} días que se conectó @${ig.username}. Tocá "Probar conexión" en Configuración → Notificaciones para confirmar que sigue viva.`, goto: 'settings' });
         }
     }
-    if (!(aiConfig?.adminKeys || '').trim() && !(aiConfig?.cerebrasKey || '').trim()) {
-        avisos.push({ id: 'ia', nivel: 'medio', titulo: 'Lau sin llave de IA', detalle: 'Sin Gemini ni Cerebras, Lau sólo responde lo básico (stock, ventas). Se carga en Configuración → IA.', goto: 'settings' });
+    if (!(aiConfig?.adminKeys || '').trim()) {
+        avisos.push({ id: 'ia', nivel: 'medio', titulo: 'Lau sin llave de IA', detalle: 'Sin la llave de Gemini, Lau sólo hace lo básico (ventas, stock, precios, gastos). Se carga en Configuración → IA.', goto: 'settings' });
     }
     return avisos;
 };

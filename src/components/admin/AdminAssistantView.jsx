@@ -1309,7 +1309,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             const cambio = interpretarCambioDeFoto(text, inventory);
             if (cambio) { setInput(''); await cambiarFoto(text, cambio); return; }
         }
-        if (!aiConfigured) { push({ role: 'system', text: 'Configurá una key de Cerebras (o Gemini) en Admin → Configuración para activarme.' }); return; }
+        if (!aiConfigured) { push({ role: 'system', text: 'Configurá la llave de Gemini en Admin → Configuración → Inteligencia Artificial para activarme.' }); return; }
 
         setInput('');
         setLoading(true);

@@ -1,6 +1,6 @@
-// Capa única de IA. Cerebras es el motor PRIMARIO; Gemini queda de
-// fallback automático si Cerebras no está configurado o falla.
-import { generateWithCerebras } from './cerebras';
+// Capa única de IA. Gemini es el motor de texto (Lau, copy, asistente de la
+// tienda); NVIDIA NIM queda sólo como respaldo de visión. Cerebras se sacó el
+// 16/09/2026 a pedido del dueño.
 import { generateWithGemini, parseJsonFromResponse } from './gemini';
 
 export { parseJsonFromResponse };
@@ -44,27 +44,13 @@ export const generateText = async (prompt, aiConfig, { scope = 'admin', system, 
     const viaProxy = await tryProxy(combined, scope);
     if (viaProxy) return viaProxy;
 
-    // 2. Fallback client-side (modo actual, hasta configurar las env vars).
-    const cerebrasKey = (aiConfig?.cerebrasKey || '').trim();
-    if (cerebrasKey) {
-        try {
-            return await generateWithCerebras(prompt, {
-                keys: cerebrasKey,
-                model: aiConfig?.cerebrasModel || undefined,
-                system,
-                temperature,
-            });
-        } catch (err) {
-            console.warn('[ai] Cerebras falló, fallback a Gemini:', err?.message);
-        }
-    }
+    // 2. Client-side con la llave de Gemini cargada en Admin → Configuración → IA.
     const keys = scope === 'customer' ? aiConfig?.customerKeys : aiConfig?.adminKeys;
     return generateWithGemini(combined, { keys });
 };
 
 // ¿Hay algún proveedor de IA configurado para uso admin?
-export const hasAdminAI = (aiConfig) =>
-    Boolean((aiConfig?.cerebrasKey || '').trim() || (aiConfig?.adminKeys || '').trim());
+export const hasAdminAI = (aiConfig) => Boolean((aiConfig?.adminKeys || '').trim());
 
 // Genera descripción + bullets + keywords SEO para un producto.
 export const generateProductCopy = async (product, aiConfig) => {

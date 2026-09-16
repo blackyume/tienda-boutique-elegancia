@@ -353,20 +353,11 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                         <div className={cardCls + ' border-l-4 border-l-[#E8C65E]/70'}>
                             <h3 className="font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white"><Bot className="w-5 h-5 text-[#E8C65E]" /> Inteligencia Artificial</h3>
                             <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-4">
-                                <p className="text-sm text-slate-600 dark:text-slate-300"><strong>Motor:</strong> Cerebras (texto · Lau y copy). <strong>Visión:</strong> Gemini primario, NVIDIA NIM como fallback. El asistente del cliente usa Gemini.</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-300"><strong>Motor:</strong> Gemini (Lau, descripciones, fotos y el asistente de la tienda). <strong>NVIDIA NIM</strong> queda como respaldo para mirar fotos, por si algún día le ponés llave.</p>
                             </div>
 
-                            <div className="bg-gradient-to-br from-[#E8C65E]/10 to-transparent p-4 rounded-xl border border-[#E8C65E]/30 mb-4">
-                                <div className="flex items-center gap-2 mb-3"><Bot className="w-4 h-4 text-[#E8C65E]" /><span className="text-sm font-bold text-[#E8C65E] uppercase tracking-wider">Cerebras · IA Principal</span></div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">Obtené tu key en <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener noreferrer" className="underline">cloud.cerebras.ai</a>.</p>
-                                <label className={labelCls}>API Key Cerebras</label>
-                                <input id="cerebrasKey" type="password" defaultValue={aiConfig?.cerebrasKey || ''} placeholder="csk-..." className={inputCls + ' font-mono mb-3'} />
-                                <label className={labelCls}>Modelo (opcional)</label>
-                                <input id="cerebrasModel" defaultValue={aiConfig?.cerebrasModel || ''} placeholder="qwen-3-235b-a22b-instruct-2507 (default)" className={inputCls + ' font-mono'} />
-                                <p className="text-[10px] text-slate-400 mt-2">Disponibles: qwen-3-235b-a22b-instruct-2507 · zai-glm-4.7 · gpt-oss-120b · llama3.1-8b</p>
-                            </div>
-
-                            <p className="text-xs font-bold uppercase text-slate-400 mb-2">Gemini · Visión + Fallback</p>
+                            <p className="text-xs font-bold uppercase text-slate-400 mb-2">Gemini · el motor de Lau</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">La llave se saca en <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="underline">aistudio.google.com/apikey</a> → Create API key. Pegala entera y tocá <strong>Guardar Keys</strong> y después <strong>Probar</strong>.</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div><label className={labelCls}>Llaves Administrador (Lau, copy, visión)</label><textarea id="aiAdminKeys" defaultValue={aiConfig?.adminKeys || ''} placeholder="AQ.… (las nuevas) o AIzaSy… (las viejas). Varias: una por línea." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
                                 <div><label className={labelCls}>Llaves Cliente (Elegancia IA)</label><textarea id="aiCustomerKeys" defaultValue={aiConfig?.customerKeys || ''} placeholder="AIzaSy..." className={inputCls + ' min-h-[120px] font-mono resize-y'} /></div>
@@ -382,7 +373,7 @@ export const SettingsView = ({ isMaintenance, toggleMaintenance, migrateData, up
                             </div>
 
                             <div className="flex gap-3 mt-4">
-                                <Button onClick={() => { updateAiConfig({ cerebrasKey: document.getElementById('cerebrasKey')?.value || '', cerebrasModel: document.getElementById('cerebrasModel')?.value || '', adminKeys: document.getElementById('aiAdminKeys')?.value || '', customerKeys: document.getElementById('aiCustomerKeys')?.value || '', nvidiaKey: document.getElementById('nvidiaKey')?.value || '', nvidiaModel: document.getElementById('nvidiaModel')?.value || '' }); addToast('Llaves guardadas', 'success'); }} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 text-xs px-6 py-2.5 rounded-lg">Guardar Keys</Button>
+                                <Button onClick={() => { updateAiConfig({ cerebrasKey: '', cerebrasModel: '', adminKeys: document.getElementById('aiAdminKeys')?.value || '', customerKeys: document.getElementById('aiCustomerKeys')?.value || '', nvidiaKey: document.getElementById('nvidiaKey')?.value || '', nvidiaModel: document.getElementById('nvidiaModel')?.value || '' }); addToast('Llaves guardadas', 'success'); }} className="bg-slate-900 dark:bg-[#E8C65E] text-white dark:text-black hover:opacity-90 text-xs px-6 py-2.5 rounded-lg">Guardar Keys</Button>
                                 <Button onClick={handleTestKey} isLoading={isTestingKey} className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-6 py-2.5 rounded-lg border border-slate-700">Probar (Gemini admin)</Button>
                             </div>
                         </div>

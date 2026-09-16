@@ -1,4 +1,4 @@
-// Visión por imagen. Cerebras es solo-texto: para "mirar" la foto de una
+// Visión por imagen. Para "mirar" la foto de una
 // prenda usamos Gemini multimodal. Devuelve un borrador de producto que
 // el copiloto propone (con precio editable) antes de publicar.
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -25,7 +25,7 @@ const fileToBase64 = (file) =>
 export const analyzeProductImage = async (file, aiConfig, categories = []) => {
     const keys = parseKeys(aiConfig?.adminKeys);
     if (keys.length === 0) {
-        throw new Error('Para analizar fotos necesitás una API key de Gemini en Admin → Configuración (Cerebras no procesa imágenes).');
+        throw new Error('Para analizar fotos necesitás una API key de Gemini en Admin → Configuración → Inteligencia Artificial.');
     }
     if (!file) throw new Error('Sin imagen');
 

@@ -77,10 +77,10 @@ export const parseJsonFromResponse = (text) => {
     }
 };
 
-// generateProductCopy se movió a utils/ai.js (Cerebras primario + fallback).
+// generateProductCopy se movió a utils/ai.js.
 
 /**
- * El error que devuelve Google (o Cerebras), traducido a qué está mal y qué
+ * El error que devuelve Google, traducido a qué está mal y qué
  * hacer. Para mostrárselo al dueño en vez del JSON.
  */
 export const explicarErrorIA = (e) => {

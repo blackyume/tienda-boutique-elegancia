@@ -23,10 +23,10 @@ const TABS = [
 export const ProductEditModal = ({ initialProduct, onClose }) => {
     const { inventory, addProduct, updateProduct, addToast, categories, uploadImage, aiConfig, paymentConfig, siteConfig } = useStore();
     const cfgPrecios = configPrecios(siteConfig);
-    const margenConfigurado = margenPara(currentProduct.category, cfgPrecios);
     const confirm = useConfirm();
 
     const [currentProduct, setCurrentProduct] = useState(() => initialProduct || {});
+    const margenConfigurado = margenPara(currentProduct.category, cfgPrecios);
     const [tab, setTab] = useState('info');
     const [tempColor, setTempColor] = useState('');
     const [tempHex, setTempHex] = useState('#C9A04E');
@@ -196,7 +196,7 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
 
     const handleGenerateCopy = async () => {
         if (!currentProduct?.name) return addToast('Agregá primero el nombre del producto', 'error');
-        if (!hasAdminAI(aiConfig)) return addToast('Configurá la API key de Cerebras (o Gemini) en Admin → Configuración', 'error');
+        if (!hasAdminAI(aiConfig)) return addToast('Configurá la llave de Gemini en Admin → Configuración', 'error');
         setIsGeneratingCopy(true);
         try {
             const copy = await generateProductCopy(currentProduct, aiConfig);
@@ -841,7 +841,7 @@ const InputGroup = ({ label, help, children }) => (
 const Row = ({ label, value, isNegative, bold }) => (
     <div className={`flex justify-between items-center py-1 ${bold ? 'font-bold text-slate-800 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
         <span>{label}</span>
-        <span className={`font-mono ${isNegative ? 'text-red-500' : ''}`}>{isNegative ? '-' : ''}{formatMoney(value)}</span>
+        <span className={`font-mono ${isNegative ? 'text-red-500' : ''}`}>{isNegative ? '-' : ''}{formatMoney(Number(value) || 0)}</span>
     </div>
 );
 

@@ -1,5 +1,5 @@
-// Visión unificada para el copiloto. Cerebras es texto-puro, así que la
-// foto de prenda la mira otro proveedor. Orden de preferencia:
+// Visión unificada para el copiloto: quién mira la foto de la prenda.
+// Orden de preferencia:
 //   1) Gemini (configurado por defecto en la mayoría de instalaciones)
 //   2) NVIDIA NIM (fallback)
 // Si ninguno funciona se tira un error claro al usuario.

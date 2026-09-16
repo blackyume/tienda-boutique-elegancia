@@ -7,13 +7,10 @@
 // (faltan env vars) cae al método viejo, así nada se rompe durante la migración.
 //
 // Env vars (Vercel):
-//   CEREBRAS_KEY            — key de Cerebras (motor principal). Acepta varias separadas por coma.
 //   GEMINI_CUSTOMER_KEYS    — keys de Gemini para el chat del cliente (fallback).
 //   GEMINI_ADMIN_KEYS       — keys de Gemini para uso admin (fallback).
 const { checkRateLimit, getClientIp } = require('./_rateLimit');
 
-const CEREBRAS_URL = 'https://api.cerebras.ai/v1/chat/completions';
-const CEREBRAS_MODELS = ['qwen-3-235b-a22b-instruct-2507', 'zai-glm-4.7', 'gpt-oss-120b', 'llama3.1-8b'];
 // Vigentes a sep-2026; 2.5-flash de respaldo hasta que Google lo apague el 16/10/2026.
 const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
 
@@ -42,26 +39,6 @@ const applyCors = (req, res) => {
 };
 
 const parseKeys = (raw) => String(raw || '').split(/[,\n]+/).map(k => k.trim()).filter(Boolean);
-
-const tryCerebras = async (prompt, keys) => {
-    for (const key of keys) {
-        for (const model of CEREBRAS_MODELS) {
-            try {
-                const res = await fetch(CEREBRAS_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
-                    body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.6, max_tokens: 2500 }),
-                });
-                if (res.status === 401 || res.status === 403) break; // key inválida → próxima key
-                if (!res.ok) continue;
-                const data = await res.json();
-                const text = data?.choices?.[0]?.message?.content;
-                if (text) return text;
-            } catch { /* próximo modelo/key */ }
-        }
-    }
-    return null;
-};
 
 const tryGemini = async (prompt, keys) => {
     for (const key of keys) {
@@ -93,13 +70,12 @@ module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') return res.status(204).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const cerebrasKeys = parseKeys(process.env.CEREBRAS_KEY);
     const customerKeys = parseKeys(process.env.GEMINI_CUSTOMER_KEYS);
     const adminKeys = parseKeys(process.env.GEMINI_ADMIN_KEYS);
 
     // Si no hay NINGUNA key configurada server-side, avisamos al cliente que use
     // el método viejo (fallback). 200 + configured:false para no romper nada.
-    if (!cerebrasKeys.length && !customerKeys.length && !adminKeys.length) {
+    if (!customerKeys.length && !adminKeys.length) {
         return res.status(200).json({ configured: false });
     }
 
@@ -115,12 +91,9 @@ module.exports = async (req, res) => {
     if (prompt.length > 12000) return res.status(400).json({ error: 'Prompt demasiado largo' });
 
     try {
-        // Cerebras primero (igual que el cliente), Gemini de fallback.
-        let text = cerebrasKeys.length ? await tryCerebras(prompt, cerebrasKeys) : null;
-        if (!text) {
-            const geminiKeys = scope === 'admin' ? adminKeys : customerKeys;
-            if (geminiKeys.length) text = await tryGemini(prompt, geminiKeys);
-        }
+        // Gemini, con la llave del scope (admin = Lau, customer = asistente de la tienda).
+        const geminiKeys = scope === 'admin' ? adminKeys : customerKeys;
+        const text = geminiKeys.length ? await tryGemini(prompt, geminiKeys) : null;
         if (!text) return res.status(502).json({ error: 'Sin respuesta de los proveedores de IA' });
         return res.status(200).json({ text });
     } catch (err) {

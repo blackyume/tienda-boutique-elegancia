@@ -101,8 +101,6 @@ export const useFirestoreSubscriptions = ({
                 if (!docSnap.exists()) return;
                 const d = docSnap.data();
                 setAiConfig({
-                    cerebrasKey: d.cerebrasKey || "",
-                    cerebrasModel: d.cerebrasModel || "",
                     adminKeys: d.adminKeys || "",
                     customerKeys: d.customerKeys || "",
                     nvidiaKey: d.nvidiaKey || "",

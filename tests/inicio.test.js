@@ -100,6 +100,6 @@ describe('avisosDeLlaves', () => {
 
     it('avisa si Lau no tiene ninguna llave de IA', () => {
         expect(avisosDeLlaves({ siteConfig: {}, aiConfig: {} }, AHORA).map(x => x.id)).toEqual(['ia']);
-        expect(avisosDeLlaves({ siteConfig: {}, aiConfig: { cerebrasKey: 'c' } }, AHORA)).toEqual([]);
+        expect(avisosDeLlaves({ siteConfig: {}, aiConfig: { adminKeys: 'AQ.x' } }, AHORA)).toEqual([]);
     });
 });

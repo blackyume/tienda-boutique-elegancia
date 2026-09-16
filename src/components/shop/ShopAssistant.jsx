@@ -97,7 +97,7 @@ export const ShopAssistant = () => {
                 ${userMsg.text}
             `;
 
-            // Cerebras (principal) → Gemini (fallback). Capa única.
+            // Gemini, por la capa única de IA.
             const responseText = await generateText(prompt, aiConfig, { scope: 'customer' });
             setMessages(prev => [...prev, { role: 'ai', text: responseText, timestamp: new Date() }]);
 

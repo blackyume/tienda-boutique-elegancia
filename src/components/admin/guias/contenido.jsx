@@ -780,9 +780,15 @@ const IaKeys = () => (
             ]} />
         </Seccion>
 
-        <Seccion id="cerebras" titulo="La otra llave: Cerebras">
-            <P>En la misma pantalla hay un campo para <strong>Cerebras</strong>, que se usa como segundo motor. También estuvo expuesta: entrá a <Link href="https://cloud.cerebras.ai">cloud.cerebras.ai</Link>, hacé una nueva, pegala y borrá la vieja. Mismo procedimiento.</P>
+        <Seccion id="aq" titulo="Si la llave nueva no anda (empieza con AQ.)">
+            <P>Desde mediados de 2026 Google AI Studio entrega llaves que empiezan con <Cod>AQ.</Cod> en vez de <Cod>AIzaSy</Cod>. A muchas cuentas esas llaves les devuelven el error <Cod>401 ACCESS_TOKEN_TYPE_UNSUPPORTED</Cod> aunque estén bien copiadas: es un problema del lado de Google, reconocido en su foro, no de la tienda. Lau te lo dice en castellano cuando pasa.</P>
+            <Pasos>
+                <Paso>Primero descartá lo simple: en <Ruta pasos={['Configuración', 'Inteligencia Artificial']} /> tocá <K>Probar</K>. Si dice OK, tu llave anda y no hay nada que hacer.</Paso>
+                <Paso>Si falla con ese error, probá sacar la llave desde la consola de Google Cloud, que sigue dando las del formato viejo: <Link href="https://console.cloud.google.com/apis/credentials">console.cloud.google.com/apis/credentials</Link> → <K>Create credentials</K> → <K>API key</K>. Antes, en ese mismo proyecto, activá la <strong>Generative Language API</strong> (<Link href="https://console.cloud.google.com/apis/library/generativelanguage.googleapis.com">acá</Link>). Pegá la llave nueva y volvé a <K>Probar</K>.</Paso>
+                <Paso>Si tampoco, esperá unos días y volvé a crear una en AI Studio: Google va arreglando cuentas de a poco. Mientras tanto Lau sigue haciendo todo lo que no necesita IA (ventas, stock, precios, gastos, medidas, planillas).</Paso>
+            </Pasos>
         </Seccion>
+
     </>
 );
 
@@ -1354,8 +1360,8 @@ export const GUIAS = [
     {
         id: 'ia-keys', titulo: 'Las llaves de la inteligencia artificial', icono: KeyRound, duracion: '5 min', para: 'Dueño',
         resumen: 'Crear la llave nueva de Gemini, pegarla en el panel y borrar la vieja. Y qué hacer cuando Lau dice que fallaron todos los modelos.',
-        palabras: ['gemini', 'api key', 'llave', 'clave', 'ai studio', 'cerebras', 'cuota', 'lau no responde'],
-        secciones: [['para-que', 'Para qué es'], ['crear', 'Crear y cargar'], ['cuota', 'Cuota agotada'], ['cerebras', 'Cerebras']],
+        palabras: ['gemini', 'api key', 'llave', 'clave', 'ai studio', 'cuota', 'lau no responde', 'AQ', 'ACCESS_TOKEN_TYPE_UNSUPPORTED'],
+        secciones: [['para-que', 'Para qué es'], ['crear', 'Crear y cargar'], ['cuota', 'Cuota agotada'], ['aq', 'Si la llave nueva no anda']],
         Contenido: IaKeys,
     },
     {
