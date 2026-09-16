@@ -254,10 +254,6 @@ export const useDbActions = ({
       await Promise.all(batchPromises);
       addToast("Migración Completada", "success");
     },
-    saveSimulation: async (simulation) => {
-      const simData = { ...simulation, createdAt: Date.now(), userId: user?.uid };
-      await addDoc(collection(db, 'simulations'), simData);
-    },
 
     // --- GASTOS (compra de mercadería, packaging, publicidad, etc.) ---
     addExpense: async (expense) => {
@@ -286,9 +282,6 @@ export const useDbActions = ({
         console.error('Error eliminando gasto:', e);
         addToast('Error al eliminar el gasto', 'error');
       }
-    },
-    deleteSimulation: async (id) => {
-      await deleteDoc(doc(db, 'simulations', id));
     },
 
     // --- CLOUDINARY UPLOAD ---

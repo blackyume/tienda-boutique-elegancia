@@ -9,7 +9,7 @@ import { RealTimeClock } from '../components/admin/AdminShared';
 import { formatMoney } from '../utils/helpers';
 import {
     LayoutDashboard, Package, Tag, LogOut, Edit2, Trash2, X,
-    TrendingUp, DollarSign, Calculator, Search, Users,
+    TrendingUp, DollarSign, Search, Users,
     Image as ImageIcon, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
     Check as CheckIcon, Lock, Settings, Blocks, Bot, Ticket, Building2,
@@ -25,7 +25,6 @@ import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock
 // Admin baja fuerte y cada vista pesada (IA, CMS, Dashboard) no se descarga
 // hasta que se entra.
 const lazyNamed = (factory, name) => lazy(() => factory().then(m => ({ default: m[name] })));
-const SimulationsView = lazyNamed(() => import('../components/admin/SimulationsView'), 'SimulationsView');
 const CMSView = lazyNamed(() => import('../components/admin/CMSView'), 'CMSView');
 const ProductEditModal = lazyNamed(() => import('../components/admin/ProductEditModal'), 'ProductEditModal');
 const ImportarInventarioModal = lazyNamed(() => import('../components/admin/ImportarInventarioModal'), 'ImportarInventarioModal');
@@ -74,7 +73,6 @@ const MENU = [
     { grupo: 'Números', items: [
         { id: 'expenses', label: 'Gastos', hint: 'Lo que pagás, para la ganancia' },
         { id: 'suppliers', label: 'Proveedores', hint: 'Agenda de a quién le comprás' },
-        { id: 'calculator', label: 'Simulador de precios', hint: 'Probar precios sin cargar nada' },
     ] },
     { grupo: 'Ayuda', items: [
         { id: 'guides', label: 'Guías', hint: 'Cómo se hace cada cosa' },
@@ -85,7 +83,7 @@ const TAB_LABELS = Object.fromEntries(MENU.flatMap(g => g.items.map(i => [i.id, 
 const ICONOS_MENU = {
     dashboard: LayoutDashboard, assistant: Bot, orders: Package, inventory: Tag, sales: TrendingUp,
     customers: Users, reviews: CheckIcon, abandoned: ShoppingCartIcon, subscribers: Mail,
-    coupons: Ticket, cms: Blocks, expenses: Wallet, suppliers: Building2, calculator: Calculator,
+    coupons: Ticket, cms: Blocks, expenses: Wallet, suppliers: Building2,
     guides: BookOpen, settings: Settings,
 };
 
@@ -896,27 +894,6 @@ export const Admin = () => {
                 {adminTab === 'orders' && <OrdersView orders={orders} updateOrderStatus={updateOrderStatus} />}
                 {adminTab === 'customers' && <CustomersView orders={orders} />}
                 {adminTab === 'sales' && <SalesView salesLog={salesLog} metrics={metrics} />}
-                {
-                    adminTab === 'calculator' && <SimulationsView
-                        onSaveToProduct={(data) => {
-                            setCurrentProduct({
-                                ...currentProduct,
-                                name: data.name,
-                                price: data.price,
-                                cost: data.cost,
-                                category: '',
-                                image: '', media: [], sizes: ['S', 'M'], colors: [], active: false, description: ''
-                            });
-                            setAdminTab('inventory');
-                            setIsProductModalOpen(true);
-                        }}
-                        onEditProduct={(p) => {
-                            setCurrentProduct({ ...p, active: p.active !== false });
-                            setIsProductModalOpen(true);
-                        }}
-                        onDeleteProduct={handleDeleteProduct}
-                    />
-                }
                 {adminTab === 'cms' && <CMSView />}
                 {adminTab === 'coupons' && <CouponsView />}
                 {adminTab === 'suppliers' && <SuppliersView />}

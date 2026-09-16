@@ -74,7 +74,7 @@ const Empezar = ({ abrir }) => (
                     [<strong>Clientas · Reseñas · Carritos sin terminar · Newsletter</strong>, 'Quién compró, qué escribieron, quién dejó el carrito a medias, quién dejó su email.', 'Dueño'],
                     [<strong>Cupones y ofertas</strong>, 'Descuentos y promociones.', 'Dueño'],
                     [<strong>Diseño de la tienda</strong>, 'Textos, portadas, categorías, redes sociales.', 'Dueño'],
-                    [<strong>Gastos · Proveedores · Simulador de precios</strong>, 'Los números: lo que pagás, a quién le comprás, y probar precios sin cargar nada.', 'Dueño'],
+                    [<strong>Gastos · Proveedores</strong>, 'Los números: lo que pagás y a quién le comprás.', 'Dueño'],
                     [<strong>Guías</strong>, 'Esto que estás leyendo.', 'Los dos'],
                     [<strong>Configuración</strong>, 'WhatsApp, pagos, precios de envío, precio automático, llaves de IA.', 'Dueño'],
                 ]}

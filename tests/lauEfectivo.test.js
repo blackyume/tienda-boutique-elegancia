@@ -37,6 +37,12 @@ describe('venta con descuento en porcentaje', () => {
         expect(r.accion.args).toMatchObject({ productId: 't1', quantity: 2, amount: 25500, discountPct: 15, payment: 'transferencia' });
         expect(r.nota).toBe(''); // sin costo cargado no hay ganancia para contar
     });
+    it('"vendí el X con 10% en efectivo", tal como lo dice el dueño', () => {
+        for (const frase of ['vendí el sweater lanilla con 10% en efectivo', 'vendi el sweater con 10 % en efectivo', 'vendí el sweater lanilla en efectivo con 10%']) {
+            const r = interpretarAccion(frase, inventario, ctx);
+            expect(r.accion.args).toMatchObject({ productId: 's1', quantity: 1, amount: 40590, discountPct: 10, payment: 'efectivo' });
+        }
+    });
     it('descuento sobre el precio dicho', () => {
         const r = interpretarAccion('vendí el top rib a 14000 con 10%', inventario, ctx);
         expect(r.accion.args).toMatchObject({ amount: 12600, listPrice: 14000, discountPct: 10 });

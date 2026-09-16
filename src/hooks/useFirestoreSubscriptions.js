@@ -17,7 +17,7 @@ export const useFirestoreSubscriptions = ({
     user,
     setUser, setInventory, setCategories, setSiteConfig, setCloudinaryConfig,
     setAiConfig, setIsMaintenance, setCoupons, setReviews,
-    setLoading, setOrders, setSimulations, setSuppliers, setAiHistory,
+    setLoading, setOrders, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
     setAbandonedCarts, setActiveSessions, setExpenses, setNewsletterSubscribers
 }) => {
@@ -115,10 +115,6 @@ export const useFirestoreSubscriptions = ({
                 setOrders(data.sort((a, b) => new Date(b.date) - new Date(a.date)));
             }, quietSnap('orders')));
 
-            subs.push(onSnapshot(collection(db, 'simulations'), (snap) => {
-                setSimulations(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.createdAt - a.createdAt));
-            }, quietSnap('simulations')));
-
             subs.push(onSnapshot(collection(db, 'suppliers'), (snap) => {
                 setSuppliers(snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => b.createdAt - a.createdAt));
             }, quietSnap('suppliers')));
@@ -165,7 +161,7 @@ export const useFirestoreSubscriptions = ({
                 }));
             }, quietSnap('newsletter_subscribers')));
         } else {
-            setSimulations([]); setSuppliers([]); setAiHistory([]);
+            setSuppliers([]); setAiHistory([]);
             setScheduledPromotions([]); setWishlistEvents([]);
             setVisitStatsHourly([]); setAbandonedCarts([]); setActiveSessions([]);
             setExpenses([]); setNewsletterSubscribers([]);

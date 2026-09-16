@@ -89,7 +89,6 @@ export const StoreProvider = ({ children }) => {
     nvidiaModel: "",   // opcional: override (meta/llama-3.2-90b-vision-instruct por defecto)
   });
 
-  const [simulations, setSimulations] = useState([]);
   const [coupons, setCoupons] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [aiHistory, setAiHistory] = useState([]);
@@ -118,7 +117,7 @@ export const StoreProvider = ({ children }) => {
     user,
     setUser, setInventory, setCategories, setSiteConfig, setCloudinaryConfig,
     setAiConfig, setIsMaintenance, setCoupons, setReviews,
-    setLoading, setOrders, setSimulations, setSuppliers, setAiHistory,
+    setLoading, setOrders, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
     setAbandonedCarts, setActiveSessions, setExpenses, setNewsletterSubscribers
   });
@@ -238,7 +237,7 @@ export const StoreProvider = ({ children }) => {
       inventory, cart, setCart, addToCart, updateCartQty, removeFromCart, clearCart, cartTotal, cartCount,
       orders, wishlist, setWishlist, toggleWishlist, isInWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout, loginAnonymously, linkGuestWithGoogle,
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
-      categories, siteConfig, cloudinaryConfig, aiConfig, loading, simulations, shippingRates, systemConfig,
+      categories, siteConfig, cloudinaryConfig, aiConfig, loading, shippingRates, systemConfig,
       visitCount, incrementVisits, paymentConfig, coupons,
       suppliers, aiHistory, scheduledPromotions, wishlistEvents, trackWishlistEvent,
       abandonedCarts, activeSessions, reviews, visitStatsHourly, expenses, newsletterSubscribers,

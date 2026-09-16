@@ -102,7 +102,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 - `config/*` — público-read, admin-write, **salvo `config/ai_settings` que es admin-only**: ahí viven las API keys de Gemini y Cerebras, y hasta el 12/09/2026 cualquiera las leía sin login. El front sólo se suscribe a ese doc si el usuario es admin (`useFirestoreSubscriptions`, bloque `if (admin)`).
 - `config/shipping` — las opciones de envío del checkout (se editan en Admin → Envíos). Pasan por `utils/envios.sanearTarifas`: una opción sin nombre o sin costo numérico se descarta, y si no queda ninguna corren las de la casa (`TARIFAS_DE_LA_CASA`). En producción el doc quedó guardado en blanco y el checkout mostraba tres botones sin nombre, todos "Gratis" — o sea que **regalaba el envío por accidente**.
 - `shipping_provinces` — **sin uso**. La tabla de 25 provincias que la acompañaba en `StoreContext` no la leía ningún componente y se borró el 12/09/2026; la regla sigue por si se retoma.
-- `suppliers`, `simulations`, `scheduled_promotions`, `ai_history` — admin-only
+- `suppliers`, `scheduled_promotions`, `ai_history` — admin-only (`simulations` quedó sin uso: el Simulador de precios se sacó del panel el 16/09/2026 porque el precio ya sale solo del costo; la regla sigue por los docs viejos)
 - `orders` — user crea, lee propias; admin lee/actualiza todas
 - `users` — self-managed + admin read-all
 - `reviews` — público read; auth create con `approved=false`; sólo admin update (aprobar)
