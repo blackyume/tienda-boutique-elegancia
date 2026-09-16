@@ -10,9 +10,12 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, 
 import { pendientesDeHoy, favoritosTop, visitasPorDia, resumenStock, avisosDeLlaves } from '../../utils/inicio';
 import { tituloDeProducto } from '../../utils/nombres';
 import { OrdersNeedingReviewPanel } from './OrdersNeedingReviewPanel';
+import { CalendarioVentas } from './CalendarioVentas';
+import { soloVentas, tendenciaDiaria } from '../../utils/ventasPorDia';
+import { nombreCliente, canalDePedido } from '../../utils/lauDirecto';
 // xlsx se importa dinámico para no cargar 700kB en el bundle del admin.
 
-export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [], abandonedCarts = [], reviews = [], inventory = [], siteConfig, aiConfig, salesLog = [], expenses = [] }) => {
+export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMaintenance, toggleMaintenance, onNavigate, onCreateProduct, onEditProduct, onToggleVisible, wishlistData = [], lowStockItems = [], lowStockThreshold = 5, activeSessions = [], visitStatsHourly = [], abandonedCarts = [], reviews = [], inventory = [], siteConfig, aiConfig, salesLog = [], expenses = [], onVerDia }) => {
 
     // Re-render cada 15s para actualizar el corte de sesiones "vivas"
     const [, tick] = useState(0);
@@ -34,6 +37,8 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
     const avisos = useMemo(() => avisosDeLlaves({ siteConfig, aiConfig }), [siteConfig, aiConfig]);
 
     const [dateRange, setDateRange] = useState('30'); // 7, 30, all
+    // Un pedido anulado, rechazado o devuelto no es una venta: no suma en ningún número.
+    const ventas = useMemo(() => soloVentas(orders), [orders]);
     // Ganancia neta del período: la bruta de cada venta (precio − costo − MP) menos los gastos cargados.
     const gananciaNeta = useMemo(() => {
         const corte = dateRange === 'all' ? 0 : Date.now() - parseInt(dateRange) * 864e5;
@@ -45,38 +50,20 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
 
     // --- BI DATA PROCESSING ---
     const filteredOrders = useMemo(() => {
-        if (dateRange === 'all') return orders;
+        if (dateRange === 'all') return ventas;
         const now = new Date();
         const past = new Date();
         past.setDate(now.getDate() - parseInt(dateRange));
-        return orders.filter(o => new Date(o.date) >= past);
-    }, [orders, dateRange]);
+        return ventas.filter(o => new Date(o.date) >= past);
+    }, [ventas, dateRange]);
 
     const salesInteractions = useMemo(() => {
         // Recalculate based on filtered orders
         const targetOrders = filteredOrders;
 
-        // Group by Date for Chart
-        // Generate last N days labels based on range (or just data points if 'all')
-        // For simplicity, if 'all', we group by month or just list last 30?
-        // Let's stick to the previous chart logic but using targetOrders
-        // If range is 7 or 30, show that many days.
-
-        const days = parseInt(dateRange) || 30; // default 30 for 'all' visual
-        const labels = [...Array(days)].map((_, i) => {
-            const d = new Date();
-            d.setDate(d.getDate() - (days - 1 - i));
-            return d.toISOString().split('T')[0];
-        });
-
-        const chartData = labels.map(date => {
-            const dayOrders = targetOrders.filter(o => o.date.startsWith(date));
-            const total = dayOrders.reduce((sum, o) => sum + o.total, 0);
-            return {
-                date: new Date(date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }),
-                ventas: total
-            };
-        });
+        // Un punto por día, en hora local (con 'Todo' se muestran los últimos 30).
+        const days = parseInt(dateRange) || 30;
+        const chartData = tendenciaDiaria(targetOrders, days).map(p => ({ date: p.label, fecha: p.fecha, ventas: p.ventas, pedidos: p.pedidos }));
 
         // Top Products (from filtered orders)
         const productMap = {};
@@ -122,7 +109,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
         // Current period
         const currentStart = new Date();
         currentStart.setDate(now.getDate() - days);
-        const currentOrders = orders.filter(o => new Date(o.date) >= currentStart);
+        const currentOrders = ventas.filter(o => new Date(o.date) >= currentStart);
         const currentRevenue = currentOrders.reduce((sum, o) => sum + o.total, 0);
         const currentCount = currentOrders.length;
 
@@ -130,7 +117,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
         const prevEnd = new Date(currentStart);
         const prevStart = new Date();
         prevStart.setDate(prevEnd.getDate() - days);
-        const prevOrders = orders.filter(o => {
+        const prevOrders = ventas.filter(o => {
             const d = new Date(o.date);
             return d >= prevStart && d < prevEnd;
         });
@@ -168,7 +155,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
             ticketChange: parseFloat(ticketChange),
             avgTicketCurrent
         };
-    }, [orders, dateRange]);
+    }, [ventas, dateRange]);
 
     const handleExport = async () => {
         const XLSX = await import('xlsx');
@@ -261,7 +248,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                 />
 
                 {/* KPI GRID */}
-                {orders.length === 0 ? (
+                {ventas.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1a1a1a] p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-5">
                         <span className="w-14 h-14 rounded-full bg-[#E8C65E]/15 flex items-center justify-center shrink-0">
                             <Wallet className="w-7 h-7 text-[#E8C65E]" />
@@ -380,6 +367,9 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                             </div>
                         </div>
 
+                        {/* CALENDARIO: cuánto se vendió cada día del mes */}
+                        <CalendarioVentas orders={orders} onVerDia={onVerDia} />
+
                         {/* FAVORITOS: lo que más guardan las clientas */}
                         <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                             <div className="flex items-center justify-between mb-5">
@@ -446,7 +436,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
 
                         {/* CHART: VENTAS SEMANALES */}
                         <div className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                            <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#E8C65E]" /> Tendencia de Ventas</h3>
+                            <h3 className="font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-[#E8C65E]" /> Tendencia de ventas</h3>
                             <div className="h-[250px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={salesInteractions.chartData}>
@@ -457,9 +447,9 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.5} />
-                                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} minTickGap={18} />
                                         <YAxis hide={true} />
-                                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }} formatter={(value) => [formatMoney(value), 'Ventas']} />
+                                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', background: '#1a1a1a', color: '#fff' }} formatter={(value, _n, p) => [`${formatMoney(value)} · ${p?.payload?.pedidos || 0} ${p?.payload?.pedidos === 1 ? 'venta' : 'ventas'}`, '']} labelFormatter={(l) => `Día ${l}`} />
                                         <Area type="monotone" dataKey="ventas" stroke="#E8C65E" strokeWidth={3} fillOpacity={1} fill="url(#colorVentas)" />
                                     </AreaChart>
                                 </ResponsiveContainer>
@@ -503,7 +493,7 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                     {salesInteractions.topProducts.map((p, i) => (
                                         <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                             <div className="flex items-center gap-3">
-                                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-[#E8C65E] text-white' : 'bg-slate-200 text-slate-600'}`}>
+                                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-[#E8C65E] text-black' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
                                                     {i + 1}
                                                 </span>
                                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-200 truncate max-w-[120px]">{p.name}</span>
@@ -583,25 +573,26 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                 <Activity className="w-4 h-4 text-[#E8C65E]" /> Actividad Reciente
                             </h3>
                             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                                {filteredOrders.slice(0, 8).map(order => (
-                                    <div key={order.id} className="flex flex-col gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-l-2 border-transparent hover:border-[#E8C65E]">
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex items-center gap-2">
-                                                <span className={`w-2 h-2 rounded-full ${order.status === 'pending' ? 'bg-amber-500' : 'bg-green-500'}`} />
-                                                <span className="text-xs font-bold dark:text-white">Pedido #{order.id.slice(-4)}</span>
+                                {orders.slice(0, 8).map(order => {
+                                    const st = String(order.status || '');
+                                    const punto = ['cancelled', 'canceled', 'rejected', 'refunded', 'failure'].includes(st) ? 'bg-red-500' : ['pending', 'pending_payment', 'pending_wa', 'review'].includes(st) ? 'bg-amber-500' : 'bg-emerald-500';
+                                    const n = (order.items || []).reduce((a, it) => a + (Number(it.quantity) || 1), 0);
+                                    return (
+                                    <button key={order.id} type="button" onClick={() => onNavigate('orders')} className="w-full text-left flex flex-col gap-1.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-l-2 border-transparent hover:border-[#E8C65E]">
+                                        <div className="flex justify-between items-start gap-2">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <span className={`w-2 h-2 rounded-full shrink-0 ${punto}`} />
+                                                <span className="text-xs font-bold dark:text-white truncate">{nombreCliente(order)}</span>
                                             </div>
-                                            <span className="text-[10px] text-slate-400">{new Date(order.date).toLocaleDateString()}</span>
+                                            <span className="text-[10px] text-slate-400 shrink-0">{new Date(order.date).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })} · {new Date(order.date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
-
-                                        <div className="pl-4">
-                                            <p className="text-xs font-medium text-slate-600 dark:text-slate-300">{order.customer?.email || 'Cliente'}</p>
-                                            <p className="text-[10px] text-slate-400 mt-0.5">
-                                                {(order.items?.length || 0)} items • <span className="text-slate-600 dark:text-slate-300 font-bold">{formatMoney(order.total)}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                                {filteredOrders.length === 0 && <p className="text-center text-xs text-slate-400 py-4">Sin actividad reciente.</p>}
+                                        <p className="pl-4 text-[10px] text-slate-400">
+                                            {n} {n === 1 ? 'prenda' : 'prendas'} · {canalDePedido(order)} · <span className="text-slate-600 dark:text-slate-300 font-bold">{formatMoney(order.total)}</span>
+                                        </p>
+                                    </button>
+                                    );
+                                })}
+                                {orders.length === 0 && <p className="text-center text-xs text-slate-400 py-4">Sin actividad reciente.</p>}
                             </div>
                         </div>
 

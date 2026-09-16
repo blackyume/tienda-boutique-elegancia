@@ -18,6 +18,9 @@ import { interpretarAccion, opcionesDeVariante, opcionesDeProducto, describirRep
 import { interpretarGasto, responderGastos, etiquetaDeCategoria } from '../../utils/gastos';
 import { explicarErrorIA } from '../../utils/gemini';
 import { normalizarCuidados, detallesPorPlantilla, revisarFicha, interpretarMedidas, MEDIDAS } from '../../utils/ficha';
+import { IlusDosCaminos, IlusWizard, IlusStockGrilla } from './guias/ilustracionesLau';
+import { IlusLau } from './guias/ilustraciones';
+import { IlusFichaCompleta } from './guias/ilustracionesPrecios';
 import { buscarProductos } from '../../utils/lauDirecto';
 
 const HISTORY_KEY = 'lau_copilot_v5';
@@ -42,16 +45,16 @@ const CAPS = [
     { icon: '🏠', label: 'Home, cupones, reseñas' },
 ];
 
-// Pasos ilustrados para cargar un producto (el wizard). Bien simple y visual.
+// Las pantallas del paso a paso (el wizard), en el orden en que aparecen.
 const LOAD_STEPS = [
-    { emoji: '📦', title: 'Tocá "Cargar producto"', text: 'Está arriba a la derecha, al lado de Guía. Tocalo.' },
-    { emoji: '📷', title: 'Foto (si querés)', text: 'Subí una o varias fotos de la prenda. O seguí sin foto, no pasa nada.' },
-    { emoji: '✏️', title: 'Nombre', text: 'Escribí cómo se llama la prenda. Ej: "Vestido Lino Blanco".' },
-    { emoji: '🎨', title: 'Color y talle', text: 'Tocá los colores y talles que tenga. Podés elegir varios.' },
-    { emoji: '🔢', title: 'Stock', text: 'Cuántas tenés de cada talle y color (o el total si es uno solo).' },
-    { emoji: '🧵', title: 'Tela, cuidados y medidas', text: 'Opcional: la composición, cómo se lava (botones con íconos) y las medidas por talle en cm. Todo se ve en la ficha.' },
-    { emoji: '💵', title: 'Precio', text: '"Tengo el precio" o "Calcular del costo". Si das el costo, te dice a cuánto venderlo ganando.' },
-    { emoji: '✅', title: 'Revisá y publicá', text: 'Te muestra todo, arma las viñetas de "Detalles" solas y te avisa qué le falta (foto, costo, descripción). Si falta algo grave, mejor borrador.' },
+    { emoji: '📷', title: 'Foto', text: 'Una o varias de la misma prenda. Podés pegar un link de video. O seguir sin foto.' },
+    { emoji: '✏️', title: 'Nombre', text: 'Cómo se llama. Ej: "Vestido lino blanco".' },
+    { emoji: '🗂️', title: 'Categoría', text: 'Tocás una (Vestidos, Tops…) o escribís una nueva.' },
+    { emoji: '🎨', title: 'Colores y talles', text: 'Tocás los que tenga. Dorado = elegido. Podés elegir varios.' },
+    { emoji: '🔢', title: 'Stock', text: 'Cuántas tenés de cada talle y color. Si es uno solo, una casilla.' },
+    { emoji: '🧵', title: 'Tela, cuidados y medidas', text: 'Opcional. La composición, cómo se lava (botones con íconos) y las medidas por talle en cm.' },
+    { emoji: '💵', title: 'Precio', text: '"Tengo el precio" o "Calcular del costo": le decís lo que te costó y te dice a cuánto venderla ganando.' },
+    { emoji: '✅', title: 'Revisá y publicá', text: 'Te muestra todo, arma las viñetas de "Detalles" solas y te avisa qué le falta. Si falta algo grave, mejor borrador.' },
 ];
 
 const COMMAND_GUIDE = [
@@ -1461,28 +1464,79 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                                 Hablale a Lau <span className="text-[#E8C65E] font-semibold">como a una empleada</span>, con tus palabras. No tenés que escribir exacto. Acá abajo está <span className="text-white/80">todo lo que podés hacer</span>, bien fácil. Tocá cualquier ejemplo y se escribe solo. Lo importante (publicar, borrar, precios) <span className="text-white/80">siempre te pregunta antes</span>.
                             </p>
 
-                            {/* CÓMO CARGAR UN PRODUCTO — visual, paso a paso */}
-                            <div className="rounded-2xl border border-[#E8C65E]/25 bg-gradient-to-b from-[#E8C65E]/[0.08] to-transparent p-5">
-                                <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2"><span className="text-xl">🛍️</span> Cargar un producto (lo más fácil)</h3>
-                                <p className="text-white/50 text-xs mb-4">Seguí estos pasitos. Lau te lleva de la mano, vos solo tocás botones.</p>
-                                <div className="flex flex-col gap-2.5">
-                                    {LOAD_STEPS.map((s, i) => (
-                                        <div key={i} className="flex items-center gap-3 bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5">
-                                            <div className="w-8 h-8 rounded-full bg-[#E8C65E]/15 border border-[#E8C65E]/40 flex items-center justify-center shrink-0 text-sm font-black text-[#E8C65E]">{i + 1}</div>
-                                            <span className="text-xl shrink-0">{s.emoji}</span>
-                                            <div className="min-w-0">
-                                                <p className="text-white text-sm font-semibold leading-tight">{s.title}</p>
-                                                <p className="text-white/50 text-xs leading-snug">{s.text}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                            {/* CÓMO CARGAR UN PRODUCTO — con dibujos, los dos caminos */}
+                            <div className="rounded-2xl border border-[#E8C65E]/25 bg-gradient-to-b from-[#E8C65E]/[0.08] to-transparent p-5 space-y-6">
+                                <div>
+                                    <h3 className="text-white font-bold text-base mb-1 flex items-center gap-2"><span className="text-xl">🛍️</span> Cargar un producto</h3>
+                                    <p className="text-white/50 text-xs">Hay dos caminos y los dos terminan en la misma ficha completa. Elegí el que te quede cómodo.</p>
                                 </div>
-                                <button
-                                    onClick={() => { setShowGuide(false); setWizardOpen(true); }}
-                                    className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#11100D] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition"
-                                >
-                                    <PackagePlus className="w-4 h-4" /> Probar ahora
-                                </button>
+                                <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusDosCaminos /></div>
+                                <div className="grid sm:grid-cols-2 gap-2.5">
+                                    <button
+                                        onClick={() => { setShowGuide(false); setWizardOpen(true); }}
+                                        className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#11100D] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition"
+                                    >
+                                        <PackagePlus className="w-4 h-4" /> Camino 1 · Cargar paso a paso
+                                    </button>
+                                    <button
+                                        onClick={() => { setInput('cargá esta prenda, me costó 20000, talles S M L, tengo 6'); setShowGuide(false); }}
+                                        className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#E8C65E] border border-[#E8C65E]/50 hover:bg-[#E8C65E]/10 transition"
+                                    >
+                                        <Paperclip className="w-4 h-4" /> Camino 2 · Por chat, con foto
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-white font-semibold text-sm mb-1">Camino 1: así es la pantalla</h4>
+                                    <p className="text-white/50 text-xs mb-3">Una pregunta por pantalla, casi todo con botones. La barra dorada de arriba te dice cuánto falta.</p>
+                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusWizard /></div>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-white font-semibold text-sm mb-2.5">Las 8 pantallas, en orden</h4>
+                                    <div className="grid sm:grid-cols-2 gap-2.5">
+                                        {LOAD_STEPS.map((s, i) => (
+                                            <div key={i} className="flex items-start gap-3 bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5">
+                                                <div className="w-7 h-7 rounded-full bg-[#E8C65E]/15 border border-[#E8C65E]/40 flex items-center justify-center shrink-0 text-xs font-black text-[#E8C65E]">{i + 1}</div>
+                                                <span className="text-lg shrink-0 leading-7">{s.emoji}</span>
+                                                <div className="min-w-0">
+                                                    <p className="text-white text-sm font-semibold leading-7 -mb-1">{s.title}</p>
+                                                    <p className="text-white/50 text-xs leading-snug">{s.text}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-white font-semibold text-sm mb-1">El paso del stock, que es el que más confunde</h4>
+                                    <p className="text-white/50 text-xs mb-3">Una casilla por cada talle y color. Con eso la tienda sabe qué se agotó y Lau descuenta el justo cuando le decís "vendí…".</p>
+                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusStockGrilla /></div>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-white font-semibold text-sm mb-1">Lo que la clienta ve después</h4>
+                                    <p className="text-white/50 text-xs mb-3">Los números son lo que se pregunta al cargar. Tela, cuidados y medidas son opcionales, pero una ficha completa vende más. Nada se inventa: si no lo decís, no va.</p>
+                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3"><IlusFichaCompleta /></div>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-white font-semibold text-sm mb-1">Camino 2: por chat, con la llave de Gemini</h4>
+                                    <p className="text-white/50 text-xs mb-3">Tocás el clip 📎, elegís la foto y escribís lo que sabés, desprolijo. Lau mira la foto, arma nombre y descripción, y lo que falta lo pregunta con botones. Sin llave (Configuración → Inteligencia Artificial), usá el camino 1.</p>
+                                    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-2 sm:p-3 mb-2.5"><IlusLau /></div>
+                                    <div className="flex flex-col gap-2">
+                                        {['cargá esta prenda, me costó 20000, talles S M L, tengo 6', 'jean oxford azul, talles 36 38 40 42, tengo 5, me costó 21000, publicalo', 'cargá este vestido: lino 100%, lavar a mano, talle M mide 92 de busto'].map((cmd) => (
+                                            <button
+                                                key={cmd}
+                                                onClick={() => { setInput(cmd); setShowGuide(false); }}
+                                                className="text-left text-sm text-white/75 bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 hover:border-[#E8C65E]/50 hover:text-white hover:bg-white/[0.07] transition-all flex items-center gap-2.5 group"
+                                            >
+                                                <span className="text-[#E8C65E]/60 group-hover:text-[#E8C65E] transition-colors">📎</span>
+                                                <span>{cmd}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
 
                             {/* PEDIRLE COSAS A LA IA — por temas */}

@@ -14,6 +14,7 @@ import {
 } from './ilustracionesMas';
 import { IlusInicio, IlusLauSinIA, IlusOferta, IlusDiseno } from './ilustracionesInicio';
 import { IlusWebVsEfectivo, IlusHastaDondeBajar, IlusVentaEfectivo, IlusCostoPorChat, IlusFichaCompleta, IlusGastos } from './ilustracionesPrecios';
+import { IlusDosCaminos, IlusWizard, IlusStockGrilla } from './ilustracionesLau';
 import { TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../../../utils/envios';
 
 // Las guías del panel. Están escritas para que las siga alguien que nunca
@@ -217,11 +218,22 @@ const Lau = ({ abrir }) => (
         </Seccion>
 
         <Seccion id="cargar" titulo="Cargar un producto">
+            <Figura titulo="Dos caminos, la misma ficha. El botón anda siempre; el chat con foto necesita la llave de Gemini.">
+                <IlusDosCaminos />
+            </Figura>
+            <P><strong>Camino 1: el botón <K>Cargar producto</K></strong>, arriba a la derecha del chat, al lado de Guía. Ocho pantallas, una pregunta por pantalla, casi todo con botones: foto, nombre, categoría, colores y talles, stock, tela y cuidados, precio, revisar y publicar. Anda sin llave de IA.</P>
+            <Figura titulo="La pantalla del paso a paso, en el paso de colores y talles. La barra dorada de arriba dice cuánto falta.">
+                <IlusWizard />
+            </Figura>
+            <Figura titulo="El paso del stock: una casilla por cada talle y color. Así la tienda sabe qué se agotó.">
+                <IlusStockGrilla />
+            </Figura>
+            <P><strong>Camino 2: por chat, con foto.</strong> Necesita la llave de Gemini (<Ruta pasos={['Configuración', 'Inteligencia Artificial']} />).</P>
             <Figura titulo="Foto + lo que sabés del producto. Lo que falta, Lau lo pregunta con botones. Nada se guarda hasta que confirmás.">
                 <IlusLau />
             </Figura>
             <Pasos>
-                <Paso>Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto). Si preferís que te lleve de la mano pregunta por pregunta, arriba a la derecha del chat, al lado de Guía, está <K>Cargar producto</K>: te pregunta nombre, color, talle, stock y precio con botones, y anda sin llave de IA.</Paso>
+                <Paso>Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto).</Paso>
                 <Paso>
                     Escribí lo que sabés. Puede ser desprolijo, Lau lo entiende:
                     <div className="space-y-2 pt-1">
@@ -1015,6 +1027,7 @@ const InicioGuia = ({ abrir }) => (
         <Resumen pasos={[
             { icono: '⚠️', titulo: 'Avisos', detalle: 'si hay algo, está arriba' },
             { icono: '📬', titulo: 'Hoy', detalle: 'qué espera tu respuesta' },
+            { icono: '📅', titulo: 'Calendario', detalle: 'cuánto vendiste cada día' },
             { icono: '♡', titulo: 'Favoritos', detalle: 'qué reponer antes' },
             { icono: '📊', titulo: 'Visitas y stock', detalle: 'cómo viene la mano' },
         ]} />
@@ -1030,6 +1043,7 @@ const InicioGuia = ({ abrir }) => (
             <Lista items={[
                 <><strong>1. Avisos.</strong> Sólo aparecen cuando hay algo que mirar: la conexión con Instagram que va a vencer, Lau sin llave. Tocás el aviso y te lleva a arreglarlo. Si no hay nada, no hay barra.</>,
                 <><strong>2. Hoy.</strong> Cuatro contadores: <strong>Por enviar</strong> (pagados y sin despachar), <strong>Pagos por confirmar</strong> (esperando la plata o coordinando por WhatsApp), <strong>Carritos de hoy</strong> (empezaron a comprar y no terminaron, últimas 24 h) y <strong>Reseñas por aprobar</strong>. Se pintan de dorado cuando hay algo. Tocás y vas.</>,
+                <><strong>Calendario de ventas</strong> (debajo de Hoy). El almanaque del mes: cada día dice cuánto vendiste y cuántas ventas hubo; más oro, más vendido. Arriba, el total del mes comparado con el anterior, el mejor día y cuántos días tuvieron venta. <strong>Tocás un día y se abre Ventas con sólo lo de esa fecha.</strong> Con las flechas vas a meses anteriores. Cuenta la web y lo que le dictás a Lau; las anuladas no.</>,
                 <><strong>3. Lo más guardado en favoritos.</strong> Las prendas que más clientas guardaron con el corazón en los últimos 30 días, con el stock que te queda al lado. Es la lista de <strong>qué reponer antes de que se venda</strong>. Con “Editar” cargás stock ahí mismo.</>,
                 <><strong>4. Visitas por día.</strong> Dos semanas, una barra por día, el pico en oro. Sirve para ver si un posteo o una historia movió gente. Tus propias visitas no cuentan.</>,
                 <><strong>5. Stock.</strong> Cuántos productos tienen stock, cuántos van por las últimas unidades y cuántos se agotaron. Abajo, si hay productos <strong>ocultos</strong> (que las clientas no ven).</>,
@@ -1043,7 +1057,8 @@ const InicioGuia = ({ abrir }) => (
                 <Paso>Mirás <strong>Hoy</strong>. Si “Por enviar” está en dorado, seguí la <Ir abrir={abrir} a="pedido-envio">guía del envío</Ir>.</Paso>
                 <Paso>Si hay <strong>Pagos por confirmar</strong>, entrás a Pedidos: los de WhatsApp los cerrás vos cuando te pagan.</Paso>
                 <Paso>Un vistazo a <strong>Stock bajo</strong> y a <strong>Favoritos</strong>: lo que está flojo y encima lo guardan muchas, se repone primero.</Paso>
-                <Paso>Listo. Lo demás (ventas del mes, ganancia) está en <Ruta pasos={['Ventas y ganancia']} /> y te lo cuenta Lau si le preguntás “¿cómo va el negocio?”.</Paso>
+                <Paso>Un ojo al <strong>Calendario</strong>: si un día se pintó de oro fuerte, algo funcionó (un posteo, una historia): repetilo.</Paso>
+                <Paso>Listo. Lo demás (cada venta con su ganancia) está en <Ruta pasos={['Ventas y ganancia']} /> y te lo cuenta Lau si le preguntás “¿cómo va el negocio?”.</Paso>
             </Pasos>
             <Aviso tipo="dato" titulo="Antes de la primera venta">
                 Mientras no haya ventas, en vez de los números de ingresos vas a ver “Todavía no hubo ventas” con las visitas del período, y arriba “Primeros pasos”, que te va marcando lo que falta para abrir. Cuando entre la primera venta, el Inicio cambia solo.
@@ -1290,7 +1305,7 @@ export const GUIAS = [
     {
         id: 'inicio', titulo: 'El Inicio: qué mirar cada mañana', icono: LayoutDashboard, duracion: '3 min', para: 'Dueño',
         resumen: 'Avisos, lo que espera tu respuesta hoy, qué reponer, cómo vienen las visitas y el stock. Un minuto y sabés si hay algo que hacer.',
-        palabras: ['inicio', 'dashboard', 'panel', 'hoy', 'por enviar', 'favoritos', 'visitas', 'stock bajo', 'avisos', 'resumen', 'mañana'],
+        palabras: ['inicio', 'dashboard', 'panel', 'hoy', 'por enviar', 'favoritos', 'visitas', 'stock bajo', 'avisos', 'resumen', 'mañana', 'calendario', 'ventas por dia', 'mejor dia'],
         secciones: [['idea', 'Para qué sirve'], ['bloques', 'Qué es cada bloque'], ['rutina', 'La rutina de la mañana']],
         Contenido: InicioGuia,
     },

@@ -19,6 +19,7 @@ import { StatusSelector } from '../components/admin/StatusSelector';
 import { usePagination, Pagination } from '../components/ui/Pagination';
 import { getTotalStock } from '../utils/variants';
 import { comisionMP, comisionDeProducto, comisionDelPedido, costoUnitario } from '../utils/comision';
+import { soloVentas } from '../utils/ventasPorDia';
 import { getLowStockItems, DEFAULT_LOW_STOCK_THRESHOLD } from '../utils/lowStock';
 
 // Cada tab se carga bajo demanda (code-splitting) — el bundle inicial del
@@ -92,6 +93,9 @@ export const Admin = () => {
     const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers, paymentConfig, expenses = [] } = useStore();
     const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
+    // Día elegido en el calendario del Inicio: abre Ventas filtrado en esa fecha.
+    const [ventasDia, setVentasDia] = useState('');
+    useEffect(() => { if (adminTab !== 'sales') setVentasDia(''); }, [adminTab]);
     // Los numeritos rojos del menú: sólo lo que espera algo de vos.
     const contadoresMenu = {
         orders: orders.filter(o => o.status === 'pending').length,
@@ -233,9 +237,10 @@ export const Admin = () => {
         }, { invested: 0, potentialProfit: 0, totalStock: 0, totalValue: 0 });
     }, [inventory, paymentConfig]);
 
-    const salesMetrics = orders.reduce((acc, o) => { acc.totalRevenue += o.total; acc.count += 1; return acc; }, { totalRevenue: 0, count: 0 });
+    const salesMetrics = soloVentas(orders).reduce((acc, o) => { acc.totalRevenue += o.total; acc.count += 1; return acc; }, { totalRevenue: 0, count: 0 });
 
-    const salesLog = useMemo(() => orders.flatMap(order => order.items.map(item => {
+    // Sólo las ventas que valen: un pedido anulado o devuelto no suma ganancia.
+    const salesLog = useMemo(() => soloVentas(orders).flatMap(order => order.items.map(item => {
         const product = inventory.find(p => String(p.id) === String(item.id))
             || inventory.find(p => (p.name || '').trim().toLowerCase() === (item.name || '').trim().toLowerCase())
             || item;
@@ -870,6 +875,7 @@ export const Admin = () => {
                     isMaintenance={isMaintenance}
                     toggleMaintenance={toggleMaintenance}
                     onNavigate={setAdminTab}
+                    onVerDia={(dia) => { setVentasDia(dia); setAdminTab('sales'); }}
                     wishlistData={wishlistEvents}
                     lowStockItems={lowStockItems}
                     lowStockThreshold={lowStockThreshold}
@@ -895,7 +901,7 @@ export const Admin = () => {
                 {adminTab === 'assistant' && <AdminAssistantView orders={orders} inventory={inventory} onClose={() => setAdminTab('dashboard')} />}
                 {adminTab === 'orders' && <OrdersView orders={orders} updateOrderStatus={updateOrderStatus} />}
                 {adminTab === 'customers' && <CustomersView orders={orders} />}
-                {adminTab === 'sales' && <SalesView salesLog={salesLog} metrics={metrics} />}
+                {adminTab === 'sales' && <SalesView salesLog={salesLog} metrics={metrics} dia={ventasDia} onLimpiarDia={() => setVentasDia('')} />}
                 {adminTab === 'cms' && <CMSView />}
                 {adminTab === 'coupons' && <CouponsView />}
                 {adminTab === 'suppliers' && <SuppliersView />}

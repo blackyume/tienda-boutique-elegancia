@@ -5,6 +5,7 @@ const ImportarVentasModal = lazy(() => import('./ImportarVentasModal').then(m =>
 import { formatMoney } from '../../utils/helpers';
 import { useStore } from '../../context/StoreContext';
 import { gastosDelPeriodo, totalGastos } from '../../utils/gastos';
+import { claveDia } from '../../utils/ventasPorDia';
 
 // Miniatura con fallback: si no hay imagen o se rompe (ej: producto borrado),
 // muestra un placeholder prolijo en vez de un cuadro vacío.
@@ -20,7 +21,7 @@ const SaleThumb = ({ src, name }) => {
     return <img src={src} alt={name} loading="lazy" onError={() => setErr(true)} className="w-12 h-14 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shrink-0" />;
 };
 
-export const SalesView = ({ salesLog, metrics }) => {
+export const SalesView = ({ salesLog, metrics, dia = '', onLimpiarDia }) => {
     const { expenses = [] } = useStore();
     const [search, setSearch] = useState('');
     const [range, setRange] = useState('all');
@@ -32,7 +33,9 @@ export const SalesView = ({ salesLog, metrics }) => {
         const q = search.trim().toLowerCase();
         const cutoff = range === 'all' ? 0 : Date.now() - parseInt(range) * 864e5;
         return (salesLog || []).filter(s => {
-            if (range !== 'all') {
+            if (dia) {
+                if (!s.date || claveDia(new Date(s.date)) !== dia) return false;
+            } else if (range !== 'all') {
                 const t = s.date ? new Date(s.date).getTime() : 0;
                 if (t < cutoff) return false;
             }
@@ -42,7 +45,8 @@ export const SalesView = ({ salesLog, metrics }) => {
                 || (s.color || '').toLowerCase().includes(q)
                 || (s.channel || '').toLowerCase().includes(q);
         });
-    }, [salesLog, search, range]);
+    }, [salesLog, search, range, dia]);
+    const diaLindo = dia ? new Date(`${dia}T12:00:00`).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
 
     const totalVendido = useMemo(() => filtered.reduce((a, s) => a + (Number(s.total) || 0), 0), [filtered]);
     const totalGanancia = useMemo(() => filtered.reduce((a, s) => a + (Number(s.profit) || 0), 0), [filtered]);
@@ -84,14 +88,14 @@ export const SalesView = ({ salesLog, metrics }) => {
                             className="pl-9 pr-3 py-2.5 text-sm w-64 bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-none focus:border-[#E8C65E] transition-colors"
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 px-3 py-2.5 rounded-lg">
+                    {!dia && <div className="flex items-center gap-2 bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 px-3 py-2.5 rounded-lg">
                         <Calendar className="w-4 h-4 text-slate-400" />
                         <select value={range} onChange={e => setRange(e.target.value)} className="bg-transparent text-sm font-bold outline-none text-slate-700 dark:text-white cursor-pointer [&>option]:bg-slate-800 [&>option]:text-white">
                             <option value="all">Todo</option>
                             <option value="7">Últimos 7 días</option>
                             <option value="30">Últimos 30 días</option>
                         </select>
-                    </div>
+                    </div>}
                     <button
                         onClick={() => setImportando(true)}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider hover:border-[#E8C65E] hover:text-[#B8932E] dark:hover:text-[#E8C65E] transition-colors"
@@ -108,6 +112,13 @@ export const SalesView = ({ salesLog, metrics }) => {
                     </button>
                 </div>
             </div>
+
+            {dia && (
+                <div className="mb-6 flex items-center justify-between gap-3 flex-wrap rounded-xl border border-[#E8C65E]/50 bg-[#E8C65E]/10 px-4 py-3">
+                    <p className="text-sm text-slate-800 dark:text-white"><Calendar className="w-4 h-4 inline -mt-0.5 mr-1.5 text-[#E8C65E]" />Viendo sólo las ventas del <strong>{diaLindo}</strong>.</p>
+                    <button type="button" onClick={onLimpiarDia} className="text-xs font-bold uppercase tracking-wider text-[#B8932E] dark:text-[#E8C65E] hover:underline">Ver todas</button>
+                </div>
+            )}
 
             {/* Resumen */}
             {(salesLog || []).length === 0 && metrics ? (
