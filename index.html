@@ -183,13 +183,14 @@
 
   <!-- Loading Logic -->
   <script>
+    // Red de seguridad: la app la saca apenas pinta (ver App.jsx); si algo
+    // fallara antes, se va sola cuando termina de cargar todo.
     window.addEventListener('load', () => {
       const loader = document.getElementById('loadingScreen');
-      if (loader) {
-        setTimeout(() => {
-          loader.style.opacity = '0';
-          setTimeout(() => { loader.remove(); }, 400);
-        }, 300);
+      if (loader && !loader.dataset.saliendo) {
+        loader.dataset.saliendo = '1';
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.remove(); }, 500);
       }
     });
   </script>

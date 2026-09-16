@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { tituloDeProducto } from '../utils/nombres';
 import { CUIDADOS, normalizarCuidados, tablaDeMedidas } from '../utils/ficha';
 import { useParams, useNavigate } from 'react-router-dom';
+import { LogoCargando } from '../components/ui/LogoCargando';
 import { useStore } from '../context/StoreContext';
 import { formatMoney, getColorHex, optimizeImage } from '../utils/helpers';
 import { Button } from '../components/ui/Button';
@@ -127,12 +128,11 @@ export const ProductDetail = () => {
             .slice(0, 4);
     }, [inventory, product]);
 
+    // Sin producto: todavía está bajando el catálogo (si no existe, el efecto
+    // de arriba ya mandó al 404).
     if (!product) return (
-        <div className="min-h-screen bg-white dark:bg-[#11100D] flex items-center justify-center">
-            <div className="flex items-center gap-3 text-[#E8C65E]">
-                <div className="w-8 h-8 border-2 border-[#E8C65E] border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm tracking-wide">Cargando producto…</span>
-            </div>
+        <div className="min-h-[60vh] bg-white dark:bg-[#11100D] flex items-center justify-center">
+            <LogoCargando chico />
         </div>
     );
 

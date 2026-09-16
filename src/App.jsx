@@ -20,6 +20,7 @@ import { AdminLauFab } from './components/admin/AdminLauFab';
 import React, { useLayoutEffect, useEffect, Suspense } from 'react';
 import { startPresence } from './utils/presence';
 import { lazyConReintento } from './utils/lazyConReintento';
+import { LogoCargando, CargandoRuta, ocultarPantallaDeEntrada } from './components/ui/LogoCargando';
 
 // Lazy-loaded routes (code-splitting to shrink initial bundle)
 const Shop = lazyConReintento(() => import('./pages/Shop').then(m => ({ default: m.Shop })));
@@ -85,7 +86,20 @@ const AppContent = () => {
     return stop;
   }, [user]);
 
-  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-[#E8C65E]">Cargando...</div>;
+  // La pantalla de entrada (index.html) se va apenas hay página pintada, no
+  // cuando terminan de bajar todas las fotos del hero.
+  useEffect(() => { if (!loading) ocultarPantallaDeEntrada(); }, [loading]);
+
+  // Con la home ya quieta, se bajan por adelantado la tienda y la ficha de
+  // producto: son las dos secciones a las que va casi toda clienta.
+  useEffect(() => {
+    if (loading || location.pathname.startsWith('/admin') || navigator.connection?.saveData) return;
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2500));
+    const id = idle(() => { import('./pages/Shop'); import('./pages/ProductDetail'); });
+    return () => (window.cancelIdleCallback || clearTimeout)(id);
+  }, [loading]);
+
+  if (loading) return <div className="min-h-screen bg-[#11100D] flex items-center justify-center"><LogoCargando texto="Moda femenina · Argentina" /></div>;
 
   // Si está en mantenimiento y NO es admin, muestra pantalla de bloqueo
   if (isMaintenance && !isAdmin && !hasQaBypass()) {
@@ -113,7 +127,8 @@ const AppContent = () => {
       {/* Asistente Lau flotante — solo para el admin */}
       <AdminLauFab />
       <div className={`flex-grow ${location.pathname !== '/' && location.pathname !== '/shop' && !location.pathname.startsWith('/admin') ? 'pt-28' : ''}`}>
-        <Suspense fallback={<RouteFallback />}>
+        <Suspense fallback={<CargandoRuta />}>
+          <div key={location.pathname} className="animate-pagina-entra">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
@@ -133,6 +148,7 @@ const AppContent = () => {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </div>
         </Suspense>
       </div>
       <FooterWrapper />
@@ -151,15 +167,6 @@ const FooterWrapper = () => {
   if (location.pathname.startsWith('/admin') || location.pathname === '/checkout') return null;
   return <Footer />;
 };
-
-const RouteFallback = () => (
-  <div className="min-h-[50vh] flex items-center justify-center">
-    <div className="flex items-center gap-3 text-[#E8C65E]">
-      <div className="w-8 h-8 border-2 border-[#E8C65E] border-t-transparent rounded-full animate-spin" />
-      <span className="text-sm tracking-wide">Cargando…</span>
-    </div>
-  </div>
-);
 
 // El chat del cliente "Elegancia IA" queda OCULTO a pedido del dueño hasta
 // terminar de configurar la IA. Para reactivarlo: poné SHOP_ASSISTANT_ENABLED = true.

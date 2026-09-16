@@ -158,6 +158,7 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 ## Features clave (qué viene listo)
 
 - **PWA + offline.html** + UpdatePrompt con SW versioning.
+- **El "cargando" es uno solo** (16/09/2026): `components/ui/LogoCargando.jsx`. La pantalla de entrada vive en `index.html` (logo respirando + estrellitas) y la saca `App.jsx` apenas `loading` es false (`ocultarPantallaDeEntrada`; el `load` de index.html queda de red de seguridad, antes esperaba TODAS las fotos del hero). Entre páginas NO hay pantalla completa a propósito (la haría más lenta): `CargandoRuta` es el logo chico y aparece sólo si el trozo tarda más de 200 ms; cada página entra con `animate-pagina-entra` (.28 s) y la home precarga `Shop` y `ProductDetail` en `requestIdleCallback`. Mismo logo chico en `Admin.TabLoader` y en la ficha mientras baja el catálogo. No hacer variantes del loader: una marca, un gesto.
 - **Hero + parallax + carrusel de portadas** con LCP optimizado (parallax difere 800ms, noise SVG vía rIC).
 - **Importar inventario desde Excel/CSV + fotos** (Admin → Inventario → ⤴ Importar Excel) — planifica antes de escribir; las fotos se emparejan por nombre de archivo y suben a Cloudinary al confirmar.
 - **Reviews con fotos + moderación** — solo usuarios que compraron + admin aprueba.

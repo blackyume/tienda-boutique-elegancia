@@ -3,6 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { Button } from '../components/ui/Button';
 import { useConfirm } from '../components/ui/ConfirmDialog';
 import { EmptyState } from '../components/ui/EmptyState';
+import { LogoCargando } from '../components/ui/LogoCargando';
 import { CommandPalette } from '../components/admin/CommandPalette';
 import { LogoSVG } from '../components/layout/LogoSVG';
 import { RealTimeClock } from '../components/admin/AdminShared';
@@ -45,7 +46,7 @@ const GuiasView = lazyNamed(() => import('../components/admin/guias/GuiasView'),
 
 const TabLoader = () => (
     <div className="flex items-center justify-center py-32">
-        <div className="w-10 h-10 border-2 border-[#E8C65E] border-t-transparent rounded-full animate-spin" />
+        <LogoCargando chico />
     </div>
 );
 
