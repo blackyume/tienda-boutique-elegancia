@@ -161,3 +161,73 @@ export const IlusCostoPorChat = () => (
         <text x="640" y="304" fontSize="10" className={textoSuave}>queda puesto.</text>
     </Svg>
 );
+
+/** La ficha de una prenda en la tienda, con lo que se completa al cargarla: tela, cuidados, detalles, medidas. */
+export const IlusFichaCompleta = () => {
+    const Marca = ({ x, y, n }) => (<g><circle cx={x} cy={y} r="10" fill={ROJO} /><text x={x} y={y + 4} textAnchor="middle" fontSize="10" fontWeight="900" fill="white">{n}</text></g>);
+    return (
+        <Svg alto={330} label="La ficha de una prenda en la tienda, numerada: descripción, composición, cuidados, guía de talles y detalles">
+            <rect x="20" y="10" width="680" height="310" rx="14" className={papel} />
+            <rect x="20" y="10" width="680" height="310" rx="14" fill="none" className={linea} />
+            {/* foto */}
+            <rect x="36" y="26" width="220" height="278" rx="10" className={papelSuave} />
+            <text x="146" y="170" textAnchor="middle" fontSize="11" className={textoSuave}>foto</text>
+            {/* datos */}
+            <text x="276" y="40" fontSize="9" fontWeight="800" letterSpacing="2" fill={ORO_OSCURO}>VESTIDOS</text>
+            <text x="276" y="62" fontSize="16" fontWeight="900" className={texto}>Vestido lino blanco</text>
+            <text x="276" y="84" fontSize="14" fontWeight="900" style={mono} fill={ORO_OSCURO}>$45.100</text>
+            <text x="276" y="106" fontSize="10" className={texto}>Un vestido de lino liviano, de corte recto y largo a la rodilla,</text>
+            <text x="276" y="119" fontSize="10" className={texto}>pensado para los días de calor. Fresco, simple y elegante.</text>
+            <Marca x={690} y={112} n="1" />
+            <text x="276" y="140" fontSize="9.5" className={textoSuave}><tspan fontWeight="800">COMPOSICIÓN:</tspan> Lino 100%</text>
+            <Marca x={690} y={137} n="2" />
+            {[['🫧 Lavar a mano', 0], ['⛱️ Secar a la sombra', 92], ['🚫 Sin lavandina', 200]].map(([l, dx]) => (
+                <g key={l} transform={`translate(${276 + dx} 150)`}>
+                    <rect width={l.length * 5.4 + 14} height="18" rx="9" fill="none" className={linea} />
+                    <text x="7" y="12.5" fontSize="8.5" className={textoSuave}>{l}</text>
+                </g>
+            ))}
+            <Marca x={690} y={159} n="3" />
+            <text x="276" y="192" fontSize="9" fontWeight="800" letterSpacing="1" className={textoSuave}>TALLE</text>
+            <text x="600" y="192" textAnchor="end" fontSize="8.5" fontWeight="800" letterSpacing="1" fill={ORO_OSCURO}>MEDIDAS DE ESTA PRENDA</text>
+            <Marca x={690} y={189} n="4" />
+            {['S', 'M', 'L'].map((s, i) => (
+                <g key={s} transform={`translate(${276 + i * 40} 200)`}>
+                    <rect width="32" height="24" rx="5" fill="none" stroke={i === 1 ? ORO : undefined} className={i === 1 ? '' : linea} strokeWidth="1.3" />
+                    <text x="16" y="16" textAnchor="middle" fontSize="10" fontWeight="800" className={texto}>{s}</text>
+                </g>
+            ))}
+            <rect x="276" y="236" width="324" height="26" rx="6" fill={ORO} />
+            <text x="438" y="253" textAnchor="middle" fontSize="10" fontWeight="900" fill="#111" letterSpacing="2">AGREGAR A LA BOLSA</text>
+            <text x="276" y="284" fontSize="10" fontWeight="800" className={texto}>Detalles del producto</text>
+            <text x="276" y="298" fontSize="9" className={textoSuave}>• Corte recto  • Largo a la rodilla  • Lino 100%  • Lavar a mano</text>
+            <Marca x={690} y={290} n="5" />
+            <text x="146" y="282" textAnchor="middle" fontSize="8.5" className={textoSuave}>1 descripción · 2 tela · 3 cuidados</text>
+            <text x="146" y="295" textAnchor="middle" fontSize="8.5" className={textoSuave}>4 medidas · 5 detalles</text>
+        </Svg>
+    );
+};
+
+/** Ganancia bruta − gastos = neta, como se ve en Ventas. */
+export const IlusGastos = () => {
+    const Caja = ({ x, titulo, valor, sub, color, ancho = 150 }) => (
+        <g transform={`translate(${x} 30)`}>
+            <rect width={ancho} height="96" rx="12" className={papel} />
+            <rect width={ancho} height="96" rx="12" fill="none" stroke={color || undefined} className={color ? '' : linea} strokeWidth="1.5" />
+            <text x="14" y="22" fontSize="8.5" fontWeight="800" letterSpacing="1.5" className={textoSuave}>{titulo}</text>
+            <text x="14" y="52" fontSize="18" fontWeight="900" style={mono} fill={color || undefined} className={color ? '' : texto}>{valor}</text>
+            <text x="14" y="72" fontSize="8.5" className={textoSuave}>{sub}</text>
+            <text x="14" y="84" fontSize="8.5" className={textoSuave}>{sub === 'Ventas − costo de las prendas' ? '− comisión de MP' : ''}</text>
+        </g>
+    );
+    return (
+        <Svg alto={190} label="En Ventas y ganancia: ganancia bruta, menos los gastos del período, igual a la ganancia neta">
+            <Caja x={20} titulo="GANANCIA BRUTA" valor="$312.000" sub="Ventas − costo de las prendas" />
+            <text x="190" y="88" textAnchor="middle" fontSize="22" fontWeight="900" className={textoSuave}>−</text>
+            <Caja x={210} titulo="GASTOS" valor="$68.000" sub="Publicidad, bolsas, envíos" color="#d97706" />
+            <text x="380" y="88" textAnchor="middle" fontSize="22" fontWeight="900" className={textoSuave}>=</text>
+            <Caja x={400} titulo="GANANCIA NETA" valor="$244.000" sub="Lo que te queda de verdad" color={VERDE} ancho={300} />
+            <text x="360" y="160" textAnchor="middle" fontSize="10.5" className={textoSuave}>Los gastos se cargan en Gastos o diciéndole a Lau “gasté 20000 en publicidad”. El costo de cada prenda NO va ahí: ya se descuenta venta por venta.</text>
+        </Svg>
+    );
+};

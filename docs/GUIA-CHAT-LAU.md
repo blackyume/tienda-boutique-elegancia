@@ -40,6 +40,11 @@ Listo, no se toca más.
 
 ## Cargar un producto
 
+Por las dos vías (chat con llave o "Cargar producto" paso a paso) la ficha queda
+completa: stock por talle y color, tela, cuidados (botones con íconos), medidas
+por talle, video, viñetas de "Detalles" (las escribe la IA o se arman con los
+datos reales) y una revisión de qué falta antes de publicar.
+
 1. Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto).
    Arriba a la derecha, al lado de Guía, está **"Cargar producto"**: hace lo
    mismo pero te lleva de la mano pregunta por pregunta (y anda sin llave de
@@ -105,6 +110,8 @@ una decisión, no una falla.
   resta de la ganancia neta en Ventas y en el Inicio. `¿cuánto gasté este
   mes?` / `gastos de la semana` → resumen por rubro.
 - `cargá un producto` → abre el paso a paso.
+- `el vestido lino talle M mide 92 de busto y 88 de largo` → carga las medidas
+  de ese talle (salen en "Medidas de esta prenda" en la tienda).
 - `deshacer` (o el botón después de cada acción) → revierte lo último.
 - Micrófono al lado del clip: dictás y queda escrito.
 

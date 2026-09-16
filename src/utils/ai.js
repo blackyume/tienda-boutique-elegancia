@@ -129,3 +129,39 @@ Devolvé SOLO el texto de la descripción (sin comillas, sin título, sin markdo
     const raw = await generateText(prompt, aiConfig, { scope: 'admin', system, temperature: 0.6 });
     return String(raw || '').trim().replace(/^["'`]+|["'`]+$/g, '').slice(0, 600);
 };
+
+/**
+ * Descripción + viñetas de "Detalles" en una sola llamada, sólo con datos
+ * reales (misma regla que la descripción: sin inventar telas ni medidas).
+ * Devuelve { description, details: [..3-5..] }; si falla el JSON, details vacío.
+ */
+export const generateGroundedFicha = async ({ name, category, colors = [], sizes = [], material = '', details: contado = '', care = [] }, aiConfig) => {
+    const facts = [
+        name && `Nombre: ${name}`,
+        category && `Categoría: ${category}`,
+        colors.length && `Colores: ${colors.join(', ')}`,
+        sizes.length && `Talles: ${sizes.join(', ')}`,
+        material && `Tela/composición: ${material}`,
+        care.length && `Cuidados: ${care.join(', ')}`,
+        contado && `Lo que contó el dueño sobre la prenda: ${contado}`,
+    ].filter(Boolean).join('\n');
+    const system = 'Sos redactor de e-commerce de moda femenina premium en Argentina. Escribís corto, elegante y cálido, en español rioplatense neutro, sin emojis ni marketing exagerado.';
+    const prompt = `Con ÚNICAMENTE los datos reales de abajo, devolvé un JSON con dos campos:
+- "description": 2 a 3 oraciones, elegantes, para la ficha del producto.
+- "details": entre 3 y 5 viñetas cortas (máximo 8 palabras cada una) sobre corte, largo, ocasión de uso, colores, talles, composición o cuidados. Cada viñeta es un dato, no una frase de venta.
+REGLA CLAVE (estricta): NO inventes telas, materiales, medidas ni composición. Si no aparece la tela en los datos, está PROHIBIDO mencionar material alguno. Corte, largo y ocasión sólo si se deducen del nombre o de lo que contó el dueño.
+
+DATOS REALES:
+${facts}
+
+Devolvé SOLO el JSON, sin markdown.`;
+    const raw = await generateText(prompt, aiConfig, { scope: 'admin', system, temperature: 0.6 });
+    const j = parseJsonFromResponse(String(raw || '')) || {};
+    const description = String(j.description || '').trim().slice(0, 600);
+    const details = (Array.isArray(j.details) ? j.details : []).map((d) => String(d || '').trim().replace(/^[-•·]\s*/, '')).filter(Boolean).slice(0, 5);
+    if (!description) {
+        const solo = await generateGroundedDescription({ name, category, colors, sizes, details: [contado, material && `Tela/composición: ${material}`].filter(Boolean).join('. ') }, aiConfig);
+        return { description: solo, details };
+    }
+    return { description, details };
+};

@@ -13,7 +13,7 @@ import {
     IlusCaminoInstagram, IlusCuentaProfesional, IlusLlaveMeta, IlusPostInstagram,
 } from './ilustracionesMas';
 import { IlusInicio, IlusLauSinIA, IlusOferta, IlusDiseno } from './ilustracionesInicio';
-import { IlusWebVsEfectivo, IlusHastaDondeBajar, IlusVentaEfectivo, IlusCostoPorChat } from './ilustracionesPrecios';
+import { IlusWebVsEfectivo, IlusHastaDondeBajar, IlusVentaEfectivo, IlusCostoPorChat, IlusFichaCompleta, IlusGastos } from './ilustracionesPrecios';
 import { TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../../../utils/envios';
 
 // Las guías del panel. Están escritas para que las siga alguien que nunca
@@ -244,6 +244,16 @@ const Lau = ({ abrir }) => (
                 </Paso>
             </Pasos>
             <Aviso tipo="dato">Con varias fotos, primero te pregunta: <strong>¿mismo producto o productos distintos?</strong> Mismo producto = una galería. Distintos = te guía uno por uno.</Aviso>
+            <P><strong>Qué pregunta y qué queda en la ficha.</strong> Por las dos vías (el chat con llave y el paso a paso) pide lo mismo: nombre, categoría, colores, talles, <strong>stock de cada talle y color</strong> (así la tienda sabe qué se agotó), costo → precio. Y una pregunta opcional para completar la ficha: la <strong>tela</strong>, los <strong>cuidados</strong> (lavar a mano, no secadora…) y las <strong>medidas por talle</strong>. Nada de esto se inventa: si no lo decís, no va.</P>
+            <Figura titulo="Lo que la clienta ve en la ficha cuando la cargaste completa. Los números: lo que se pregunta al cargar.">
+                <IlusFichaCompleta />
+            </Figura>
+            <Lista items={[
+                <><strong>Detalles del producto</strong> (las viñetas de abajo) se arman solas: con la IA, del corte, largo y ocasión; sin llave, con la tela, los colores, los talles y los cuidados. Podés escribirlas vos, una por línea.</>,
+                <><strong>Medidas por talle</strong>: aparecen en “Medidas de esta prenda” (el botón al lado de los talles). Después también se cargan por chat: <em>“el vestido lino talle M mide 92 de busto y 88 de largo”</em>.</>,
+                <><strong>Antes de publicar te avisa qué le falta</strong> (sin foto, sin costo, sin descripción, sin talles) y, si es grave, te sugiere dejarla en borrador. Una ficha floja vende menos.</>,
+                <><strong>Video</strong>: en el paso de la foto pegás el link (YouTube, Instagram o .mp4) y queda en la galería.</>,
+            ]} />
         </Seccion>
 
         <Seccion id="planillas" titulo="Tirale una planilla y ella la carga">
@@ -286,6 +296,9 @@ const Lau = ({ abrir }) => (
                     ['“vendí el jean oxford por whatsapp” · “vendí 2 tops rib a 14.800” · “vendí el short por 30.000 en el local”', 'Anota la venta por fuera: descuenta el stock (te pregunta talle y color con botones), la suma a las ventas y queda como pedido. “a X” es por unidad; “por X” es el total; sin precio usa el de la tienda.'],
                     ['“vendí el sweater en efectivo” · “…con 10% de descuento” · “¿cuánto es el sweater en efectivo?”', 'Te ofrece el precio efectivo (sin la comisión de MP), calcula el descuento y te dice cuánto te queda antes de confirmar. Todo en la guía de precios.'],
                     ['“el sweater lanilla me costó 20000 más 500 de flete”', 'Guarda el costo en ese producto y te propone el precio con un botón.'],
+                    ['“gasté 20000 en publicidad” · “pagué 8000 de bolsas ayer” · “¿cuánto gasté este mes?”', 'Anota el gasto (rubro y fecha solos) y se resta de la ganancia neta; o te resume los gastos por rubro.'],
+                    ['“el vestido lino talle M mide 92 de busto y 88 de largo”', 'Carga las medidas de ese talle: aparecen en “Medidas de esta prenda” en la tienda.'],
+                    ['“cargá un producto”', 'Abre el paso a paso.'],
                     ['“llegaron 10 sweater lanilla” · “me llegaron 3 jean oxford 40 azul”', 'Suma unidades al stock (con talle y color si el producto los tiene).'],
                     ['“ponele 48000 al sweater lanilla” · “el jean chupín a 45.000”', 'Cambia el precio.'],
                     ['“ocultá el gamulán” · “mostrá la cartera de cuero”', 'Lo saca de la tienda o lo vuelve a poner, sin borrar nada.'],
@@ -1014,6 +1027,7 @@ const InicioGuia = ({ abrir }) => (
                 <><strong>3. Lo más guardado en favoritos.</strong> Las prendas que más clientas guardaron con el corazón en los últimos 30 días, con el stock que te queda al lado. Es la lista de <strong>qué reponer antes de que se venda</strong>. Con “Editar” cargás stock ahí mismo.</>,
                 <><strong>4. Visitas por día.</strong> Dos semanas, una barra por día, el pico en oro. Sirve para ver si un posteo o una historia movió gente. Tus propias visitas no cuentan.</>,
                 <><strong>5. Stock.</strong> Cuántos productos tienen stock, cuántos van por las últimas unidades y cuántos se agotaron. Abajo, si hay productos <strong>ocultos</strong> (que las clientas no ven).</>,
+                <><strong>Cuando hay ventas</strong>, arriba de todo aparecen los números del período: ingresos, pedidos, ticket promedio, <strong>ganancia neta</strong> (la bruta de cada venta menos los gastos que cargaste) y conversión.</>,
                 <><strong>6. Stock bajo.</strong> Los productos por debajo del umbral, con el talle y color más flojo. El lápiz abre el producto para reponer; el ojo lo oculta de la tienda hasta que llegue.</>,
             ]} />
         </Seccion>
@@ -1180,10 +1194,22 @@ const PreciosGuia = ({ abrir }) => (
             />
         </Seccion>
 
+        <Seccion id="gastos" titulo="Los gastos: lo que se resta de verdad">
+            <P>La ganancia de cada venta ya descuenta el costo de la prenda y la comisión de MP. Pero el negocio tiene otros gastos —publicidad, bolsas, envíos que pagás vos, internet, alquiler— y esos se cargan en <Ruta pasos={['Gastos']} /> o por chat: <em>“gasté 20000 en publicidad”</em>, <em>“pagué 8000 de bolsas ayer”</em>. Lau les pone el rubro y la fecha sola.</P>
+            <Figura titulo="Así lo ves en Ventas y ganancia: bruta, menos gastos, neta. En el Inicio, la tarjeta “Ganancia neta”.">
+                <IlusGastos />
+            </Figura>
+            <BienMal
+                bien={['Publicidad de Instagram, sorteos, influencers', 'Bolsas, etiquetas, cajas', 'El cadete o el correo cuando lo pagás vos', 'Internet, luz, alquiler, contador']}
+                mal={['La compra de mercadería, si cada prenda tiene su costo cargado: se contaría dos veces', 'El envío que paga la clienta en el checkout: eso no es un gasto tuyo']}
+            />
+            <P>Preguntale <em>“¿cuánto gasté este mes?”</em> y te lo resume por rubro. En <Ruta pasos={['Gastos']} /> tenés las barras por rubro y podés cargar un gasto con la fecha de atrás.</P>
+        </Seccion>
+
         <Seccion id="ver" titulo="Dónde se ve después">
             <Lista items={[
                 <><Ruta pasos={['Pedidos']} />: la venta aparece como <Cod>MAN-…</Cod>, ya aprobada, con el canal y cómo cobraste (efectivo / transferencia). Sin envío que gestionar.</>,
-                <><Ruta pasos={['Ventas y ganancia']} />: suma a la facturación del día y del mes; la ganancia se calcula con el costo de la prenda y <strong>sin comisión</strong> (porque no la hubo).</>,
+                <><Ruta pasos={['Ventas y ganancia']} />: suma a la facturación del día y del mes; la ganancia bruta se calcula con el costo de la prenda y <strong>sin comisión</strong> (porque no la hubo), y abajo la neta, ya con los gastos restados.</>,
                 <>Si te equivocaste: <strong>Deshacer</strong> ahí mismo, o “anulá la venta MAN-123456”: repone el stock y da de baja el pedido.</>,
             ]} />
             <P>Las ofertas y los cupones (descuentos para <em>todas</em>, no para una venta) están en la <Ir abrir={abrir} a="ofertas">guía de ofertas</Ir>; el resto de frases de Lau, en la <Ir abrir={abrir} a="lau">guía de Lau</Ir>.</P>
@@ -1291,10 +1317,10 @@ export const GUIAS = [
         Contenido: OfertasGuia,
     },
     {
-        id: 'precios', titulo: 'Precios, costos y ventas en efectivo', icono: Coins, duracion: '6 min', para: 'Dueño',
-        resumen: 'Vos decís cuánto te costó; Lau calcula el precio con tu margen y la comisión de MP. Y cuando vendés en efectivo, cuánto podés bajar sin perder.',
-        palabras: ['precio', 'precios', 'costo', 'costos', 'margen', 'ganancia', 'comision', 'mercado pago', 'efectivo', 'transferencia', 'descuento', 'flete', 'embalaje', 'packaging', 'calcular', 'cuanto cobro', 'plata'],
-        secciones: [['idea', 'La idea'], ['costos', 'Decirle los costos'], ['comision', 'Comisión de MP'], ['efectivo', 'Vender en efectivo'], ['bajar', 'Hasta dónde bajar'], ['ver', 'Dónde se ve']],
+        id: 'precios', titulo: 'Precios, costos, efectivo y gastos', icono: Coins, duracion: '7 min', para: 'Dueño',
+        resumen: 'Vos decís cuánto te costó; Lau calcula el precio con tu margen y la comisión de MP. Cuánto bajar en efectivo sin perder, y qué gastos se restan de la ganancia.',
+        palabras: ['precio', 'precios', 'costo', 'costos', 'margen', 'ganancia', 'comision', 'mercado pago', 'efectivo', 'transferencia', 'descuento', 'flete', 'embalaje', 'packaging', 'calcular', 'cuanto cobro', 'plata', 'gastos', 'gasto', 'publicidad', 'neta', 'bruta'],
+        secciones: [['idea', 'La idea'], ['costos', 'Decirle los costos'], ['comision', 'Comisión de MP'], ['efectivo', 'Vender en efectivo'], ['bajar', 'Hasta dónde bajar'], ['gastos', 'Los gastos'], ['ver', 'Dónde se ve']],
         Contenido: PreciosGuia,
     },
     {

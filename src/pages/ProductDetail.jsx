@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { tituloDeProducto } from '../utils/nombres';
+import { CUIDADOS, normalizarCuidados, tablaDeMedidas } from '../utils/ficha';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { formatMoney, getColorHex, optimizeImage } from '../utils/helpers';
@@ -288,6 +289,15 @@ export const ProductDetail = () => {
                             <span className="font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Composición:</span> {product.material}
                         </p>
                     )}
+                    {normalizarCuidados(product.care || []).length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-6 -mt-3">
+                            {normalizarCuidados(product.care).map(id => { const c = CUIDADOS.find(x => x.id === id); return (
+                                <span key={id} title={c.label} className="inline-flex items-center gap-1.5 text-[11px] text-noche-300 border border-white/10 rounded-full px-2.5 py-1">
+                                    <span aria-hidden>{c.icono}</span> {c.label}
+                                </span>
+                            ); })}
+                        </div>
+                    )}
 
                     <div className="space-y-6 border-t border-slate-100 dark:border-slate-800 pt-6">
                         {/* Colores */}
@@ -340,10 +350,10 @@ export const ProductDetail = () => {
                                         Talle{selectedSize ? `: ${selectedSize}` : ''}
                                     </span>
                                     <button
-                                        onClick={() => setIsSizeGuideOpen(true)}
+                                        onClick={() => setIsSizeGuideOpen(product)}
                                         className="text-[10px] font-bold uppercase tracking-widest text-cielo-gold hover:underline"
                                     >
-                                        Guía de talles
+                                        {tablaDeMedidas(product) ? 'Medidas de esta prenda' : 'Guía de talles'}
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-4 md:grid-cols-6 gap-2">

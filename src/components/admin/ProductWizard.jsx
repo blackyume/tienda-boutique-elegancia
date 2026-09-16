@@ -1,8 +1,9 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Paperclip, X, ChevronLeft, Check, Plus, Sparkles, Loader2, Image as ImageIcon, Star, Tag } from 'lucide-react';
+import { Paperclip, X, ChevronLeft, Check, Plus, Sparkles, Loader2, Image as ImageIcon, Star, Tag, Video, AlertTriangle, Ruler } from 'lucide-react';
 import { getColorHex } from '../../utils/helpers';
 import { comisionMP, configPrecios, margenPara, redondear } from '../../utils/comision';
-import { generateGroundedDescription, hasAdminAI } from '../../utils/ai';
+import { generateGroundedFicha, hasAdminAI } from '../../utils/ai';
+import { CUIDADOS, MEDIDAS, detallesPorPlantilla, revisarFicha, mejorBorrador } from '../../utils/ficha';
 
 // Wizard DETERMINÍSTICO de carga de producto. NO usa IA: es una secuencia fija
 // de pasos con botones que junta los datos en estado y crea el producto al final
@@ -121,6 +122,11 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
     const [genDesc, setGenDesc] = useState(false);
     const [descErr, setDescErr] = useState('');
     const [material, setMaterial] = useState('');     // tela / composición
+    const [care, setCare] = useState([]);              // cuidados (ids de CUIDADOS)
+    const [medidas, setMedidas] = useState({});        // { talle: { busto, cintura, ... } } en cm
+    const [details, setDetails] = useState('');        // viñetas de "Detalles del producto", una por línea
+    const [videoUrl, setVideoUrl] = useState('');
+    const [videos, setVideos] = useState([]);
     const [launchSale, setLaunchSale] = useState(false);
     const [salePercent, setSalePercent] = useState(20);
     const [featured, setFeatured] = useState(false);  // destacar en home
@@ -207,16 +213,34 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
     const generarDescripcion = async () => {
         setGenDesc(true); setDescErr('');
         try {
-            const txt = await generateGroundedDescription(
-                { name: name.trim(), category: newCat.trim() || category, colors, sizes, details: [descDetails.trim(), material.trim() && `Tela/composición: ${material.trim()}`].filter(Boolean).join('. ') },
+            const r = await generateGroundedFicha(
+                { name: name.trim(), category: newCat.trim() || category, colors, sizes, material: material.trim(), care: care.map(id => CUIDADOS.find(c => c.id === id)?.label || id), details: descDetails.trim() },
                 aiConfig
             );
-            if (txt) setDescription(txt);
+            if (r?.description) setDescription(r.description);
             else setDescErr('No vino texto, probá de nuevo.');
+            if (r?.details?.length) setDetails(r.details.join('\n'));
         } catch (e) {
             setDescErr(e?.message || 'No se pudo generar.');
         } finally { setGenDesc(false); }
     };
+
+    // Sólo los talles con algún número cargado.
+    const medidasLimpias = useMemo(() => {
+        const out = {};
+        for (const [s, v] of Object.entries(medidas)) {
+            const fila = Object.fromEntries(MEDIDAS.filter(([k]) => Number(v?.[k]) > 0).map(([k]) => [k, Number(v[k])]));
+            if (Object.keys(fila).length) out[s] = fila;
+        }
+        return out;
+    }, [medidas]);
+    const setMedida = (s, k, val) => setMedidas(prev => ({ ...prev, [s]: { ...(prev[s] || {}), [k]: val } }));
+
+    // Qué le falta a la ficha, para verlo antes de publicar.
+    const avisos = useMemo(() => revisarFicha({
+        name, price: finalPrice, cost: priceMode === 'cost' ? Number(cost) || 0 : 0, category: newCat.trim() || category,
+        description, sizes, stock: totalStock, images, material,
+    }), [name, finalPrice, priceMode, cost, newCat, category, description, sizes, totalStock, images, material]);
 
     const publish = async (asVisible) => {
         setSaving(true);
@@ -249,9 +273,13 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                 ...(Object.keys(colorHex).some(k => colors.includes(k)) ? { colorHex: colors.reduce((a, c) => { if (colorHex[c]) a[c] = colorHex[c]; return a; }, {}) } : {}),
                 description: description.trim(),
                 material: material.trim(),
+                care,
+                ...(Object.keys(medidasLimpias).length ? { measurements: medidasLimpias } : {}),
+                // Las viñetas de "Detalles": las que escribió (o generó la IA), si no una plantilla con los datos reales.
+                details: details.trim() || detallesPorPlantilla({ material: material.trim(), colors, sizes, care, measurements: medidasLimpias }),
                 image: images[0] || '',
                 images,
-                media: images.map(u => ({ type: 'image', url: u })),
+                media: [...images.map(u => ({ type: 'image', url: u })), ...videos.map(u => ({ type: 'video', url: u }))],
                 badges: { isNew: true, ...(pct > 0 ? { isOnSale: true } : {}), ...(featured ? { isFeatured: true } : {}) },
                 active: asVisible,
             };
@@ -266,7 +294,7 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
     };
 
     // --- Navegación de pasos ---
-    const ORDER = ['photos', 'name', 'category', 'variantes', 'stock', 'price', 'summary'];
+    const ORDER = ['photos', 'name', 'category', 'variantes', 'stock', 'ficha', 'price', 'summary'];
     const goNext = () => {
         const i = ORDER.indexOf(step);
         if (i >= 0 && i < ORDER.length - 1) setStep(ORDER[i + 1]);
@@ -350,6 +378,22 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                 {uploading ? <Loader2 className="w-7 h-7 animate-spin text-[#E8C65E]" /> : <Paperclip className="w-7 h-7" />}
                                 <span className="text-sm font-semibold">{uploading ? 'Subiendo…' : 'Tocá para subir foto(s)'}</span>
                             </button>
+                        </Field>
+                        <Field label="Video (opcional)" hint="Pegá el link de un video de la prenda (YouTube, Instagram o un .mp4). Se ve en la galería, después de las fotos.">
+                            <div className="flex gap-2">
+                                <input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { const v = videoUrl.trim(); if (/^https?:\/\//.test(v) && !videos.includes(v)) setVideos([...videos, v]); setVideoUrl(''); } }} placeholder="https://…" className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
+                                <button onClick={() => { const v = videoUrl.trim(); if (/^https?:\/\//.test(v) && !videos.includes(v)) setVideos([...videos, v]); setVideoUrl(''); }} className="px-4 rounded-xl bg-white/5 text-white/70 hover:text-white border border-white/10"><Video className="w-4 h-4" /></button>
+                            </div>
+                            {videos.length > 0 && (
+                                <div className="flex flex-col gap-1.5 mt-2">
+                                    {videos.map(v => (
+                                        <div key={v} className="flex items-center justify-between gap-2 text-xs text-white/70 bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2">
+                                            <span className="truncate flex items-center gap-2"><Video className="w-3.5 h-3.5 text-[#E8C65E] shrink-0" /> {v}</span>
+                                            <button onClick={() => setVideos(videos.filter(x => x !== v))} className="text-white/40 hover:text-red-400"><X className="w-3.5 h-3.5" /></button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </Field>
                     </StepShell>
                 )}
@@ -466,6 +510,45 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                     </StepShell>
                 )}
 
+                {step === 'ficha' && (
+                    <StepShell {...shellProps} canNext={true} nextLabel={material.trim() || care.length || Object.keys(medidasLimpias).length ? 'Continuar' : 'Continuar sin esto'}>
+                        <Field label="Tela / composición (opcional)" hint="Sólo si la sabés: se muestra en la ficha y la IA la usa para la descripción. Si no, dejala vacía — no se inventa.">
+                            <input value={material} onChange={e => setMaterial(e.target.value)} placeholder="Ej: Algodón 95%, Elastano 5%" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E]" />
+                        </Field>
+                        <Field label="Cuidados (opcional)" hint="Tocá los que correspondan. Se ven con íconos en la ficha.">
+                            <div className="flex flex-wrap gap-2">
+                                {CUIDADOS.map(c => (
+                                    <Chip key={c.id} active={care.includes(c.id)} onClick={() => toggle(care, setCare, c.id)}>{c.icono} {c.label}</Chip>
+                                ))}
+                            </div>
+                        </Field>
+                        <Field label="Medidas por talle (opcional)" hint={sizes.length ? 'En centímetros, las que tengas. Aparecen en “Guía de talles” de esta prenda y bajan las preguntas de “¿qué talle soy?”.' : 'Elegí talles en el paso anterior para cargar medidas.'}>
+                            {sizes.length > 0 && (
+                                <div className="overflow-x-auto rounded-xl border border-white/10">
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-white/[0.03] text-[10px] uppercase tracking-widest text-[#E8C65E]/80">
+                                            <tr><th className="p-2 pl-3 text-left font-bold">Talle</th>{MEDIDAS.map(([k, l]) => <th key={k} className="p-2 text-center font-bold">{l}</th>)}</tr>
+                                        </thead>
+                                        <tbody>
+                                            {sizes.map(s => (
+                                                <tr key={s} className="border-t border-white/5">
+                                                    <td className="p-2 pl-3 font-bold text-white">{s}</td>
+                                                    {MEDIDAS.map(([k]) => (
+                                                        <td key={k} className="p-1.5">
+                                                            <input type="number" min="0" inputMode="numeric" value={medidas[s]?.[k] ?? ''} onChange={e => setMedida(s, k, e.target.value)} placeholder="—" className="w-16 px-2 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 text-white text-center outline-none focus:border-[#E8C65E]" />
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                            <p className="text-[11px] text-white/35 mt-2 flex items-center gap-1"><Ruler className="w-3 h-3" /> Después también las podés decir a Lau: “el vestido lino talle M mide 92 de busto y 88 de largo”.</p>
+                        </Field>
+                    </StepShell>
+                )}
+
                 {step === 'price' && (
                     <div className="flex flex-col gap-5">
                         {!priceMode && (
@@ -535,6 +618,9 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                 ['Stock', usaVariantes ? `${totalStock} (${combos.filter(cb => Number(variantStock[cb.key]) > 0).map(cb => `${cb.label}: ${Number(variantStock[cb.key]) || 0}`).join(', ') || 'sin cargar'})` : (totalStock || '0')],
                                 ['Precio', launchSale && finalPrice > 0 ? `$${Math.round(finalPrice * (1 - salePercent / 100)).toLocaleString('es-AR')} (antes $${finalPrice.toLocaleString('es-AR')}, −${salePercent}%)` : `$${finalPrice.toLocaleString('es-AR')}`],
                                 ...(material.trim() ? [['Tela', material.trim()]] : []),
+                                ...(care.length ? [['Cuidados', care.map(id => CUIDADOS.find(c => c.id === id)?.label || id).join(', ')]] : []),
+                                ...(Object.keys(medidasLimpias).length ? [['Medidas', `${Object.keys(medidasLimpias).length} talle${Object.keys(medidasLimpias).length === 1 ? '' : 's'} con medidas`]] : []),
+                                ...(videos.length ? [['Video', `${videos.length}`]] : []),
                             ].map(([k, v]) => (
                                 <div key={k} className="flex justify-between px-4 py-2.5">
                                     <span className="text-white/50 text-sm">{k}</span>
@@ -568,12 +654,12 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Acá aparece la descripción (o escribila vos)." className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white outline-none focus:border-[#E8C65E] resize-none" />
                         </Field>
 
+                        <Field label="Detalles del producto (opcional)" hint="Viñetas cortas, una por línea: corte, largo, ocasión, cuidados. Si las dejás vacías, se arman solas con los datos reales (tela, colores, talles, cuidados).">
+                            <textarea value={details} onChange={e => setDetails(e.target.value)} rows={3} placeholder={detallesPorPlantilla({ material: material.trim(), colors, sizes, care, measurements: medidasLimpias }) || 'Ej: Corte recto\nLargo a la rodilla\nIdeal para el día'} className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm outline-none focus:border-[#E8C65E] resize-none" />
+                        </Field>
+
                         <Field label="Detalles extra (opcional)" hint="Lo que sumás acá hace tu prenda más completa. Todo es opcional.">
                             <div className="flex flex-col gap-3">
-                                <div>
-                                    <p className="text-xs text-white/55 mb-1.5">Tela / composición <span className="text-white/30">(opcional · si NO la sabés, dejala vacía — no se inventa)</span></p>
-                                    <input value={material} onChange={e => setMaterial(e.target.value)} placeholder="Solo si la conocés. Ej: Algodón 95%, Elastano 5%" className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-sm outline-none focus:border-[#E8C65E]" />
-                                </div>
                                 <button type="button" onClick={() => setFeatured(v => !v)} className={`flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-semibold transition-all ${featured ? 'border-[#E8C65E] bg-[#E8C65E]/15 text-white' : 'border-white/10 bg-white/[0.03] text-white/75'}`}>
                                     <span className="flex items-center gap-2"><Star className="w-4 h-4 text-[#E8C65E]" /> Destacar en la home</span>
                                     {featured ? <Check className="w-4 h-4 text-[#E8C65E]" /> : <span className="text-white/30 text-xs">Off</span>}
@@ -600,6 +686,19 @@ export const ProductWizard = ({ categories = [], uploadImage, addProduct, addCat
                                 </div>
                             </div>
                         </Field>
+                        {avisos.length > 0 && (
+                            <div className={`rounded-2xl border p-4 ${mejorBorrador(avisos) ? 'border-amber-400/40 bg-amber-400/[0.06]' : 'border-white/10 bg-white/[0.03]'}`}>
+                                <p className="text-[11px] uppercase tracking-widest font-bold mb-2 flex items-center gap-1.5 text-amber-300"><AlertTriangle className="w-3.5 h-3.5" /> Antes de publicar</p>
+                                <ul className="space-y-1">
+                                    {avisos.map(a => (
+                                        <li key={a.texto} className={`text-xs flex items-start gap-1.5 ${a.nivel === 'alto' ? 'text-amber-200' : a.nivel === 'medio' ? 'text-white/75' : 'text-white/45'}`}>
+                                            <span className="mt-0.5">{a.nivel === 'alto' ? '⚠' : '·'}</span> {a.texto}
+                                        </li>
+                                    ))}
+                                </ul>
+                                {mejorBorrador(avisos) && <p className="text-xs text-amber-300 font-semibold mt-2">Mejor guardala como borrador y completala después: así no se ve floja en la tienda.</p>}
+                            </div>
+                        )}
                         <div className="flex flex-col gap-2 pt-2">
                             <button onClick={() => publish(true)} disabled={saving} className="w-full py-3 rounded-xl text-sm font-bold text-black flex items-center justify-center gap-2 disabled:opacity-50" style={{ background: GOLD }}>
                                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} Publicar en la tienda

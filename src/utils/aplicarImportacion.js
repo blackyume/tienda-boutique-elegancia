@@ -2,6 +2,7 @@
 // `planearImportacion`): sube las fotos y crea/actualiza. Lo usan el modal
 // de Inventario y Lau, así los dos hacen exactamente lo mismo.
 
+import { detallesPorPlantilla } from './ficha';
 const subirFotos = async (lista, etiqueta, { uploadImage, onAvance }) => {
     const urls = [];
     for (let i = 0; i < lista.length; i += 1) {
@@ -27,6 +28,8 @@ export const aplicarPlanDeProductos = async (plan, { uploadImage, addProduct, up
             const imagenes = alta.fotos.length ? await subirFotos(alta.fotos, alta.nombre, { uploadImage, onAvance }) : null;
             if (alta.fotos.length && !imagenes) sinSubir += 1;
             const datos = imagenes ? { ...alta.datos, ...imagenes } : { ...alta.datos, active: false };
+            // Las viñetas de "Detalles" salen de los datos reales de la fila (colores, talles).
+            if (!datos.details) datos.details = detallesPorPlantilla(datos);
             await addProduct(datos, { silencioso: true });
         } catch { fallados += 1; }
         hechos += 1;

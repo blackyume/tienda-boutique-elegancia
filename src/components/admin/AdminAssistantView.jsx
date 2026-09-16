@@ -17,16 +17,18 @@ import { interpretarCambioDeFoto, patchDeFotos } from '../../utils/fotos';
 import { interpretarAccion, opcionesDeVariante, opcionesDeProducto, describirRepetidos, accionInversa } from '../../utils/lauAcciones';
 import { interpretarGasto, responderGastos, etiquetaDeCategoria } from '../../utils/gastos';
 import { explicarErrorIA } from '../../utils/gemini';
+import { normalizarCuidados, detallesPorPlantilla, revisarFicha, interpretarMedidas, MEDIDAS } from '../../utils/ficha';
 import { buscarProductos } from '../../utils/lauDirecto';
 
-const HISTORY_KEY = 'lau_copilot_v4';
+const HISTORY_KEY = 'lau_copilot_v5';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
 const MAX_STEPS = 5;
 const WELCOME = {
     role: 'ai', text:
         '¡Hola! 👋 Soy Lau, tu copiloto. Manejás toda la tienda hablándome como a una empleada — y yo ejecuto las acciones de verdad (lo importante siempre te lo confirmo antes).\n\n' +
         'Para cargar un producto, tocá "Cargar producto" arriba a la derecha: te lleva con botones por nombre, color, talle, stock y precio, sin vueltas. Para todo lo demás, pedímelo en tus palabras.\n\n' +
-        'Preguntame "¿cuánto queda del vestido negro?" o "¿qué se vendió hoy?" y te lo digo al instante. Y mientras me tengas abierta te aviso sola cada venta que entra y cada prenda que se agota.\n\n' +
+        'Sin llave de IA ya entiendo lo de todos los días: "vendí el jean por whatsapp", "vendí el sweater con 10% en efectivo", "llegaron 10 tops", "ponele 48000 al sweater", "gasté 20000 en publicidad", "el vestido talle M mide 92 de busto". Siempre te muestro qué voy a hacer y espero tu Confirmar; después tenés Deshacer.\n\n' +
+        'Preguntame "¿cuánto queda del vestido negro?", "¿qué se vendió hoy?", "¿cuánto es el sweater en efectivo?" o "¿cuánto gasté este mes?" y te lo digo al instante. Y mientras me tengas abierta te aviso sola cada venta que entra y cada prenda que se agota.\n\n' +
         'Tocá 📖 Guía arriba para ver TODO con ejemplos. ¿Arrancamos?'
 };
 
@@ -46,18 +48,22 @@ const LOAD_STEPS = [
     { emoji: '📷', title: 'Foto (si querés)', text: 'Subí una o varias fotos de la prenda. O seguí sin foto, no pasa nada.' },
     { emoji: '✏️', title: 'Nombre', text: 'Escribí cómo se llama la prenda. Ej: "Vestido Lino Blanco".' },
     { emoji: '🎨', title: 'Color y talle', text: 'Tocá los colores y talles que tenga. Podés elegir varios.' },
-    { emoji: '🔢', title: 'Stock', text: 'Tocá cuántas unidades tenés (1, 2, 3, 5, 10… o escribí otra).' },
+    { emoji: '🔢', title: 'Stock', text: 'Cuántas tenés de cada talle y color (o el total si es uno solo).' },
+    { emoji: '🧵', title: 'Tela, cuidados y medidas', text: 'Opcional: la composición, cómo se lava (botones con íconos) y las medidas por talle en cm. Todo se ve en la ficha.' },
     { emoji: '💵', title: 'Precio', text: '"Tengo el precio" o "Calcular del costo". Si das el costo, te dice a cuánto venderlo ganando.' },
-    { emoji: '✅', title: 'Listo', text: 'Te muestra todo para revisar. Tocás "Publicar" y ya está en la tienda.' },
+    { emoji: '✅', title: 'Revisá y publicá', text: 'Te muestra todo, arma las viñetas de "Detalles" solas y te avisa qué le falta (foto, costo, descripción). Si falta algo grave, mejor borrador.' },
 ];
 
 const COMMAND_GUIDE = [
     {
-        icon: '💰', title: 'Saber a cuánto vender', color: 'precio',
-        sub: 'Le decís lo que te costó y cuánto querés ganar.',
+        icon: '💰', title: 'Precios y costos', color: 'precio',
+        sub: 'Le decís lo que te costó; ella calcula el precio con tu margen y la comisión de MP. Anda sin llave de IA.',
         items: [
-            'Me costó $8000 y quiero ganar 50%, ¿a cuánto lo vendo?',
-            '¿A cuánto vendo algo que me salió $12000 con 60% de ganancia?',
+            'Me costó 24000',
+            'El sweater lanilla me costó 20000 más 500 de flete y 300 de embalaje',
+            'Ponele 48000 al sweater lanilla',
+            '¿Cuánto es el sweater lanilla en efectivo?',
+            'Poné el margen en 100%',
         ],
     },
     {
@@ -73,19 +79,24 @@ const COMMAND_GUIDE = [
     },
     {
         icon: '🛒', title: 'Anotar una venta de afuera', color: 'venta',
-        sub: 'Vendiste por WhatsApp, Insta o en persona. Se lo decís y descuenta el stock.',
+        sub: 'Vendiste por WhatsApp, Insta o en persona. Se lo decís y descuenta el stock. Antes de confirmar te dice cuánto te queda. Anda sin llave de IA.',
         items: [
-            'Vendí 2 Vestidos Rojos talle M a $50000 en persona',
-            'Se vendió 1 Cartera Negra por Instagram a $30000',
+            'Vendí el jean oxford por whatsapp',
+            'Vendí 2 tops rib a 14800 en el local',
+            'Vendí el sweater lanilla en efectivo',
+            'Vendí el sweater con 10% de descuento en efectivo',
             'Anulá la venta MAN-123456 (fue un error)',
         ],
     },
     {
-        icon: '📦', title: 'Reponer stock', color: 'stock',
-        sub: 'Te llegó mercadería nueva.',
+        icon: '📦', title: 'Stock y ficha', color: 'stock',
+        sub: 'Te llegó mercadería, o querés completar una prenda ya cargada. Anda sin llave de IA.',
         items: [
-            'Me llegaron 10 Vestidos Aurora, sumalos al stock',
-            'Restá 3 al stock del Blazer talle S beige',
+            'Llegaron 10 sweater lanilla',
+            'Me llegaron 3 jean oxford 40 azul',
+            'El vestido lino talle M mide 92 de busto y 88 de largo',
+            'Ocultá el gamulán',
+            'Deshacer',
         ],
     },
     {
@@ -100,10 +111,11 @@ const COMMAND_GUIDE = [
     },
     {
         icon: '💸', title: 'Plata: gastos y ganancia', color: 'plata',
-        sub: 'Anotás lo que gastás y te dice cuánto ganaste de verdad.',
+        sub: 'Anotás lo que gastás (se resta en Ventas y en el Inicio) y te dice cuánto ganaste de verdad. Anda sin llave de IA.',
         items: [
-            'Gasté $80000 en tela',
-            'Registrá un gasto de $20000 en publicidad',
+            'Gasté 20000 en publicidad',
+            'Pagué 8000 de bolsas ayer',
+            '¿Cuánto gasté este mes?',
             '¿Cuánto vendí hoy?',
             '¿Cuánto me quedó limpio este mes?',
         ],
@@ -207,9 +219,10 @@ const actionLabel = (a) => {
         case 'delete_expense': return `ELIMINAR gasto ${A.expenseId}`;
         case 'set_sale': return Number(A.percent) > 0 ? `Poner ${A.productId} en oferta −${A.percent}%` : `Quitar oferta de ${A.productId}`;
         case 'edit_product': {
-            const K = { price: 'precio', cost: 'costo', shippingCost: 'flete', packagingCost: 'embalaje', name: 'nombre', category: 'categoría', colors: 'colores', sizes: 'talles', description: 'descripción', stock: 'stock' };
+            const K = { price: 'precio', cost: 'costo', shippingCost: 'flete', packagingCost: 'embalaje', name: 'nombre', category: 'categoría', colors: 'colores', sizes: 'talles', description: 'descripción', stock: 'stock', material: 'tela', care: 'cuidados', details: 'detalles', measurements: 'medidas' };
             const plata = (k) => ['price', 'cost', 'shippingCost', 'packagingCost'].includes(k);
-            return `Editar "${A.nombre || A.productId}": ${Object.entries(A.fields || {}).map(([k, v]) => `${K[k] || k} ${plata(k) ? '$' + Number(v).toLocaleString('es-AR') : (Array.isArray(v) ? v.join('/') : v)}`).join(', ') || '(sin cambios)'}`;
+            const ver = (k, v) => plata(k) ? '$' + Number(v).toLocaleString('es-AR') : k === 'measurements' ? Object.entries(v || {}).map(([s, m]) => `${s}: ${Object.entries(m || {}).map(([kk, n]) => `${kk} ${n}`).join(' ')}`).join('; ') : Array.isArray(v) ? v.join('/') : String(v);
+            return `Editar "${A.nombre || A.productId}": ${Object.entries(A.fields || {}).map(([k, v]) => `${K[k] || k} ${ver(k, v)}`).join(', ') || '(sin cambios)'}`;
         }
         case 'schedule_promotion': return `Oferta −${A.discount}% ${A.category && !['all', 'todo', 'todos'].includes(String(A.category).toLowerCase()) ? `en ${A.category}` : 'toda la tienda'} · ${A.when || 'ahora'}`;
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
@@ -595,6 +608,19 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 if (f.shippingCost != null) patch.shippingCost = Math.max(0, Number(f.shippingCost) || 0);
                 if (f.packagingCost != null) patch.packagingCost = Math.max(0, Number(f.packagingCost) || 0);
                 if (f.category != null) patch.category = String(f.category);
+                if (f.material != null) patch.material = String(f.material).trim();
+                if (f.care != null) patch.care = normalizarCuidados(f.care);
+                if (f.details != null) patch.details = Array.isArray(f.details) ? f.details.map(d => String(d || '').trim()).filter(Boolean).join('\n') : String(f.details).trim();
+                if (f.measurements && typeof f.measurements === 'object') {
+                    // Se mezclan con las que ya tiene: cargar el talle M no borra el S.
+                    const m = { ...(p.measurements && typeof p.measurements === 'object' ? p.measurements : {}) };
+                    for (const [s, v] of Object.entries(f.measurements)) {
+                        const fila = { ...(m[String(s).trim()] || {}) };
+                        for (const [k] of MEDIDAS) if (Number(v?.[k]) > 0) fila[k] = Number(v[k]);
+                        if (Object.keys(fila).length) m[String(s).trim()] = fila;
+                    }
+                    patch.measurements = A.reemplazar ? f.measurements : m;
+                }
                 if (f.colors != null) patch.colors = toArr(f.colors);
                 if (f.sizes != null) patch.sizes = toArr(f.sizes);
                 if (f.description != null) patch.description = String(f.description);
@@ -815,11 +841,36 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     badges: { isNew: true },
                     active: visible,
                 };
+                // Stock por talle y color (misma forma que el paso a paso: { "talle::color": n }).
+                const vars = Array.isArray(A.variants) ? A.variants.filter(v => v && (v.size || v.color)) : [];
+                if (vars.length) {
+                    product.variants = Object.fromEntries(vars.map(v => [`${String(v.size || '').trim()}::${String(v.color || '').trim()}`, Math.max(0, Number(v.stock) || 0)]));
+                    product.stock = vars.reduce((a, v) => a + (Math.max(0, Number(v.stock) || 0)), 0);
+                    if (!product.sizes.length) product.sizes = [...new Set(vars.map(v => String(v.size || '').trim()).filter(Boolean))];
+                    if (!product.colors.length) product.colors = [...new Set(vars.map(v => String(v.color || '').trim()).filter(Boolean))];
+                }
+                // La ficha completa: tela, cuidados, medidas, detalles (o plantilla), video.
+                if (A.material) product.material = String(A.material).trim();
+                const care = normalizarCuidados(A.care || []);
+                if (care.length) product.care = care;
+                if (A.measurements && typeof A.measurements === 'object') {
+                    const m = {};
+                    for (const [s, v] of Object.entries(A.measurements)) { const fila = Object.fromEntries(MEDIDAS.filter(([k]) => Number(v?.[k]) > 0).map(([k]) => [k, Number(v[k])])); if (Object.keys(fila).length) m[String(s).trim()] = fila; }
+                    if (Object.keys(m).length) product.measurements = m;
+                }
+                const det = Array.isArray(A.details) ? A.details.map(d => String(d || '').trim()).filter(Boolean).join('\n') : String(A.details || '').trim();
+                product.details = det || detallesPorPlantilla(product);
+                if (A.videoUrl && /^https?:\/\//.test(String(A.videoUrl))) product.media.push({ type: 'video', url: String(A.videoUrl).trim() });
+                const pct = Math.min(90, Math.max(0, Number(A.launchSalePercent) || 0));
+                if (pct > 0 && product.price > 0) { product.compareAtPrice = product.price; product.price = Math.round(product.price * (1 - pct / 100)); product.badges.isOnSale = true; }
+                if (A.featured) product.badges.isFeatured = true;
+                const avisos = revisarFicha(product).filter(a => a.nivel !== 'bajo');
                 const id = await addProduct(product);
                 // Quitar de las fotos pendientes las que se acaban de usar (flujo guiado)
                 if (imgs.length) pendingPhotosRef.current = pendingPhotosRef.current.filter(p => !imgs.includes(p.url));
                 const galeria = imgs.length > 1 ? ` con ${imgs.length} fotos` : '';
-                return id ? `Producto "${product.name}"${galeria} ${visible ? 'PUBLICADO' : 'guardado como borrador'} (id ${id})${sugerido ? ` a $${sugerido.precio.toLocaleString('es-AR')} (calculado desde el costo con tu margen del ${sugerido.margen}%)` : ''}.` : 'No se pudo crear (revisá Cloudinary/permisos).';
+                const faltan = avisos.length ? ` Le falta: ${avisos.map(a => a.texto.replace(/[.:].*$/, '').toLowerCase()).join(', ')}.` : '';
+                return id ? `Producto "${product.name}"${galeria} ${visible ? 'PUBLICADO' : 'guardado como borrador'} (id ${id})${sugerido ? ` a $${sugerido.precio.toLocaleString('es-AR')} (calculado desde el costo con tu margen del ${sugerido.margen}%)` : ''}${vars.length ? ` · stock por talle/color: ${vars.map(v => `${[v.size, v.color].filter(Boolean).join(' ')} ${Number(v.stock) || 0}`).join(', ')}` : ''}${pct ? ` · oferta de lanzamiento −${pct}%` : ''}.${faltan}` : 'No se pudo crear (revisá Cloudinary/permisos).';
             }
             case 'set_price': {
                 const p = findProduct(A.productId); if (!p) return 'No encontré el producto.';
@@ -1232,6 +1283,16 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 setInput(''); push({ role: 'user', text });
                 push({ role: 'ai', text: 'Dale. Te abro el paso a paso: foto, nombre, categoría, colores y talles, stock, costo → precio. Si preferís hacerlo por chat, mandame la foto con el clip y decime "me costó X".' });
                 setWizardOpen(true);
+                return;
+            }
+            const med = interpretarMedidas(text, inventory);
+            if (med) {
+                if (!med.productos.length) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: `¿De qué prenda son esas medidas? Decímelo con el nombre como figura en Inventario: "el vestido lino talle M mide 92 de busto".` }); return; }
+                if (med.productos.length > 1) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: '¿Cuál de estos?' + describirRepetidos(med.productos), options: opcionesDeProducto(text, med.nombre, med.productos) }); return; }
+                if (!med.talle) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: `¿De qué talle? Decímelo así: "${med.productos[0].name} talle M mide ${Object.entries(med.medidas).map(([k, v]) => `${v} de ${k}`).join(' y ')}".` }); return; }
+                const p = med.productos[0];
+                setInput('');
+                await accionDirecta(text, { tipo: 'medidas', producto: p, accion: { tool: 'edit_product', args: { productId: p.id, nombre: p.name, fields: { measurements: { [med.talle]: med.medidas } } } } });
                 return;
             }
             const gastosResp = responderGastos(text, expenses);

@@ -99,7 +99,7 @@ const AppContent = () => {
       <ScrollToTop />
       <NavbarWrapper onOpenCart={() => setIsCartOpen(true)} />
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-      {isSizeGuideOpen && <SizeGuideModal onClose={() => setIsSizeGuideOpen(false)} />}
+      {isSizeGuideOpen && <SizeGuideModal producto={typeof isSizeGuideOpen === 'object' ? isSizeGuideOpen : null} onClose={() => setIsSizeGuideOpen(false)} />}
       <ToastContainer />
       <ScrollProgress />
       <UpdatePrompt />

@@ -204,7 +204,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                         <div>
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest">Talle: <span className="text-slate-500 font-normal">{selectedSize || 'Elegir'}</span></span>
-                                <button onClick={() => setIsSizeGuideOpen(true)} className="text-xs text-[#E8C65E] hover:underline flex items-center gap-1"><Ruler className="w-3 h-3" /> Tabla de Talles</button>
+                                <button onClick={() => setIsSizeGuideOpen(product)} className="text-xs text-[#E8C65E] hover:underline flex items-center gap-1"><Ruler className="w-3 h-3" /> Tabla de Talles</button>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {product.sizes && product.sizes.map(size => {

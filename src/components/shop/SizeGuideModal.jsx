@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Ruler } from 'lucide-react';
+import { tablaDeMedidas } from '../../utils/ficha';
+import { tituloDeProducto } from '../../utils/nombres';
 
 const TOPS = [
     ['S', '85 - 90', '50'],
@@ -14,8 +16,11 @@ const BOTTOMS = [
     ['42 (XL)', '72 - 76', '100 - 104'],
 ];
 
-export const SizeGuideModal = ({ onClose }) => {
-    const [tab, setTab] = useState('tops');
+// `producto`: si viene y tiene medidas cargadas, se muestran primero las de ESA
+// prenda (columnas según lo que cargó el dueño) y la tabla general queda abajo.
+export const SizeGuideModal = ({ onClose, producto = null }) => {
+    const propias = tablaDeMedidas(producto);
+    const [tab, setTab] = useState(propias ? 'propias' : 'tops');
     const isTops = tab === 'tops';
     const rows = isTops ? TOPS : BOTTOMS;
 
@@ -60,7 +65,7 @@ export const SizeGuideModal = ({ onClose }) => {
 
                     {/* Tabs */}
                     <div className="flex">
-                        {[['tops', 'Partes de arriba'], ['bottoms', 'Partes de abajo']].map(([key, label]) => (
+                        {[...(propias ? [['propias', 'Esta prenda']] : []), ['tops', 'Partes de arriba'], ['bottoms', 'Partes de abajo']].map(([key, label]) => (
                             <button
                                 key={key}
                                 onClick={() => setTab(key)}
@@ -74,6 +79,33 @@ export const SizeGuideModal = ({ onClose }) => {
 
                     {/* Content */}
                     <div className="p-7">
+                        {tab === 'propias' && propias ? (
+                            <>
+                                <p className="text-xs text-slate-400 mb-3">Medidas de <span className="text-white font-semibold">{tituloDeProducto(producto.name)}</span>, en centímetros, tomadas sobre la prenda.</p>
+                                <div className="overflow-x-auto rounded-xl border border-white/10">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-white/[0.03] text-[#E8C65E]/80 uppercase text-[10px] tracking-[0.15em]">
+                                            <tr>
+                                                <th className="p-3 pl-5 font-bold">Talle</th>
+                                                {propias.columnas.map(([k, l]) => <th key={k} className="p-3 font-bold">{l} (cm)</th>)}
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-slate-300">
+                                            {propias.filas.map(([s, v], i) => (
+                                                <tr key={s} className={i % 2 ? 'bg-white/[0.02]' : ''}>
+                                                    <td className="p-3 pl-5 font-bold text-white">{s}</td>
+                                                    {propias.columnas.map(([k]) => <td key={k} className="p-3">{v[k] ?? '—'}</td>)}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="mt-5 rounded-xl border border-[#E8C65E]/20 bg-[#E8C65E]/[0.06] p-4 text-xs text-slate-300 leading-relaxed">
+                                    <strong className="text-[#E8C65E]">Cómo comparar:</strong> medí una prenda tuya parecida, apoyada y estirada, y compará con la tabla. Si estás entre dos talles, elegí el más grande.
+                                </div>
+                            </>
+                        ) : (
+                        <>
                         <div className="overflow-hidden rounded-xl border border-white/10">
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-white/[0.03] text-[#E8C65E]/80 uppercase text-[10px] tracking-[0.15em]">
@@ -104,6 +136,8 @@ export const SizeGuideModal = ({ onClose }) => {
                                 Si estás entre dos talles, elegí el más grande para mayor comodidad.
                             </span>
                         </div>
+                        </>
+                        )}
                     </div>
                 </div>
             </div>

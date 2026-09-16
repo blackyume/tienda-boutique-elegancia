@@ -12,6 +12,7 @@ import { generateProductCopy, hasAdminAI } from '../../utils/ai';
 import { getTotalStock } from '../../utils/variants';
 import { comisionDeProducto, configPrecios, margenPara, redondear } from '../../utils/comision';
 import { getColorHex } from '../../utils/colors';
+import { CUIDADOS, MEDIDAS, normalizarCuidados, detallesPorPlantilla } from '../../utils/ficha';
 
 const TABS = [
     { id: 'info', label: 'Producto' },
@@ -162,6 +163,8 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
             packagingCost: Number(currentProduct.packagingCost || 0),
             feePercent: Number(currentProduct.feePercent || 0),
             fixedFee: Number(currentProduct.fixedFee || 0),
+            // Sin viñetas escritas, se arman con los datos reales (tela, colores, talles, cuidados).
+            details: String(currentProduct.details || '').trim() || detallesPorPlantilla(currentProduct),
             active: currentProduct.active !== undefined ? currentProduct.active : true
         };
 
@@ -410,6 +413,55 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
                                             className="input text-sm mt-1"
                                             placeholder="Ej: Algodón 95%, Elastano 5%"
                                         />
+
+                                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-3 block">Detalles del producto <span className="text-slate-400 normal-case font-normal">(una viñeta por línea; vacío = se arman solas con tela, colores, talles y cuidados)</span></label>
+                                        <textarea
+                                            value={currentProduct.details || ''}
+                                            onChange={e => setCurrentProduct({ ...currentProduct, details: e.target.value })}
+                                            className="input min-h-[70px] text-sm resize-none mt-1"
+                                            placeholder={detallesPorPlantilla(currentProduct) || 'Ej: Corte recto\nLargo a la rodilla\nIdeal para el día'}
+                                        />
+
+                                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-3 block">Cuidados</label>
+                                        <div className="flex flex-wrap gap-1.5 mt-1">
+                                            {CUIDADOS.map(c => {
+                                                const activos = normalizarCuidados(currentProduct.care || []);
+                                                const on = activos.includes(c.id);
+                                                return (
+                                                    <button key={c.id} type="button" onClick={() => setCurrentProduct({ ...currentProduct, care: on ? activos.filter(x => x !== c.id) : [...activos, c.id] })}
+                                                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-colors ${on ? 'border-[#E8C65E] bg-[#E8C65E]/15 text-slate-900 dark:text-white' : 'border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-[#E8C65E]/60'}`}>
+                                                        {c.icono} {c.label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {(currentProduct.sizes || []).length > 0 && (
+                                            <>
+                                                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-3 block">Medidas por talle <span className="text-slate-400 normal-case font-normal">(cm, las que tengas; salen en “Guía de talles” de esta prenda)</span></label>
+                                                <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700 mt-1">
+                                                    <table className="w-full text-xs">
+                                                        <thead className="bg-slate-50 dark:bg-slate-900 text-[10px] uppercase tracking-wider text-slate-500">
+                                                            <tr><th className="p-2 text-left">Talle</th>{MEDIDAS.map(([k, l]) => <th key={k} className="p-2 text-center">{l}</th>)}</tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {(currentProduct.sizes || []).map(s => (
+                                                                <tr key={s} className="border-t border-slate-100 dark:border-slate-800">
+                                                                    <td className="p-2 font-bold text-slate-800 dark:text-white">{s}</td>
+                                                                    {MEDIDAS.map(([k]) => (
+                                                                        <td key={k} className="p-1">
+                                                                            <input type="number" min="0" inputMode="numeric" value={currentProduct.measurements?.[s]?.[k] ?? ''} placeholder="—"
+                                                                                onChange={e => { const v = e.target.value; setCurrentProduct(p => { const m = { ...(p.measurements || {}) }; const fila = { ...(m[s] || {}) }; if (v === '' || Number(v) <= 0) delete fila[k]; else fila[k] = Number(v); if (Object.keys(fila).length) m[s] = fila; else delete m[s]; return { ...p, measurements: m }; }); }}
+                                                                                className="w-14 px-1.5 py-1 rounded bg-white dark:bg-[#121212] border border-slate-200 dark:border-slate-700 text-center text-slate-900 dark:text-white outline-none focus:border-[#E8C65E]" />
+                                                                        </td>
+                                                                    ))}
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <InputGroup label="Categoría">

@@ -236,8 +236,8 @@ export const accionInversa = (accion, producto, resultado) => {
         case 'adjust_stock': return { tool: 'adjust_stock', args: { productId: producto.id, delta: -Number(A.delta || 0), size: A.size, color: A.color }, resumen: `Restar de nuevo ${A.delta} a "${producto.name}"` };
         case 'edit_product': {
             const fields = {};
-            for (const k of Object.keys(A.fields || {})) fields[k] = producto[k] ?? 0;
-            return { tool: 'edit_product', args: { productId: producto.id, nombre: producto.name, fields }, resumen: `Volver el costo de "${producto.name}" a como estaba` };
+            for (const k of Object.keys(A.fields || {})) fields[k] = k === 'measurements' ? (producto.measurements || {}) : (producto[k] ?? 0);
+            return { tool: 'edit_product', args: { productId: producto.id, nombre: producto.name, fields, reemplazar: true }, resumen: `Volver "${producto.name}" a como estaba` };
         }
         case 'record_sale': {
             const id = (String(resultado || '').match(/\b(MAN-\d+|ORD-\w+)\b/) || [])[1];
