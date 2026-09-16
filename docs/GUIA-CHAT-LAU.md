@@ -41,9 +41,9 @@ Listo, no se toca más.
 ## Cargar un producto
 
 1. Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto).
-   Arriba del cuadro de texto hay un botón dorado **"Cargar producto (paso a
-   paso)"**: hace lo mismo pero te lleva de la mano pregunta por pregunta.
-   Usá el que te resulte cómodo.
+   Arriba a la derecha, al lado de Guía, está **"Cargar producto"**: hace lo
+   mismo pero te lleva de la mano pregunta por pregunta (y anda sin llave de
+   IA). Usá el que te resulte cómodo.
 
    Con el mismo clip podés adjuntar un **Excel**: la plantilla de productos
    (con las fotos en el mismo mensaje) o tu planilla de ventas por fuera. Lau
@@ -91,6 +91,15 @@ una decisión, no una falla.
 - `llegaron 10 sweater lanilla` / `me llegaron 3 jean oxford 40 azul` → suma stock.
 - `ponele 48000 al sweater lanilla` / `el jean chupín a 45.000` → cambia el precio.
 - `ocultá el gamulán` / `mostrá la cartera` → visibilidad en la tienda.
+- `vendí el sweater en efectivo` / `…por transferencia` → te ofrece precio de
+  lista o precio efectivo (sin la comisión de MP) con botones.
+- `vendí el sweater con 10% de descuento en efectivo` / `2 tops rib 15% off`
+  → calcula el descuento sobre la lista (o sobre el precio que digas).
+- `¿cuánto es el sweater en efectivo?` → sólo contesta, no anota.
+- `el sweater lanilla me costó 20000 más 500 de flete y 300 de embalaje` →
+  guarda el costo en ese producto y propone el precio con un botón.
+- Antes de confirmar una venta por fuera te dice cuánto te queda limpio y te
+  avisa con ⚠ si quedás abajo del costo.
 - `deshacer` (o el botón después de cada acción) → revierte lo último.
 - Micrófono al lado del clip: dictás y queda escrito.
 

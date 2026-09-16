@@ -253,12 +253,27 @@ export const responderPrecio = (texto, { cotizar, categorias = [] } = {}) => {
     return cotizar(costo, cat);
 };
 
-export const responderDirecto = (texto, { inventario = [], pedidos = [], umbral = 5, ahora = new Date(), cotizar, categorias = [] } = {}) => {
+const EFECTIVO = /\b(en efectivo|efectivo|contado|por transferencia|transferencia|sin mp|sin mercado ?pago|sin comision)\b/;
+const responderEfectivo = (t, { inventario = [], efectivo } = {}) => {
+    if (typeof efectivo !== 'function' || !EFECTIVO.test(t) || ACCION.test(t) || VENTA.test(t) || /\d{3}/.test(t)) return null;
+    const termino = t.replace(EFECTIVO, ' ').split(' ').filter((w) => w && !RELLENO.has(w) && !/^(precio|precios|cuanto|cuánto|vale|sale|cuesta|es|esta|cobro|cobrar|le|del|al|de|el|la|en|un|una|por|si|para|dejar|dejo|puedo)$/.test(w)).join(' ').trim();
+    if (!termino) return null;
+    const encontrados = buscarProductos(inventario, termino);
+    if (encontrados.length === 1) return efectivo(encontrados[0]);
+    if (encontrados.length > 1 && encontrados.length <= 8) return encontrados.map(efectivo).join('\n');
+    return null;
+};
+
+export const responderDirecto = (texto, { inventario = [], pedidos = [], umbral = 5, ahora = new Date(), cotizar, categorias = [], efectivo } = {}) => {
     const t = limpiar(texto);
     if (!t || t.length > 140) return null;
 
     const precio = responderPrecio(texto, { cotizar, categorias });
     if (precio) return precio;
+
+    // "¿cuánto es el jean en efectivo?", "precio efectivo del sweater", "el top sin MP".
+    const enEfectivo = responderEfectivo(t, { inventario, efectivo });
+    if (enEfectivo) return enEfectivo;
 
     // Ventas: "¿cuánto vendí hoy?", "qué se vendió ayer", "últimas ventas".
     // Con números ("vendí 2 jeans") o con envíos ("qué tengo que enviar") va a la IA.

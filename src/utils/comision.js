@@ -28,6 +28,31 @@ export const costoUnitario = (p) =>
     (Number(p?.cost) || 0) + (Number(p?.shippingCost) || 0) + (Number(p?.packagingCost) || 0) + (Number(p?.fixedFee) || 0);
 
 /**
+ * Precio "en efectivo": el de lista sin la parte que se lleva MP. Una venta por
+ * fuera (local, transferencia) no paga comisión, así que a este precio la
+ * ganancia es la misma que vendiendo por la web. Redondeado a 100 para arriba.
+ */
+export const precioEfectivo = (precio, comision) => {
+    const p = Number(precio) || 0;
+    if (!(p > 0)) return 0;
+    return Math.ceil((p * (1 - (Number(comision) || 0) / 100)) / 100) * 100;
+};
+
+/**
+ * Qué deja una venta por fuera (sin comisión) cobrando `total` por `cantidad`
+ * unidades: ganancia por unidad, total y % sobre el costo. null si el producto
+ * no tiene costo cargado.
+ */
+export const gananciaPorFuera = (producto, total, cantidad = 1) => {
+    const costo = costoUnitario(producto);
+    const q = Math.max(1, Number(cantidad) || 1);
+    if (!(costo > 0) || !(Number(total) > 0)) return null;
+    const unit = Number(total) / q;
+    const neto = unit - costo;
+    return { costo, unit: Math.round(unit), neto: Math.round(neto), total: Math.round(neto * q), margen: Math.round((neto / costo) * 100), bajoCosto: unit < costo };
+};
+
+/**
  * Precio de venta para ganar `margen` % SOBRE el costo, limpio después de la
  * comisión de MP. Redondeado al múltiplo de 100 hacia arriba.
  *   precio = costo × (1 + margen/100) / (1 − comisión/100)

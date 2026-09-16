@@ -7,10 +7,10 @@ import { isSensitive, buildSnapshot, buildAgentMessages, parsePlan } from '../..
 import { generateShippingLabel } from '../../utils/shippingLabel';
 import { getTotalStock, getVariantStock } from '../../utils/variants';
 import { celdasDesdeExcel, leerVentasDeCeldas, planearVentas, notaDesdeNombre, interpretarMensajeDePlanilla, resumirPlanDeVentas, renombrarClientas } from '../../utils/importarVentas';
-import { planearImportacion, filasDesdeExcel } from '../../utils/importarInventario';
+import { planearImportacion, filasDesdeExcel, normalizarTexto } from '../../utils/importarInventario';
 import { aplicarPlanDeProductos, resumirPlanDeProductos } from '../../utils/aplicarImportacion';
 import { responderDirecto, avisoNuevaVenta, avisoCambiosDeStock, fotoDeStock, ventasDesde, nombreCliente } from '../../utils/lauDirecto';
-import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, precioSugerido, explicarPrecio, avisoMargenBajo, fotoDeCostos, interpretarConfigPrecios, aplicarConfigPrecios, describirConfigPrecios } from '../../utils/comision';
+import { comisionMP, comisionDelPedido, COMISION_MP_ESTIMADA, configPrecios, precioSugerido, explicarPrecio, avisoMargenBajo, fotoDeCostos, interpretarConfigPrecios, aplicarConfigPrecios, describirConfigPrecios, precioEfectivo } from '../../utils/comision';
 import { candidatosLiquidacion, configLiquidacion, resumirLiquidacion, esPedidoDeLiquidacion, descuentoPedido } from '../../utils/liquidacion';
 import { captionDeProducto, fotoDeProducto, publicarEnInstagram } from '../../utils/instagram';
 import { interpretarCambioDeFoto, patchDeFotos } from '../../utils/fotos';
@@ -22,7 +22,7 @@ const MAX_STEPS = 5;
 const WELCOME = {
     role: 'ai', text:
         '¡Hola! 👋 Soy Lau, tu copiloto. Manejás toda la tienda hablándome como a una empleada — y yo ejecuto las acciones de verdad (lo importante siempre te lo confirmo antes).\n\n' +
-        'Para cargar un producto, tocá el botón dorado "Cargar producto (paso a paso)" abajo: te lleva con botones por nombre, color, talle, stock y precio, sin vueltas. Para todo lo demás, pedímelo en tus palabras.\n\n' +
+        'Para cargar un producto, tocá "Cargar producto" arriba a la derecha: te lleva con botones por nombre, color, talle, stock y precio, sin vueltas. Para todo lo demás, pedímelo en tus palabras.\n\n' +
         'Preguntame "¿cuánto queda del vestido negro?" o "¿qué se vendió hoy?" y te lo digo al instante. Y mientras me tengas abierta te aviso sola cada venta que entra y cada prenda que se agota.\n\n' +
         'Tocá 📖 Guía arriba para ver TODO con ejemplos. ¿Arrancamos?'
 };
@@ -39,7 +39,7 @@ const CAPS = [
 
 // Pasos ilustrados para cargar un producto (el wizard). Bien simple y visual.
 const LOAD_STEPS = [
-    { emoji: '🟡', title: 'Tocá el botón dorado', text: 'Abajo de todo dice "Cargar producto (paso a paso)". Tocalo.' },
+    { emoji: '📦', title: 'Tocá "Cargar producto"', text: 'Está arriba a la derecha, al lado de Guía. Tocalo.' },
     { emoji: '📷', title: 'Foto (si querés)', text: 'Subí una o varias fotos de la prenda. O seguí sin foto, no pasa nada.' },
     { emoji: '✏️', title: 'Nombre', text: 'Escribí cómo se llama la prenda. Ej: "Vestido Lino Blanco".' },
     { emoji: '🎨', title: 'Color y talle', text: 'Tocá los colores y talles que tenga. Podés elegir varios.' },
@@ -192,7 +192,9 @@ const actionLabel = (a) => {
             const q = Number(A.quantity) || 1;
             const v = [A.size, A.color].filter(Boolean).join('/');
             const tot = A.amount != null ? Number(A.amount) : (A.unitPrice != null ? Number(A.unitPrice) * q : 0);
-            return `Registrar venta externa: ${q}× ${A.nombre || A.productId}${v ? ` (${v})` : ''}${tot ? ` por $${tot.toLocaleString('es-AR')}` : ''} — descuenta stock`;
+            const desc = A.discountPct ? ` (lista $${(Number(A.listPrice) * q).toLocaleString('es-AR')} −${A.discountPct}%)` : '';
+            const pago = A.payment ? ` · ${A.payment}` : '';
+            return `Registrar venta externa: ${q}× ${A.nombre || A.productId}${v ? ` (${v})` : ''}${tot ? ` por $${tot.toLocaleString('es-AR')}` : ''}${desc}${pago} — descuenta stock`;
         }
         case 'adjust_stock': return `Ajustar stock de ${A.nombre || A.productId}: ${Number(A.delta) > 0 ? '+' : ''}${A.delta}${[A.size, A.color].filter(Boolean).length ? ` (${[A.size, A.color].filter(Boolean).join('/')})` : ''}`;
         case 'cancel_sale': return `ANULAR venta ${A.orderId} (repone el stock)`;
@@ -201,7 +203,11 @@ const actionLabel = (a) => {
         case 'delete_category': return `ELIMINAR categoría "${A.name}"`;
         case 'delete_expense': return `ELIMINAR gasto ${A.expenseId}`;
         case 'set_sale': return Number(A.percent) > 0 ? `Poner ${A.productId} en oferta −${A.percent}%` : `Quitar oferta de ${A.productId}`;
-        case 'edit_product': return `Editar "${A.productId}": ${Object.entries(A.fields || {}).map(([k, v]) => `${k} ${k === 'price' ? '$' + Number(v).toLocaleString('es-AR') : (Array.isArray(v) ? v.join('/') : v)}`).join(', ') || '(sin cambios)'}`;
+        case 'edit_product': {
+            const K = { price: 'precio', cost: 'costo', shippingCost: 'flete', packagingCost: 'embalaje', name: 'nombre', category: 'categoría', colors: 'colores', sizes: 'talles', description: 'descripción', stock: 'stock' };
+            const plata = (k) => ['price', 'cost', 'shippingCost', 'packagingCost'].includes(k);
+            return `Editar "${A.nombre || A.productId}": ${Object.entries(A.fields || {}).map(([k, v]) => `${K[k] || k} ${plata(k) ? '$' + Number(v).toLocaleString('es-AR') : (Array.isArray(v) ? v.join('/') : v)}`).join(', ') || '(sin cambios)'}`;
+        }
         case 'schedule_promotion': return `Oferta −${A.discount}% ${A.category && !['all', 'todo', 'todos'].includes(String(A.category).toLowerCase()) ? `en ${A.category}` : 'toda la tienda'} · ${A.when || 'ahora'}`;
         case 'reject_review': return `ELIMINAR reseña ${A.reviewId}`;
         case 'update_home': return `Editar la home (${Object.keys(A).join(', ')})`;
@@ -458,7 +464,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                     total,
                     manual: true,
                     channel,
-                    paymentMethod: channel,
+                    paymentMethod: A.payment ? String(A.payment) : channel,
+                    ...(A.discountPct ? { discountPct: Number(A.discountPct), listPrice: Number(A.listPrice) || 0 } : {}),
                     stockApplied: true,
                     customer: { nombre: A.customer ? String(A.customer) : 'Venta externa', email: '' },
                     items: [{ id: p.id, name: p.name, price: Math.round(unit), quantity: qty, size, color, category: p.category || '', image: p.image || p.media?.[0]?.url || '', cost: Number(p.cost) || 0 }],
@@ -579,6 +586,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 const patch = {};
                 if (f.name != null) patch.name = String(f.name);
                 if (f.price != null) patch.price = Math.max(0, Number(f.price) || 0);
+                if (f.cost != null) patch.cost = Math.max(0, Number(f.cost) || 0);
+                if (f.shippingCost != null) patch.shippingCost = Math.max(0, Number(f.shippingCost) || 0);
+                if (f.packagingCost != null) patch.packagingCost = Math.max(0, Number(f.packagingCost) || 0);
                 if (f.category != null) patch.category = String(f.category);
                 if (f.colors != null) patch.colors = toArr(f.colors);
                 if (f.sizes != null) patch.sizes = toArr(f.sizes);
@@ -591,7 +601,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 }
                 if (!Object.keys(patch).length) return `No cambié nada${stockNota ? '.' + stockNota : ' (decime qué editar: precio, stock, nombre, colores, talles, categoría o descripción).'}`;
                 await updateProduct(p.id, patch);
-                const resumen = Object.entries(patch).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join('/') : (k === 'price' ? '$' + Number(v).toLocaleString('es-AR') : v)}`).join(', ');
+                const K = { price: 'precio', cost: 'costo', shippingCost: 'flete', packagingCost: 'embalaje', name: 'nombre', category: 'categoría', colors: 'colores', sizes: 'talles', description: 'descripción', stock: 'stock' };
+                const resumen = Object.entries(patch).map(([k, v]) => `${K[k] || k}: ${Array.isArray(v) ? v.join('/') : (['price', 'cost', 'shippingCost', 'packagingCost'].includes(k) ? '$' + Number(v).toLocaleString('es-AR') : v)}`).join(', ');
                 return `"${p.name}" actualizado → ${resumen}.${stockNota}`;
             }
             case 'business_summary': {
@@ -1101,6 +1112,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         if (r.productos && !r.productos.length) { push({ role: 'ai', text: `No encontré ningún producto que se llame "${r.nombre || '…'}". Decímelo como figura en Inventario.` }); return; }
         if (r.productos && r.productos.length > 1) { push({ role: 'ai', text: `¿Cuál de estos?${describirRepetidos(r.productos)}`, options: opcionesDeProducto(text, r.nombre, r.productos) }); return; }
         if (r.sinStock) { push({ role: 'ai', text: r.motivo }); return; }
+        if (r.falta === 'precio') { push({ role: 'ai', text: r.motivo, options: r.opciones }); return; }
         if (r.falta === 'variante') {
             const ops = r.tipo === 'venta' ? r.opciones.filter(v => v.stock > 0) : r.opciones;
             if (!ops.length) { push({ role: 'ai', text: `"${r.producto.name}" no tiene stock en ningún talle/color. Si llegó mercadería, decime "llegaron N ${r.producto.name}".` }); return; }
@@ -1108,6 +1120,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             push({ role: 'ai', text: `${r.motivo ? r.motivo + ' ' : ''}¿Qué talle y color?${hay}`, options: opcionesDeVariante(text, ops) });
             return;
         }
+        if (r.nota) push({ role: 'ai', text: r.nota });
         const ok = await askConfirm([r.accion]);
         if (!ok) { push({ role: 'system', text: 'Cancelado por vos. No cambié nada.' }); return; }
         setLoading(true);
@@ -1117,6 +1130,22 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             const inversa = accionInversa(r.accion, r.producto, out);
             deshacerRef.current = inversa;
             push({ role: 'ai', text: String(out).startsWith('✅') ? out : `✅ ${out}`, options: inversa ? ['Deshacer'] : undefined });
+            if (r.tipo === 'costo') {
+                // Con el costo cargado, el precio sale solo: lo propone y un botón lo aplica.
+                const f = r.accion.args.fields || {};
+                const sug = precioSugerido(f.cost, { categoria: r.producto.category, siteConfig, paymentConfig, flete: f.shippingCost ?? r.producto.shippingCost, packaging: f.packagingCost ?? r.producto.packagingCost });
+                if (sug) {
+                    const ef = precioEfectivo(sug.precio, sug.comision);
+                    const repetido = inventory.filter(p => normalizarTexto(p.name) === normalizarTexto(r.producto.name)).length > 1;
+                    const ref = repetido ? ` #${String(r.producto.id).slice(0, 6)}` : '';
+                    const actual = Number(r.producto.price) || 0;
+                    push({
+                        role: 'ai',
+                        text: `${explicarPrecio(sug)}\nEn efectivo o transferencia (sin la comisión de MP) lo podés dejar a $${ef.toLocaleString('es-AR')} y ganás lo mismo.${actual ? `\nHoy está a $${actual.toLocaleString('es-AR')}.` : ''} ¿Le pongo el precio sugerido?`,
+                        options: actual === sug.precio ? undefined : [`ponele ${sug.precio} al ${r.producto.name}${ref}`],
+                    });
+                }
+            }
             logAiAction?.('copilot', text, 'ok');
         } catch (e) {
             push({ role: 'system', text: `Error: ${e?.message || e}` });
@@ -1171,10 +1200,14 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             // "poné el margen en 110%", "packaging 800", "liquidación a los 60 días con 25%".
             if (cambios) { setInput(''); await configurarPrecios(text, cambios); return; }
             const cotizar = (costo, cat) => explicarPrecio(precioSugerido(costo, { categoria: cat, siteConfig, paymentConfig }));
-            const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name) });
+            const comision = comisionMP(paymentConfig);
+            const accion = interpretarAccion(text, inventory, { comision });
+            // "el sweater me costó 20000": guarda el costo de ESE producto (antes que la cotización suelta).
+            if (accion?.tipo === 'costo') { setInput(''); await accionDirecta(text, accion); return; }
+            const efectivo = (p) => { const ef = precioEfectivo(p.price, comision); return `"${p.name}" está a $${Number(p.price || 0).toLocaleString('es-AR')} en la tienda. En efectivo o transferencia no pagás la comisión de MP (${comision}%): podés cobrarlo $${ef.toLocaleString('es-AR')} y ganás lo mismo. Más abajo de eso, ya sale de tu ganancia.`; };
+            const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name), efectivo });
             if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }
             if (/^deshacer$/i.test(text)) { setInput(''); await deshacer(); return; }
-            const accion = interpretarAccion(text, inventory);
             if (accion) { setInput(''); await accionDirecta(text, accion); return; }
         }
         if (text && files.length) {
@@ -1299,6 +1332,9 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
+                        <button onClick={() => setWizardOpen(true)} disabled={loading} title="Cargar un producto paso a paso (sin IA)" className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[#E8C65E] hover:bg-[#E8C65E]/10 transition-colors text-xs font-bold uppercase tracking-wider disabled:opacity-40">
+                            <PackagePlus className="w-4 h-4" /> <span className="hidden sm:inline">Cargar producto</span>
+                        </button>
                         <button onClick={() => setShowGuide(true)} title="Guía de comandos" className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[#E8C65E] hover:bg-[#E8C65E]/10 transition-colors text-xs font-bold uppercase tracking-wider">
                             <BookOpen className="w-4 h-4" /> <span className="hidden sm:inline">Guía</span>
                         </button>
@@ -1382,7 +1418,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
                             <div className="rounded-2xl p-4 bg-[#E8C65E]/[0.06] border border-[#E8C65E]/20">
                                 <p className="text-white/70 text-sm leading-relaxed">
-                                    💡 <span className="text-white font-semibold">Acordate:</span> para <span className="text-white">cargar</span> una prenda usá el botón dorado de abajo. Para <span className="text-white">todo lo demás</span> (precios, ventas, ofertas, resúmenes), escribile o tocá un ejemplo de acá arriba.
+                                    💡 <span className="text-white font-semibold">Acordate:</span> para <span className="text-white">cargar</span> una prenda usá "Cargar producto", arriba a la derecha. Para <span className="text-white">todo lo demás</span> (precios, ventas, ofertas, resúmenes), escribile o tocá un ejemplo de acá arriba.
                                 </p>
                             </div>
                         </div>
@@ -1518,12 +1554,6 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                             {previews.length > 1 && <span className="self-end text-[10px] text-white/40 pb-1">{previews.length} fotos</span>}
                         </div>
                     )}
-                    <button
-                        onClick={() => setWizardOpen(true)}
-                        className="w-full mb-2.5 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-[#11100D] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] hover:brightness-110 transition shadow-[0_0_18px_rgba(232,198,94,0.35)]"
-                    >
-                        <PackagePlus className="w-4 h-4" /> Cargar producto (paso a paso)
-                    </button>
                     <div className="flex items-end gap-1 bg-white/[0.06] border border-white/15 rounded-2xl pl-1.5 pr-1.5 py-1.5 transition-colors focus-within:border-[#E8C65E]/60 focus-within:bg-white/[0.08]">
                         <input ref={fileRef} type="file" accept="image/*,.xlsx" multiple className="hidden" onChange={onPick} />
                         <button onClick={() => fileRef.current?.click()} disabled={loading} className="p-2.5 rounded-xl text-white/40 hover:text-[#E8C65E] hover:bg-white/5 disabled:opacity-40 transition-colors shrink-0" title="Adjuntar fotos o una planilla de ventas (.xlsx)"><Paperclip className="w-5 h-5" /></button>

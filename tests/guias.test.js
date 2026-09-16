@@ -13,7 +13,7 @@ const render = (g) => renderToStaticMarkup(React.createElement(g.Contenido, { ab
 
 describe('guías del panel', () => {
     it('hay diez y los ids no se repiten', () => {
-        expect(GUIAS.length).toBe(13);
+        expect(GUIAS.length).toBe(14);
         expect(new Set(GUIAS.map(g => g.id)).size).toBe(GUIAS.length);
     });
 

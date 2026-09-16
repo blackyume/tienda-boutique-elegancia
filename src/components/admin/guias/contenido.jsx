@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-key -- las celdas y los items van como datos en arrays; Tabla y Lista les ponen key al renderizar */
 import React from 'react';
-import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket, Receipt, Instagram, LayoutDashboard, Ticket, Palette } from 'lucide-react';
+import { LogIn, FileSpreadsheet, Bot, PackageCheck, Truck, Globe2, KeyRound, Rocket, Receipt, Instagram, LayoutDashboard, Ticket, Palette, Coins } from 'lucide-react';
 import { Seccion, P, K, Cod, Ruta, Pasos, Paso, Lista, Aviso, Tabla, Mensaje, Botones, Figura, Link, Resumen, Numero, Numeros, BienMal, Quien } from './bloques';
 import {
     IlusNombresFotos, IlusExcel, IlusImportar, IlusRetiroCosto,
@@ -13,6 +13,7 @@ import {
     IlusCaminoInstagram, IlusCuentaProfesional, IlusLlaveMeta, IlusPostInstagram,
 } from './ilustracionesMas';
 import { IlusInicio, IlusLauSinIA, IlusOferta, IlusDiseno } from './ilustracionesInicio';
+import { IlusWebVsEfectivo, IlusHastaDondeBajar, IlusVentaEfectivo, IlusCostoPorChat } from './ilustracionesPrecios';
 import { TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../../../utils/envios';
 
 // Las guías del panel. Están escritas para que las siga alguien que nunca
@@ -220,7 +221,7 @@ const Lau = ({ abrir }) => (
                 <IlusLau />
             </Figura>
             <Pasos>
-                <Paso>Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto). Si preferís que te lleve de la mano pregunta por pregunta, arriba del cuadro de texto está el botón dorado <K>Cargar producto (paso a paso)</K>.</Paso>
+                <Paso>Tocá el clip 📎 y elegí la foto (o varias, si son del mismo producto). Si preferís que te lleve de la mano pregunta por pregunta, arriba a la derecha del chat, al lado de Guía, está <K>Cargar producto</K>: te pregunta nombre, color, talle, stock y precio con botones, y anda sin llave de IA.</Paso>
                 <Paso>
                     Escribí lo que sabés. Puede ser desprolijo, Lau lo entiende:
                     <div className="space-y-2 pt-1">
@@ -283,6 +284,8 @@ const Lau = ({ abrir }) => (
                 cabecera={['Decís', 'Hace']}
                 filas={[
                     ['“vendí el jean oxford por whatsapp” · “vendí 2 tops rib a 14.800” · “vendí el short por 30.000 en el local”', 'Anota la venta por fuera: descuenta el stock (te pregunta talle y color con botones), la suma a las ventas y queda como pedido. “a X” es por unidad; “por X” es el total; sin precio usa el de la tienda.'],
+                    ['“vendí el sweater en efectivo” · “…con 10% de descuento” · “¿cuánto es el sweater en efectivo?”', 'Te ofrece el precio efectivo (sin la comisión de MP), calcula el descuento y te dice cuánto te queda antes de confirmar. Todo en la guía de precios.'],
+                    ['“el sweater lanilla me costó 20000 más 500 de flete”', 'Guarda el costo en ese producto y te propone el precio con un botón.'],
                     ['“llegaron 10 sweater lanilla” · “me llegaron 3 jean oxford 40 azul”', 'Suma unidades al stock (con talle y color si el producto los tiene).'],
                     ['“ponele 48000 al sweater lanilla” · “el jean chupín a 45.000”', 'Cambia el precio.'],
                     ['“ocultá el gamulán” · “mostrá la cartera de cuero”', 'Lo saca de la tienda o lo vuelve a poner, sin borrar nada.'],
@@ -297,7 +300,7 @@ const Lau = ({ abrir }) => (
                 <><strong>Micrófono 🎤</strong> al lado del clip: tocás, hablás, y lo que dijiste queda escrito en el cuadro para que lo mandes. Anda en Chrome, Edge y Safari; la primera vez el navegador pide permiso.</>,
             ]} />
             <Aviso tipo="dato" titulo="Qué sí necesita la llave">
-                Cargar un producto por chat (la IA arma la ficha), generar descripciones, ofertas programadas, el resumen con consejos, y todo lo que no esté en la tabla. Para cargar productos sin llave está el botón dorado <K>Cargar producto (paso a paso)</K> y el Excel.
+                Cargar un producto por chat (la IA arma la ficha), generar descripciones, ofertas programadas, el resumen con consejos, y todo lo que no esté en la tabla. Para cargar productos sin llave está <K>Cargar producto</K> (arriba a la derecha del chat, al lado de Guía) y el Excel.
             </Aviso>
         </Seccion>
 
@@ -1095,6 +1098,100 @@ const OfertasGuia = ({ abrir }) => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 14. Precios, costos y ventas en efectivo
+// ─────────────────────────────────────────────────────────────────────────────
+const PreciosGuia = ({ abrir }) => (
+    <>
+        <Resumen pasos={[
+            { icono: '🧾', titulo: 'Vos ponés los costos', detalle: 'prenda, flete, embalaje: una vez' },
+            { icono: '🧮', titulo: 'Lau hace la cuenta', detalle: 'margen + comisión de MP = precio' },
+            { icono: '💵', titulo: 'En efectivo, menos', detalle: 'sin comisión, misma ganancia' },
+            { icono: '🛡️', titulo: 'Nunca a ciegas', detalle: 'te dice qué ganás antes de confirmar' },
+        ]} />
+
+        <Seccion id="idea" titulo="La idea en un minuto">
+            <P>Vos <strong>no tenés que calcular nada</strong>. Le decís a Lau (o cargás en el formulario) tres números: cuánto te costó la prenda, cuánto el flete para traerla y cuánto el embalaje. Lau les suma tu <strong>margen</strong> (lo que querés ganar: 50%, 70%, 100%…) y la <strong>comisión de Mercado Pago</strong>, y de ahí sale el precio de lista.</P>
+            <Figura titulo="Del costo al precio. Los del medio los configurás una vez; después sólo decís cuánto te costó.">
+                <IlusCostoAPrecio />
+            </Figura>
+            <Aviso tipo="dato" titulo="¿Por qué el precio de lista incluye la comisión de MP?">
+                Porque la tienda tiene <strong>un solo precio</strong> y no sabe de antemano si esa prenda la va a comprar una clienta por la web (ahí MP cobra su parte) o se la vas a vender vos en el local. Se arma para el peor caso: si sale por la web, tu ganancia queda entera igual. Si la vendés en mano, ganás un poco más… o le hacés ese descuento a la clienta (más abajo).
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="costos" titulo="Decirle los costos">
+            <P>Hay dos clases de números. Los que son <strong>iguales para todas las prendas</strong> se configuran una sola vez; el costo de <strong>cada prenda</strong> se lo decís cuando la cargás o cuando quieras.</P>
+            <Tabla
+                cabecera={['Qué', 'Dónde / cómo se lo decís a Lau']}
+                filas={[
+                    ['Margen (lo que querés ganar sobre el costo)', '“poné el margen en 100%” · por categoría: “camperas 80% de margen”'],
+                    ['Embalaje por prenda (bolsa, etiqueta)', '“packaging 300” · “las bolsas me cuestan 650”'],
+                    ['Flete por prenda (lo que cuesta traerla)', '“flete 500 por prenda”'],
+                    ['Cómo redondear', '“redondeá a 500” · “precios terminados en 99”'],
+                    ['Costo de UNA prenda ya cargada', '“el sweater lanilla me costó 20000” · con extras propios: “…más 500 de flete y 300 de embalaje”'],
+                    ['Sólo una cotización, sin guardar nada', '“me costó 24000” · “me costó 24000, camperas”'],
+                ]}
+            />
+            <P>Todo esto también está en <Ruta pasos={['Configuración', 'Precios']} />, con un ejemplo que se recalcula mientras tocás los números.</P>
+            <Figura titulo="El costo de una prenda dicho por chat: Lau lo guarda, te propone el precio y con un botón lo aplica.">
+                <IlusCostoPorChat />
+            </Figura>
+            <Lista items={[
+                <>Si le decís el costo de una prenda que <strong>ya tiene precio</strong>, no se lo cambia sola: te propone el nuevo y vos tocás el botón (o no).</>,
+                <>Si un día te <strong>sube el costo</strong> de algo y con el precio actual ya no llegás al margen, Lau te avisa en el momento y te dice a cuánto ponerlo.</>,
+                <>Al cargar un producto nuevo desde <Ruta pasos={['Inventario', 'Nuevo Diseño']} />, ponés el costo, elegís “Calcular desde el costo” y el precio aparece con tu margen. Si esa prenda merece otro margen, tocás 50 / 70 / 100% ahí mismo.</>,
+            ]} />
+        </Seccion>
+
+        <Seccion id="comision" titulo="La comisión de Mercado Pago">
+            <P>No la tenés que buscar ni cargar. Hasta la primera venta, Lau usa un estimado (<strong>7,6%</strong>, que es “dinero disponible al instante” con IVA). Desde la primera venta real por la web, usa <strong>la comisión que MP te cobró de verdad</strong>, y se va actualizando sola. En <Ruta pasos={['Configuración', 'Precios']} /> ves cuál está usando.</P>
+            <Figura titulo="La misma prenda, dos ventas. Por la web MP se lleva su parte; en efectivo no, y por eso a $41.700 ganás lo mismo que a $45.100.">
+                <IlusWebVsEfectivo />
+            </Figura>
+        </Seccion>
+
+        <Seccion id="efectivo" titulo="Vender en efectivo o transferencia">
+            <P>Cuando vendés por fuera de la web (en el local, por WhatsApp, por Instagram) y la clienta te paga en mano o por transferencia, <strong>Mercado Pago no interviene</strong>: la plata ya la cobraste vos. Lo único que hace Lau es anotarlo: descuenta el stock, lo suma a las ventas y lo deja como pedido. Y como sabe que no hubo comisión, te ofrece el <strong>precio efectivo</strong>.</P>
+            <Figura titulo="Le decís que fue en efectivo y Lau te da a elegir: precio de lista o precio efectivo. Antes de confirmar te dice cuánto te queda.">
+                <IlusVentaEfectivo />
+            </Figura>
+            <Tabla
+                cabecera={['Decís', 'Pasa']}
+                filas={[
+                    ['“vendí el sweater lanilla en efectivo” · “…por transferencia”', 'Te muestra el precio de lista y el efectivo (sin la comisión) como botones. Tocás uno o escribís otro número.'],
+                    ['“vendí el sweater lanilla a 40000 en efectivo”', 'Anota la venta a $40.000. El precio de la tienda no cambia.'],
+                    ['“vendí el sweater con 10% de descuento en efectivo” · “2 tops rib 15% off”', 'Calcula el descuento sobre el precio de lista (o sobre el precio que digas) y anota el final.'],
+                    ['“vendí 2 tops rib por 25.000”', '“por” o “total” es el total de todo; “a” es por unidad.'],
+                    ['“¿cuánto es el sweater lanilla en efectivo?” · “precio efectivo del top rib”', 'Sólo te contesta el precio efectivo, sin anotar nada. Para cuando la clienta pregunta.'],
+                ]}
+            />
+            <Aviso tipo="tip" titulo="Antes de confirmar, siempre te dice qué ganás">
+                “Te quedan $20.900 limpios (100% sobre el costo)”. Si el número que dijiste queda <strong>abajo del costo</strong>, te lo marca con ⚠ y cuánto perdés. Para eso necesita el costo de la prenda cargado: si no lo tiene, anota igual pero sin esa cuenta.
+            </Aviso>
+        </Seccion>
+
+        <Seccion id="bajar" titulo="Hasta dónde bajar">
+            <Figura titulo="Las tres zonas de un precio. En verde el descuento no te cuesta nada; en dorado sale de tu ganancia; en rojo perdés.">
+                <IlusHastaDondeBajar />
+            </Figura>
+            <BienMal
+                bien={['“Te lo dejo a 41.700 en efectivo” (ganás lo mismo que por la web)', '“Con 10% en efectivo” cuando querés cerrar la venta: Lau te muestra que igual te quedan $19.000', 'Preguntarle a Lau “¿cuánto es en efectivo?” antes de contestarle a la clienta']}
+                mal={['Regalar 20% “porque es en efectivo”: la comisión es 7,6%, el resto sale de tu bolsillo', 'Anotar la venta al precio de lista cuando cobraste menos: las ganancias del panel quedan infladas', 'Bajar sin tener el costo cargado: Lau no puede avisarte si estás perdiendo']}
+            />
+        </Seccion>
+
+        <Seccion id="ver" titulo="Dónde se ve después">
+            <Lista items={[
+                <><Ruta pasos={['Pedidos']} />: la venta aparece como <Cod>MAN-…</Cod>, ya aprobada, con el canal y cómo cobraste (efectivo / transferencia). Sin envío que gestionar.</>,
+                <><Ruta pasos={['Ventas y ganancia']} />: suma a la facturación del día y del mes; la ganancia se calcula con el costo de la prenda y <strong>sin comisión</strong> (porque no la hubo).</>,
+                <>Si te equivocaste: <strong>Deshacer</strong> ahí mismo, o “anulá la venta MAN-123456”: repone el stock y da de baja el pedido.</>,
+            ]} />
+            <P>Las ofertas y los cupones (descuentos para <em>todas</em>, no para una venta) están en la <Ir abrir={abrir} a="ofertas">guía de ofertas</Ir>; el resto de frases de Lau, en la <Ir abrir={abrir} a="lau">guía de Lau</Ir>.</P>
+        </Seccion>
+    </>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 13. Diseño de la tienda
 // ─────────────────────────────────────────────────────────────────────────────
 const DisenoGuia = ({ abrir }) => (
@@ -1192,6 +1289,13 @@ export const GUIAS = [
         palabras: ['oferta', 'descuento', 'cupon', 'codigo', 'liquidacion', 'promo', 'promocion', 'programada', 'finde', 'off', 'tachado', 'sorteo'],
         secciones: [['cual', 'Oferta o cupón'], ['oferta', 'Poner una oferta'], ['cupon', 'Crear un cupón'], ['liquidacion', 'Liquidación']],
         Contenido: OfertasGuia,
+    },
+    {
+        id: 'precios', titulo: 'Precios, costos y ventas en efectivo', icono: Coins, duracion: '6 min', para: 'Dueño',
+        resumen: 'Vos decís cuánto te costó; Lau calcula el precio con tu margen y la comisión de MP. Y cuando vendés en efectivo, cuánto podés bajar sin perder.',
+        palabras: ['precio', 'precios', 'costo', 'costos', 'margen', 'ganancia', 'comision', 'mercado pago', 'efectivo', 'transferencia', 'descuento', 'flete', 'embalaje', 'packaging', 'calcular', 'cuanto cobro', 'plata'],
+        secciones: [['idea', 'La idea'], ['costos', 'Decirle los costos'], ['comision', 'Comisión de MP'], ['efectivo', 'Vender en efectivo'], ['bajar', 'Hasta dónde bajar'], ['ver', 'Dónde se ve']],
+        Contenido: PreciosGuia,
     },
     {
         id: 'diseno', titulo: 'Cambiar textos y fotos de la tienda', icono: Palette, duracion: '5 min', para: 'Dueño',
