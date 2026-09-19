@@ -30,12 +30,12 @@ const ArrivalCard = ({ product, onQuickView }) => {
 
                 {/* Badges */}
                 {product.stock === 0 && (
-                    <span className="absolute top-3 left-3 z-20 px-2.5 py-1 bg-black/80 text-white text-[9px] font-bold uppercase tracking-widest border border-white/20">
+                    <span className="absolute top-3 left-3 z-20 px-2.5 py-1 bg-black/80 text-white text-[10px] font-bold uppercase tracking-widest border border-white/20">
                         Agotado
                     </span>
                 )}
                 {product.stock > 0 && product.stock <= 5 && (
-                    <span className="absolute top-3 left-3 z-20 px-2.5 py-1 text-black text-[9px] font-bold uppercase tracking-widest"
+                    <span className="absolute top-3 left-3 z-20 px-2.5 py-1 text-black text-[10px] font-bold uppercase tracking-widest"
                         style={{ background: 'linear-gradient(90deg,#BF953F,#FCF6BA 50%,#B38728)' }}>
                         Últimas unidades
                     </span>
@@ -53,7 +53,7 @@ const ArrivalCard = ({ product, onQuickView }) => {
             {/* Info */}
             <div className="px-1">
                 {product.category && (
-                    <p className="text-[9px] uppercase tracking-[0.35em] text-cielo-gold/60 mb-1.5 font-semibold">
+                    <p className="text-[10px] uppercase tracking-[0.35em] text-cielo-gold/60 mb-1.5 font-semibold">
                         {product.category}
                     </p>
                 )}

@@ -28,6 +28,11 @@ export const StoreProvider = ({ children }) => {
 
   // --- FIREBASE STATE (Real-time) ---
   const [inventory, setInventory] = useState([]);
+  // `loading` se apaga apenas se arman las suscripciones, ANTES de que Firestore
+  // conteste. `inventoryListo` recien pasa a true con el primer snapshot de
+  // productos (aunque venga vacio): es lo que separa "todavia no llego" de
+  // "no hay productos", y lo que la tienda usa para sostener el esqueleto.
+  const [inventoryListo, setInventoryListo] = useState(false);
   const [orders, setOrders] = useState([]);
   const [categories, setCategories] = useState([]);
   // Consolidated Site Config (Images + Text)
@@ -113,7 +118,7 @@ export const StoreProvider = ({ children }) => {
   // --- FIREBASE SUBSCRIPTIONS (extraídas a hook dedicado) ---
   useFirestoreSubscriptions({
     user,
-    setUser, setInventory, setCategories, setSiteConfig, setCloudinaryConfig,
+    setUser, setInventory, setInventoryListo, setCategories, setSiteConfig, setCloudinaryConfig,
     setAiConfig, setIsMaintenance, setCoupons, setReviews,
     setLoading, setOrders, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
@@ -232,7 +237,7 @@ export const StoreProvider = ({ children }) => {
 
   return (
     <StoreContext.Provider value={{
-      inventory, cart, setCart, addToCart, updateCartQty, removeFromCart, clearCart, cartTotal, cartCount,
+      inventory, inventoryListo, cart, setCart, addToCart, updateCartQty, removeFromCart, clearCart, cartTotal, cartCount,
       orders, wishlist, setWishlist, toggleWishlist, isInWishlist, toasts, addToast, isAdmin, user, login, loginWithGoogle, register, logout, loginAnonymously, linkGuestWithGoogle,
       theme, toggleTheme, isSizeGuideOpen, setIsSizeGuideOpen, isCartOpen, setIsCartOpen, isMaintenance, setIsMaintenance,
       categories, siteConfig, cloudinaryConfig, aiConfig, loading, shippingRates, systemConfig,

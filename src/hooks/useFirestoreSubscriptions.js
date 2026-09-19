@@ -15,7 +15,7 @@ export const quietSnap = (label) => (err) => {
 // StoreContext. Recibe los setters y `user`; no cambia comportamiento.
 export const useFirestoreSubscriptions = ({
     user,
-    setUser, setInventory, setCategories, setSiteConfig, setCloudinaryConfig,
+    setUser, setInventory, setInventoryListo, setCategories, setSiteConfig, setCloudinaryConfig,
     setAiConfig, setIsMaintenance, setCoupons, setReviews,
     setLoading, setOrders, setSuppliers, setAiHistory,
     setScheduledPromotions, setWishlistEvents, setVisitStatsHourly,
@@ -30,6 +30,7 @@ export const useFirestoreSubscriptions = ({
         const unsubProd = onSnapshot(collection(db, "products"), (snap) => {
             const data = snap.docs.map(d => ({ ...d.data(), id: d.id }));
             setInventory(data.sort((a, b) => b.id - a.id));
+            setInventoryListo?.(true);
         });
 
         // Orders → suscripción por rol en el effect [user] (regla Firestore:

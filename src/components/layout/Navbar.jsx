@@ -198,7 +198,7 @@ export const Navbar = ({ onOpenCart }) => {
                         </div>
 
                         {/* En el celular el logo va más chico: a 200px pisaba el ícono de la cuenta. */}
-                        <LogoSVG to="/" width={scrolled ? 180 : 240} className="max-w-[150px] sm:max-w-none [&>svg]:max-w-full [&>svg]:h-auto" />
+                        <LogoSVG to="/" width={scrolled ? 180 : 240} className="max-w-[30vw] sm:max-w-none [&>svg]:max-w-full [&>svg]:h-auto" />
                     </Link>
 
 

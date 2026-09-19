@@ -141,7 +141,10 @@ export const Hero = () => {
                 />
             )}
 
-            <div ref={contentRef} className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-16 pb-24 md:pb-32 will-change-transform">
+            {/* pt-36: el bloque va apoyado abajo (items-end), pero en pantallas bajas
+                (celular chico, celular apaisado) es mas alto que la pantalla y su tope
+                quedaba debajo del header fijo: el titulo se pisaba con el logo. */}
+            <div ref={contentRef} className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-16 pt-36 pb-24 md:pb-32 will-change-transform">
 
                 <div className="flex items-center gap-3 mb-8 animate-fadeIn">
                     <span className="h-px w-12 bg-cielo-gold/60" />

@@ -68,7 +68,9 @@ export const BotonesContacto = () => {
             onMouseLeave={() => setShowTip(false)}
             className={`fixed ${location.pathname.startsWith('/product/') ? 'bottom-24' : 'bottom-4'} sm:bottom-6 right-4 sm:right-6 z-50 group flex flex-col items-end gap-3 transition-all duration-700 ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
         >
-            <div className={`origin-bottom-right transition-all duration-400 ${showTip ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}`}>
+            {/* El globo solo desde `sm`: en celular no hay hover y el aviso automatico
+                (5 s a 11 s) caia justo encima del boton "Ver la tienda" del hero. */}
+            <div className={`hidden sm:block origin-bottom-right transition-all duration-400 ${showTip ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}`}>
                 <div className="relative bg-slate-900/95 backdrop-blur-xl border border-[#E8C65E]/30 px-4 py-3 rounded-xl rounded-br-none shadow-[0_8px_32px_rgba(0,0,0,0.45)] max-w-[220px]">
                     <p className="text-[11px] font-semibold tracking-wide text-[#E8C65E] mb-0.5" style={{ fontFamily: "'Cinzel', serif" }}>
                         Atención Personalizada

@@ -112,7 +112,7 @@ const SmallCard = ({ item, onQuickView }) => (
         </button>
 
         <div className="absolute inset-x-0 bottom-0 z-20 p-3 md:p-5">
-            <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] md:tracking-[0.35em] text-cielo-gold/70 mb-1 md:mb-1.5 font-semibold">{item.category}</p>
+            <p className="text-[10px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.35em] text-cielo-gold/70 mb-1 md:mb-1.5 font-semibold">{item.category}</p>
             <h3 className="font-serif text-sm md:text-lg text-white leading-snug mb-1.5 md:mb-2 line-clamp-2">{tituloDeProducto(item.name)}</h3>
             <div className="flex items-center justify-between">
                 <span className="text-sm md:text-base text-white/90 font-light">{formatMoney(item.price)}</span>
@@ -128,7 +128,7 @@ const SmallCard = ({ item, onQuickView }) => (
                 <Link
                     to={`/product/${item.id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.25em] px-4 py-2 text-black"
+                    className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.25em] px-4 py-2 text-black"
                     style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                 >
                     Comprar <ArrowRight className="w-2.5 h-2.5" />

@@ -8,6 +8,12 @@ import { QuickViewModal } from './QuickViewModal';
 import { useStore } from '../../context/StoreContext';
 import { useMarcoFoto } from '../../utils/marcoFoto';
 
+// Ancho REAL de la tarjeta en la grilla de la tienda (2 columnas siempre, 3
+// desde lg, 4 desde 2xl). El `sizes` por defecto de LazyImage decia `100vw` en
+// celular, y con pantalla 3x eso pedia la version de 1200 px para una cajita de
+// 164 px: 617 KB de fotos contra 147 KB en notebook.
+const SIZES_GRILLA = '(min-width: 1536px) 22vw, (min-width: 1024px) 30vw, 45vw';
+
 const isNew = (product) => {
     if (!product?.createdAt) return false;
     const days = (Date.now() - Number(product.createdAt)) / (1000 * 60 * 60 * 24);
@@ -73,6 +79,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                         src={mainImage}
                         alt={product.name}
                         width={640}
+                        sizes={SIZES_GRILLA}
                         onNaturalSize={setMarcoFoto}
                         fetchPriority={priority ? 'high' : 'auto'}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
@@ -82,6 +89,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             src={hoverImage}
                             alt=""
                             width={640}
+                            sizes={SIZES_GRILLA}
                             className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                         />
                     )}
@@ -92,22 +100,22 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                     {/* Badges */}
                     <div className="absolute top-3 left-3 right-14 flex flex-col items-start gap-1.5 z-10">
                         {fresh && !outOfStock && (
-                            <span className="bg-cielo-gold text-black text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
+                            <span className="bg-cielo-gold text-black text-[10px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
                                 Nuevo
                             </span>
                         )}
                         {discount > 0 && (
-                            <span className="bg-[#0A0908]/90 backdrop-blur text-white border border-white/25 text-[9px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
+                            <span className="bg-[#0A0908]/90 backdrop-blur text-white border border-white/25 text-[10px] font-bold uppercase tracking-[0.2em] px-2.5 py-1">
                                 -{discount}%
                             </span>
                         )}
                         {outOfStock && (
-                            <span className="bg-black/60 backdrop-blur text-white/70 text-[9px] font-semibold uppercase tracking-[0.2em] px-2.5 py-1">
+                            <span className="bg-black/60 backdrop-blur text-white/70 text-[10px] font-semibold uppercase tracking-[0.2em] px-2.5 py-1">
                                 Agotado
                             </span>
                         )}
                         {!outOfStock && lowStock && (
-                            <span className="bg-[#0A0908]/90 backdrop-blur text-cielo-gold border border-cielo-gold/50 text-[9px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] px-2 sm:px-2.5 py-1 whitespace-nowrap">
+                            <span className="bg-[#0A0908]/90 backdrop-blur text-cielo-gold border border-cielo-gold/50 text-[10px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] px-2 sm:px-2.5 py-1 whitespace-nowrap">
                                 <span className="sm:hidden">Últimas</span><span className="hidden sm:inline">Últimas unidades</span>
                             </span>
                         )}

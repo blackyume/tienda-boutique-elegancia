@@ -13,7 +13,7 @@ const PAGE_SIZE = 12;
 const parseSet = (raw) => new Set((raw || '').split(',').map((s) => s.trim()).filter(Boolean));
 
 export const Shop = () => {
-    const { inventory, loading } = useStore();
+    const { inventory, inventoryListo } = useStore();
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [category, setCategory] = useState(searchParams.get('category') || 'all');
@@ -327,7 +327,7 @@ export const Shop = () => {
                         </div>
                     )}
 
-                    {loading && inventory.length === 0 ? (
+                    {!inventoryListo ? (
                         <ProductGridSkeleton count={9} />
                     ) : paged.length > 0 ? (
                         <>

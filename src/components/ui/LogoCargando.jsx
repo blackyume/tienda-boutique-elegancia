@@ -32,7 +32,10 @@ export const CargandoRuta = () => {
         return () => clearTimeout(t);
     }, []);
     return (
-        <div className="min-h-[50vh] flex items-center justify-center">
+        // min-h-screen, no 50vh: con media pantalla el pie de pagina quedaba a la
+        // vista mientras bajaba el trozo JS de la ruta, y al llegar la pagina lo
+        // empujaba (CLS 0,5 en la tienda). A pantalla entera el pie arranca abajo.
+        <div className="min-h-screen flex items-center justify-center">
             {ver && <div className="animate-pagina-entra"><LogoCargando chico /></div>}
         </div>
     );

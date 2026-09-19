@@ -134,6 +134,16 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 - **Portadas nuevas:** `python scripts/armar-portada.py "C:/ruta/foto.jpeg" portada-modelo-3`, y después sumarlas desde Admin → Contenido → Hero (editor de portadas: agregar, ordenar, quitar).
 - ⚠️ **Medir un antes/después en el navegador exige bloquear el service worker** (`newContext({ serviceWorkers: 'block' })`), si no la PWA sirve la copia cacheada y las dos capturas salen idénticas.
 
+### Responsive — lo medido el 18/09/2026 (12 pantallas × 5 páginas, Playwright con SW bloqueado)
+
+- Cero desborde horizontal y cero errores JS de 320 px a 2560 px. Lo que sí falló y se arregló ese día:
+  - **El globo de WhatsApp va `hidden sm:block`** (`BotonesContacto.jsx`): en celular no hay hover y el aviso automático (5–11 s) caía encima del botón "Ver la tienda" del hero.
+  - **El bloque de texto del hero lleva `pt-36`**: va apoyado abajo (`items-end`), pero en pantallas bajas (320×568, celular apaisado 844×390) es más alto que la pantalla y su tope quedaba debajo del header fijo. En pantallas altas el padding no se ve. El logo del header en celular es `max-w-[30vw]`, no un ancho fijo: a 150 px tocaba el icono de usuario en 375.
+  - **`inventoryListo` (store) sostiene el esqueleto de la tienda.** `loading` se apaga en el mismo instante en que se arman las suscripciones, antes de que Firestore conteste; sólo `inventoryListo` distingue "todavía no llegó" de "no hay productos". Y `CargandoRuta` es `min-h-screen`, no `50vh`: con media pantalla el pie quedaba a la vista mientras bajaba el trozo JS de la ruta. CLS de /shop: 0,42 (celular) y 0,16–0,30 (escritorio) → 0,00–0,03.
+  - **`SIZES_GRILLA` en `ProductCard`**: el `sizes` por defecto de `LazyImage` decía `100vw` en celular y con pantalla 3× pedía `w_1200` para una cajita de 164 px — 617 KB de fotos en /shop contra 147 KB en notebook. Ahora pide `w_640`: 245 KB.
+  - Texto de contenido a 8–9 px (categoría de las tarjetas destacadas, "Comprar", chapitas Nuevo/-%) subió a 10–11. Los únicos <10 px que quedan son adornos: los rombos `◆` y el "Scroll" vertical.
+- Umbrales usados: CLS bueno < 0,1; zona táctil ≥ 40 px; texto de contenido ≥ 10 px en celular.
+
 ### Pendiente acordado con el dueño
 
 - **La transición del carrusel puede ser más natural** — hoy es fundido cruzado + ken-burns por portada. Queda para otro día; el dueño lo aprobó como está.
