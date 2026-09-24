@@ -14,8 +14,10 @@ sirve, en hoja A4.
 ## 1. Abrir la cuenta (una sola vez)
 
 1. Entrá a **https://micorreo.correoargentino.com.ar** → **Registrate**.
-2. Te pide: nombre y apellido, **CUIT** (por ser negocio), teléfono, email,
-   contraseña, y la dirección de Rafaela con código postal **2300**.
+2. Te pide: nombre y apellido, **DNI, CUIL o CUIT**, teléfono, email,
+   contraseña, y la dirección de Rafaela con código postal **2300**. El CUIT
+   lo piden sólo si te registrás como empresa; como emprendedora alcanza con
+   el DNI o el CUIL (el sistema valida los datos contra AFIP).
 3. Te llega un email para validar la cuenta. **Revisá spam** si no aparece.
 
 ## 2. Pedir que pasen a buscar (una sola vez)

@@ -474,7 +474,7 @@ const PedidoEnvio = ({ abrir }) => (
         <Seccion id="cuenta" titulo="Una sola vez: abrir la cuenta en MiCorreo">
             <Pasos>
                 <Paso>Entrá a <Link href="https://micorreo.correoargentino.com.ar">micorreo.correoargentino.com.ar</Link> → <K>Registrate</K>.</Paso>
-                <Paso>Te pide: nombre y apellido, <strong>CUIT</strong> (por ser negocio), teléfono, email, contraseña, y la dirección de Rafaela con código postal <Cod>2300</Cod>.</Paso>
+                <Paso>Te pide: nombre y apellido, <strong>DNI, CUIL o CUIT</strong>, teléfono, email, contraseña, y la dirección de Rafaela con código postal <Cod>2300</Cod>. <strong>El CUIT lo piden sólo si te registrás como empresa</strong>: como emprendedora alcanza con el DNI o el CUIL.</Paso>
                 <Paso>Te llega un email para confirmar la cuenta. <strong>Revisá spam</strong> si no aparece.</Paso>
             </Pasos>
             <Aviso tipo="dato">Son 10 minutos y no se vuelve a hacer. Anotá la contraseña en un lugar seguro: la vas a usar con cada pedido.</Aviso>
