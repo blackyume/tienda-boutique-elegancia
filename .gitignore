@@ -140,3 +140,11 @@ vite.config.js.timestamp-*.mjs
 *firebase-adminsdk*.json
 serviceAccount*.json
 
+# Produccion con IA (sesion "Productor"): material pesado y, sobre todo, la
+# llave de Kaggle. NUNCA a git. Vive dentro del proyecto sólo por comodidad.
+Boutique_Elegancia_Produccion_IA/
+
+# Llaves sueltas de cualquier servicio
+kaggle.json
+*.key
+*.pem
