@@ -149,7 +149,32 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 - **La transición del carrusel puede ser más natural** — hoy es fundido cruzado + ken-burns por portada. Queda para otro día; el dueño lo aprobó como está.
 - ~~Normalizar las fotos de producto al subir (los fondos amarillos no son el mismo amarillo entre foto y foto).~~ **Falso, medido el 21/08/2026:** las 12 fotos publicadas comparten la MISMA placa de fondo — 40% de sus píxeles son idénticos entre foto y foto y las cuatro esquinas dan `#A07829` en todas, con dispersión cero en H, S y L. No había nada que normalizar. Lo que faltaba era poder **reproducir esa placa** para las fotos nuevas: eso lo hace `scripts/fondo-oro.py`.
 - **La tira de Instagram repite las mismas 6 fotos del catálogo** que ya se ven más arriba.
-- Las fichas de categoría siguen con prenda apoyada; el salto es pasarlas a prenda **puesta**, cuando estén las modelos.
+- Las fichas de categoría siguen con prenda apoyada; el salto es pasarlas a prenda **puesta**. **En curso desde el 29/09/2026** con la sesión "Productor" (ver abajo).
+
+### Fotos de modelo — lo acordado el 29/09/2026 (tienda + productor)
+
+El material lo genera con IA la sesión **Productor**; esta sesión publica. Nada se publica sin el OK del dueño.
+
+**Medidas, leídas del componente que las usa — no inferir de un archivo parecido:**
+
+| Pieza | Medida | De dónde sale |
+|---|---|---|
+| Ficha de categoría | **4:5**, `object-cover object-center`, **un solo archivo de 700 px sin srcset** | `src/pages/Home.jsx` |
+| 2ª foto de producto | **4:5** — el marco lo fija la **primera** foto, y hoy son cuadradas 1280 | `ProductCard.jsx` + `utils/marcoFoto.js` |
+| Hero | foto **vertical**, modelo de **≥1120 px de alto**, con **dorado limpio en los 55 px de cada borde lateral** (de ahí fabrica el fondo). El lienzo lo arma el script | `scripts/armar-portada.py` |
+| Redes | 1080×1080, 1080×1350, 1080×1920 | — |
+
+⚠️ La ficha de categoría y la 2ª foto **no se agrandan**: se sirven a 700 y 640. El agrandado con IA sólo se justifica en el hero y en redes; en las chicas mete artefactos en la piel y en el tejido sin ganar un píxel en pantalla.
+
+**Criterio de aceptación de una ficha — se mira a 158 px** (lo que mide en un celular de 375), no en grande:
+1. la línea del **escote** completa, sin pelo encima; 2. los **dos hombros** o los dos tirantes; 3. dónde **termina la manga**.
+Si falta uno, la ficha no entra. A ese tamaño NO se exige textura de tela, botones ni costuras: no llegan.
+
+**El pelo tiene dos usos** (el dueño pidió pelo largo hasta la cintura): **suelto** en hero y redes, donde se luce y la prenda se ve entera; **enteramente hacia atrás** en fichas de `BODYS`, `MUSCULOSAS` y `REMERAS MANGAS CORTAS`, porque ahí lo único que distingue una categoría de otra es el escote y el tirante, y es justo lo que tapa. En el resto de las categorías, libre.
+
+**Casting:** a 158 px **no distingue la cara, distingue el pelo** — color y silueta. Por eso la casa lleva siluetas de pelo que no se pisen: la castaña caramelo de las portadas actuales + una cobriza + una de rulos.
+
+🛠 **Pendiente que salió de esto:** la ficha de categoría **no tiene `srcset`** (la tarjeta de producto sí). En un monitor 1920 a 2× pide 918 px y recibe 700.
 
 ## Estilo de código
 
