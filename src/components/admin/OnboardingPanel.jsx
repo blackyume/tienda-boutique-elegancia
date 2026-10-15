@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
+import { tokenMPValido } from '../../utils/comision';
 import { Check, Sparkles, ArrowRight, PartyPopper, ChevronDown, X } from 'lucide-react';
 
 // Panel de "Primeros pasos" para la puesta en marcha de la tienda.
@@ -31,8 +32,8 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
             key: 'pay',
             label: 'Conectá Mercado Pago',
             corto: 'Mercado Pago',
-            desc: 'Para cobrar online (tarjeta, débito, cuotas).',
-            done: !!(paymentConfig?.accessToken),
+            desc: 'Para cobrar online (tarjeta, débito, cuotas). Pegá el access token que empieza con APP_USR-.',
+            done: tokenMPValido(paymentConfig?.accessToken),
             cta: 'Configurar',
             action: () => onNavigate('settings'),
         },

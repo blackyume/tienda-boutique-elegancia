@@ -27,6 +27,31 @@ export const TARIFAS_DE_LA_CASA = Object.freeze({
     },
 });
 
+/**
+ * El pedido guarda la CLAVE de la opcion (`correo_domicilio`), no su nombre.
+ * El panel la mostraba cruda y en mayusculas: la duena leia "CORREO_DOMICILIO".
+ * Devuelve el nombre configurado; si la opcion ya no existe, al menos lo deja
+ * legible en vez de con guiones bajos.
+ */
+export const nombreDeEnvio = (clave, tarifas) => {
+    const k = String(clave || '').trim();
+    if (!k) return '';
+    const desde = (tarifas && tarifas[k]?.name) || TARIFAS_DE_LA_CASA[k]?.name;
+    if (desde) return desde;
+    return k.replace(/[_-]+/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
+};
+
+/**
+ * Una fecha que no se puede leer no se muestra como "Invalid Date". En los
+ * pedidos reales aparecio un registro con la fecha rota y el panel lo cantaba
+ * asi, en ingles, al lado de los pedidos de verdad.
+ */
+export const fechaLegible = (valor) => {
+    if (!valor) return '';
+    const d = new Date(valor);
+    return Number.isNaN(d.getTime()) ? 'sin fecha' : d.toLocaleDateString();
+};
+
 // Lo que cobra el correo, sin margen, para tener el piso a mano.
 export const COSTO_REAL_CORREO_1KG = Object.freeze({ domicilio: 10586, sucursal: 7745 });
 

@@ -12,6 +12,22 @@
 
 export const COMISION_MP_ESTIMADA = 7.6;
 
+/**
+ * ¿El token de Mercado Pago es un token de verdad?
+ *
+ * No alcanza con que el campo tenga algo escrito. En la tienda real apareció
+ * una CONTRASEÑA cargada ahí, y como el panel sólo miraba que no estuviera
+ * vacío, "Primeros pasos" daba Mercado Pago por conectado: el dueño podía
+ * abrir la tienda creyendo que cobraba, y no cobraba nada.
+ *
+ * Los access token de MP son `APP_USR-…` (producción) o `TEST-…` (prueba).
+ * `credentialToken` es el formato viejo de las credenciales de aplicación.
+ */
+export const tokenMPValido = (token) => {
+    const t = String(token || '').trim();
+    return /^(APP_USR|TEST)-[\w-]{8,}/.test(t);
+};
+
 export const comisionMP = (paymentConfig) => {
     const real = Number(paymentConfig?.realMpFeePercent);
     return real > 0 ? real : COMISION_MP_ESTIMADA;

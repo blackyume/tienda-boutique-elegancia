@@ -6,6 +6,7 @@ import { usePrompt, useConfirm } from '../ui/ConfirmDialog';
 import { LayoutList, KanbanSquare, PackageOpen, ChevronDown } from 'lucide-react';
 import { DetallePedido } from './DetallePedido';
 import { useStore } from '../../context/StoreContext';
+import { nombreDeEnvio, fechaLegible } from '../../utils/envios';
 import { usePagination, Pagination } from '../ui/Pagination';
 import { getStatusLabel, getStatusClasses, isFulfillable } from '../../utils/orderStatus';
 
@@ -15,7 +16,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'board'
     const [filter, setFilter] = useState('all');
     const [abierto, setAbierto] = useState(null); // id del pedido con el detalle desplegado
-    const { addToast } = useStore();
+    const { addToast, shippingRates } = useStore();
 
     // Derived state
     const filteredOrders = (orders || []).filter(o => filter === 'all' || o.status === filter);
@@ -90,7 +91,7 @@ export const OrdersView = ({ orders, updateOrderStatus }) => {
                                         </div>
                                         <p className="text-sm font-bold dark:text-white">{o.customer?.nombre || 'Cliente'} {o.customer?.apellido || ''}</p>
                                         <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                                            {o.date ? new Date(o.date).toLocaleDateString() : '—'} • {(o.shipping || '').toUpperCase()}
+                                            {[fechaLegible(o.date) || '—', nombreDeEnvio(o.shipping, shippingRates)].filter(Boolean).join(' • ')}
                                             {o.trackingNumber && <span className="text-blue-500 font-mono bg-blue-50 dark:bg-blue-900/20 px-1 rounded">TRK: {o.trackingNumber}</span>}
                                         </p>
                                     </div>

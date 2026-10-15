@@ -21,8 +21,8 @@ export const TrustBadges = ({ className = "" }) => {
                     <Truck className="w-5 h-5" />
                 </div>
                 <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Envío Gratis</h4>
-                    <p className="text-[10px] text-slate-500">En compras superiores</p>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Envíos a todo el país</h4>
+                    <p className="text-[10px] text-slate-500">Con Correo Argentino</p>
                 </div>
             </div>
 
@@ -32,7 +32,7 @@ export const TrustBadges = ({ className = "" }) => {
                 </div>
                 <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">Cuotas</h4>
-                    <p className="text-[10px] text-slate-500">Sin interés con bancos</p>
+                    <p className="text-[10px] text-slate-500">Las que ofrezca tu tarjeta</p>
                 </div>
             </div>
         </div>

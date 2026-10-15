@@ -141,7 +141,7 @@ export const About = () => {
                     <div className="w-full md:w-1/2 p-12 lg:p-16 flex flex-col justify-center text-white">
                         <h3 className="text-3xl font-cinzel font-bold mb-6">Experiencia Digital</h3>
                         <p className="text-slate-300 font-light text-lg mb-8 leading-relaxed">
-                            Nuestra boutique opera exclusivamente online, llevando la moda de alta costura directamente a tu puerta. Cada envío es preparado con la dedicación de un regalo personal.
+                            Nuestra boutique funciona sólo online y te lleva las prendas hasta la puerta de tu casa. Cada envío se prepara con el cuidado de un regalo.
                         </p>
 
                         <div className="space-y-4 mb-10">

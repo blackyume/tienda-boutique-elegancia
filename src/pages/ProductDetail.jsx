@@ -439,7 +439,7 @@ export const ProductDetail = () => {
                             disabled={totalStock === 0}
                             className="w-full py-5 text-sm font-bold tracking-[0.2em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 h-14 hover:bg-cielo-gold dark:hover:bg-cielo-gold hover:text-black transition-colors shadow-lg"
                         >
-                            {totalStock === 0 ? 'AGOTADO' : 'AGREGAR AL SHOPPING BAG'}
+                            {totalStock === 0 ? 'AGOTADO' : 'AGREGAR A LA BOLSA'}
                         </Button>
 
                         <button
@@ -477,7 +477,7 @@ export const ProductDetail = () => {
                             </div>
                         </Accordion>
                         <Accordion title="Cambios & Devoluciones">
-                            Por la naturaleza de nuestras prendas (alta costura y ediciones limitadas), y para garantizar la higiene y exclusividad de cada pieza, <strong>no contamos con política de cambios ni devoluciones</strong> por gusto o talle. Antes de comprar te asesoramos por WhatsApp para que elijas el talle ideal. Esto no afecta el derecho de revocación de 10 días corridos que establece la Ley de Defensa del Consumidor.
+                            Por higiene, y porque de cada prenda tenemos muy pocas unidades, <strong>no hacemos cambios ni devoluciones</strong> por gusto o talle. Antes de comprar te asesoramos por WhatsApp para que elijas el talle ideal. Esto no afecta el derecho de revocación de 10 días corridos que establece la Ley de Defensa del Consumidor.
                         </Accordion>
                     </div>
                 </div>

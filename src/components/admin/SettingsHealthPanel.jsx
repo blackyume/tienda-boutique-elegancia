@@ -1,6 +1,8 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 import { CheckCircle2, AlertCircle, Activity } from 'lucide-react';
+import { tokenMPValido } from '../../utils/comision';
+import { WHATSAPP_DE_LA_CASA } from '../../utils/contacto';
 
 // Panel de "salud" de la tienda — al toque ves qué está conectado y qué falta.
 const Row = ({ ok, label, hint, onGoTo }) => (
@@ -25,7 +27,7 @@ const Row = ({ ok, label, hint, onGoTo }) => (
 export const SettingsHealthPanel = ({ onJump }) => {
     const { siteConfig, aiConfig, paymentConfig, cloudinaryConfig } = useStore();
     const checks = [
-        { id: 'pay',  ok: Boolean(paymentConfig?.accessToken && paymentConfig?.publicKey), label: 'Mercado Pago', okHint: 'Credenciales cargadas', badHint: 'Falta accessToken o publicKey', goto: 'pagos' },
+        { id: 'pay',  ok: tokenMPValido(paymentConfig?.accessToken), label: 'Mercado Pago', okHint: 'Credenciales cargadas', badHint: 'Falta accessToken o publicKey', goto: 'pagos' },
         { id: 'cld',  ok: Boolean(cloudinaryConfig?.cloudName && cloudinaryConfig?.uploadPreset), label: 'Cloudinary (imágenes)', okHint: 'Subida de fotos activa', badHint: 'Falta cloudName / uploadPreset — sin esto no podés subir fotos', goto: 'tienda' },
         { id: 'gma',  ok: Boolean((aiConfig?.adminKeys || '').trim()), label: 'Gemini (Lau, copy, visión)', okHint: 'Análisis de fotos disponible', badHint: 'Sin Gemini ni NVIDIA, Lau no puede analizar fotos', goto: 'ia' },
         { id: 'nv',   ok: Boolean((aiConfig?.nvidiaKey || '').trim()), label: 'NVIDIA NIM · Visión fallback', okHint: 'Activo como fallback de Gemini', badHint: 'Opcional. Sin esto, si Gemini falla no hay fallback de visión', goto: 'ia' },
@@ -34,7 +36,7 @@ export const SettingsHealthPanel = ({ onJump }) => {
         { id: 'push', ok: Boolean(siteConfig?.push?.vapidKey && siteConfig?.push?.adminSecret), label: 'Notificaciones Push (FCM)', okHint: 'Push web activo', badHint: 'Falta VAPID key o admin secret', goto: 'notificaciones' },
         { id: 'tg',   ok: Boolean(siteConfig?.telegram?.secret), label: 'Telegram (opcional)', okHint: 'Secret configurado', badHint: 'Opcional. Si lo usás en Vercel pegá el secret', goto: 'notificaciones' },
         { id: 'ig',   ok: Boolean(siteConfig?.instagram?.conectado?.username), label: 'Instagram (publicar con Lau)', okHint: `Conectado como @${siteConfig?.instagram?.conectado?.username}`, badHint: 'Opcional. Trámite en Guías → Publicar en Instagram con Lau', goto: 'notificaciones' },
-        { id: 'wa',   ok: Boolean(siteConfig?.whatsappNumber), label: 'WhatsApp Business', okHint: `Número ${siteConfig?.whatsappNumber}`, badHint: 'Falta número — el botón de WA no funcionará', goto: 'marca' },
+        { id: 'wa',   ok: true, label: 'WhatsApp Business', okHint: `Número ${siteConfig?.whatsappNumber || WHATSAPP_DE_LA_CASA}${siteConfig?.whatsappNumber ? '' : ' (el de la casa)'}`, badHint: 'Falta número — el botón de WA no funcionará', goto: 'marca' },
         { id: 'ga',   ok: Boolean(siteConfig?.gaMeasurementId), label: 'Google Analytics 4', okHint: `ID ${siteConfig?.gaMeasurementId}`, badHint: 'Sin medición de tráfico web', goto: 'marca' },
     ];
     const okCount = checks.filter(c => c.ok).length;

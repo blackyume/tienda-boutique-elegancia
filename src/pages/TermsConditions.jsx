@@ -47,7 +47,7 @@ export const TermsConditions = () => {
                         <div className="space-y-4 text-sm leading-relaxed">
                             <p className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-lg text-amber-900 dark:text-amber-100">
                                 <strong>IMPORTANTE - LEER CON ATENCIÓN:</strong><br />
-                                Dada la naturaleza de nuestros productos (indumentaria de alta costura y ediciones limitadas) y para garantizar la higiene y exclusividad de cada pieza entregada, <strong>NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES</strong> por gusto, talle o arrepentimiento fuera del plazo legal obligatorio.
+                                Por razones de higiene, y porque de cada prenda contamos con muy pocas unidades, <strong>NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES</strong> por gusto, talle o arrepentimiento fuera del plazo legal obligatorio.
                             </p>
                             <p>
                                 <strong>5.1. Excepciones:</strong> Únicamente se admitirán reclamos en caso de defectos de fabricación comprobables o error en el envío del artículo, los cuales deberán ser notificados dentro de las 48hs de recibido el paquete.

@@ -47,7 +47,7 @@ export const Shipping = () => {
                             <RotateCcw className="w-5 h-5 text-[#E8C65E]" /> Cambios y devoluciones
                         </h2>
                         <p className="text-sm leading-relaxed mb-3">
-                            Por la naturaleza de nuestros productos (indumentaria y ediciones limitadas) y por higiene, no realizamos cambios por gusto o talle fuera del plazo legal. Te recomendamos revisar bien la <strong>Tabla de Talles</strong> antes de comprar o consultarnos.
+                            Por higiene, y porque de cada prenda tenemos muy pocas unidades, no hacemos cambios por gusto o talle fuera del plazo legal. Te recomendamos revisar bien la <strong>Tabla de Talles</strong> antes de comprar o consultarnos.
                         </p>
                         <ul className="text-sm leading-relaxed space-y-2 list-disc pl-5 marker:text-[#E8C65E]">
                             <li><strong>Falla de fábrica o error en el envío:</strong> escribinos apenas recibas el paquete y lo resolvemos.</li>

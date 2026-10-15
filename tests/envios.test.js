@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { esOpcionValida, sanearTarifas, TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG } from '../src/utils/envios';
+import { esOpcionValida, sanearTarifas, TARIFAS_DE_LA_CASA, COSTO_REAL_CORREO_1KG, nombreDeEnvio, fechaLegible } from '../src/utils/envios';
 
 describe('esOpcionValida', () => {
     it('acepta una opción con nombre y costo numérico', () => {
@@ -65,5 +65,42 @@ describe('sanearTarifas', () => {
     it('ninguna tarifa de la casa queda por debajo de lo que cobra el correo', () => {
         expect(TARIFAS_DE_LA_CASA.correo_domicilio.cost).toBeGreaterThanOrEqual(COSTO_REAL_CORREO_1KG.domicilio);
         expect(TARIFAS_DE_LA_CASA.sucursal.cost).toBeGreaterThanOrEqual(COSTO_REAL_CORREO_1KG.sucursal);
+    });
+});
+
+describe('nombreDeEnvio', () => {
+    it('traduce la clave guardada en el pedido al nombre configurado', () => {
+        expect(nombreDeEnvio('correo_domicilio')).toBe('Correo Argentino a domicilio');
+        expect(nombreDeEnvio('sucursal')).toContain('sucursal');
+    });
+
+    it('prefiere la tarifa configurada por la dueña antes que la de la casa', () => {
+        const propias = { correo_domicilio: { name: 'Moto a domicilio', cost: 5000 } };
+        expect(nombreDeEnvio('correo_domicilio', propias)).toBe('Moto a domicilio');
+    });
+
+    it('nunca devuelve la clave cruda con guiones bajos', () => {
+        expect(nombreDeEnvio('envio_expreso_nuevo')).toBe('Envio expreso nuevo');
+    });
+
+    it('sin método devuelve vacío, para que el panel no muestre un punto suelto', () => {
+        expect(nombreDeEnvio('')).toBe('');
+        expect(nombreDeEnvio(undefined)).toBe('');
+    });
+});
+
+describe('fechaLegible', () => {
+    it('formatea una fecha válida', () => {
+        expect(fechaLegible('2026-09-22T17:59:00Z')).not.toBe('sin fecha');
+    });
+
+    it('una fecha rota NO se muestra como "Invalid Date"', () => {
+        expect(fechaLegible('a-ver-que-pasa')).toBe('sin fecha');
+        expect(fechaLegible('#-PAGAR')).toBe('sin fecha');
+    });
+
+    it('sin fecha devuelve vacío', () => {
+        expect(fechaLegible(null)).toBe('');
+        expect(fechaLegible('')).toBe('');
     });
 });

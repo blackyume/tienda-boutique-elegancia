@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { comisionMP, comisionDeProducto, costoUnitario, precioConMargen, comisionDelPedido, COMISION_MP_ESTIMADA } from '../src/utils/comision';
+import { comisionMP, comisionDeProducto, costoUnitario, precioConMargen, comisionDelPedido, COMISION_MP_ESTIMADA, tokenMPValido } from '../src/utils/comision';
 
 describe('comisión de Mercado Pago', () => {
     it('usa la real medida; si no hay, el estimado (6,29% + IVA); el recargo a la clienta no cuenta', () => {
@@ -90,5 +90,24 @@ describe('precio automático (Configuración → Precios)', () => {
         expect(plan.altas[0].datos.price).toBeGreaterThan(8000);
         expect(plan.altas[0].avisos.join(' ')).toContain('Precio calculado desde el costo');
         expect(plan.errores[0].motivo).toContain('sin precio ni costo');
+    });
+});
+
+describe('tokenMPValido', () => {
+    it('acepta los access token de Mercado Pago', () => {
+        expect(tokenMPValido('APP_USR-1234567890abcdef')).toBe(true);
+        expect(tokenMPValido('TEST-9876543210zzzz')).toBe(true);
+        expect(tokenMPValido('  APP_USR-1234567890ab  ')).toBe(true);
+    });
+
+    it('RECHAZA cualquier texto suelto: el caso real fue una CONTRASEÑA', () => {
+        // En la tienda real habia una contrasena cargada en ese campo y
+        // "Primeros pasos" daba Mercado Pago por conectado porque sólo
+        // miraba que no estuviera vacio.
+        expect(tokenMPValido('Luchobanda21')).toBe(false);
+        expect(tokenMPValido('laboutiquedelaeleganciaoficial@gmail.com')).toBe(false);
+        expect(tokenMPValido('APP_USR-')).toBe(false);
+        expect(tokenMPValido('')).toBe(false);
+        expect(tokenMPValido(undefined)).toBe(false);
     });
 });
