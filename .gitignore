@@ -148,3 +148,6 @@ Boutique_Elegancia_Produccion_IA/
 kaggle.json
 *.key
 *.pem
+
+# Hojas de contacto y pruebas de imagen que armo para mostrarle al dueno
+hoja_*.png
