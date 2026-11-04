@@ -36,10 +36,11 @@ const sendEmailJS = async ({ to_email, to_name, items_summary, total, recovery_l
             template_params: {
                 to_name: to_name || 'Cliente',
                 to_email,
-                order_id: 'Recordatorio',
+                subject: 'Te guardamos tu selección 🛍️',
+                status_label: 'Tu selección te espera',
+                message: 'Todavía guardamos las prendas que elegiste. Hay pocas unidades de cada una: completá tu compra antes de que vuelen.',
                 total: formatMoney(total),
                 items_summary,
-                shipping_method: `Completá tu pedido: ${recovery_link}`,
                 recovery_link
             }
         })
