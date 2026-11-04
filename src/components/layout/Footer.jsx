@@ -96,7 +96,7 @@ export const Footer = () => {
                             ].map(({ to, label }) => (
                                 <li key={label}>
                                     <Link to={to} className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
-                                        <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
+                                        <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                         <span>{label}</span>
                                     </Link>
                                 </li>
@@ -122,7 +122,7 @@ export const Footer = () => {
                                             to={to}
                                             className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
-                                            <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
+                                            <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
                                         </Link>
                                     ) : (
@@ -130,7 +130,7 @@ export const Footer = () => {
                                             onClick={action}
                                             className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group text-left"
                                         >
-                                            <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
+                                            <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             {label}
                                         </button>
                                     )}
@@ -156,7 +156,7 @@ export const Footer = () => {
                                             to={to}
                                             className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
-                                            <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
+                                            <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
                                         </Link>
                                     ) : (
@@ -166,7 +166,7 @@ export const Footer = () => {
                                             rel="noopener noreferrer"
                                             className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
-                                            <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-cielo-gold/60 transition-all duration-300" />
+                                            <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
                                         </a>
                                     )}
@@ -177,7 +177,7 @@ export const Footer = () => {
                                     onClick={() => setIsRegretOpen(true)}
                                     className="text-sm text-noche-300/80 hover:text-rose-400 transition-colors duration-200 flex items-center gap-2 group text-left"
                                 >
-                                    <span className="w-3 h-px bg-white/20 group-hover:w-5 group-hover:bg-rose-400/60 transition-all duration-300" />
+                                    <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-rose-400/60 transition-all duration-300" />
                                     Bot&oacute;n Arrepentimiento
                                 </button>
                             </li>
