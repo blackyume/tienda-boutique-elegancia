@@ -8,6 +8,7 @@ import { useCart } from '../hooks/useCart';
 import { useDbActions } from '../hooks/useDbActions';
 import { useAuth } from '../hooks/useAuth';
 import { TARIFAS_DE_LA_CASA, sanearTarifas } from '../utils/envios';
+import { esDispositivoDeLaCasa } from '../utils/visitasPropias';
 
 const StoreContext = createContext();
 
@@ -45,9 +46,9 @@ export const StoreProvider = ({ children }) => {
       buttonLink: "shop"
     },
     showMarquee: true,
-    marquee: "La Boutique de la Elegancia • Collection 2026 • World Class Fashion • Future Luxury • Nueva Temporada",
+    marquee: "La Boutique de la Elegancia • Collection 2027 • World Class Fashion • Future Luxury • Nueva Temporada",
     announcement: {
-      text: "Compra Segura | Envíos a todo el País | Nueva Colección 2026",
+      text: "Compra Segura | Envíos a todo el País | Nueva Colección 2027",
       enabled: true,
     },
     promoPopup: {
@@ -212,6 +213,7 @@ export const StoreProvider = ({ children }) => {
 
   const incrementVisits = async () => {
     if (window.location.hostname === 'localhost') return;
+    if (esDispositivoDeLaCasa()) return;
     const visited = sessionStorage.getItem('cielo_visited');
     if (!visited) {
       try {

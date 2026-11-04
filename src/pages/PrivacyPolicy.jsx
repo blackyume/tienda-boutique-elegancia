@@ -39,7 +39,7 @@ export const PrivacyPolicy = () => {
                         </p>
                         <ul className="list-disc pl-6 space-y-2 mt-4 marker:text-[#E8C65E]">
                             <li>Procesar, confirmar y enviar sus pedidos.</li>
-                            <li>Brindar asistencia al cliente y seguimiento de compras.</li>
+                            <li>Brindar asistencia al cliente, responder sus consultas y dar seguimiento a sus compras.</li>
                             <li>Enviar comunicaciones promocionales (solo si ha dado su consentimiento explícito).</li>
                             <li>Mejorar la experiencia de usuario en nuestra plataforma digital.</li>
                         </ul>

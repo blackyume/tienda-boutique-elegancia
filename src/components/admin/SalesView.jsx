@@ -193,6 +193,9 @@ export const SalesView = ({ salesLog, metrics, dia = '', onLimpiarDia }) => {
                                             {s.channel ? ` · ${s.channel}` : ''}
                                             {typeof s.stockLeft === 'number' ? ` · quedan ${s.stockLeft}` : ''}
                                         </p>
+                                        {s.sinFicha && (
+                                            <p className="text-[11px] text-amber-500 mt-0.5">No está en el inventario: sin foto ni costo, la ganancia es el precio entero.</p>
+                                        )}
                                     </div>
                                 </div>
                             </td>

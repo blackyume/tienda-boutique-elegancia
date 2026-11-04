@@ -5,11 +5,11 @@
 import { db } from '../lib/firebase';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+export const esCorreoValido = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
 export const subscribeNewsletter = async (rawEmail, source = 'web') => {
     const email = String(rawEmail || '').trim().toLowerCase();
-    if (!isEmail(email) || email.length > 256) return false;
+    if (!esCorreoValido(email) || email.length > 256) return false;
     // id seguro: sin caracteres que rompan la ruta del doc.
     const id = email.replace(/[^a-z0-9._%+-]/g, '_');
     try {

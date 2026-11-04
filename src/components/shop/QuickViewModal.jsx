@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRotacionFotos } from '../../hooks/useRotacionFotos';
 import { tituloDeProducto } from '../../utils/nombres';
 import { useNavigate } from 'react-router-dom';
 import { X, Heart, Check, Ruler, Share2, ChevronDown, ArrowRight } from 'lucide-react';
@@ -14,14 +15,17 @@ export const QuickViewModal = ({ product, onClose }) => {
     const [selectedColor, setSelectedColor] = useState("");
     const [copied, setCopied] = useState(false);
 
-    // Media State
-    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-
     const mediaList = product?.media && product.media.length > 0
         ? product.media
         : Array.isArray(product?.images) && product.images.length > 0
             ? product.images.map(url => ({ type: 'image', url }))
             : [{ type: 'image', url: product?.image }];
+
+    // Frente y espalda rotan solas con fundido; con un video en pantalla, no.
+    const conVideo = mediaList.some(m => m.type === 'video');
+    const fotos = useRotacionFotos(mediaList.length, { clave: product?.id, activa: !conVideo });
+    const activeMediaIndex = fotos.indice;
+    const setActiveMediaIndex = (v) => fotos.elegir(typeof v === 'function' ? v(fotos.indice) : v);
 
 
     useEffect(() => {
@@ -118,7 +122,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                 {/* GALERÍA MULTIMEDIA */}
                 <div className="w-full md:w-[55%] shrink-0 bg-slate-100 dark:bg-slate-900 relative flex flex-col md:max-h-[92vh]">
                     {/* Main Viewer */}
-                    <div className="flex-1 relative min-h-[300px] md:min-h-[500px]">
+                    <div className="flex-1 relative min-h-[300px] md:min-h-[500px]" onMouseEnter={fotos.alEntrar} onMouseLeave={fotos.alSalir}>
                         {mediaList[activeMediaIndex].type === 'video' ? (
                             <iframe
                                 src={getEmbedUrl(mediaList[activeMediaIndex].url)}
@@ -129,8 +133,19 @@ export const QuickViewModal = ({ product, onClose }) => {
                                 title="Product Video"
                             ></iframe>
                         ) : (
-                            <img src={mediaList[activeMediaIndex].url} alt={product.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+                            mediaList.map((m, i) => (
+                                <img
+                                    key={`${m.url}-${i}`}
+                                    src={m.url}
+                                    alt={i === activeMediaIndex ? product.name : ''}
+                                    aria-hidden={i !== activeMediaIndex}
+                                    loading={i === 0 ? 'eager' : 'lazy'}
+                                    decoding="async"
+                                    className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-[1200ms] ease-in-out ${i === activeMediaIndex ? 'opacity-100' : 'opacity-0'}`}
+                                />
+                            ))
                         )}
+                        {fotos.rota && <div key={fotos.vuelta} className="barra-foto absolute bottom-0 inset-x-0 h-px bg-cielo-gold/70 pointer-events-none" />}
 
                         {/* Navigation Arrows (if multiple) */}
                         {mediaList.length > 1 && (

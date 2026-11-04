@@ -20,7 +20,7 @@ const MarqueeTrack = ({ segments, className = '' }) => (
 
 export const Marquee = () => {
     const { siteConfig } = useStore();
-    const raw = siteConfig?.marquee || 'La Boutique de la Elegancia - Collection 2026 - Moda Atemporal';
+    const raw = siteConfig?.marquee || 'La Boutique de la Elegancia - Collection 2027 - Moda Atemporal';
     const segments = Array.from({ length: 6 }, () => raw.split('-')).flat();
 
     return (

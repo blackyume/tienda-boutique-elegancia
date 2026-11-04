@@ -158,7 +158,7 @@ export const Maintenance = () => {
                     <span className="block mt-2 text-gray-500 text-xs">Nuestra tienda online está siendo optimizada para brindarte el mejor servicio.</span>
                 </p>
 
-                <span className="block text-[#E8C65E] font-medium tracking-[0.2em] text-xs md:text-sm mb-6 uppercase">Nueva Colección 2026 • Muy Pronto</span>
+                <span className="block text-[#E8C65E] font-medium tracking-[0.2em] text-xs md:text-sm mb-6 uppercase">Nueva Colección 2027 • Muy Pronto</span>
 
                 {/* Email Form */}
                 <div className="w-full max-w-sm mx-auto mb-10">
@@ -229,7 +229,7 @@ export const Maintenance = () => {
 
                 {/* Footer */}
                 <p className="text-[10px] text-gray-600 uppercase tracking-[0.3em]">
-                    La Boutique de la Elegancia &copy; 2026
+                    La Boutique de la Elegancia &copy; 2027
                 </p>
             </div>
         </div>

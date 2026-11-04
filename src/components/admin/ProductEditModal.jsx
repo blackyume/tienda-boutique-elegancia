@@ -156,6 +156,9 @@ export const ProductEditModal = ({ initialProduct, onClose }) => {
             ...currentProduct,
             media: cleanMedia,
             image: cleanImage,
+            // La tarjeta (foto al pasar el mouse) y la ficha leen `images`: si no se
+            // sincroniza con la galería, siguen mostrando las fotos viejas.
+            images: cleanMedia.filter(m => m.type === 'image').map(m => m.url),
             price: Number(currentProduct.price),
             stock: Number(currentProduct.stock),
             cost: Number(currentProduct.cost || 0),

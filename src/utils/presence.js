@@ -6,6 +6,8 @@
 // una sola vez por sesión x hora (usa sessionStorage para dedupe).
 import { db } from '../lib/firebase';
 import { doc, setDoc, deleteDoc, serverTimestamp, increment, updateDoc } from 'firebase/firestore';
+import { esDispositivoDeLaCasa } from './visitasPropias';
+import { claveDiaLocal, origenDeVisita, dispositivoDe } from './visitas';
 
 const SESSION_STORAGE_KEY = 'lbe_session_id';
 const PING_INTERVAL_MS = 30_000;
@@ -29,6 +31,7 @@ const ADMIN_EMAILS = new Set([
 export const startPresence = (user) => {
     if (typeof window === 'undefined') return () => { };
     if (user && ADMIN_EMAILS.has(user.email)) return () => { };
+    if (esDispositivoDeLaCasa()) return () => { };
 
     const sessionId = getSessionId();
     if (!sessionId) return () => { };
@@ -59,7 +62,37 @@ export const startPresence = (user) => {
         } catch { }
     };
 
+    // Registro por día (visit_stats_daily): un visitante por dispositivo y día,
+    // una visita por sesión y día, con el origen y el tipo de dispositivo.
+    const registrarDia = async () => {
+        try {
+            const hoy = claveDiaLocal();
+            const marcaVisitante = `lbde_visitante_${hoy}`;
+            const marcaVisita = `lbde_visita_${hoy}`;
+            const nuevoVisitante = !localStorage.getItem(marcaVisitante);
+            const nuevaVisita = !sessionStorage.getItem(marcaVisita);
+            if (!nuevoVisitante && !nuevaVisita) return;
+            const datos = { fecha: hoy, ts: Date.now() };
+            if (nuevaVisita) datos.visitas = increment(1);
+            if (nuevoVisitante) {
+                const origen = origenDeVisita({
+                    referrer: document.referrer,
+                    search: window.location.search,
+                    userAgent: navigator.userAgent,
+                    host: window.location.hostname,
+                });
+                datos.visitantes = increment(1);
+                datos.origen = { [origen]: increment(1) };
+                datos.dispositivo = { [dispositivoDe(navigator.userAgent)]: increment(1) };
+            }
+            await setDoc(doc(db, 'visit_stats_daily', hoy), datos, { merge: true });
+            if (nuevoVisitante) localStorage.setItem(marcaVisitante, '1');
+            if (nuevaVisita) sessionStorage.setItem(marcaVisita, '1');
+        } catch { }
+    };
+
     ping();
+    registrarDia();
     const interval = setInterval(ping, PING_INTERVAL_MS);
 
     const cleanup = () => {

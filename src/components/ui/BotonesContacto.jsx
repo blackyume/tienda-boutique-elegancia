@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
-import { telegramDeConfig, whatsappDeConfig } from '../../utils/contacto';
+import { MENSAJERIA_ACTIVA, telegramDeConfig, whatsappDeConfig } from '../../utils/contacto';
 
 const IconoTelegram = ({ className }) => (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -56,6 +56,7 @@ export const BotonesContacto = () => {
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
     }, []);
 
+    if (!MENSAJERIA_ACTIVA) return null;
     if (location.pathname.startsWith('/admin') || location.pathname === '/checkout') return null;
 
     const telegram = telegramDeConfig(siteConfig);

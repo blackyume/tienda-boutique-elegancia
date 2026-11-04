@@ -16,9 +16,11 @@ import { PromoPopup } from './components/ui/PromoPopup';
 import { PushOptIn } from './components/ui/PushOptIn';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
+import { ChatConsultas } from './components/ui/ChatConsultas';
 import { AdminLauFab } from './components/admin/AdminLauFab';
 import React, { useLayoutEffect, useEffect, Suspense } from 'react';
 import { startPresence } from './utils/presence';
+import { marcarDispositivoDeLaCasa } from './utils/visitasPropias';
 import { lazyConReintento } from './utils/lazyConReintento';
 import { LogoCargando, CargandoRuta, ocultarPantallaDeEntrada } from './components/ui/LogoCargando';
 
@@ -33,6 +35,7 @@ const Tracking = lazyConReintento(() => import('./pages/Tracking').then(m => ({ 
 const PrivacyPolicy = lazyConReintento(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
 const TermsConditions = lazyConReintento(() => import('./pages/TermsConditions').then(m => ({ default: m.TermsConditions })));
 const Wishlist = lazyConReintento(() => import('./pages/Wishlist').then(m => ({ default: m.Wishlist })));
+const Insta = lazyConReintento(() => import('./pages/Insta').then(m => ({ default: m.Insta })));
 const UserProfile = lazyConReintento(() => import('./pages/UserProfile').then(m => ({ default: m.UserProfile })));
 const NotFound = lazyConReintento(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 const Success = lazyConReintento(() => import('./pages/Success').then(m => ({ default: m.Success })));
@@ -80,6 +83,10 @@ const AppContent = () => {
   // Trigger visits exactly once on mount
   useEffect(() => { incrementVisits(); }, []);
 
+  // Un dispositivo donde entró un admin queda como "de la casa" y deja de
+  // sumar visitas, aunque después navegue sin sesión.
+  useEffect(() => { if (isAdmin) marcarDispositivoDeLaCasa(); }, [isAdmin]);
+
   // Presence tracking (visitantes live) — ignora admin
   useEffect(() => {
     const stop = startPresence(user);
@@ -118,6 +125,7 @@ const AppContent = () => {
       <ScrollProgress />
       <UpdatePrompt />
       <BotonesContacto />
+      <ChatConsultas />
       <SystemAlert />
       <PromoPopup />
       <NewsletterPopup />
@@ -145,6 +153,7 @@ const AppContent = () => {
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsConditions />} />
             <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/insta" element={<Insta />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

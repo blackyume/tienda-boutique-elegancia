@@ -94,7 +94,7 @@ export const Home = () => {
                                 key={cat.id}
                                 to={`/shop?category=${encodeURIComponent(cat.name)}`}
                                 aria-label={`Ver categoría ${cat.name}`}
-                                className="relative group cursor-pointer overflow-hidden rounded-sm aspect-[4/5] transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.12)]"
+                                className="relative group cursor-pointer overflow-hidden rounded-sm aspect-[2/3] transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.12)]"
                             >
                                 <div className="absolute inset-0 bg-slate-800 animate-pulse" />
                                 <img

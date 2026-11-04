@@ -145,7 +145,7 @@ export const Shop = () => {
             <div className="w-full bg-slate-900 dark:bg-black/40 text-white py-16 md:py-20 px-6 text-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-overlay" />
                 <div className="relative z-10 animate-fadeIn">
-                    <h1 className="text-4xl md:text-6xl font-luxury mb-4 tracking-wider">Colección 2026</h1>
+                    <h1 className="text-4xl md:text-6xl font-luxury mb-4 tracking-wider">Colección 2027</h1>
                     <p className="font-serif italic text-lg text-slate-300 max-w-2xl mx-auto">
                         Descubrí la esencia del lujo moderno. Piezas únicas diseñadas para destacar.
                     </p>

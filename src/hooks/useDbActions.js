@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { db } from '../lib/firebase';
 import { direccionEnUnaLinea } from '../utils/direccion';
+import { esDispositivoDeLaCasa } from '../utils/visitasPropias';
 import { collection, addDoc, updateDoc, deleteDoc, doc, setDoc, increment } from 'firebase/firestore';
 import imageCompression from 'browser-image-compression';
 import { deleteProductImages } from '../utils/cloudinaryDelete';
@@ -133,6 +134,7 @@ export const useDbActions = ({
       }
     },
     incrementProductView: async (id) => {
+      if (esDispositivoDeLaCasa()) return;
       try {
         await updateDoc(doc(db, "products", String(id)), { views: increment(1) });
       } catch (err) {
@@ -455,10 +457,11 @@ export const useDbActions = ({
         template_params: {
           to_name: abandonedCart.customer?.nombre || 'Cliente',
           to_email: abandonedCart.email,
-          order_id: 'Recordatorio',
+          subject: 'Te guardamos tu selección 🛍️',
+          status_label: 'Tu selección te espera',
+          message: 'Todavía guardamos las prendas que elegiste. Hay pocas unidades de cada una: completá tu compra antes de que vuelen.',
           total: abandonedCart.total,
           items_summary: itemsSummary,
-          shipping_method: `Link para completar: ${recoveryLink}`,
           recovery_link: recoveryLink
         }
       };

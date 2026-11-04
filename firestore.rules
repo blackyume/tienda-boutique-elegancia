@@ -173,6 +173,12 @@ service cloud.firestore {
 
     // --- VISIT STATS HOURLY ---
     // Counters por hora. Cualquiera incrementa; admin lee/borra.
+    match /visit_stats_daily/{id} {
+      allow read: if isAdmin();
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+
     match /visit_stats_hourly/{id} {
       allow read: if isAdmin();
       allow create, update: if true;
@@ -186,6 +192,21 @@ service cloud.firestore {
       allow create, update: if request.resource.data.email is string
         && request.resource.data.email.size() <= 256;
       allow delete: if isAdmin();
+    }
+
+    // --- CONSULTAS DE CLIENTAS ---
+    // Cualquiera deja una; sólo admin las lee, marca y borra.
+    match /consultas/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['nombre', 'email', 'mensaje', 'producto', 'novedades', 'pagina', 'estado', 'creada'])
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() > 0 && request.resource.data.nombre.size() <= 80
+        && request.resource.data.email is string && request.resource.data.email.size() > 4 && request.resource.data.email.size() <= 256
+        && request.resource.data.mensaje is string && request.resource.data.mensaje.size() > 0 && request.resource.data.mensaje.size() <= 1500
+        && request.resource.data.producto is string && request.resource.data.producto.size() <= 200
+        && request.resource.data.pagina is string && request.resource.data.pagina.size() <= 200
+        && request.resource.data.novedades is bool
+        && request.resource.data.estado == 'nueva'
+        && request.resource.data.creada == request.time;
     }
 
     // --- PUSH SUBSCRIPTIONS (FCM) ---

@@ -9,9 +9,15 @@
 
 import { PORTADA_PROPIA, resolveHeroImage } from './helpers';
 
+// Desde el 1/11/2026: collages del productor, tres modelos recortadas sobre un
+// mismo fondo de estudio (una sola en el teléfono), siempre de cuerpo entero y
+// con aire en los bordes, porque el zoom lento del hero come lo que toca el borde.
+// Al cambiar una portada, cambiar el NOMBRE del archivo: el service worker y la
+// CDN siguen sirviendo la vieja si el nombre es el mismo.
 export const PORTADAS_PROPIAS = [
-    { escritorio: '/portada-modelo.webp', telefono: '/portada-modelo-sm.webp', respaldo: '/portada-modelo.jpg' },
-    { escritorio: '/portada-modelo-2.webp', telefono: '/portada-modelo-2-sm.webp', respaldo: '/portada-modelo-2.jpg' },
+    { escritorio: '/portada-estudio-b1.webp', telefono: '/portada-estudio-b1-sm.webp', respaldo: '/portada-estudio-b1.jpg' },
+    { escritorio: '/portada-estudio-b2.webp', telefono: '/portada-estudio-b2-sm.webp', respaldo: '/portada-estudio-b2.jpg' },
+    { escritorio: '/portada-estudio-b3.webp', telefono: '/portada-estudio-b3-sm.webp', respaldo: '/portada-estudio-b3.jpg' },
 ];
 
 const normalizar = (slide) => {

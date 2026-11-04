@@ -77,13 +77,18 @@ export const CapaPortadas = ({ visibles, activa, propias }) => (
                         loading={i === 0 ? 'eager' : 'lazy'}
                         decoding="async"
                         className={[
+                            // Las propias de escritorio van ENTERAS (contain), apoyadas a la
+                            // derecha: sus bordes son del mismo negro que la página, así que el
+                            // hueco no se ve, y en una pantalla ancha y baja el cover le cortaba
+                            // los pies o la cabeza a las modelos.
                             'absolute inset-0 w-full h-full object-cover object-center',
+                            propias && 'md:object-contain md:object-right-bottom',
                             'transition-opacity duration-[1600ms] ease-in-out motion-reduce:transition-none',
-                            esActiva ? 'opacity-95' : 'opacity-0',
+                            esActiva ? 'opacity-100' : 'opacity-0',
                             esActiva
                                 ? 'animate-kenburns motion-reduce:animate-none motion-reduce:scale-110'
                                 : 'scale-[1.02]',
-                        ].join(' ')}
+                        ].filter(Boolean).join(' ')}
                     />
                 </picture>
             );
@@ -94,7 +99,7 @@ export const CapaPortadas = ({ visibles, activa, propias }) => (
 export const PuntosPortada = ({ slides, activa, onElegir }) => {
     if (slides.length < 2) return null;
     return (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5 lg:left-auto lg:right-24 lg:translate-x-0">
+        <div className="absolute top-[calc(86svh-2.5rem)] md:top-auto md:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5 lg:left-auto lg:right-24 lg:translate-x-0">
             {slides.map((s, i) => (
                 <button
                     key={s.escritorio}

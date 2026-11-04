@@ -21,7 +21,7 @@ export const Atelier = () => (
             </h2>
             <p className="mt-8 text-noche-300/85 text-sm md:text-base font-light leading-relaxed max-w-xl mx-auto">
                 La Boutique de la Elegancia es una tienda chica de Rafaela. No hacemos ropa: la elegimos.
-                Prendas que revisamos antes de publicar, y una persona de verdad del otro lado del WhatsApp.
+                Prendas que revisamos antes de publicar, y una persona de verdad del otro lado de cada consulta.
             </p>
         </Reveal>
 

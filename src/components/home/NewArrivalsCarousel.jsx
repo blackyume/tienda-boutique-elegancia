@@ -14,7 +14,7 @@ const ArrivalCard = ({ product, onQuickView }) => {
             onClick={() => onQuickView?.(product)}
         >
             {/* Image container */}
-            <div className="relative aspect-[4/5] overflow-hidden mb-4" style={{ background: '#080808' }}>
+            <div className="relative aspect-[2/3] overflow-hidden mb-4" style={{ background: '#080808' }}>
                 <img
                     src={optimizeImage(product.image, 600)}
                     alt={product.name}

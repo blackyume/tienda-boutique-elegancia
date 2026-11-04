@@ -526,7 +526,17 @@ export const DashboardView = ({ metrics, visitCount, salesMetrics, orders, isMai
                                     <span className="text-5xl font-black text-slate-900 dark:text-white">{liveVisitors.length}</span>
                                     <span className="text-xs text-slate-500 dark:text-slate-400 mb-2">visitante{liveVisitors.length !== 1 ? 's' : ''} ahora</span>
                                 </div>
-                                <p className="text-[11px] text-slate-400 mt-1">Actualizado cada 15s · excluye admin.</p>
+                                <p className="text-[11px] text-slate-400 mt-1">Actualizado cada 15s · no cuenta los dispositivos de ustedes.</p>
+                                {/* Quién es cada uno: dispositivo y página, para saber si es una clienta o un celular propio sin marcar. */}
+                                {liveVisitors.length > 0 && (
+                                    <ul className="mt-3 space-y-1">
+                                        {liveVisitors.slice(0, 5).map(s => (
+                                            <li key={s.id} className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                                                {/Mobi|Android|iPhone|iPad/i.test(s.userAgent || '') ? '📱 Celular' : '💻 Computadora'} · {s.path === '/' ? 'Inicio' : s.path}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                         </div>
 

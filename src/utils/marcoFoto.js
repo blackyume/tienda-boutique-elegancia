@@ -19,9 +19,9 @@ const CARRILES = [
 export const marcoParaRatio = (ratio) =>
     (CARRILES.find((c) => ratio >= c.min) || CARRILES[CARRILES.length - 1]).clase;
 
-// Arranca en 4:5 (el más conservador: es lo que hay cargado hoy) y se corrige
-// solo cuando la foto informa que es vertical.
-export const useMarcoFoto = (inicial = 'aspect-[4/5]') => {
+// Arranca en 2:3 (desde el 1/11/2026 todo el catálogo es foto de modelo de
+// cuerpo entero) y se corrige solo cuando la foto informa su proporción.
+export const useMarcoFoto = (inicial = 'aspect-[2/3]') => {
     const [marco, setMarco] = useState(inicial);
     const onNaturalSize = useCallback((w, h) => {
         if (w > 0 && h > 0) setMarco(marcoParaRatio(w / h));

@@ -27,6 +27,11 @@ export const linkWhatsApp = (valor, mensaje = '') => {
     return `https://wa.me/${digitos}${texto}`;
 };
 
+// WhatsApp y Telegram apagados por ahora (pedido del dueño, 3/11/2026): las
+// clientas escriben por el chat de consultas. Para volver a mostrarlos alcanza
+// con poner true; la Contacto y las Preguntas Frecuentes hay que rearmarlas.
+export const MENSAJERIA_ACTIVA = false;
+
 export const telegramDeConfig = (siteConfig) => linkTelegram(siteConfig?.social?.telegram);
 
 // El WhatsApp de la tienda, dado por el dueño el 12/09/2026. Es el respaldo

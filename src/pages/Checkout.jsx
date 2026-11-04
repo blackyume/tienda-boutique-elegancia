@@ -11,7 +11,7 @@ import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
 import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
 import { BrandStrip } from '../components/ui/BrandBadges';
-import { canalDePedido } from '../utils/contacto';
+import { MENSAJERIA_ACTIVA, canalDePedido } from '../utils/contacto';
 
 export const Checkout = () => {
     const { cart, cartTotal, createOrder, addToast, user, loginAnonymously, loginWithGoogle, shippingRates, paymentConfig, createPreferenceMP, siteConfig, coupons, sendOrderEmail } = useStore();
@@ -363,7 +363,7 @@ ${itemsList}
 
 Hubo un error con el pago automático. Quisiera coordinar por acá.`;
 
-                const canal = canalDePedido(siteConfig, message);
+                const canal = MENSAJERIA_ACTIVA ? canalDePedido(siteConfig, message) : null;
                 if (!canal) {
                     addToast(`Pedido ${newOrder.id} registrado, pero el pago automático falló. Te contactamos para coordinar.`, 'error');
                     setLoading(false);
@@ -650,6 +650,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                             {loading ? <span className="animate-pulse">Procesando...</span> : <span>Pagar con Mercado Pago</span>}
                         </button>
 
+                        {MENSAJERIA_ACTIVA && (<>
                         <div className="flex items-center gap-3 my-4">
                             <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
                             <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">o</span>
@@ -668,6 +669,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                             Finalizar por WhatsApp
                         </button>
                         <p className="text-[10px] text-center text-slate-400 mt-2">Coordiná el pago y envío por chat con una asesora.</p>
+                        </>)}
 
                         <div className="mt-6 flex justify-center items-center gap-4 text-slate-400">
                             <Lock className="w-4 h-4" />

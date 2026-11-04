@@ -7,6 +7,22 @@ import { initSentry } from './lib/sentry'
 
 initSentry();
 
+// Después de un deploy, una pestaña abierta con la versión vieja pide trozos JS
+// que ya no existen y la pantalla caía en "error crítico". Vite avisa con
+// `vite:preloadError`: se recarga UNA vez (la marca evita un bucle si el fallo
+// fuera otro).
+window.addEventListener('vite:preloadError', (event) => {
+  try {
+    if (sessionStorage.getItem('lbde-recarga-por-version')) return;
+    sessionStorage.setItem('lbde-recarga-por-version', '1');
+  } catch { /* sin storage: se recarga igual */ }
+  event.preventDefault();
+  window.location.reload();
+});
+window.addEventListener('load', () => {
+  setTimeout(() => { try { sessionStorage.removeItem('lbde-recarga-por-version'); } catch { /* sin storage */ } }, 10000);
+});
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>

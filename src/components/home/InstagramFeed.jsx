@@ -52,7 +52,7 @@ export const InstagramFeed = () => {
                                 to={`/product/${item.id}`}
                                 key={item.id || idx}
                                 aria-label={`Ver ${item.name}`}
-                                className="group relative aspect-square overflow-hidden cursor-pointer"
+                                className="group relative aspect-[2/3] overflow-hidden cursor-pointer"
                             >
                                 <img
                                     src={optimizeImage(item.url, 400)}

@@ -1,120 +1,51 @@
 <!--
-  TEMPLATE UNIVERSAL DE PEDIDO — La Boutique de la Elegancia
-  Sirve para los 3 emails: confirmación, pago aprobado y pedido enviado.
-  El texto cambia solo según las variables que manda la tienda.
+  PLANTILLA DE LA TIENDA — La Boutique de la Elegancia
+  Es la que está cargada en EmailJS (template_t14ilhy). Sirve para pedido
+  recibido, pago aprobado, pedido enviado, carrito y aviso de consulta: cada
+  bloque aparece sólo si la tienda le manda ese dato.
 
-  CÓMO USARLO EN EmailJS:
-  1. Entrá a emailjs.com → Email Templates → Create New Template.
-  2. En "Subject" (asunto) poné EXACTAMENTE:  {{subject}}
-  3. En el cuerpo, tocá "</> Code editor" (o "Edit Content" → modo HTML) y pegá TODO este archivo.
-  4. En "To Email" poné:  {{to_email}}     y en "To Name":  {{to_name}}
-  5. Guardá. Copiá el Template ID (template_xxx) y pegalo en
-     Admin → Configuración → EmailJS → "Template — Confirmación de pedido".
-  (Con este único template alcanza para los tres avisos.)
-
-  Variables que usa: subject, to_name, status_label, message, order_id,
-                     items_summary, total, shipping_method, shipping_address, tracking
+  Los {{#dato}} van entre <div>, nunca entre filas de una tabla: el editor de
+  EmailJS los saca de la tabla y dejan de funcionar.
+  Asunto: {{subject}} · Para: {{to_email}} · Responder a: {{email}}
 -->
-<div style="margin:0;padding:0;background:#0a0a0a;font-family:'Helvetica Neue',Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 0;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:92%;background:#111111;border:1px solid #262626;border-radius:16px;overflow:hidden;">
-
-          <!-- Header -->
-          <tr>
-            <td align="center" style="background:#0a0a0a;padding:36px 24px 28px;border-bottom:1px solid #1f1f1f;">
-              <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;letter-spacing:2px;color:#D4AF37;font-weight:700;">
-                LA BOUTIQUE
-              </div>
-              <div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;letter-spacing:6px;color:#9a8347;margin-top:4px;text-transform:uppercase;">
-                de la Elegancia
-              </div>
-            </td>
-          </tr>
-
-          <!-- Status banner -->
-          <tr>
-            <td align="center" style="padding:30px 24px 6px;">
-              <div style="display:inline-block;background:#D4AF37;color:#1a1308;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:999px;">
-                {{status_label}}
-              </div>
-            </td>
-          </tr>
-
-          <!-- Saludo + mensaje -->
-          <tr>
-            <td style="padding:18px 40px 8px;">
-              <p style="color:#ffffff;font-size:20px;font-weight:600;margin:0 0 10px;">¡Hola, {{to_name}}!</p>
-              <p style="color:#b9b9b9;font-size:15px;line-height:1.6;margin:0;">{{message}}</p>
-            </td>
-          </tr>
-
-          <!-- Detalle del pedido -->
-          <tr>
-            <td style="padding:24px 40px 8px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0d0d0d;border:1px solid #242424;border-radius:12px;">
-                <tr>
-                  <td style="padding:20px 22px;">
-                    <p style="color:#7a7a7a;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px;">Pedido</p>
-                    <p style="color:#D4AF37;font-size:17px;font-weight:700;margin:0 0 16px;">{{order_id}}</p>
-
-                    <p style="color:#7a7a7a;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px;">Productos</p>
-                    <p style="color:#e6e6e6;font-size:14px;line-height:1.6;margin:0 0 16px;">{{items_summary}}</p>
-
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td style="color:#7a7a7a;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:0;">Total</td>
-                        <td align="right" style="color:#ffffff;font-size:20px;font-weight:700;padding:0;">{{total}}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Envío -->
-          <tr>
-            <td style="padding:8px 40px 4px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="color:#7a7a7a;font-size:12px;padding:6px 0;border-bottom:1px solid #1c1c1c;">Método de envío</td>
-                  <td align="right" style="color:#e6e6e6;font-size:13px;padding:6px 0;border-bottom:1px solid #1c1c1c;">{{shipping_method}}</td>
-                </tr>
-                <tr>
-                  <td style="color:#7a7a7a;font-size:12px;padding:6px 0;border-bottom:1px solid #1c1c1c;">Dirección</td>
-                  <td align="right" style="color:#e6e6e6;font-size:13px;padding:6px 0;border-bottom:1px solid #1c1c1c;">{{shipping_address}}</td>
-                </tr>
-                {{#tracking}}
-                <tr>
-                  <td style="color:#7a7a7a;font-size:12px;padding:6px 0;">Seguimiento</td>
-                  <td align="right" style="color:#D4AF37;font-size:13px;font-weight:700;padding:6px 0;">{{tracking}}</td>
-                </tr>
-                {{/tracking}}
-              </table>
-            </td>
-          </tr>
-
-          <!-- CTA -->
-          <tr>
-            <td align="center" style="padding:28px 40px 36px;">
-              <a href="https://la-boutique-de-la-elegancia.web.app" style="display:inline-block;background:#D4AF37;color:#1a1308;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 34px;border-radius:8px;">
-                Ver la tienda
-              </a>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td align="center" style="background:#0a0a0a;padding:24px;border-top:1px solid #1f1f1f;">
-              <p style="color:#8a7740;font-family:Georgia,serif;font-size:14px;letter-spacing:1px;margin:0 0 6px;">La Boutique de la Elegancia</p>
-              <p style="color:#555555;font-size:11px;margin:0;">Gracias por elegirnos 💛</p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
+<div style="margin:0;padding:0;background-color:#0C0B09;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0C0B09;">
+<tr><td align="center" style="padding:28px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background-color:#11100D;border:1px solid #B8932E;">
+<tr><td style="padding:6px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #4A3C1A;">
+<tr><td align="center" style="padding:40px 28px 26px;">
+<a href="https://la-boutique-de-la-elegancia.web.app" style="text-decoration:none;"><img src="https://la-boutique-de-la-elegancia.web.app/assets/logo-main.png" width="270" alt="La Boutique de la Elegancia" style="display:block;width:270px;max-width:80%;height:auto;border:0;color:#E8C65E;font-family:Georgia,serif;font-size:22px;"></a>
+<div style="width:56px;height:1px;background-color:#B8932E;margin:26px auto 22px;line-height:1px;font-size:1px;">&nbsp;</div>
+<div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#E8C65E;">{{status_label}}</div>
+</td></tr>
+<tr><td style="padding:0 36px 8px;">
+<div style="font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:25px;line-height:1.3;color:#F4EDDD;text-align:center;">¡Hola, {{to_name}}!</div>
+<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:#CFC6B4;text-align:center;margin-top:14px;white-space:pre-line;">{{message}}</div>
+</td></tr>
+<tr><td style="padding:22px 36px 6px;">
+{{#order_id}}<div style="border-top:1px solid #2E2717;padding:14px 0;font-family:Arial,Helvetica,sans-serif;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9C8F76;margin-bottom:5px;">Pedido</div><div style="font-size:15px;color:#F4EDDD;">{{order_id}}</div></div>{{/order_id}}
+{{#items_summary}}<div style="border-top:1px solid #2E2717;padding:14px 0;font-family:Arial,Helvetica,sans-serif;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9C8F76;margin-bottom:5px;">Productos</div><div style="font-size:15px;line-height:1.6;color:#F4EDDD;">{{items_summary}}</div></div>{{/items_summary}}
+{{#shipping_method}}<div style="border-top:1px solid #2E2717;padding:14px 0;font-family:Arial,Helvetica,sans-serif;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9C8F76;margin-bottom:5px;">Método de envío</div><div style="font-size:15px;color:#F4EDDD;">{{shipping_method}}</div></div>{{/shipping_method}}
+{{#shipping_address}}<div style="border-top:1px solid #2E2717;padding:14px 0;font-family:Arial,Helvetica,sans-serif;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9C8F76;margin-bottom:5px;">Dirección</div><div style="font-size:15px;line-height:1.6;color:#F4EDDD;">{{shipping_address}}</div></div>{{/shipping_address}}
+{{#tracking}}<div style="border-top:1px solid #2E2717;padding:14px 0;font-family:Arial,Helvetica,sans-serif;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9C8F76;margin-bottom:5px;">Seguimiento</div><div style="font-size:15px;color:#F4EDDD;">{{tracking}}</div></div>{{/tracking}}
+{{#total}}<div style="border-top:1px solid #B8932E;padding:16px 0 4px;font-family:Arial,Helvetica,sans-serif;text-align:center;"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9C8F76;margin-bottom:6px;">Total</div><div style="font-size:28px;font-weight:300;color:#E8C65E;">{{total}}</div></div>{{/total}}
+</td></tr>
+<tr><td align="center" style="padding:22px 36px 34px;">
+{{#recovery_link}}<div style="margin-bottom:12px;"><a href="{{recovery_link}}" style="display:inline-block;background-color:#E8C65E;color:#11100D;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:15px 34px;">Completar mi compra</a></div>{{/recovery_link}}
+{{^recovery_link}}<div><a href="https://la-boutique-de-la-elegancia.web.app/shop" style="display:inline-block;background-color:#E8C65E;color:#11100D;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;text-decoration:none;padding:15px 34px;">Ver la tienda</a></div>{{/recovery_link}}
+</td></tr>
+<tr><td align="center" style="padding:24px 28px 30px;border-top:1px solid #2E2717;">
+<div style="font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:16px;color:#E8C65E;">Elegancia que habla por vos.</div>
+<div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.9;color:#9C8F76;margin-top:10px;">
+<a href="https://www.instagram.com/laboutiquedelaeleganciaoficial/" style="color:#CFC6B4;text-decoration:none;">@laboutiquedelaeleganciaoficial</a><br>
+<a href="https://la-boutique-de-la-elegancia.web.app" style="color:#CFC6B4;text-decoration:none;">la-boutique-de-la-elegancia.web.app</a><br>
+Rafaela, Santa Fe · Envíos a todo el país
+</div>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</td></tr>
+</table>
 </div>

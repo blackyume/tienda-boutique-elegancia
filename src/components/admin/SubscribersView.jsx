@@ -9,6 +9,7 @@ const SOURCE_LABEL = {
     popup: 'Popup',
     footer: 'Footer',
     maintenance: 'Mantenimiento',
+    chat: 'Consultas',
     web: 'Web',
 };
 

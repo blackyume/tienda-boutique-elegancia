@@ -351,13 +351,28 @@ html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
     .text-\[9px\], .text-\[9\.5px\], .text-\[10px\] { font-size: 11px !important; }
 }
 
-/* El "cargando" de la marca: el logo respira (misma animación que la pantalla
-   de entrada de index.html) y cada página entra con un fundido corto. */
+/* El "cargando" de la marca: el logo respira apenas (luz, no tamaño) y debajo
+   corre un hilo dorado. Mismo lenguaje que la pantalla de entrada de
+   index.html. Antes llevaba anillo, estrellitas y un spinner: se veía de
+   juguete (pedido del dueño, 1/11/2026: pulirlo). */
 @keyframes respirar {
-    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(232,198,94,.3)); }
-    50% { transform: scale(1.04); filter: drop-shadow(0 0 24px rgba(232,198,94,.7)); }
+    0%, 100% { opacity: .82; filter: drop-shadow(0 0 6px rgba(232,198,94,.18)); }
+    50% { opacity: 1; filter: drop-shadow(0 0 16px rgba(232,198,94,.45)); }
 }
-.animate-respirar { animation: respirar 3s ease-in-out infinite; }
+.animate-respirar { animation: respirar 3.2s ease-in-out infinite; }
+@keyframes hilo-cargando {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(250%); }
+}
+.hilo-cargando { position: relative; height: 1px; overflow: hidden; background: rgba(232,198,94,.14); }
+.hilo-cargando::after {
+    content: ''; position: absolute; inset: 0; width: 40%;
+    background: linear-gradient(90deg, transparent, #E8C65E, transparent);
+    animation: hilo-cargando 1.8s cubic-bezier(.45,0,.25,1) infinite;
+}
+/* El hilo dorado bajo la foto de producto mientras rota sola (useRotacionFotos). */
+@keyframes barra-foto { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.barra-foto { transform-origin: left; animation: barra-foto 5.5s linear forwards; }
 @keyframes pagina-entra {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: none; }
@@ -370,5 +385,5 @@ html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
    pantalla. Con `backwards` el transform se suelta apenas termina el fundido. */
 .animate-pagina-entra { animation: pagina-entra .28s ease-out backwards; }
 @media (prefers-reduced-motion: reduce) {
-    .animate-respirar, .animate-pagina-entra { animation: none; }
+    .animate-respirar, .animate-pagina-entra, .hilo-cargando::after { animation: none; }
 }

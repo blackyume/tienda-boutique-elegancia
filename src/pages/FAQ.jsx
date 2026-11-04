@@ -1,8 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, MessageCircle } from 'lucide-react';
-import { useStore } from '../context/StoreContext';
-import { whatsappDeConfig } from '../utils/contacto';
+import { abrirConsulta } from '../utils/consultas';
 
 const FAQS = [
     {
@@ -11,7 +10,7 @@ const FAQS = [
     },
     {
         q: '¿Qué medios de pago aceptan?',
-        a: 'Pagás de forma segura con Mercado Pago: tarjeta de crédito (en cuotas), débito, dinero en cuenta o efectivo (Pago Fácil / Rapipago). También podés coordinar por WhatsApp si preferís.',
+        a: 'Pagás de forma segura con Mercado Pago: tarjeta de crédito (en cuotas), débito, dinero en cuenta o efectivo (Pago Fácil / Rapipago).',
     },
     {
         q: '¿Hacen envíos a todo el país?',
@@ -31,7 +30,7 @@ const FAQS = [
     },
     {
         q: '¿Cómo sé qué talle elegir?',
-        a: 'Tenés la Tabla de Talles disponible en cada producto y en el pie de la página. Si tenés dudas, escribinos por WhatsApp y te asesoramos sin problema.',
+        a: 'Tenés la Tabla de Talles disponible en cada producto y en el pie de la página. Si tenés dudas, dejanos tu consulta en el chat y te asesoramos sin problema.',
     },
     {
         q: '¿Los productos son los de las fotos?',
@@ -58,9 +57,7 @@ const FaqItem = ({ q, a, open, onToggle }) => (
 
 export const FAQ = () => {
     useLayoutEffect(() => { window.scrollTo(0, 0); }, []);
-    const { siteConfig } = useStore();
     const [openIdx, setOpenIdx] = useState(0);
-    const whatsappUrl = whatsappDeConfig(siteConfig);
 
     return (
         <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans">
@@ -79,15 +76,13 @@ export const FAQ = () => {
 
                 <div className="mt-12 text-center bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/10 rounded-2xl p-8">
                     <p className="text-slate-700 dark:text-white font-semibold mb-1">¿No encontraste tu respuesta?</p>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-5">Escribinos y te ayudamos al toque.</p>
-                    <a
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-[#25D366] hover:brightness-110 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all"
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-5">Escribinos y te respondemos por correo.</p>
+                    <button
+                        onClick={() => abrirConsulta()}
+                        className="inline-flex items-center gap-2 bg-cielo-gold hover:bg-[#F3D985] text-[#11100D] font-bold text-sm px-6 py-3 rounded-xl transition-all"
                     >
-                        <MessageCircle className="w-4 h-4" /> Escribinos por WhatsApp
-                    </a>
+                        <MessageCircle className="w-4 h-4" /> Hacer una consulta
+                    </button>
                     <p className="text-xs text-slate-400 mt-4">
                         También podés ver nuestra <Link to="/envios" className="text-[#E8C65E] hover:underline">política de envíos</Link> o los <Link to="/terms" className="text-[#E8C65E] hover:underline">términos y condiciones</Link>.
                     </p>

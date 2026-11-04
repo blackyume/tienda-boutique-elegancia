@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { tokenMPValido } from '../../utils/comision';
 import { Check, Sparkles, ArrowRight, PartyPopper, ChevronDown, X } from 'lucide-react';
@@ -13,10 +13,35 @@ const CLAVE_CERRADO = 'lbde-primeros-pasos-cerrado';
 const leer = (k) => { try { return localStorage.getItem(k) === '1'; } catch { return false; } };
 const guardar = (k, v) => { try { v ? localStorage.setItem(k, '1') : localStorage.removeItem(k); } catch { /* sin storage */ } };
 
+// El cobro real usa MP_ACCESS_TOKEN de Vercel, no el token del panel. Se le pide
+// al endpoint un pedido vacío: si contesta "faltan prendas" (400) el token está;
+// si contesta 500 "Missing MP_ACCESS_TOKEN", no. No crea nada en Mercado Pago.
+const CLAVE_MP_SERVIDOR = 'lbde-mp-servidor';
+const useMpEnServidor = (paymentConfig) => {
+    const [ok, setOk] = useState(() => { try { return sessionStorage.getItem(CLAVE_MP_SERVIDOR) === '1'; } catch { return false; } });
+    useEffect(() => {
+        if (ok) return;
+        const url = paymentConfig?.backendUrl
+            ? `${paymentConfig.backendUrl.replace(/\/$/, '')}/api/create-preference`
+            : 'https://tienda-boutique-elegancia.vercel.app/api/create-preference';
+        let vivo = true;
+        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+            .then(async (r) => {
+                const txt = await r.text();
+                const tiene = r.status === 400 && !/MP_ACCESS_TOKEN/.test(txt);
+                if (vivo && tiene) { setOk(true); try { sessionStorage.setItem(CLAVE_MP_SERVIDOR, '1'); } catch { /* sin storage */ } }
+            })
+            .catch(() => {});
+        return () => { vivo = false; };
+    }, [ok, paymentConfig?.backendUrl]);
+    return ok;
+};
+
 export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance, isMaintenance }) => {
     const { inventory, paymentConfig, siteConfig, shippingRates } = useStore();
     const [plegado, setPlegado] = useState(() => leer(CLAVE_PLEGADO));
     const [cerrado, setCerrado] = useState(() => leer(CLAVE_CERRADO));
+    const mpEnServidor = useMpEnServidor(paymentConfig);
 
     const steps = [
         {
@@ -33,7 +58,7 @@ export const OnboardingPanel = ({ onCreateProduct, onNavigate, toggleMaintenance
             label: 'Conectá Mercado Pago',
             corto: 'Mercado Pago',
             desc: 'Para cobrar online (tarjeta, débito, cuotas). Pegá el access token que empieza con APP_USR-.',
-            done: tokenMPValido(paymentConfig?.accessToken),
+            done: tokenMPValido(paymentConfig?.accessToken) || mpEnServidor,
             cta: 'Configurar',
             action: () => onNavigate('settings'),
         },

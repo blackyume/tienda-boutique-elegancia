@@ -14,7 +14,7 @@ import {
     Image as ImageIcon, Link as LinkIcon,
     Eye, EyeOff, ChevronDown, ChevronUp, Wallet, Filter, SlidersHorizontal, ArrowUpDown,
     Check as CheckIcon, Lock, Settings, Blocks, Bot, Ticket, Building2,
-    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen, Mail, BookOpen, Instagram as InstagramIcon
+    ShoppingCart as ShoppingCartIcon, Send as SendIcon, Menu, PackageOpen, Mail, MessageCircle, BookOpen, Instagram as InstagramIcon
 } from 'lucide-react';
 import { StatusSelector } from '../components/admin/StatusSelector';
 import { usePagination, Pagination } from '../components/ui/Pagination';
@@ -38,10 +38,12 @@ const AdminAssistantView = lazyNamed(() => import('../components/admin/AdminAssi
 const CouponsView = lazyNamed(() => import('../components/admin/CouponsView'), 'CouponsView');
 const SalesView = lazyNamed(() => import('../components/admin/SalesView'), 'SalesView');
 const SuppliersView = lazyNamed(() => import('../components/admin/SuppliersView'), 'SuppliersView');
+const VisitasView = lazyNamed(() => import('../components/admin/VisitasView'), 'VisitasView');
 const ExpensesView = lazyNamed(() => import('../components/admin/ExpensesView'), 'ExpensesView');
 const AbandonedCartsView = lazyNamed(() => import('../components/admin/AbandonedCartsView'), 'AbandonedCartsView');
 const ReviewsView = lazyNamed(() => import('../components/admin/ReviewsView'), 'ReviewsView');
 const SubscribersView = lazyNamed(() => import('../components/admin/SubscribersView'), 'SubscribersView');
+const ConsultasView = lazyNamed(() => import('../components/admin/ConsultasView'), 'ConsultasView');
 const GuiasView = lazyNamed(() => import('../components/admin/guias/GuiasView'), 'GuiasView');
 
 const TabLoader = () => (
@@ -63,6 +65,7 @@ const MENU = [
         { id: 'sales', label: 'Ventas y ganancia', hint: 'Cuánto vendiste' },
     ] },
     { grupo: 'Clientas', items: [
+        { id: 'queries', label: 'Consultas', hint: 'Lo que preguntan y hay que responder' },
         { id: 'customers', label: 'Clientas', hint: 'Quién compró qué' },
         { id: 'reviews', label: 'Reseñas', hint: 'Aprobar lo que escriben' },
         { id: 'abandoned', label: 'Carritos sin terminar', hint: 'Recordarles que vuelvan' },
@@ -73,6 +76,7 @@ const MENU = [
         { id: 'cms', label: 'Diseño de la tienda', hint: 'Textos, fotos, categorías' },
     ] },
     { grupo: 'Números', items: [
+        { id: 'visits', label: 'Visitas', hint: 'Quién entra a la tienda, día por día' },
         { id: 'expenses', label: 'Gastos', hint: 'Lo que pagás, para la ganancia' },
         { id: 'suppliers', label: 'Proveedores', hint: 'Agenda de a quién le comprás' },
     ] },
@@ -84,8 +88,8 @@ const MENU = [
 const TAB_LABELS = Object.fromEntries(MENU.flatMap(g => g.items.map(i => [i.id, i.label])));
 const ICONOS_MENU = {
     dashboard: LayoutDashboard, assistant: Bot, orders: Package, inventory: Tag, sales: TrendingUp,
-    customers: Users, reviews: CheckIcon, abandoned: ShoppingCartIcon, subscribers: Mail,
-    coupons: Ticket, cms: Blocks, expenses: Wallet, suppliers: Building2,
+    customers: Users, reviews: CheckIcon, abandoned: ShoppingCartIcon, subscribers: Mail, queries: MessageCircle,
+    coupons: Ticket, cms: Blocks, expenses: Wallet, suppliers: Building2, visits: Eye,
     guides: BookOpen, settings: Settings,
 };
 
@@ -245,6 +249,10 @@ export const Admin = () => {
         const product = inventory.find(p => String(p.id) === String(item.id))
             || inventory.find(p => (p.name || '').trim().toLowerCase() === (item.name || '').trim().toLowerCase())
             || item;
+        // Venta de una prenda que nunca se cargó (o se borró) del inventario:
+        // no hay foto, ni costo, ni stock que mostrar. Se avisa en la fila en vez
+        // de decir "quedan 0" y dar el precio entero como ganancia sin aclarar.
+        const sinFicha = product === item;
         const cost = costoUnitario(product);
         // Comisión: la real del pedido si MP ya la informó, repartida entre las
         // prendas según su precio; cero si fue una venta por fuera.
@@ -258,7 +266,8 @@ export const Admin = () => {
             size: item.size || (Array.isArray(product.sizes) && product.sizes.length === 1 ? product.sizes[0] : ''),
             color: item.color || (Array.isArray(product.colors) && product.colors.length === 1 ? product.colors[0] : ''),
             channel: order.manual ? (order.channel || 'Venta externa') : 'Tienda',
-            stockLeft: getTotalStock(product),
+            stockLeft: sinFicha ? null : getTotalStock(product),
+            sinFicha,
             quantity: item.quantity,
             price: item.price,
             total: item.price * item.quantity,
@@ -906,10 +915,12 @@ export const Admin = () => {
                 {adminTab === 'cms' && <CMSView />}
                 {adminTab === 'coupons' && <CouponsView />}
                 {adminTab === 'suppliers' && <SuppliersView />}
+                {adminTab === 'visits' && <VisitasView />}
                 {adminTab === 'expenses' && <ExpensesView />}
                 {adminTab === 'abandoned' && <AbandonedCartsView />}
                 {adminTab === 'reviews' && <ReviewsView />}
                 {adminTab === 'subscribers' && <SubscribersView />}
+                {adminTab === 'queries' && <ConsultasView />}
                 {adminTab === 'guides' && <GuiasView />}
                 {adminTab === 'settings' && <SettingsView isMaintenance={isMaintenance} toggleMaintenance={toggleMaintenance} migrateData={migrateData} updateSystemVersion={updateSystemVersion} cleanStorage={cleanStorage} siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />}
                 </Suspense>

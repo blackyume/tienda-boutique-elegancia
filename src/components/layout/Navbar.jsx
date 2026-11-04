@@ -3,34 +3,9 @@ import { AuthModal } from '../auth/AuthModal';
 import { User, Menu, ChevronDown, Search, ShieldCheck, ShoppingBag, X, LogOut, Heart, Package, ArrowRight } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
-import { useState, useEffect, useRef } from 'react';
-
-// Estrellita de cuatro puntas que titila alrededor del logo. Cada una tiene su
-// tamaño, color y desfasaje para que no parpadeen todas juntas.
-const Chispa = ({ pos, size, color, delay }) => (
-    <svg
-        className={`absolute ${pos} ${size} ${color} animate-sparkle-subtle`}
-        style={{ animationDelay: `${delay}ms` }}
-        viewBox="0 0 24 24"
-        fill="currentColor"
-    >
-        <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-    </svg>
-);
-
-const CHISPAS = [
-    { pos: 'top-2 right-6', size: 'w-2.5 h-2.5', color: 'text-white', delay: 0 },
-    { pos: 'top-3 left-6', size: 'w-2 h-2', color: 'text-cielo-gold', delay: 500 },
-    { pos: 'bottom-3 right-8', size: 'w-1.5 h-1.5', color: 'text-white/80', delay: 1000 },
-    { pos: 'bottom-2 left-8', size: 'w-2 h-2', color: 'text-cielo-gold', delay: 1500 },
-    { pos: '-top-1 left-1/2', size: 'w-2 h-2', color: 'text-white/90', delay: 2200 },
-    { pos: 'top-1/2 -left-3 hidden sm:block', size: 'w-2.5 h-2.5', color: 'text-cielo-gold/90', delay: 800 },
-    { pos: 'top-1/2 -right-3 hidden sm:block', size: 'w-2 h-2', color: 'text-white/85', delay: 1900 },
-    { pos: '-bottom-1 left-1/3', size: 'w-1.5 h-1.5', color: 'text-cielo-gold', delay: 300 },
-    { pos: '-bottom-1 right-1/4', size: 'w-2 h-2', color: 'text-white/80', delay: 2600 },
-    { pos: 'top-1 right-1/4', size: 'w-1.5 h-1.5', color: 'text-cielo-gold/80', delay: 1200 },
-    { pos: 'bottom-1 left-1/4', size: 'w-1.5 h-1.5', color: 'text-white/70', delay: 2000 },
-];
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { optimizeImage } from '../../utils/helpers';
+import { tituloDeProducto } from '../../utils/nombres';
 
 export const Navbar = ({ onOpenCart }) => {
     const { cart, categories, user, logout, isAdmin, siteConfig, inventory } = useStore();
@@ -104,6 +79,21 @@ export const Navbar = ({ onOpenCart }) => {
         }
     };
 
+    // Categorías del menú con su foto: la propia o, si no tiene, la de una
+    // prenda de esa categoría (mismo criterio que las fichas de la home).
+    const categoriasMenu = useMemo(() => (categories || [])
+        .filter(c => c && c.name)
+        .map(c => {
+            if (c.image) return c;
+            const prod = (inventory || []).find(p =>
+                p.active !== false &&
+                (p.category || '').toLowerCase() === c.name.toLowerCase() &&
+                (p.image || p.media?.[0]?.url)
+            );
+            return { ...c, image: prod ? (prod.image || prod.media?.[0]?.url) : null };
+        }), [categories, inventory]);
+    const fotosMenu = categoriasMenu.filter(c => c.image).slice(0, 3);
+
     // Shop lee la categoría del parámetro ?category= de la URL. Antes esto
     // escribía un estado global que no leía nadie y mandaba a la home a buscar
     // un #shop que no existe, así que elegir una categoría no filtraba nada.
@@ -132,7 +122,7 @@ export const Navbar = ({ onOpenCart }) => {
                         <p className="relative flex items-center justify-center gap-3 text-[10px] md:text-[11px] font-extrabold tracking-[0.22em] uppercase text-[#211705]">
                             <span className="text-[#5c4410]/60 text-[8px]">◆</span>
                             <span className="drop-shadow-[0_1px_0_rgba(255,255,255,0.25)]">
-                                {siteConfig.announcement.text || "Compra Segura · Envíos a todo el País · Nueva Colección 2026"}
+                                {siteConfig.announcement.text || "Compra Segura · Envíos a todo el País · Nueva Colección 2027"}
                             </span>
                             <span className="text-[#5c4410]/60 text-[8px]">◆</span>
                         </p>
@@ -141,12 +131,12 @@ export const Navbar = ({ onOpenCart }) => {
             )}
 
             {/* NAV COMPONENT */}
-            <div className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-500 ease-out ${scrolled ? 'pt-4' : 'pt-12'}`}>
+            <div className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-500 ease-out ${scrolled ? 'pt-4' : 'pt-10'}`}>
                 <div className={`
                     relative flex items-center justify-between px-8 transition-all duration-500
                     ${scrolled
-                        ? 'w-[90%] md:w-[85%] lg:w-[1000px] h-14 rounded-full bg-slate-900/60 dark:bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)]'
-                        : 'w-full h-24 bg-gradient-to-b from-black/80 to-transparent border-none'
+                        ? 'w-[90%] md:w-[85%] lg:w-[1100px] xl:w-[1180px] h-14 rounded-full bg-slate-900/60 dark:bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)]'
+                        : 'w-full h-20 px-10 lg:px-14 bg-gradient-to-b from-black/80 to-transparent border-none'
                     }
                 `}>
                     {/* LEFT: hamburguesa (mobile) + navegación (desktop) */}
@@ -154,56 +144,82 @@ export const Navbar = ({ onOpenCart }) => {
                         <button aria-label="Abrir menú" className="md:hidden p-2 text-white" onClick={() => setIsMobileMenuOpen(true)}>
                             <Menu className="w-6 h-6" />
                         </button>
-                        <div className={`hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.15em] transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-90'}`}>
-                            <div className="relative group" onMouseEnter={() => setIsShopMenuOpen(true)} onMouseLeave={() => setIsShopMenuOpen(false)}>
-                                <button className="flex items-center gap-1 text-white hover:text-cielo-gold transition-colors py-4">
-                                    Tienda <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
-                                </button>
+                        <div className="hidden md:flex items-center gap-9 text-[11px] font-medium uppercase tracking-[0.24em]">
+                            <button
+                                onMouseEnter={() => setIsShopMenuOpen(true)}
+                                onMouseLeave={() => setIsShopMenuOpen(false)}
+                                onClick={() => setIsShopMenuOpen(v => !v)}
+                                aria-expanded={isShopMenuOpen}
+                                className={`flex items-center gap-1.5 py-4 uppercase tracking-[0.24em] font-medium transition-colors ${isShopMenuOpen ? 'text-cielo-gold' : 'text-white hover:text-cielo-gold'}`}
+                            >
+                                Tienda <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isShopMenuOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            <Link to="/shop?sort=newest" className="hidden lg:inline text-white hover:text-cielo-gold transition-colors">Novedades</Link>
+                        </div>
 
-                                {/* MEGA MENU — el pt-3 es un puente invisible para que no se cierre
-                                    al bajar el mouse del botón al menú (antes el mt-2 dejaba un hueco). */}
-                                <div className={`absolute top-full left-0 pt-3 transition-all duration-300 origin-top-left ${isShopMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-                                    <div className="min-w-[200px] bg-[#11100D]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                                        <button onClick={() => handleCategoryClick("Todos")} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all">Ver Todo</button>
-                                        <div className="h-px bg-white/10 my-1"></div>
-                                        {categories.map(cat => (
-                                            <button key={cat.id} onClick={() => handleCategoryClick(cat.name)} className="text-left py-2 px-3 text-xs text-slate-300 hover:text-cielo-gold hover:bg-white/5 rounded-lg transition-all flex items-center gap-2">
-                                                <div className="w-1 h-1 rounded-full bg-cielo-gold opacity-0 group-hover:opacity-100"></div>
-                                                {cat.name}
-                                            </button>
-                                        ))}
+                        {/* MENÚ DE LA TIENDA — panel a lo ancho de la barra (pedido del dueño,
+                            1/11/2026: la columna angosta dejaba vacío todo el espacio de arriba).
+                            Va fuera del botón para tomar el ancho de la barra; el pt-2 es el
+                            puente para que no se cierre al bajar el mouse. Las fotos van en 2:3,
+                            igual que las fotos de modelo: se ven enteras, sin recorte. */}
+                        <div
+                            onMouseEnter={() => setIsShopMenuOpen(true)}
+                            onMouseLeave={() => setIsShopMenuOpen(false)}
+                            className={`hidden md:block absolute top-full inset-x-0 pt-2 transition-all duration-300 ${isShopMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}
+                        >
+                            <div className={`bg-noche-900 border-cielo-gold/15 shadow-[0_30px_60px_rgba(0,0,0,0.6)] ${scrolled ? 'border rounded-3xl' : 'border-y'}`}>
+                                <div className="max-w-6xl mx-auto px-10 py-9 grid grid-cols-[minmax(0,1fr)_auto] gap-14">
+                                    <div>
+                                        <p className="text-2xs uppercase tracking-[0.4em] font-medium text-cielo-gold/90 mb-6">Categorías</p>
+                                        <ul className="grid grid-cols-2 gap-x-10 gap-y-3">
+                                            {categoriasMenu.map(cat => (
+                                                <li key={cat.id}>
+                                                    <button onClick={() => handleCategoryClick(cat.name)} className="group/cat flex items-center gap-3 font-serif text-lg lg:text-xl text-noche-100 hover:text-cielo-gold transition-colors text-left">
+                                                        <span className="h-px w-0 bg-cielo-gold transition-all duration-300 group-hover/cat:w-5" />
+                                                        {tituloDeProducto(cat.name)}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <div className="mt-8 pt-6 border-t border-white/10 flex items-center gap-9 font-cinzel text-2xs uppercase tracking-[0.3em]">
+                                            <button onClick={() => handleCategoryClick('Todos')} className="text-white border-b border-cielo-gold/40 pb-1.5 hover:border-cielo-gold transition-colors">Ver todo</button>
+                                            <button onClick={() => { navigate('/shop?sort=newest'); setIsShopMenuOpen(false); }} className="text-noche-300 hover:text-white transition-colors">Novedades</button>
+                                        </div>
                                     </div>
+                                    {fotosMenu.length > 0 && (
+                                        <div className="flex gap-4">
+                                            {fotosMenu.map(cat => (
+                                                <button key={cat.id} onClick={() => handleCategoryClick(cat.name)} className="group/foto w-32 lg:w-40 text-left">
+                                                    <div className="aspect-[2/3] overflow-hidden bg-noche-850">
+                                                        <img src={optimizeImage(cat.image, 400)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-90 transition-opacity duration-500 group-hover/foto:opacity-100" />
+                                                    </div>
+                                                    <span className="block mt-3 font-serif italic text-sm text-noche-100 transition-colors group-hover/foto:text-cielo-gold">{tituloDeProducto(cat.name)}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            <Link to="/about" className="text-white hover:text-cielo-gold transition-colors">Nosotros</Link>
                         </div>
                     </div>
 
                     {/* CENTER: LOGO (centrado, layout de lujo) */}
                     <Link to="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 group flex items-center justify-center">
-                        <div className="absolute inset-0 bg-cielo-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                        {/* Estrellitas siempre encendidas, alrededor del logo (ver CHISPAS) */}
-                        <div className="absolute inset-0 pointer-events-none">
-                            {CHISPAS.map((c, i) => <Chispa key={i} {...c} />)}
-                        </div>
-
-                        {/* Sparkles - Hover Burst */}
-                        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg className="absolute top-2 right-8 w-3 h-3 text-cielo-gold group-hover:animate-sparkle-burst" style={{ animationDelay: '0ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            <svg className="absolute bottom-2 left-6 w-3 h-3 text-white group-hover:animate-sparkle-burst" style={{ animationDelay: '100ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            <svg className="absolute top-1/2 right-7 w-2 h-2 text-cielo-gold/80 group-hover:animate-sparkle-burst" style={{ animationDelay: '200ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            <svg className="absolute -top-1 left-1/3 w-2 h-2 text-white/90 group-hover:animate-sparkle-burst" style={{ animationDelay: '150ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                            <svg className="absolute -bottom-1 right-1/3 w-2.5 h-2.5 text-cielo-gold group-hover:animate-sparkle-burst" style={{ animationDelay: '250ms' }} viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                        </div>
+                        {/* Sin estrellitas alrededor (pedido del dueño, 1/11/2026: más fino).
+                            El brillo pasa una sola vez al entrar (LogoSVG) y el rombo respira. */}
+                        <div className="absolute inset-0 bg-cielo-gold/15 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
 
                         {/* En el celular el logo va más chico: a 200px pisaba el ícono de la cuenta. */}
-                        <LogoSVG to="/" width={scrolled ? 180 : 240} className="max-w-[30vw] sm:max-w-none [&>svg]:max-w-full [&>svg]:h-auto" />
+                        {/* Al bajar se achica con una escala animada; cambiar el ancho del SVG
+                            lo hacía de golpe. */}
+                        <LogoSVG to="/" width={240} className={`max-w-[30vw] sm:max-w-none [&>svg]:max-w-full [&>svg]:h-auto transition-transform duration-500 ease-out ${scrolled ? 'scale-75' : 'scale-100'}`} />
                     </Link>
 
 
-                    {/* ICONS (RIGHT) */}
+                    {/* ICONS (RIGHT) — con «Nuestra historia» delante, así la barra queda
+                        pareja: dos textos a cada lado del logo. */}
                     <div className="flex items-center gap-4 pr-2">
+                        <Link to="/about" className="hidden lg:block mr-5 text-[11px] font-medium uppercase tracking-[0.24em] text-white hover:text-cielo-gold transition-colors">Nuestra historia</Link>
                         {/* SEARCH (EXPANDING + AUTOCOMPLETE) */}
                         <div className="hidden md:block relative">
                             <div className={`flex items-center transition-all duration-300 ease-out border border-transparent ${isSearchOpen ? 'w-56 bg-white/10 px-3 py-1.5 rounded-full border-white/10' : 'w-8 bg-transparent'}`}>
@@ -409,7 +425,7 @@ export const Navbar = ({ onOpenCart }) => {
                             )}
                         </div>
 
-                        <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-white/80 hover:text-cielo-gold transition-colors">Nosotros</Link>
+                        <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className="text-sm uppercase tracking-widest text-white/80 hover:text-cielo-gold transition-colors">Nuestra historia</Link>
                         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs uppercase tracking-widest text-slate-400">
                             <Link to="/faq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Preguntas</Link>
                             <Link to="/envios" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-cielo-gold transition-colors">Envíos</Link>

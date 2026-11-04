@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Instagram, Mail, Send, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
-import { whatsappDeConfig } from '../../utils/contacto';
+import { MENSAJERIA_ACTIVA, whatsappDeConfig } from '../../utils/contacto';
+import { abrirConsulta, CORREO_DE_LA_TIENDA } from '../../utils/consultas';
 import { RegretModal } from './RegretModal';
 import { BrandStrip } from '../ui/BrandBadges';
 
@@ -56,7 +57,7 @@ export const Footer = () => {
                                 <Instagram className="w-4 h-4" />
                             </SocialBtn>
                             {/* Telegram: aparece cuando se carga el usuario en config. WhatsApp retirado. */}
-                            {(siteConfig?.social?.telegram || siteConfig?.telegram) && (
+                            {MENSAJERIA_ACTIVA && (siteConfig?.social?.telegram || siteConfig?.telegram) && (
                                 <SocialBtn href={`https://t.me/${String(siteConfig?.social?.telegram || siteConfig?.telegram).replace(/^@/, '').replace(/^t\.me\//, '')}`}>
                                     <Send className="w-4 h-4" />
                                 </SocialBtn>
@@ -71,7 +72,7 @@ export const Footer = () => {
                             {[
                                 { to: '/', label: 'Inicio' },
                                 { to: '/shop', label: 'Ver Tienda' },
-                                { to: '/about', label: 'Quiénes Somos' },
+                                { to: '/about', label: 'Nuestra historia' },
                             ].map(({ to, label }) => (
                                 <li key={label}>
                                     <Link to={to} className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
@@ -167,7 +168,16 @@ export const Footer = () => {
                             Dudas con un talle, un pedido o un env&iacute;o: escribinos, contesta una persona.
                         </p>
                         <div className="space-y-3">
-                            <a
+                            <button
+                                onClick={() => abrirConsulta()}
+                                className="flex items-center gap-3 text-sm text-noche-300/80 hover:text-white transition-colors group"
+                            >
+                                <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-cielo-gold/50 flex items-center justify-center group-hover:text-cielo-gold transition-all">
+                                    <MessageCircle className="w-3.5 h-3.5" />
+                                </span>
+                                Hacer una consulta
+                            </button>
+                            {MENSAJERIA_ACTIVA && <a
                                 href={whatsappDeConfig(siteConfig, 'Hola! Tengo una consulta.')}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -177,8 +187,8 @@ export const Footer = () => {
                                     <MessageCircle className="w-3.5 h-3.5" />
                                 </span>
                                 WhatsApp
-                            </a>
-                            {(siteConfig?.social?.telegram || siteConfig?.telegram) && (
+                            </a>}
+                            {MENSAJERIA_ACTIVA && (siteConfig?.social?.telegram || siteConfig?.telegram) && (
                                 <a
                                     href={`https://t.me/${String(siteConfig?.social?.telegram || siteConfig?.telegram).replace(/^@/, '').replace(/^t\.me\//, '')}`}
                                     target="_blank"
@@ -192,7 +202,7 @@ export const Footer = () => {
                                 </a>
                             )}
                             <a
-                                href={`mailto:${siteConfig?.contact?.email || 'hola@laboutique.com.ar'}`}
+                                href={`mailto:${siteConfig?.contact?.email || CORREO_DE_LA_TIENDA}`}
                                 className="flex items-center gap-3 text-sm text-noche-300/80 hover:text-white transition-colors group"
                             >
                                 <span className="w-7 h-7 rounded-full border border-white/10 group-hover:border-cielo-gold/50 flex items-center justify-center group-hover:text-cielo-gold transition-all">
@@ -216,7 +226,7 @@ export const Footer = () => {
                 {/* Bottom bar */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                     <span className="text-2xs text-noche-300/70 tracking-[0.2em] uppercase">
-                        &copy; 2026 La Boutique de la Elegancia &nbsp;&middot;&nbsp; Todos los derechos reservados
+                        &copy; 2027 La Boutique de la Elegancia &nbsp;&middot;&nbsp; Todos los derechos reservados
                     </span>
                     <span className="text-2xs text-noche-300/70 tracking-[0.25em] uppercase">
                         Moda femenina &nbsp;&middot;&nbsp; Hecho en Argentina

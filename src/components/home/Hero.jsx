@@ -55,7 +55,7 @@ export const Hero = () => {
     const subtitle = LEGADO[siteConfig?.hero?.subtitle] || siteConfig?.hero?.subtitle || 'de la Elegancia';
     // El eslogan de la marca. Habla de la clienta y de cómo se elige acá, sin
     // repetir el titular de la sección La Boutique, que ya cuenta el detalle.
-    const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'La elegancia no se improvisa: se elige. Prendas seleccionadas con criterio para la mujer que se viste con intención.';
+    const tagline = siteConfig?.hero?.tagline || siteConfig?.hero?.description || 'Elegancia que habla por vos. Prendas elegidas una a una para la mujer que se viste con intención.';
     const [, lema, resto] = tagline.match(/^(.+?[.!?])\s+(\S.*)$/s) || [];
     const buttonText = LEGADO[siteConfig?.hero?.buttonText] || siteConfig?.hero?.buttonText || 'Ver la tienda';
     const buttonLink = siteConfig?.hero?.buttonLink || 'shop';
@@ -84,7 +84,7 @@ export const Hero = () => {
     const MEDIA_ESCRITORIO = '(min-width: 768px)';
 
     return (
-        <section className="relative min-h-screen flex items-end justify-center overflow-hidden bg-cielo-dark">
+        <section className="relative md:min-h-screen flex flex-col md:flex-row md:items-center justify-start overflow-hidden bg-cielo-dark">
             {primera && (
                 <Helmet>
                     {esPortadaPropia ? (
@@ -98,34 +98,40 @@ export const Hero = () => {
                 </Helmet>
             )}
 
-            <div ref={layerRef} className="absolute inset-0 z-0 will-change-transform sin-textura">
+            {/* En el teléfono la foto va ARRIBA y el texto DEBAJO: superpuesto le tapaba
+                la ropa a la modelo, y la prenda se tiene que ver entera (pedido del dueño,
+                1/11/2026). En escritorio sigue a pantalla completa con el texto a la izquierda. */}
+            <div ref={layerRef} className="relative h-[86svh] md:h-auto md:absolute md:inset-x-0 md:bottom-0 md:top-[7.5rem] z-0 will-change-transform sin-textura">
                 <CapaPortadas visibles={visibles} activa={activa} propias={esPortadaPropia} />
+                <div className="md:hidden absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#11100D] pointer-events-none" />
             </div>
 
+            {/* Los velos sólo tocan los bordes: arriba para el menú, abajo para el
+                pase a la sección siguiente. Las modelos van a plena luz (pedido del
+                dueño, 1/11/2026: «más premium»); antes un velo las apagaba enteras.
+                La capa de fotos arranca debajo del menú (md:top-[7.5rem]): en pantallas
+                anchas y bajas el logo le tapaba la cabeza a la modelo del medio. */}
             <div
-                className="absolute inset-0 z-[1] pointer-events-none"
+                className="hidden md:block absolute inset-0 z-[1] pointer-events-none"
                 style={{
                     background: `linear-gradient(180deg,
-                        rgba(17,16,13,0.75) 0%,
-                        rgba(17,16,13,0.20) 30%,
-                        rgba(17,16,13,0.10) 50%,
-                        rgba(17,16,13,0.60) 75%,
-                        rgba(17,16,13,0.97) 100%
+                        rgba(17,16,13,0.60) 0%,
+                        rgba(17,16,13,0) 20%,
+                        rgba(17,16,13,0) 90%,
+                        rgba(17,16,13,0.80) 100%
                     )`
                 }}
             />
 
-            {/* Velo lateral: la columna de texto arranca sobre fondo oscuro sí o sí.
-                Sin esto el volante dorado queda dorado-sobre-dorado e ilegible
-                cuando la foto del CMS es clara. */}
+            {/* Velo lateral: la columna de texto arranca sobre fondo oscuro sí o sí
+                aunque la foto del CMS sea clara. Muere antes de la primera modelo. */}
             <div
-                className="absolute inset-0 z-[1] pointer-events-none"
+                className="hidden md:block absolute inset-0 z-[1] pointer-events-none"
                 style={{
-                    background: `linear-gradient(100deg,
-                        rgba(17,16,13,0.85) 0%,
-                        rgba(17,16,13,0.55) 32%,
-                        rgba(17,16,13,0.12) 58%,
-                        rgba(17,16,13,0) 75%
+                    background: `linear-gradient(90deg,
+                        rgba(17,16,13,0.70) 0%,
+                        rgba(17,16,13,0.35) 24%,
+                        rgba(17,16,13,0) 38%
                     )`
                 }}
             />
@@ -141,44 +147,37 @@ export const Hero = () => {
                 />
             )}
 
-            {/* pt-36: el bloque va apoyado abajo (items-end), pero en pantallas bajas
-                (celular chico, celular apaisado) es mas alto que la pantalla y su tope
-                quedaba debajo del header fijo: el titulo se pisaba con el logo. */}
-            <div ref={contentRef} className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-16 pt-36 pb-24 md:pb-32 will-change-transform">
+            {/* La columna de texto vive en el aire oscuro de la izquierda de la portada
+                (las modelos arrancan al 42% del ancho) y nunca pasa del 36% de la
+                pantalla: antes el titular de 7vw se montaba sobre la primera modelo.
+                md:pt-28 deja libre el menú fijo en pantallas bajas. */}
+            <div ref={contentRef} className="relative z-10 w-full md:w-auto px-8 md:pl-[5.5vw] md:pr-0 pt-2 md:pt-28 pb-16 md:pb-20 will-change-transform md:max-w-[36vw]">
 
-                <div className="flex items-center gap-3 mb-8 animate-fadeIn">
-                    <span className="h-px w-12 bg-cielo-gold/60" />
-                    <span className="text-2xs uppercase tracking-[0.25em] md:tracking-[0.45em] font-semibold text-cielo-gold">
-                        Colección 2026 · Rafaela
-                    </span>
-                </div>
+                <span className="block text-2xs uppercase tracking-[0.35em] md:tracking-[0.5em] font-medium text-cielo-gold/90 mb-7 animate-fadeIn">
+                    Colección 2027
+                </span>
 
                 <h1
-                    className="font-cinzel font-bold leading-[0.88] tracking-tight text-white animate-slideUp max-w-3xl"
-                    style={{ fontSize: 'clamp(2.75rem, 7vw, 6rem)' }}
+                    className="font-cinzel font-medium leading-none tracking-[0.06em] text-white animate-slideUp text-[clamp(1.9rem,9.5vw,2.6rem)] md:text-[clamp(2.4rem,3.3vw,4.5rem)]"
                 >
                     {title}
                 </h1>
 
                 <p
-                    className="font-serif italic font-light text-noche-100/85 mt-3 animate-fadeIn opacity-0 [animation-delay:300ms]"
-                    style={{ fontSize: 'clamp(1.25rem, 3vw, 2.5rem)' }}
+                    className="font-serif italic font-light text-noche-100/90 mt-3 animate-fadeIn opacity-0 [animation-delay:300ms]"
+                    style={{ fontSize: 'clamp(1.35rem, 1.9vw, 2.4rem)' }}
                 >
                     {subtitle}
                 </p>
 
-                <div className="flex items-center gap-3 mt-8 animate-fadeIn opacity-0 [animation-delay:400ms]">
-                    <span className="h-px w-16 bg-cielo-gold/40" />
-                    <span className="w-1 h-1 rounded-full bg-cielo-gold/50" />
-                    <span className="h-px w-8 bg-cielo-gold/20" />
-                </div>
+                <span className="block h-px w-14 bg-cielo-gold/50 mt-9 animate-fadeIn opacity-0 [animation-delay:400ms]" />
 
-                <div className="mt-8 flex flex-col items-start gap-7 animate-fadeIn opacity-0 [animation-delay:550ms]">
-                    <p className="text-sm md:text-base text-noche-300/85 max-w-md font-light leading-relaxed">
+                <div className="mt-9 flex flex-col items-start gap-9 animate-fadeIn opacity-0 [animation-delay:550ms]">
+                    <p className="text-sm md:text-[0.95rem] text-noche-300/90 max-w-sm font-light leading-relaxed">
                         {/* La primera oración es el lema y va en serif, más grande */}
                         {lema ? (
                             <>
-                                <span className="block font-serif italic text-noche-100 text-lg md:text-2xl leading-snug mb-2 text-balance">
+                                <span className="block font-serif italic text-noche-100 text-xl md:text-2xl leading-snug mb-3 text-balance">
                                     {lema}
                                 </span>
                                 {resto}
@@ -186,17 +185,22 @@ export const Hero = () => {
                         ) : tagline}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-5">
+                    <div className="flex flex-wrap items-center gap-x-8 gap-y-5">
                         <Link
                             to="/shop"
                             onClick={primaryAction}
-                            className="group relative inline-flex items-center gap-3 px-10 py-4 text-black font-cinzel font-semibold text-2xs uppercase tracking-[0.25em] overflow-hidden shadow-[0_8px_40px_-8px_rgba(193,154,107,0.5)] transition-transform hover:scale-[1.03]"
-                            style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
+                            className="group inline-flex items-center gap-3 px-9 py-4 bg-cielo-gold text-[#11100D] font-cinzel font-semibold text-2xs uppercase tracking-[0.3em] transition-colors duration-300 hover:bg-[#F3D985]"
                         >
-                            <span className="relative z-10">{buttonText}</span>
-                            <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-1" />
-                            <span className="absolute inset-0 bg-white/40 translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700" />
+                            <span>{buttonText}</span>
+                            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                         </Link>
+                        <a
+                            href="#categories"
+                            onClick={(e) => { e.preventDefault(); document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' }); }}
+                            className="font-cinzel text-2xs uppercase tracking-[0.3em] text-noche-100/85 border-b border-cielo-gold/40 pb-1.5 transition-colors hover:text-white hover:border-cielo-gold"
+                        >
+                            Categorías
+                        </a>
                     </div>
                 </div>
 

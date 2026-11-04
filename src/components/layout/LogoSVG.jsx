@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 // Gradiente de oro metálico (vertical: luz arriba, brillo al medio, sombra abajo)
-// + brillo "shimmer" que recorre el texto muy lento para un efecto de lujo sutil.
+// + un brillo que cruza el texto UNA vez al entrar (antes cada 6 s sin parar).
 const GoldDefs = ({ uid, shineFrom = -120, shineTo = 380 }) => (
     <defs>
         <linearGradient id={`${uid}-gold`} x1="0" y1="0" x2="0" y2="1">
@@ -18,8 +18,8 @@ const GoldDefs = ({ uid, shineFrom = -120, shineTo = 380 }) => (
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
             <stop offset="50%" stopColor="#fffdf2" stopOpacity="0.55" />
             <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-            <animate attributeName="x1" values={`${shineFrom};${shineTo}`} dur="6s" begin="1.2s" repeatCount="indefinite" />
-            <animate attributeName="x2" values={`${shineFrom + 80};${shineTo + 80}`} dur="6s" begin="1.2s" repeatCount="indefinite" />
+            <animate attributeName="x1" values={`${shineFrom};${shineTo}`} dur="2.8s" begin="0.6s" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" fill="freeze" />
+            <animate attributeName="x2" values={`${shineFrom + 80};${shineTo + 80}`} dur="2.8s" begin="0.6s" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" fill="freeze" />
         </linearGradient>
         <linearGradient id={`${uid}-line`} x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#E8C65E" stopOpacity="0" />
@@ -59,7 +59,9 @@ export const LogoSVG = ({ to = '/', onClick, width = 210, className = '' }) => {
 
                 {/* Ornamental row */}
                 <line x1="18" y1="60" x2="141" y2="60" stroke={`url(#${uid}-line2)`} strokeWidth="0.55" />
-                <polygon points="170,53 175,60 170,67 165,60" fill="#E8C65E" opacity="0.65" />
+                <polygon points="170,53 175,60 170,67 165,60" fill="#E8C65E" opacity="0.65">
+                    <animate attributeName="opacity" values="0.5;0.95;0.5" dur="5s" repeatCount="indefinite" />
+                </polygon>
                 <line x1="199" y1="60" x2="322" y2="60" stroke={`url(#${uid}-line2)`} strokeWidth="0.55" />
 
                 {/* de la Elegancia */}

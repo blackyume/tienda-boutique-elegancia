@@ -171,7 +171,7 @@ const SmartImageUploader = ({ currentImage, onUpload, label, className = "" }) =
 // a como se ve en la tienda) + atajos. Sólo guarda al apretar el botón.
 const ANNOUNCEMENT_PRESETS = [
     'Compra Segura · Envíos a todo el País',
-    'Nueva Colección 2026 · Ya Disponible',
+    'Nueva Colección 2027 · Ya Disponible',
     'Envíos a todo el País · Atención Personalizada',
     'Compra Protegida con Mercado Pago',
 ];
@@ -203,7 +203,7 @@ const AnnouncementEditor = ({ text, enabled, onSaveText, onToggle }) => {
                     <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-white/40" />
                     <p className="relative flex items-center justify-center gap-3 text-[10px] font-extrabold tracking-[0.22em] uppercase text-[#211705]">
                         <span className="text-[#5c4410]/60 text-[8px]">◆</span>
-                        <span>{draft || 'Compra Segura · Envíos a todo el País · Nueva Colección 2026'}</span>
+                        <span>{draft || 'Compra Segura · Envíos a todo el País · Nueva Colección 2027'}</span>
                         <span className="text-[#5c4410]/60 text-[8px]">◆</span>
                     </p>
                 </div>
@@ -427,7 +427,7 @@ export const CMSView = () => {
 
                                     {/* Content Overlay */}
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12 text-white pointer-events-none">
-                                        <p className="font-cinzel text-xs tracking-[0.3em] mb-4 opacity-90 drop-shadow-lg">EST. 2026</p>
+                                        <p className="font-cinzel text-xs tracking-[0.3em] mb-4 opacity-90 drop-shadow-lg">EST. 2027</p>
                                         <h2 className="font-cinzel text-4xl md:text-6xl mb-4 drop-shadow-xl font-medium">{siteConfig.hero?.title || "TITULO"}</h2>
                                         <p className="font-serif text-2xl italic text-[#E8C65E] mb-10 drop-shadow-lg">{siteConfig.hero?.subtitle || "Subtítulo"}</p>
                                         <div className="px-10 py-4 bg-white text-slate-900 font-bold text-sm tracking-[0.2em] uppercase shadow-2xl">
@@ -559,7 +559,7 @@ export const CMSView = () => {
                             </div>
                             <div>
                                 <label className="text-xs font-bold uppercase text-slate-500 mb-1 block">Código de Descuento (Opcional)</label>
-                                <input value={siteConfig.promoPopup?.code || ""} onChange={(e) => updateSection('promoPopup', 'code', e.target.value)} className="w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-lg text-sm font-mono text-center tracking-widest uppercase border border-dashed border-slate-300" placeholder="Ej: VERANO2026" />
+                                <input value={siteConfig.promoPopup?.code || ""} onChange={(e) => updateSection('promoPopup', 'code', e.target.value)} className="w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-lg text-sm font-mono text-center tracking-widest uppercase border border-dashed border-slate-300" placeholder="Ej: VERANO2027" />
                             </div>
                         </div>
                     </section>
@@ -861,7 +861,7 @@ const SectionsEditor = ({ siteConfig, updateSiteConfig, addToast, inventory }) =
                         <input
                             value={drop.title || ''}
                             onChange={(e) => saveNested('drop', { title: e.target.value })}
-                            placeholder="Ej: Colección Otoño 2026"
+                            placeholder="Ej: Colección Otoño 2027"
                             className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm border border-slate-200 dark:border-slate-700 outline-none focus:border-[#E8C65E]"
                         />
                     </div>

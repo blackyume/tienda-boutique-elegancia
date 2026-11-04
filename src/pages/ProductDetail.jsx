@@ -11,6 +11,7 @@ import { Accordion } from '../components/ui/Accordion';
 import { SEO } from '../components/seo/SEO';
 import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 import { TrustBadges } from '../components/ui/TrustBadges';
+import { abrirConsulta } from '../utils/consultas';
 import { ProductCard } from '../components/shop/ProductCard';
 import { ReviewsSection } from '../components/shop/ReviewsSection';
 import {
@@ -21,6 +22,7 @@ import {
 } from '../utils/variants';
 import { trackViewItem } from '../utils/analytics';
 import { useMarcoFoto } from '../utils/marcoFoto';
+import { useRotacionFotos } from '../hooks/useRotacionFotos';
 
 export const ProductDetail = () => {
     const { id } = useParams();
@@ -40,7 +42,6 @@ export const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
-    const [activeImage, setActiveImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [lightbox, setLightbox] = useState(false);
     const [zoomed, setZoomed] = useState(false);
@@ -68,7 +69,6 @@ export const ProductDetail = () => {
     // snapshot de Firestore.
     useEffect(() => {
         setSelectedSize('');
-        setActiveImage(0);
         setQuantity(1);
         window.scrollTo(0, 0);
         // Cinturón de seguridad por si algún modal previo dejó el body
@@ -91,6 +91,10 @@ export const ProductDetail = () => {
         if (Array.isArray(product.images) && product.images.length > 0) return product.images;
         return [product.image];
     }, [product]);
+
+    const fotos = useRotacionFotos(images.length, { clave: id, activa: !lightbox });
+    const activeImage = fotos.indice;
+    const setActiveImage = (v) => fotos.elegir(typeof v === 'function' ? v(fotos.indice) : v);
 
     const prevImage = () => setActiveImage((i) => (i - 1 + images.length) % images.length);
     const nextImage = () => setActiveImage((i) => (i + 1) % images.length);
@@ -195,17 +199,24 @@ export const ProductDetail = () => {
                     <div
                         className={`${marcoFoto} bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group sin-textura`}
                         onClick={() => setLightbox(true)}
+                        onMouseEnter={fotos.alEntrar}
+                        onMouseLeave={fotos.alSalir}
                     >
-                        <img
-                            key={images[activeImage]}
-                            src={optimizeImage(images[activeImage], 1200)}
-                            alt={product.name}
-                            onLoad={(e) => setMarcoFoto(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)}
-                            className="w-full h-full object-cover animate-fadeIn transition-transform duration-700 group-hover:scale-105"
-                            loading="eager"
-                            fetchPriority="high"
-                            decoding="async"
-                        />
+                        {/* Todas apiladas y con fundido cruzado: frente y espalda rotan solas. */}
+                        {images.map((src, i) => (
+                            <img
+                                key={`${src}-${i}`}
+                                src={optimizeImage(src, 1200)}
+                                alt={i === activeImage ? product.name : ''}
+                                aria-hidden={i !== activeImage}
+                                onLoad={i === 0 ? (e) => setMarcoFoto(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight) : undefined}
+                                className={`absolute inset-0 w-full h-full object-cover transition-[opacity,transform] duration-[1200ms] ease-in-out group-hover:scale-105 ${i === activeImage ? 'opacity-100' : 'opacity-0'}`}
+                                loading={i === 0 ? 'eager' : 'lazy'}
+                                fetchPriority={i === 0 ? 'high' : 'auto'}
+                                decoding="async"
+                            />
+                        ))}
+                        {fotos.rota && <div key={fotos.vuelta} className="barra-foto absolute bottom-0 inset-x-0 h-px bg-cielo-gold/80 pointer-events-none z-[1]" />}
                         <div className="absolute top-3 left-3 bg-black/50 text-white p-2 rounded-full backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                             <ZoomIn className="w-4 h-4" />
                         </div>
@@ -222,7 +233,7 @@ export const ProductDetail = () => {
                                     key={i}
                                     onClick={() => setActiveImage(i)}
                                     aria-label={`Imagen ${i + 1}`}
-                                    className={`aspect-[4/5] overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
+                                    className={`aspect-[2/3] overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
                                 >
                                     <img src={optimizeImage(img, 300)} alt="" className="w-full h-full object-cover" loading="lazy" />
                                 </button>
@@ -452,6 +463,12 @@ export const ProductDetail = () => {
                     </div>
 
                     <div className="mt-8">
+                        <button
+                            onClick={() => abrirConsulta(tituloDeProducto(product.name))}
+                            className="mb-5 text-[10px] font-bold uppercase tracking-widest text-cielo-gold hover:underline"
+                        >
+                            Preguntar por esta prenda
+                        </button>
                         <TrustBadges />
                     </div>
 
@@ -477,7 +494,7 @@ export const ProductDetail = () => {
                             </div>
                         </Accordion>
                         <Accordion title="Cambios & Devoluciones">
-                            Por higiene, y porque de cada prenda tenemos muy pocas unidades, <strong>no hacemos cambios ni devoluciones</strong> por gusto o talle. Antes de comprar te asesoramos por WhatsApp para que elijas el talle ideal. Esto no afecta el derecho de revocación de 10 días corridos que establece la Ley de Defensa del Consumidor.
+                            Por higiene, y porque de cada prenda tenemos muy pocas unidades, <strong>no hacemos cambios ni devoluciones</strong> por gusto o talle. Antes de comprar te asesoramos por el chat de consultas para que elijas el talle ideal. Esto no afecta el derecho de revocación de 10 días corridos que establece la Ley de Defensa del Consumidor.
                         </Accordion>
                     </div>
                 </div>
