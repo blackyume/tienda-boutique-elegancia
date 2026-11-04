@@ -92,7 +92,7 @@ export const ReviewsSection = ({ productId }) => {
         <section className="mt-12">
             <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
                 <div>
-                    <h2 className="text-2xl font-cinzel text-slate-900 dark:text-white mb-1">Reseñas verificadas</h2>
+                    <h2 className="text-3xl md:text-4xl font-serif text-noche-100 mb-2">Reseñas verificadas</h2>
                     {productReviews.length > 0 ? (
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                             <Stars value={Math.round(avg)} size="sm" />

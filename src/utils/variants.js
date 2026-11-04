@@ -7,6 +7,22 @@
 // `key` = `${size}::${color}`. Si el producto no tiene `variants`, se asume
 // que todas las combinaciones talla/color comparten `product.stock`.
 
+const LETRAS_DE_TALLE = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+
+const pesoDeTalle = (talle) => {
+    const t = String(talle).trim().toUpperCase();
+    if (/^\d+$/.test(t)) return [0, Number(t)];
+    const letra = LETRAS_DE_TALLE.indexOf(t);
+    return letra >= 0 ? [1, letra] : [2, 0];
+};
+
+/** Números de menor a mayor, después las letras de XS a XXL, y al final lo demás. */
+export const ordenarTalles = (talles) => [...talles].sort((a, b) => {
+    const [ga, va] = pesoDeTalle(a);
+    const [gb, vb] = pesoDeTalle(b);
+    return ga - gb || va - vb || String(a).localeCompare(String(b));
+});
+
 export const variantKey = (size, color) => `${size || ''}::${color || ''}`;
 
 export const hasVariantMap = (product) => {

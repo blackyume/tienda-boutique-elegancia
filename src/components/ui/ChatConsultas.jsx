@@ -123,7 +123,8 @@ export const ChatConsultas = () => {
         setPaso('listo');
     };
 
-    const alto = location.pathname.startsWith('/product/') ? 'bottom-24' : 'bottom-4';
+    const enFicha = location.pathname.startsWith('/product/');
+    const alto = enFicha ? 'bottom-24' : 'bottom-4';
 
     return (
         <>
@@ -205,7 +206,7 @@ export const ChatConsultas = () => {
                 <div
                     onMouseEnter={() => setMostrarAviso(true)}
                     onMouseLeave={() => setMostrarAviso(false)}
-                    className={`fixed ${alto} sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-3 transition-all duration-700 ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
+                    className={`fixed ${alto} sm:bottom-6 right-4 sm:right-6 z-50 ${enFicha ? 'hidden sm:flex' : 'flex'} flex-col items-end gap-3 transition-all duration-700 ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}
                 >
                     {/* El globo sólo desde `sm`: en celular caía encima del botón del hero. */}
                     <div className={`hidden sm:block origin-bottom-right transition-all duration-300 ${mostrarAviso ? 'scale-100 opacity-100' : 'scale-75 opacity-0 pointer-events-none'}`}>

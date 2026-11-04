@@ -16,6 +16,11 @@ const CARRILES = [
     { min: 0.00, clase: 'aspect-[2/3]' },  // modelo de cuerpo entero
 ];
 
+const PROPORCIONES = { 'aspect-[4/5]': 4 / 5, 'aspect-[3/4]': 3 / 4, 'aspect-[2/3]': 2 / 3 };
+
+// La misma proporción en número, para calcular el ancho desde el alto de la pantalla.
+export const proporcionDelMarco = (clase) => PROPORCIONES[clase] || 2 / 3;
+
 export const marcoParaRatio = (ratio) =>
     (CARRILES.find((c) => ratio >= c.min) || CARRILES[CARRILES.length - 1]).clase;
 

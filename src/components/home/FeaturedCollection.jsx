@@ -46,7 +46,7 @@ const HeroCard = ({ item, onQuickView }) => (
         {/* Info */}
         <div className="absolute inset-x-0 bottom-0 z-20 p-6 md:p-8">
             <p className="text-[10px] uppercase tracking-[0.4em] text-cielo-gold/70 mb-2 font-semibold">
-                {item.category}
+                {tituloDeProducto(item.category)}
             </p>
             <h3 className="font-serif text-2xl md:text-3xl text-white leading-tight mb-3 line-clamp-2">
                 {tituloDeProducto(item.name)}
@@ -113,7 +113,7 @@ const SmallCard = ({ item, onQuickView }) => (
         </button>
 
         <div className="absolute inset-x-0 bottom-0 z-20 p-3 md:p-5">
-            <p className="text-[10px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.35em] text-cielo-gold/70 mb-1 md:mb-1.5 font-semibold">{item.category}</p>
+            <p className="text-[10px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.35em] text-cielo-gold/70 mb-1 md:mb-1.5 font-semibold">{tituloDeProducto(item.category)}</p>
             <h3 className="font-serif text-sm md:text-lg text-white leading-snug mb-1.5 md:mb-2 line-clamp-2">{tituloDeProducto(item.name)}</h3>
             <div className="flex items-center justify-between">
                 <span className="text-sm md:text-base text-white/90 font-light">{formatMoney(item.price)}</span>

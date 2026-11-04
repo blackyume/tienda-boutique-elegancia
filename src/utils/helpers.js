@@ -38,7 +38,7 @@ const COLOR_DICT = {
     'verde': '#10B981', 'green': '#10B981',
     'verde manzana': '#84CC16', 'manzana': '#84CC16', 'pistacho': '#BEF264',
     'verde militar': '#4F5D2F', 'militar': '#4F5D2F', 'oliva': '#4F5D2F', 'musgo': '#3F6212', 'seco': '#4F5D2F',
-    'verde agua': '#99F6E4', 'menta': '#6EE7B7', 'esmeralda': '#10B981',
+    'verde agua': '#99F6E4', 'verde cemento': '#8A9A8E', 'menta': '#6EE7B7', 'esmeralda': '#10B981',
     'verde botella': '#064E3B', 'botella': '#064E3B', 'benetton': '#009944', 'inglés': '#064E3B', 'bosque': '#14532D',
     'lima': '#84CC16', 'lime': '#84CC16', 'limón': '#D9F99D', 'limon': '#D9F99D',
 

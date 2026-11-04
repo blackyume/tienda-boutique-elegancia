@@ -181,7 +181,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                 {/* INFO — sólo esta columna scrollea en desktop */}
                 <div className="scrollbar-gold w-full md:w-[45%] p-8 md:p-10 flex flex-col bg-white dark:bg-slate-950 md:overflow-y-auto md:max-h-[92vh]">
                     <div className="flex justify-between items-start mb-2 pr-8">
-                        <span className="text-xs font-bold text-[#E8C65E] uppercase tracking-[0.2em]">{product.category}</span>
+                        <span className="text-xs font-bold text-[#E8C65E] uppercase tracking-[0.2em]">{tituloDeProducto(product.category)}</span>
                         <button onClick={copyLink} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cielo-gold transition-colors" title="Copiar enlace">
                             {copied ? <span className="text-green-500 flex items-center gap-1"><Check className="w-4 h-4" /> Copiado</span> : <span className="flex items-center gap-1"><Share2 className="w-4 h-4" /> Compartir</span>}
                         </button>
@@ -242,7 +242,7 @@ export const QuickViewModal = ({ product, onClose }) => {
 
                     <div className="mt-auto flex gap-4">
                         <Button onClick={handleAddToCart} className="btn-oro flex-1 py-4 text-sm bg-slate-900 dark:bg-white dark:text-slate-900 shadow-xl h-14" disabled={totalStock === 0}>
-                            {totalStock === 0 ? 'SIN STOCK' : 'AGREGAR AL CARRITO'}
+                            {totalStock === 0 ? 'SIN STOCK' : 'AGREGAR A LA BOLSA'}
                         </Button>
                         <button onClick={toggleWishlist} className="w-14 h-14 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                             <Heart className={`w-6 h-6 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-slate-400 dark:text-slate-500'}`} />

@@ -147,7 +147,7 @@ export const Navbar = ({ onOpenCart }) => {
                 <div className={`
                     relative flex items-center justify-between px-8 transition-all duration-500
                     ${scrolled
-                        ? 'w-[90%] md:w-[85%] lg:w-[1100px] xl:w-[1180px] h-14 rounded-full bg-slate-900/60 dark:bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.12)]'
+                        ? 'w-[90%] md:w-[85%] lg:w-[1100px] xl:w-[1180px] h-14 rounded-full bg-noche-900/90 backdrop-blur-xl border border-cielo-gold/15 shadow-[0_8px_30px_rgb(0,0,0,0.35)]'
                         : 'w-full h-20 px-10 lg:px-14 bg-gradient-to-b from-black/80 to-transparent border-none'
                     }
                 `}>
@@ -265,7 +265,7 @@ export const Navbar = ({ onOpenCart }) => {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="text-xs font-bold text-white truncate">{p.name}</p>
-                                                        <p className="text-[10px] text-slate-400 truncate">{p.category}</p>
+                                                        <p className="text-[10px] text-slate-400 truncate">{tituloDeProducto(p.category)}</p>
                                                     </div>
                                                     <span className="text-xs text-cielo-gold font-bold shrink-0">
                                                         {typeof p.price === 'number' ? `$${p.price.toLocaleString('es-AR')}` : ''}

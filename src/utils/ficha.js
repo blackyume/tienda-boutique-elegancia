@@ -107,6 +107,16 @@ export const detallesPorPlantilla = (p = {}) => {
     return L.slice(0, 5).join('\n');
 };
 
+/** Las viñetas que agregan algo: color, talles, tela y cuidados ya están arriba en la ficha. */
+export const detallesSinRepetir = (p = {}) => String(p.details || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => {
+        if (!l || /^(colou?r(es)?|disponible en|talles?)\b/i.test(l)) return false;
+        if (p.material && /^composici[oó]n\b/i.test(l)) return false;
+        return !(normalizarCuidados(p.care || []).length && /^cuidados\b/i.test(l));
+    });
+
 // ---------------------------------------------------------------------------
 // Revisión antes de publicar: qué le falta a la ficha.
 // ---------------------------------------------------------------------------

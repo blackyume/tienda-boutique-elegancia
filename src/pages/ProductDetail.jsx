@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { tituloDeProducto } from '../utils/nombres';
-import { CUIDADOS, normalizarCuidados, tablaDeMedidas } from '../utils/ficha';
+import { CUIDADOS, detallesSinRepetir, normalizarCuidados, tablaDeMedidas } from '../utils/ficha';
+import { prendasRelacionadas } from '../utils/relacionados';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LogoCargando } from '../components/ui/LogoCargando';
 import { useStore } from '../context/StoreContext';
@@ -23,7 +24,7 @@ import {
     isSizeAvailable
 } from '../utils/variants';
 import { trackViewItem } from '../utils/analytics';
-import { useMarcoFoto } from '../utils/marcoFoto';
+import { proporcionDelMarco, useMarcoFoto } from '../utils/marcoFoto';
 import { useRotacionFotos } from '../hooks/useRotacionFotos';
 
 export const ProductDetail = () => {
@@ -129,9 +130,7 @@ export const ProductDetail = () => {
 
     const relatedProducts = useMemo(() => {
         if (!product) return [];
-        return inventory
-            .filter((p) => p.category === product.category && p.id !== product.id && p.active !== false)
-            .slice(0, 4);
+        return prendasRelacionadas(inventory, product);
     }, [inventory, product]);
 
     // Sin producto: todavía está bajando el catálogo (si no existe, el efecto
@@ -168,6 +167,7 @@ export const ProductDetail = () => {
     };
 
     const wished = isInWishlist(product.id);
+    const detalles = detallesSinRepetir(product);
     const scarcityThreshold = parseInt(siteConfig?.sales?.scarcity?.threshold) || 5;
     const showScarcity = siteConfig?.sales?.scarcity?.enabled && totalStock > 0 && totalStock <= scarcityThreshold;
 
@@ -195,11 +195,13 @@ export const ProductDetail = () => {
                 />
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-                {/* Galería */}
-                <div>
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-8 lg:pt-0 pb-8 grid grid-cols-1 lg:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] gap-10 lg:gap-16">
+                {/* Galería: en PC la foto entra entera en la pantalla y acompaña al bajar. */}
+                <div className="lg:sticky lg:top-24 lg:self-start lg:flex lg:gap-3">
+                    <div className="lg:flex-1 lg:min-w-0">
                     <div
-                        className={`${marcoFoto} bg-slate-100 dark:bg-[#121212] overflow-hidden relative cursor-zoom-in group sin-textura`}
+                        className={`${marcoFoto} ficha-foto bg-slate-100 dark:bg-[#121212] overflow-hidden relative cursor-zoom-in group sin-textura`}
+                        style={{ '--marco': proporcionDelMarco(marcoFoto) }}
                         onClick={() => setLightbox(true)}
                         onMouseEnter={fotos.alEntrar}
                         onMouseLeave={fotos.alSalir}
@@ -229,14 +231,15 @@ export const ProductDetail = () => {
                             </div>
                         )}
                     </div>
+                    </div>
                     {images.length > 1 && (
-                        <div className="mt-3 grid grid-cols-4 md:grid-cols-5 gap-2">
+                        <div className="mt-3 grid grid-cols-4 md:grid-cols-5 gap-2 lg:mt-0 lg:order-first lg:flex lg:flex-col lg:w-20 lg:shrink-0 lg:p-0.5 lg:max-h-[calc(100svh-11.5rem)] lg:overflow-y-auto scrollbar-hide">
                             {images.map((img, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setActiveImage(i)}
                                     aria-label={`Imagen ${i + 1}`}
-                                    className={`aspect-[2/3] overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
+                                    className={`aspect-[2/3] shrink-0 overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
                                 >
                                     <img src={optimizeImage(img, 300)} alt="" className="w-full h-full object-cover" loading="lazy" />
                                 </button>
@@ -250,7 +253,7 @@ export const ProductDetail = () => {
                 <div>
                     <div className="flex justify-between items-start mb-3">
                         <span className="inline-flex items-center gap-3 text-2xs font-semibold tracking-[0.35em] text-cielo-gold/80 uppercase">
-                            <Rombo /> {product.category}
+                            <Rombo /> {tituloDeProducto(product.category)}
                         </span>
                         <button
                             onClick={handleShare}
@@ -476,10 +479,10 @@ export const ProductDetail = () => {
                     </div>
 
                     <div className="space-y-2 mt-6">
-                        {product.details && (
+                        {detalles.length > 0 && (
                             <Accordion title="Detalles del producto" defaultOpen={true}>
                                 <ul className="list-disc pl-4 space-y-1">
-                                    {product.details.split('\n').filter(Boolean).map((d, i) => (
+                                    {detalles.map((d, i) => (
                                         <li key={i}>{d}</li>
                                     ))}
                                 </ul>
@@ -503,7 +506,7 @@ export const ProductDetail = () => {
                 </div>
             </div>
 
-            <div id="product-reviews" className="max-w-5xl mx-auto px-4">
+            <div id="product-reviews" className="max-w-[1400px] mx-auto px-4 md:px-8">
                 <ReviewsSection productId={product.id} />
             </div>
 
@@ -534,7 +537,7 @@ export const ProductDetail = () => {
                         className="btn-oro flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] text-black transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{ background: totalStock === 0 ? '#94a3b8' : 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                     >
-                        {totalStock === 0 ? 'Agotado' : 'Agregar al carrito'}
+                        {totalStock === 0 ? 'Agotado' : 'Agregar a la bolsa'}
                     </button>
                 </div>
             </div>

@@ -11,6 +11,9 @@ const MINUSCULAS = new Set(['de', 'del', 'la', 'el', 'los', 'las', 'con', 'sin',
 // Marcas y nombres propios que van con mayúscula aunque estén en el medio.
 const PROPIOS = new Set(['oxford', 'morley', 'rafaela', 'levis', "levi's", 'wrangler', 'lee', 'santi']);
 
+// Palabras que el dueño carga sin tilde porque van en mayúsculas.
+const TILDES = { algodon: 'algodón', chupin: 'chupín', gamulan: 'gamulán', raton: 'ratón', rustico: 'rústico' };
+
 // Siglas y talles que se dejan como están.
 const SIGLAS = /^(xs|s|m|l|xl|xxl|xxxl|xg|g|xxg|uv|3d|2d|v|u)$/i;
 
@@ -27,7 +30,7 @@ export const tituloDeProducto = (nombre) => {
     const letras = s.replace(/[^a-záéíóúñü]/gi, '');
     if (!letras || letras !== letras.toUpperCase()) return s;
 
-    return s.toLowerCase().split(' ').map((palabra, i) => {
+    return s.toLowerCase().split(' ').map((p) => TILDES[p] || p).map((palabra, i) => {
         if (SIGLAS.test(palabra) && palabra.length <= 3) return palabra.toUpperCase();
         if (i > 0 && MINUSCULAS.has(palabra)) return palabra;
         if (PROPIOS.has(palabra)) return capitalizar(palabra);

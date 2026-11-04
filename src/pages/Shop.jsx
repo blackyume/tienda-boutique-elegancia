@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { formatMoney, getColorHex } from '../utils/helpers';
-import { getTotalStock } from '../utils/variants';
+import { getTotalStock, ordenarTalles } from '../utils/variants';
 import { ChevronDown, SlidersHorizontal, X, Search } from 'lucide-react';
 import { ProductCard } from '../components/shop/ProductCard';
 import { ProductGridSkeleton } from '../components/shop/ProductSkeleton';
@@ -35,7 +35,7 @@ export const Shop = () => {
         [inventory]
     );
     const allSizes = useMemo(
-        () => Array.from(new Set(inventory.flatMap((p) => p.sizes || []))),
+        () => ordenarTalles(new Set(inventory.flatMap((p) => p.sizes || []))),
         [inventory]
     );
     const allColors = useMemo(
@@ -160,7 +160,7 @@ export const Shop = () => {
 
             <div className="max-w-[1400px] 2xl:max-w-[1720px] mx-auto px-4 md:px-8 py-10 flex flex-col md:flex-row gap-8">
                 {/* Sidebar desktop */}
-                <aside className="hidden md:block w-64 flex-shrink-0 space-y-8 sticky top-32 h-fit">
+                <aside className="hidden md:block w-64 flex-shrink-0 space-y-8 h-fit">
                     <div>
                         <h3 className="font-serif text-xl mb-4 border-b border-slate-200 dark:border-white/10 pb-2">
                             Filtros

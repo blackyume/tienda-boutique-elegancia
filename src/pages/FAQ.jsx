@@ -7,7 +7,7 @@ import { abrirConsulta } from '../utils/consultas';
 const FAQS = [
     {
         q: '¿Cómo compro en la tienda?',
-        a: 'Elegí tu producto, seleccioná talle y color, agregalo al carrito y tocá "Finalizar compra". Completás tus datos, elegís el envío y pagás con Mercado Pago. ¡Listo! Te llega un mail de confirmación.',
+        a: 'Elegí tu producto, seleccioná talle y color, agregalo a la bolsa y tocá "Finalizar compra". Completás tus datos, elegís el envío y pagás con Mercado Pago. ¡Listo! Te llega un mail de confirmación.',
     },
     {
         q: '¿Qué medios de pago aceptan?',

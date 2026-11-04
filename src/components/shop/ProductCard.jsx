@@ -153,7 +153,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 <div className="pt-4 pb-4 px-3 flex flex-col items-center text-center filo-luz">
                     {product.category && (
                         <span className="text-2xs uppercase tracking-[0.3em] text-cielo-gold/60 mb-1">
-                            {product.category}
+                            {tituloDeProducto(product.category)}
                         </span>
                     )}
                     <h3 className="font-serif text-[14px] sm:text-[15px] text-white/90 group-hover:text-white transition-colors line-clamp-2 sm:line-clamp-1 leading-snug min-h-[2.6em] sm:min-h-0">

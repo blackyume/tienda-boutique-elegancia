@@ -35,7 +35,7 @@ export const useCart = ({ cart, setCart, wishlist, setWishlist, inventory, addTo
             return [...prev, { ...snapshot, size, color, quantity: addQty, key }];
         });
         trackAddToCart(product, size, color, addQty);
-        addToast('Agregado al carrito', 'success');
+        addToast('Agregado a la bolsa', 'success');
         return true;
     };
 

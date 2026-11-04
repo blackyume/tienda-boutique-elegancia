@@ -55,7 +55,7 @@ const ArrivalCard = ({ product, onQuickView }) => {
             <div className="px-1">
                 {product.category && (
                     <p className="text-[10px] uppercase tracking-[0.35em] text-cielo-gold/60 mb-1.5 font-semibold">
-                        {product.category}
+                        {tituloDeProducto(product.category)}
                     </p>
                 )}
                 <h3 className="font-serif text-white text-base leading-snug mb-2 line-clamp-2 group-hover:text-cielo-gold/90 transition-colors duration-300">

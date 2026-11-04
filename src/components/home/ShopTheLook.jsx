@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { tituloDeProducto } from '../../utils/nombres';
 import { Link } from 'react-router-dom';
 import { Plus, X, ShoppingBag } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
@@ -116,7 +117,7 @@ export const ShopTheLook = () => {
                                                         loading="lazy"
                                                     />
                                                 </div>
-                                                <p className="text-2xs uppercase tracking-[0.25em] text-cielo-gold/70 mb-1">{product.category}</p>
+                                                <p className="text-2xs uppercase tracking-[0.25em] text-cielo-gold/70 mb-1">{tituloDeProducto(product.category)}</p>
                                                 <p className="text-sm text-white font-serif leading-tight line-clamp-1">{product.name}</p>
                                                 <p className="text-sm font-semibold text-cielo-gold mt-1">{formatMoney(product.price)}</p>
                                             </Link>

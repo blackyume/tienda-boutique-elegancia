@@ -38,7 +38,7 @@
 
 /* Fix Global: Evitar scroll horizontal indeseado y mejorar renderizado texto */
 body {
-    overflow-x: hidden;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
 }
 

@@ -420,3 +420,8 @@ html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 }
 .btn-oro:hover:not(:disabled) { filter: brightness(1.08); }
 .btn-oro:disabled { opacity: .55; }
+
+/* Ficha en PC: la foto se achica para entrar entera en la pantalla, sin recortar a la modelo. */
+@media (min-width: 1024px) {
+  .ficha-foto { width: min(100%, max(20rem, calc((100svh - 11.5rem) * var(--marco, .6667)))); }
+}

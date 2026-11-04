@@ -4,8 +4,8 @@ import { tituloDeProducto } from '../src/utils/nombres';
 describe('tituloDeProducto', () => {
     it('pasa los nombres en mayúsculas a frase con mayúscula inicial', () => {
         expect(tituloDeProducto('JEANS ELASTIZADO OXFORD')).toBe('Jeans elastizado Oxford');
-        expect(tituloDeProducto('GAMULAN FORRADO CON CORDERITO')).toBe('Gamulan forrado con corderito');
-        expect(tituloDeProducto('TOP COLA RATON MORLEY RIB VERANO')).toBe('Top cola raton Morley rib verano');
+        expect(tituloDeProducto('GAMULAN FORRADO CON CORDERITO')).toBe('Gamulán forrado con corderito');
+        expect(tituloDeProducto('TOP COLA RATON MORLEY RIB VERANO')).toBe('Top cola ratón Morley rib verano');
     });
 
     it('respeta talles y siglas', () => {
