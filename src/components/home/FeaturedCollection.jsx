@@ -1,3 +1,4 @@
+import { Rombo } from '../ui/Ornamento';
 import React, { useMemo } from 'react';
 import { tituloDeProducto } from '../../utils/nombres';
 import { Link } from 'react-router-dom';
@@ -22,7 +23,7 @@ const HeroCard = ({ item, onQuickView }) => (
         />
 
         {/* Gold border flash on hover */}
-        <span className="absolute inset-0 z-10 pointer-events-none border border-cielo-gold/0 group-hover:border-cielo-gold/30 transition-all duration-700" />
+        <span className="absolute inset-2 z-10 pointer-events-none border border-cielo-gold/0 group-hover:border-cielo-gold/70 transition-all duration-700" />
 
         {/* Gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
@@ -77,7 +78,7 @@ const HeroCard = ({ item, onQuickView }) => (
                 </Link>
                 <button
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); onQuickView?.(item); }}
-                    className="inline-flex items-center px-5 py-2.5 border border-white/25 text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:border-cielo-gold/50 hover:text-cielo-gold transition-colors"
+                    className="btn-oro inline-flex items-center px-5 py-2.5 border border-white/25 text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:border-cielo-gold/50 hover:text-cielo-gold transition-colors"
                 >
                     Vista rápida
                 </button>
@@ -171,7 +172,7 @@ export const FeaturedCollection = ({ onQuickView }) => {
                 <div className="flex items-end justify-between mb-10 md:mb-14">
                     <div>
                         <div className="flex items-center gap-3 mb-4">
-                            <span className="h-px w-10 bg-cielo-gold/50" />
+                            <Rombo />
                             <span className="text-[10px] uppercase tracking-[0.4em] font-semibold text-cielo-gold/70">
                                 Selección limitada
                             </span>
@@ -198,8 +199,11 @@ export const FeaturedCollection = ({ onQuickView }) => {
                         <HeroCard item={hero} onQuickView={onQuickView} />
 
                         <div className="grid grid-cols-2 gap-3 md:gap-4">
-                            {[second, third, fourth, fifth].filter(Boolean).map(p => (
-                                <SmallCard key={p.id} item={p} onQuickView={onQuickView} />
+                            {/* En el celular van dos: las otras están a un toque en la tienda */}
+                            {[second, third, fourth, fifth].filter(Boolean).map((p, i) => (
+                                <div key={p.id} className={i > 1 ? 'hidden md:block' : ''}>
+                                    <SmallCard item={p} onQuickView={onQuickView} />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -216,7 +220,7 @@ export const FeaturedCollection = ({ onQuickView }) => {
                     <span className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-transparent to-cielo-gold/30" />
                     <Link
                         to="/shop"
-                        className="inline-flex items-center gap-3 px-10 py-3.5 text-black text-[11px] font-cinzel font-bold uppercase tracking-[0.3em] hover:shadow-[0_0_30px_rgba(193,154,107,0.4)] transition-shadow"
+                        className="btn-oro inline-flex items-center gap-3 px-10 py-3.5 text-black text-[11px] font-cinzel font-bold uppercase tracking-[0.3em] hover:shadow-[0_0_30px_rgba(193,154,107,0.4)] transition-shadow"
                         style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                     >
                         Ver toda la colección <ArrowRight className="w-3.5 h-3.5" />

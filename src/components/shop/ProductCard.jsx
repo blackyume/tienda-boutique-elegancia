@@ -96,6 +96,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
 
                     {/* Velo oscuro al hover */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-500 pointer-events-none" />
+                    <span aria-hidden="true" className="absolute inset-2 border border-cielo-gold/0 group-hover:border-cielo-gold/70 transition-colors duration-500 pointer-events-none" />
 
                     {/* Badges */}
                     <div className="absolute top-3 left-3 right-14 flex flex-col items-start gap-1.5 z-10">

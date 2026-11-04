@@ -1,6 +1,7 @@
 import React, { useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Truck, Store, Clock, PackageSearch, RotateCcw, ShieldCheck } from 'lucide-react';
+import { Rombo } from '../components/ui/Ornamento';
 
 const Card = ({ icon: Icon, title, children }) => (
     <div className="bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 rounded-2xl p-6">
@@ -19,8 +20,8 @@ export const Shipping = () => {
         <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans">
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
-                    <span className="text-[#E8C65E] font-bold tracking-[0.25em] uppercase text-xs">Información</span>
-                    <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mt-2 tracking-wide">Envíos y Devoluciones</h1>
+                    <span className="inline-flex items-center gap-3 text-[#E8C65E]/80 font-semibold tracking-[0.35em] uppercase text-2xs"><Rombo /> Información <Rombo /></span>
+                    <h1 className="text-4xl md:text-5xl font-serif text-slate-900 dark:text-noche-100 mt-3">Envíos y Devoluciones</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-3 text-sm">Enviamos a todo el país con Correo Argentino.</p>
                 </div>
 
@@ -50,8 +51,8 @@ export const Shipping = () => {
                             Por higiene, y porque de cada prenda tenemos muy pocas unidades, no hacemos cambios por gusto o talle fuera del plazo legal. Te recomendamos revisar bien la <strong>Tabla de Talles</strong> antes de comprar o consultarnos.
                         </p>
                         <ul className="text-sm leading-relaxed space-y-2 list-disc pl-5 marker:text-[#E8C65E]">
-                            <li><strong>Falla de fábrica o error en el envío:</strong> escribinos apenas recibas el paquete y lo resolvemos.</li>
-                            <li><strong>Derecho de arrepentimiento:</strong> tenés 10 días corridos desde la entrega para arrepentirte (producto sin uso, con etiquetas y empaque original), según la Resolución 424/2020.</li>
+                            <li><strong>Falla de fábrica o error en el envío:</strong> escribinos y lo resolvemos. Tenés la garantía legal de 6 meses.</li>
+                            <li><strong>Derecho de arrepentimiento:</strong> tenés 10 días corridos desde la entrega para arrepentirte (producto sin uso, con etiquetas y empaque original), según la Resolución 424/2020. La devolución no tiene costo para vos.</li>
                         </ul>
                         <p className="text-xs text-slate-400 mt-4">Más detalle en los <Link to="/terms" className="text-[#E8C65E] hover:underline">Términos y Condiciones</Link>.</p>
                     </section>

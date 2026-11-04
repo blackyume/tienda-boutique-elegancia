@@ -1,6 +1,6 @@
 import { LogoSVGFooter } from './LogoSVG';
 import React, { useState } from 'react';
-import { Instagram, Mail, Send, MessageCircle } from 'lucide-react';
+import { Instagram, Mail, Send, MessageCircle, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { MENSAJERIA_ACTIVA, whatsappDeConfig } from '../../utils/contacto';
@@ -17,6 +17,26 @@ const FooterHeading = ({ children }) => (
         {children}
     </h4>
 );
+
+// En el celular Tienda y Ayuda se pliegan; lo legal y el contacto quedan siempre
+// a la vista porque esos enlaces son obligatorios.
+const Plegable = ({ titulo, children }) => {
+    const [abierta, setAbierta] = useState(false);
+    return (
+        <>
+            <button
+                type="button"
+                onClick={() => setAbierta((a) => !a)}
+                aria-expanded={abierta}
+                className="md:hidden w-full flex items-center justify-between py-1 font-cinzel text-2xs uppercase tracking-[0.35em] text-cielo-gold/80"
+            >
+                {titulo} <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${abierta ? 'rotate-180' : ''}`} />
+            </button>
+            <div className="hidden md:block"><FooterHeading>{titulo}</FooterHeading></div>
+            <div className={`${abierta ? 'block mt-4' : 'hidden'} md:block`}>{children}</div>
+        </>
+    );
+};
 
 const SocialBtn = ({ href, children }) => (
     <a
@@ -41,8 +61,8 @@ export const Footer = () => {
             {/* Línea dorada superior */}
             <div className="h-px w-full bg-gradient-to-r from-transparent via-cielo-gold/40 to-transparent" />
 
-            <div className="max-w-7xl mx-auto px-6 pt-20 pb-10">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+            <div className="max-w-7xl mx-auto px-6 pt-12 md:pt-20 pb-10">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-7 md:gap-12 mb-12 md:mb-16">
 
                     {/* Brand — 3 cols */}
                     <div className="md:col-span-3">
@@ -67,7 +87,7 @@ export const Footer = () => {
 
                     {/* Tienda — 2 cols */}
                     <div className="md:col-span-2">
-                        <FooterHeading>Tienda</FooterHeading>
+                        <Plegable titulo="Tienda">
                         <ul className="space-y-3">
                             {[
                                 { to: '/', label: 'Inicio' },
@@ -82,11 +102,12 @@ export const Footer = () => {
                                 </li>
                             ))}
                         </ul>
+                        </Plegable>
                     </div>
 
                     {/* Ayuda — 2 cols */}
                     <div className="md:col-span-2">
-                        <FooterHeading>Ayuda</FooterHeading>
+                        <Plegable titulo="Ayuda">
                         <ul className="space-y-3">
                             {[
                                 { to: '/tracking', label: 'Seguimiento' },
@@ -116,6 +137,7 @@ export const Footer = () => {
                                 </li>
                             ))}
                         </ul>
+                        </Plegable>
                     </div>
 
                     {/* Legal — 2 cols */}
@@ -125,6 +147,7 @@ export const Footer = () => {
                             {[
                                 { to: '/terms', label: 'Términos' },
                                 { to: '/privacy', label: 'Privacidad' },
+                                { to: '/baja', label: 'Darse de baja' },
                                 { href: 'https://www.argentina.gob.ar/produccion/defensadelconsumidor/formulario', label: 'Defensa al Consumidor' },
                             ].map(({ to, href, label }) => (
                                 <li key={label}>
@@ -229,7 +252,7 @@ export const Footer = () => {
                         &copy; 2027 La Boutique de la Elegancia &nbsp;&middot;&nbsp; Todos los derechos reservados
                     </span>
                     <span className="text-2xs text-noche-300/70 tracking-[0.25em] uppercase">
-                        Moda femenina &nbsp;&middot;&nbsp; Hecho en Argentina
+                        Moda femenina &nbsp;&middot;&nbsp; Rafaela, Santa Fe
                     </span>
                 </div>
             </div>

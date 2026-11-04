@@ -3,7 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { useState, useEffect } from 'react';
 import { CampoCheckout, BotonGoogle } from '../components/checkout/CamposCheckout';
 import { validarDatosCheckout, normalizarDatosCheckout, esRetiroEnSucursal, PROVINCIAS, partirNombreCompleto } from '../utils/direccion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { User, Lock, ChevronRight, ShieldCheck, ShoppingBag, Ticket, X, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
@@ -386,8 +386,8 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
     if (cart.length === 0) return (
         <div className="min-h-screen flex flex-col items-center justify-center pt-20 bg-white dark:bg-[#11100D] text-slate-900 dark:text-white transition-colors">
             <ShoppingBag className="w-16 h-16 text-state-300 dark:text-slate-600 mb-6" />
-            <h2 className="text-3xl font-cinzel mb-4">Tu bolsa está vacía</h2>
-            <Button onClick={() => navigate('/')} className="bg-slate-900 text-white dark:bg-white dark:text-slate-900">Volver al Shop</Button>
+            <h2 className="text-3xl font-serif mb-4">Tu bolsa está vacía</h2>
+            <Button onClick={() => navigate('/')} className="btn-oro bg-slate-900 text-white dark:bg-white dark:text-slate-900">Volver a la tienda</Button>
         </div>
     );
 
@@ -407,7 +407,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                         </button>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl font-cinzel text-slate-900 dark:text-white">Checkout</h1>
+                    <h1 className="text-4xl md:text-5xl font-serif text-slate-900 dark:text-noche-100">Finalizar compra</h1>
 
                     {/* Comprar NO exige cuenta. Google se ofrece grande porque es un
                         toque y llena nombre y email solo; la invitada sigue igual. */}
@@ -591,7 +591,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                                         type="button"
                                         onClick={handleApplyCoupon}
                                         disabled={applyingCoupon || !couponCode}
-                                        className="px-5 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-slate-700 dark:hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="btn-oro px-5 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-slate-700 dark:hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {applyingCoupon ? '...' : 'Aplicar'}
                                     </button>
@@ -638,14 +638,14 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                         )}
 
                         <div className="flex justify-between items-end pt-6 mt-2 pb-8">
-                            <span className="font-cinzel text-xl text-slate-900 dark:text-white">Total</span>
-                            <span className=" font-bold text-3xl text-slate-900 dark:text-white">{formatMoney(finalTotal)}</span>
+                            <span className="font-serif text-2xl text-slate-900 dark:text-noche-100">Total</span>
+                            <span className="font-light text-3xl text-cielo-gold">{formatMoney(finalTotal)}</span>
                         </div>
 
                         <button
                             onClick={handleCheckout}
                             disabled={loading}
-                            className="w-full bg-cielo-gold hover:bg-[#B8932E] text-black hover:text-white py-5 rounded-xl font-bold text-sm uppercase tracking-[0.2em] shadow-lg shadow-cielo-gold/20 transition-all transform hover:-translate-y-1 active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                            className="btn-oro w-full bg-cielo-gold hover:bg-[#B8932E] text-black hover:text-white py-5 rounded-xl font-bold text-sm uppercase tracking-[0.2em] shadow-lg shadow-cielo-gold/20 transition-all transform hover:-translate-y-1 active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {loading ? <span className="animate-pulse">Procesando...</span> : <span>Pagar con Mercado Pago</span>}
                         </button>
@@ -670,6 +670,10 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                         </button>
                         <p className="text-[10px] text-center text-slate-400 mt-2">Coordiná el pago y envío por chat con una asesora.</p>
                         </>)}
+
+                        <p className="mt-4 text-[11px] leading-relaxed text-center text-slate-400">
+                            Al pagar aceptás los <Link to="/terms" target="_blank" className="underline hover:text-cielo-gold">Términos</Link> y la <Link to="/privacy" target="_blank" className="underline hover:text-cielo-gold">Política de Privacidad</Link>. Tenés 10 días corridos desde que recibís tu compra para arrepentirte.
+                        </p>
 
                         <div className="mt-6 flex justify-center items-center gap-4 text-slate-400">
                             <Lock className="w-4 h-4" />

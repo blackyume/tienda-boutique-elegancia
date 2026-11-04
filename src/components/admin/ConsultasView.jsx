@@ -19,7 +19,8 @@ const fecha = (ts) => {
 
 // Abre un correo nuevo en el Gmail de la tienda, ya dirigido a la clienta.
 const enlaceRespuesta = (c) => {
-    const asunto = c.producto ? `Tu consulta por ${c.producto}` : 'Tu consulta en La Boutique de la Elegancia';
+    const asunto = c.codigo ? `Tu arrepentimiento ${c.codigo}`
+        : c.producto ? `Tu consulta por ${c.producto}` : 'Tu consulta en La Boutique de la Elegancia';
     return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(c.email)}&su=${encodeURIComponent(asunto)}`;
 };
 
@@ -91,11 +92,14 @@ export const ConsultasView = () => {
                                 </p>
                                 <span className="text-xs text-slate-400">{fecha(c.creada)}</span>
                             </div>
+                            {c.tipo === 'arrepentimiento' && <p className="text-xs font-bold text-rose-500 mb-2">Botón de Arrepentimiento · Código {c.codigo} · La devolución la paga la tienda</p>}
                             {c.producto && <p className="text-xs font-bold text-[#B8932E] dark:text-[#E8C65E] mb-2">Por: {c.producto}</p>}
                             <p className="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap break-words">{c.mensaje}</p>
-                            <p className="text-[11px] text-slate-400 mt-3">
-                                {c.novedades ? 'Aceptó recibir novedades: está en Newsletter.' : 'No pidió novedades: no le mandes publicidad.'}
-                            </p>
+                            {c.tipo !== 'arrepentimiento' && (
+                                <p className="text-[11px] text-slate-400 mt-3">
+                                    {c.novedades ? 'Aceptó recibir novedades: está en Newsletter.' : 'No pidió novedades: no le mandes publicidad.'}
+                                </p>
+                            )}
                             <div className="flex flex-wrap gap-2 mt-4">
                                 <a
                                     href={enlaceRespuesta(c)}

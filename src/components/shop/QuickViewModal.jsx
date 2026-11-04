@@ -229,7 +229,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
                                             disabled={!available}
-                                            className={`h-12 w-12 border flex items-center justify-center text-sm font-bold uppercase transition-all rounded-lg relative ${selectedSize === size ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent shadow-lg' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-900 dark:hover:border-white'} ${!available ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                            className={`h-12 w-12 border flex items-center justify-center text-sm font-bold uppercase transition-all rounded-lg relative ${selectedSize === size ? 'btn-oro' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-900 dark:hover:border-white'} ${!available ? 'opacity-40 cursor-not-allowed' : ''}`}
                                         >
                                             {size}
                                             {!available && <span className="absolute inset-x-1 h-[1px] bg-slate-400 rotate-[-10deg]" />}
@@ -241,7 +241,7 @@ export const QuickViewModal = ({ product, onClose }) => {
                     </div>
 
                     <div className="mt-auto flex gap-4">
-                        <Button onClick={handleAddToCart} className="flex-1 py-4 text-sm bg-slate-900 dark:bg-white dark:text-slate-900 shadow-xl h-14" disabled={totalStock === 0}>
+                        <Button onClick={handleAddToCart} className="btn-oro flex-1 py-4 text-sm bg-slate-900 dark:bg-white dark:text-slate-900 shadow-xl h-14" disabled={totalStock === 0}>
                             {totalStock === 0 ? 'SIN STOCK' : 'AGREGAR AL CARRITO'}
                         </Button>
                         <button onClick={toggleWishlist} className="w-14 h-14 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
@@ -251,7 +251,7 @@ export const QuickViewModal = ({ product, onClose }) => {
 
                     <button
                         onClick={goToDetail}
-                        className="mt-4 w-full h-12 rounded-xl border border-[#E8C65E]/60 text-[#E8C65E] hover:bg-[#E8C65E] hover:text-black text-xs font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group/ficha"
+                        className="btn-oro mt-4 w-full h-12 rounded-xl border border-[#E8C65E]/60 text-[#E8C65E] hover:bg-[#E8C65E] hover:text-black text-xs font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group/ficha"
                     >
                         Ver ficha completa y comprar
                         <ArrowRight className="w-4 h-4 transition-transform group-hover/ficha:translate-x-1" />

@@ -76,7 +76,7 @@ export const PaymentStatus = () => {
                             </div>
                         )}
 
-                        <Button onClick={() => navigate('/profile')} className="w-full">Ver Mis Pedidos</Button>
+                        <Button onClick={() => navigate('/profile')} className="btn-oro w-full">Ver Mis Pedidos</Button>
                     </>
                 ) : status === 'failure' ? (
                     <>
@@ -85,7 +85,7 @@ export const PaymentStatus = () => {
                         </div>
                         <h1 className="text-4xl font-serif mb-4">Pago Rechazado</h1>
                         <p className="text-slate-500 dark:text-slate-400 mb-8">Hubo un problema con tu pago. Por favor intenta nuevamente.</p>
-                        <Button onClick={() => navigate('/checkout')} variant="secondary" className="w-full">Volver al Checkout</Button>
+                        <Button onClick={() => navigate('/checkout')} variant="secondary" className="btn-oro w-full">Volver a la compra</Button>
                     </>
                 ) : (
                     <>
@@ -94,7 +94,7 @@ export const PaymentStatus = () => {
                         </div>
                         <h1 className="text-4xl font-serif mb-4">Pago Pendiente</h1>
                         <p className="text-slate-500 dark:text-slate-400 mb-8">Tu pago se está procesando. Te avisaremos cuando se confirme.</p>
-                        <Button onClick={() => navigate('/')} variant="secondary" className="w-full">Volver a la Tienda</Button>
+                        <Button onClick={() => navigate('/')} variant="secondary" className="btn-oro w-full">Volver a la Tienda</Button>
                     </>
                 )}
 

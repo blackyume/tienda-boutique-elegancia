@@ -36,7 +36,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
 
             {/* Header */}
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
-               <h2 className="text-2xl font-cinzel text-cielo-gold">Tu bolsa <span className="text-sm font-sans text-slate-400 font-normal">({cartCount})</span></h2>
+               <h2 className="text-2xl font-serif text-noche-100">Tu bolsa <span className="text-sm font-sans text-slate-400 font-normal">({cartCount})</span></h2>
                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors group">
                   <X className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
                </button>
@@ -160,7 +160,7 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                   {/* Shipping Estimator */}
                   <div className="mb-8 p-4 rounded-xl bg-white/5 border border-white/5">
                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
-                        <Truck className="w-3 h-3" /> Calcular Envío
+                        <Truck className="w-3 h-3" /> Calcular envío
                      </p>
                      <div className="flex gap-2">
                         <input
@@ -171,14 +171,14 @@ export const CartDrawer = ({ isOpen, onClose }) => {
                         />
                         <button
                            onClick={calculateShipping}
-                           className="bg-white/10 hover:bg-cielo-gold hover:text-black px-4 rounded-lg text-white transition-all duration-300"
+                           className="btn-oro bg-white/10 hover:bg-cielo-gold hover:text-black px-4 rounded-lg text-white transition-all duration-300"
                         >
                            <ArrowRight className="w-4 h-4" />
                         </button>
                      </div>
                      {shippingEstimate && (
-                        <div className="flex justify-between items-center mt-3 text-xs font-bold text-green-400 animate-fadeIn">
-                           <span>Envío Estimado:</span>
+                        <div className="flex justify-between items-center mt-3 text-xs font-bold text-cielo-gold animate-fadeIn">
+                           <span>Envío estimado:</span>
                            <span>{formatMoney(shippingEstimate)}</span>
                         </div>
                      )}
@@ -186,15 +186,15 @@ export const CartDrawer = ({ isOpen, onClose }) => {
 
                   {/* Total & Checkout */}
                   <div className="flex justify-between items-end mb-6">
-                     <span className="text-slate-400 text-sm uppercase tracking-widest">Total Estimado</span>
-                     <span className="font-cinzel text-3xl text-white">{formatMoney(cartTotal)}</span>
+                     <span className="text-slate-400 text-sm uppercase tracking-widest">Total estimado</span>
+                     <span className="font-light text-3xl text-cielo-gold">{formatMoney(cartTotal)}</span>
                   </div>
 
                   <Button
-                     className="w-full py-4 bg-cielo-gold text-black font-bold tracking-[0.2em] hover:bg-white hover:text-black transition-all shadow-[0_0_20px_rgba(193,154,107,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]"
+                     className="btn-oro w-full py-4 bg-cielo-gold text-black font-bold tracking-[0.2em] hover:bg-white hover:text-black transition-all shadow-[0_0_20px_rgba(193,154,107,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]"
                      onClick={() => { onClose(); navigate('/checkout'); }}
                   >
-                     INICIAR COMPRA
+                     Iniciar compra
                   </Button>
                </div>
             )}

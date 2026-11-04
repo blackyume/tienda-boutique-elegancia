@@ -13,11 +13,12 @@ export const InstagramFeed = () => {
     // Son fotos del catálogo, no posteos de Instagram (traerlos necesitaría la
     // API de Meta). Antes cada una llevaba al perfil: la visitante tocaba una
     // prenda que le gustó y terminaba fuera de la tienda. Ahora cada foto va a
-    // SU producto, y el botón de abajo queda para seguir la cuenta.
+    // SU producto, y el botón de abajo queda para seguir la cuenta. Va la segunda
+    // foto de cada prenda: con la principal repetía lo que ya se vio más arriba.
     const feedImages = (inventory || [])
         .filter(p => p?.active !== false && p?.image)
-        .slice(0, 6)
-        .map(p => ({ id: p.id, url: p.image, name: p.name }));
+        .slice(-6)
+        .map(p => ({ id: p.id, url: p.images?.[1] || p.image, name: p.name }));
 
     // Extract handle from URL if it's a full URL
     const getHandle = (url) => {
@@ -39,7 +40,7 @@ export const InstagramFeed = () => {
                 <SectionHeader
                     eyebrow={<span className="inline-flex items-center gap-2"><Instagram className="w-3.5 h-3.5" /> Seguinos en Instagram</span>}
                     title={handle}
-                    titleClassName="text-2xl md:text-3xl lg:text-4xl break-all sm:break-normal"
+                    titleClassName="text-xl sm:text-2xl md:text-3xl lg:text-4xl"
                     subtitle="Tocá cualquier prenda para verla, y seguinos para las novedades"
                     className="mb-12"
                 />
@@ -52,7 +53,7 @@ export const InstagramFeed = () => {
                                 to={`/product/${item.id}`}
                                 key={item.id || idx}
                                 aria-label={`Ver ${item.name}`}
-                                className="group relative aspect-[2/3] overflow-hidden cursor-pointer"
+                                className={`group relative aspect-[2/3] overflow-hidden cursor-pointer ${idx > 2 ? 'hidden md:block' : ''}`}
                             >
                                 <img
                                     src={optimizeImage(item.url, 400)}
@@ -76,7 +77,7 @@ export const InstagramFeed = () => {
                         href={instagramUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-8 py-3 border border-white/20 text-white text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-colors backdrop-blur-sm"
+                        className="btn-oro inline-flex items-center gap-2 px-8 py-3 border border-white/20 text-white text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-colors backdrop-blur-sm"
                     >
                         <Instagram className="w-4 h-4" />
                         Ver perfil en Instagram

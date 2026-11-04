@@ -49,7 +49,7 @@ export const UserProfile = () => {
         return (
             <div className="pt-32 pb-20 min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950 px-4">
                 <p>Inicia sesión para ver tu perfil.</p>
-                <Button onClick={() => navigate('/')} className="mt-4">Ir al Inicio</Button>
+                <Button onClick={() => navigate('/')} className="btn-oro mt-4">Ir al Inicio</Button>
             </div>
         );
     }
@@ -100,7 +100,7 @@ export const UserProfile = () => {
                             <button onClick={() => copy(referralLink)} className="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors" title="Copiar link">
                                 <Copy className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                             </button>
-                            <button onClick={share} className="p-2.5 rounded-lg bg-[#E8C65E] hover:bg-[#C19A2E] text-white transition-colors" title="Compartir">
+                            <button onClick={share} className="btn-oro p-2.5 rounded-lg bg-[#E8C65E] hover:bg-[#C19A2E] text-white transition-colors" title="Compartir">
                                 <Share2 className="w-4 h-4" />
                             </button>
                         </div>
@@ -121,7 +121,7 @@ export const UserProfile = () => {
                     {myOrders.length === 0 ? (
                         <div className="text-center py-16 bg-white dark:bg-[#1a1a1a] rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
                             <p className="text-slate-400 mb-4">Aún no has realizado pedidos.</p>
-                            <Button onClick={() => navigate('/shop')}>Ir a la Tienda</Button>
+                            <Button onClick={() => navigate('/shop')} className="btn-oro">Ir a la Tienda</Button>
                         </div>
                     ) : (
                         myOrders.map(order => (

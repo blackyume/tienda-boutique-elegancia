@@ -51,7 +51,7 @@ export const textoDelAviso = (c) => [
 ].filter((l) => l !== null).join('\n');
 
 // Usa la plantilla de los correos de pedido, la única que hay en EmailJS.
-const avisarALaTienda = async (c, siteConfig) => {
+const mandarCorreo = async (params, siteConfig) => {
     const ej = siteConfig?.emailjs || {};
     if (!ej.serviceId || !ej.templateId || !ej.publicKey) throw new Error('EmailJS no configurado');
     const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
@@ -61,19 +61,22 @@ const avisarALaTienda = async (c, siteConfig) => {
             service_id: ej.serviceId,
             template_id: ej.templateId,
             user_id: ej.publicKey,
-            template_params: {
-                to_name: 'La Boutique',
-                to_email: siteConfig?.contact?.email || CORREO_DE_LA_TIENDA,
-                email: c.email, // la plantilla lo usa de Reply-To: Responder en Gmail le llega a ella
-                email_type: 'consulta',
-                subject: `Consulta de ${c.nombre}`,
-                status_label: 'Consulta nueva',
-                message: textoDelAviso(c),
-            },
+            template_params: params,
         }),
     });
     if (!res.ok) throw new Error(`EmailJS ${res.status}`);
 };
+
+const avisarALaTienda = (c, siteConfig, extra) => mandarCorreo({
+    to_name: 'La Boutique',
+    to_email: siteConfig?.contact?.email || CORREO_DE_LA_TIENDA,
+    email: c.email, // la plantilla lo usa de Reply-To: Responder en Gmail le llega a ella
+    email_type: 'consulta',
+    subject: `Consulta de ${c.nombre}`,
+    status_label: 'Consulta nueva',
+    message: textoDelAviso(c),
+    ...extra,
+}, siteConfig);
 
 /** Devuelve true si la consulta quedó guardada. */
 export const enviarConsulta = async (datos, siteConfig) => {
@@ -88,4 +91,50 @@ export const enviarConsulta = async (datos, siteConfig) => {
     if (c.novedades) await subscribeNewsletter(c.email, 'chat');
     await avisarALaTienda(c, siteConfig).catch((e) => console.warn('Aviso de consulta sin enviar', e));
     return true;
+};
+
+export const codigoDeArrepentimiento = (ahora = Date.now(), azar = Math.random()) =>
+    `ARR-${ahora.toString(36).slice(-4)}${azar.toString(36).slice(2, 6).padEnd(4, '0')}`.toUpperCase();
+
+export const textoDelArrepentimiento = ({ nombre, pedido, codigo }) => [
+    `Recibimos tu pedido de arrepentimiento de la compra ${pedido}.`,
+    '',
+    `Tu código de trámite es ${codigo}. Guardalo: con él seguimos la gestión.`,
+    '',
+    `${nombre}, te vamos a escribir a este correo para coordinar la devolución. No tiene costo para vos.`,
+].join('\n');
+
+/**
+ * Botón de Arrepentimiento (Res. 424/2020): la norma pide un código de trámite
+ * dentro de las 24 h y por el mismo medio, así que se da en el momento. Va a
+ * `consultas` para que la tienda lo vea junto a lo demás que hay que responder.
+ * Devuelve { codigo, correo } o null si no se pudo guardar.
+ */
+export const enviarArrepentimiento = async ({ nombre, pedido, email }, siteConfig) => {
+    const p = String(pedido || '').trim().slice(0, 40);
+    const c = limpiarConsulta({ nombre, email, mensaje: `Quiere arrepentirse de la compra del pedido ${p}.` });
+    if (!p || !consultaCompleta(c)) return null;
+    const codigo = codigoDeArrepentimiento();
+    try {
+        await addDoc(collection(db, 'consultas'), { ...c, tipo: 'arrepentimiento', codigo, estado: 'nueva', creada: serverTimestamp() });
+    } catch (e) {
+        console.warn('No se pudo guardar el arrepentimiento', e);
+        return null;
+    }
+    await avisarALaTienda(c, siteConfig, {
+        subject: `Arrepentimiento ${codigo} · pedido ${p}`,
+        status_label: 'Arrepentimiento',
+        message: `${c.nombre} pidió arrepentirse de la compra del pedido ${p}.\n\nCódigo de trámite: ${codigo}\nResponder a: ${c.email}\n\nLa devolución la paga la tienda.`,
+    }).catch((e) => console.warn('Aviso de arrepentimiento sin enviar', e));
+    const correo = await mandarCorreo({
+        to_name: c.nombre,
+        to_email: c.email,
+        email: siteConfig?.contact?.email || CORREO_DE_LA_TIENDA,
+        order_id: p,
+        email_type: 'arrepentimiento',
+        subject: `Recibimos tu arrepentimiento · ${codigo}`,
+        status_label: 'Arrepentimiento recibido',
+        message: textoDelArrepentimiento({ nombre: c.nombre, pedido: p, codigo }),
+    }, siteConfig).then(() => true, (e) => { console.warn('Código sin enviar', e); return false; });
+    return { codigo, correo };
 };

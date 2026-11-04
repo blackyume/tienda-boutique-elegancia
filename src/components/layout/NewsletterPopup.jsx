@@ -21,7 +21,7 @@ export const NewsletterPopup = () => {
         if (!hasSeen && !isSubscribed) {
             const timer = setTimeout(() => {
                 setIsOpen(true);
-            }, 5000);
+            }, 45000); // a quien ya estuvo mirando: al entrar corta la vidriera
             return () => clearTimeout(timer);
         }
     }, [config.active]);

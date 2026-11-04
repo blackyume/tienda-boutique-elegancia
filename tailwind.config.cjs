@@ -26,6 +26,9 @@ module.exports = {
                 // 9,05:1 sobre este negro; este da 11,48:1 -- mas luz sin
                 // salirse a amarillo limon. Texto negro encima: 12,00:1.
                 'cielo-gold': '#E8C65E',
+                // Tercer color de la marca (4/11/2026): corta el negro continuo. El oro
+                // sobre marfil es el oscuro: el de la casa no llega a AA en texto chico.
+                marfil: { DEFAULT: '#F3ECDE', 200: '#E9DFCB', tinta: '#1B1813', oro: '#7A5B1C' },
                 noche: {
                     950: '#0A0908',  // fondo de pagina, el mas hondo
                     900: '#11100D',  // fondo base  (= cielo-dark)

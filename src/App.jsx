@@ -12,7 +12,6 @@ import { SystemAlert } from './components/ui/SystemAlert';
 import { SizeGuideModal } from './components/shop/SizeGuideModal';
 import { Home } from './pages/Home';
 import { Maintenance } from './pages/Maintenance';
-import { PromoPopup } from './components/ui/PromoPopup';
 import { PushOptIn } from './components/ui/PushOptIn';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
@@ -41,6 +40,7 @@ const NotFound = lazyConReintento(() => import('./pages/NotFound').then(m => ({ 
 const Success = lazyConReintento(() => import('./pages/Success').then(m => ({ default: m.Success })));
 const FAQ = lazyConReintento(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
 const Shipping = lazyConReintento(() => import('./pages/Shipping').then(m => ({ default: m.Shipping })));
+const Baja = lazyConReintento(() => import('./pages/Baja').then(m => ({ default: m.Baja })));
 const Contact = lazyConReintento(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
 
 const ScrollToTop = () => {
@@ -127,9 +127,8 @@ const AppContent = () => {
       <BotonesContacto />
       <ChatConsultas />
       <SystemAlert />
-      <PromoPopup />
       <NewsletterPopup />
-      {location.pathname !== '/admin' && <PushOptIn />}
+      {location.pathname !== '/admin' && location.pathname !== '/checkout' && <PushOptIn />}
       {/* Elegancia IA Chat Widget */}
       <ShopAssistantWrapper />
       {/* Asistente Lau flotante — solo para el admin */}
@@ -149,6 +148,7 @@ const AppContent = () => {
             <Route path="/tracking" element={<Tracking />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/envios" element={<Shipping />} />
+            <Route path="/baja" element={<Baja />} />
             <Route path="/contacto" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsConditions />} />

@@ -50,8 +50,11 @@ export const ChatConsultas = () => {
 
     useEffect(() => {
         const t1 = setTimeout(() => setVisible(true), 1200);
-        const t2 = setTimeout(() => setMostrarAviso(true), 5000);
-        const t3 = setTimeout(() => setMostrarAviso(false), 11000);
+        // El globo sale una vez por visita, no en cada página
+        let visto = false;
+        try { visto = sessionStorage.getItem('lbde_aviso_chat') === '1'; sessionStorage.setItem('lbde_aviso_chat', '1'); } catch { /* noop */ }
+        const t2 = setTimeout(() => setMostrarAviso(!visto), 12000);
+        const t3 = setTimeout(() => setMostrarAviso(false), 18000);
         return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
     }, []);
 
@@ -148,7 +151,7 @@ export const ChatConsultas = () => {
                         <div className="p-4 border-t border-white/10">
                             <button
                                 onClick={() => empezar()}
-                                className="w-full py-3 border border-cielo-gold/40 text-cielo-gold font-cinzel text-2xs uppercase tracking-[0.25em] transition-colors hover:bg-cielo-gold/10"
+                                className="btn-oro w-full py-3 border border-cielo-gold/40 text-cielo-gold font-cinzel text-2xs uppercase tracking-[0.25em] transition-colors hover:bg-cielo-gold/10"
                             >
                                 Hacer otra consulta
                             </button>
@@ -183,7 +186,7 @@ export const ChatConsultas = () => {
                                     type="submit"
                                     disabled={enviando || !datos[paso].trim()}
                                     aria-label={paso === 'email' ? 'Enviar consulta' : 'Seguir'}
-                                    className="w-11 h-11 shrink-0 rounded-xl bg-cielo-gold text-[#11100D] flex items-center justify-center transition-colors hover:bg-[#F3D985] disabled:opacity-40"
+                                    className="btn-oro w-11 h-11 shrink-0 rounded-xl bg-cielo-gold text-[#11100D] flex items-center justify-center transition-colors hover:bg-[#F3D985] disabled:opacity-40"
                                 >
                                     <Send className="w-4 h-4" />
                                 </button>

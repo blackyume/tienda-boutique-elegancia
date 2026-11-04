@@ -6,6 +6,8 @@ import { ChevronDown, SlidersHorizontal, X, Search } from 'lucide-react';
 import { ProductCard } from '../components/shop/ProductCard';
 import { ProductGridSkeleton } from '../components/shop/ProductSkeleton';
 import { SEO } from '../components/seo/SEO';
+import { Rombo } from '../components/ui/Ornamento';
+import { tituloDeProducto } from '../utils/nombres';
 import { useSearchParams } from 'react-router-dom';
 
 const PAGE_SIZE = 12;
@@ -137,17 +139,21 @@ export const Shop = () => {
     return (
         <div className="min-h-screen bg-white dark:bg-[#11100D] text-slate-900 dark:text-white pt-24 transition-colors">
             <SEO
-                title="Shop Online — La Boutique de la Elegancia"
-                description="Explora nuestra colección exclusiva de ropa de mujer. Filtrá por talle, color y precio. Envíos a todo el país."
+                title="Tienda — La Boutique de la Elegancia"
+                description="Mirá nuestra colección de ropa de mujer. Filtrá por talle, color y precio. Envíos a todo el país."
             />
 
-            {/* Hero */}
-            <div className="w-full bg-slate-900 dark:bg-black/40 text-white py-16 md:py-20 px-6 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-overlay" />
-                <div className="relative z-10 animate-fadeIn">
-                    <h1 className="text-4xl md:text-6xl font-luxury mb-4 tracking-wider">Colección 2027</h1>
-                    <p className="font-serif italic text-lg text-slate-300 max-w-2xl mx-auto">
-                        Descubrí la esencia del lujo moderno. Piezas únicas diseñadas para destacar.
+            {/* Encabezado: chico a propósito, las prendas se tienen que ver enseguida */}
+            <div className="relative w-full bg-noche-950 py-9 md:py-14 px-6 text-center overflow-hidden">
+                <div aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 top-3 md:top-5 w-[34rem] md:w-[46rem] h-[40rem] rounded-t-full border border-cielo-gold/[0.12]" />
+                <div aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 top-9 md:top-12 w-[26rem] md:w-[36rem] h-[40rem] rounded-t-full border border-cielo-gold/[0.07]" />
+                <div className="relative animate-fadeIn">
+                    <span className="inline-flex items-center gap-4 text-2xs uppercase tracking-[0.4em] font-semibold text-cielo-gold/70">
+                        <Rombo /> La tienda <Rombo />
+                    </span>
+                    <h1 className="mt-4 font-serif text-noche-100 text-4xl md:text-6xl">Colección 2027</h1>
+                    <p className="mt-3 font-serif italic text-noche-300 md:text-lg max-w-2xl mx-auto">
+                        Prendas elegidas una por una, para que hable tu estilo.
                     </p>
                 </div>
             </div>
@@ -156,7 +162,7 @@ export const Shop = () => {
                 {/* Sidebar desktop */}
                 <aside className="hidden md:block w-64 flex-shrink-0 space-y-8 sticky top-32 h-fit">
                     <div>
-                        <h3 className="font-luxury text-lg mb-4 border-b border-slate-200 dark:border-white/10 pb-2">
+                        <h3 className="font-serif text-xl mb-4 border-b border-slate-200 dark:border-white/10 pb-2">
                             Filtros
                         </h3>
 
@@ -180,7 +186,7 @@ export const Shop = () => {
                                             onClick={() => setCategory(cat)}
                                             className={`text-sm transition-colors ${category === cat ? 'font-bold text-cielo-gold' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                                         >
-                                            {cat === 'all' ? 'Ver Todo' : cat}
+                                            {cat === 'all' ? 'Ver todo' : tituloDeProducto(cat)}
                                         </button>
                                     </li>
                                 ))}
@@ -194,7 +200,7 @@ export const Shop = () => {
                                         <button
                                             key={s}
                                             onClick={() => toggleIn(sizes, s, setSizes)}
-                                            className={`px-3 h-9 min-w-[36px] text-xs font-bold border rounded-md transition ${sizes.has(s) ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white' : 'border-slate-200 dark:border-slate-700 hover:border-slate-400'}`}
+                                            className={`px-3 h-9 min-w-[36px] text-xs font-bold border rounded-md transition ${sizes.has(s) ? 'btn-oro' : 'border-slate-200 dark:border-slate-700 hover:border-slate-400'}`}
                                         >
                                             {s}
                                         </button>
@@ -280,7 +286,7 @@ export const Shop = () => {
                 {/* Main */}
                 <div className="flex-1">
                     <div className="flex flex-wrap justify-between items-center gap-3 mb-4 border-b border-slate-100 dark:border-white/5 pb-4">
-                        <p className="text-sm font-serif text-slate-500">{filtered.length} Productos</p>
+                        <p className="text-sm text-noche-300">{filtered.length} {filtered.length === 1 ? 'prenda' : 'prendas'}</p>
 
                         <div className="flex gap-3 items-center min-w-0 max-w-full">
                             <button
@@ -386,9 +392,9 @@ export const Shop = () => {
                                 <button
                                     key={cat}
                                     onClick={() => setCategory(cat)}
-                                    className={`px-4 py-2 rounded-full border text-sm ${category === cat ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border-slate-200 dark:border-slate-700'}`}
+                                    className={`px-4 py-2 rounded-full border text-sm ${category === cat ? 'btn-oro' : 'border-slate-200 dark:border-slate-700'}`}
                                 >
-                                    {cat === 'all' ? 'Todos' : cat}
+                                    {cat === 'all' ? 'Todos' : tituloDeProducto(cat)}
                                 </button>
                             ))}
                         </div>
@@ -401,7 +407,7 @@ export const Shop = () => {
                                     <button
                                         key={s}
                                         onClick={() => toggleIn(sizes, s, setSizes)}
-                                        className={`px-3 h-10 min-w-[40px] text-xs font-bold border rounded-md ${sizes.has(s) ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white' : 'border-slate-200 dark:border-slate-700'}`}
+                                        className={`px-3 h-10 min-w-[40px] text-xs font-bold border rounded-md ${sizes.has(s) ? 'btn-oro' : 'border-slate-200 dark:border-slate-700'}`}
                                     >
                                         {s}
                                     </button>
@@ -477,7 +483,7 @@ export const Shop = () => {
                         </button>
                         <button
                             onClick={() => setIsMobileFilterOpen(false)}
-                            className="flex-[2] bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 font-bold uppercase tracking-widest rounded-xl"
+                            className="btn-oro flex-[2] bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-4 font-bold uppercase tracking-widest rounded-xl"
                         >
                             Ver {filtered.length} resultados
                         </button>

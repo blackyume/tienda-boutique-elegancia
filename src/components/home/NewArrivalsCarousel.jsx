@@ -1,3 +1,4 @@
+import { Rombo } from '../ui/Ornamento';
 import React, { useRef } from 'react';
 import { tituloDeProducto } from '../../utils/nombres';
 import { ArrowLeft, ArrowRight, Eye } from 'lucide-react';
@@ -94,7 +95,7 @@ export const NewArrivalsCarousel = ({ products, onQuickView }) => {
             <div className="flex items-end justify-between mb-10">
                 <div>
                     <div className="flex items-center gap-3 mb-4">
-                        <span className="h-px w-10 bg-cielo-gold/50" />
+                        <Rombo />
                         <span className="text-[10px] uppercase tracking-[0.4em] font-semibold text-cielo-gold/70">
                             Novedades
                         </span>
@@ -127,7 +128,9 @@ export const NewArrivalsCarousel = ({ products, onQuickView }) => {
                 </div>
             </div>
 
-            {/* Cards */}
+            {/* Cards. El fundido va sólo sobre las tarjetas: sobre todo el bloque
+                le comía la primera letra al título y la flecha derecha. */}
+            <div className="relative">
             <div
                 ref={scrollRef}
                 className="flex gap-5 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory"
@@ -139,9 +142,8 @@ export const NewArrivalsCarousel = ({ products, onQuickView }) => {
                 ))}
             </div>
 
-            {/* Fade edges */}
             <div className="absolute top-0 right-0 h-full w-20 md:w-32 bg-gradient-to-l from-[#11100D] to-transparent pointer-events-none" />
-            <div className="absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-[#11100D] to-transparent pointer-events-none" />
+            </div>
         </div>
     );
 };

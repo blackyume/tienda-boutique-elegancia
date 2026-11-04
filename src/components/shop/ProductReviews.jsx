@@ -223,7 +223,7 @@ export const ProductReviews = ({ product }) => {
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="w-full py-3 text-xs font-bold uppercase tracking-widest bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-cielo-gold hover:text-black transition-colors disabled:opacity-50"
+                                    className="btn-oro w-full py-3 text-xs font-bold uppercase tracking-widest bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-cielo-gold hover:text-black transition-colors disabled:opacity-50"
                                 >
                                     {submitting ? 'Enviando...' : 'Publicar reseña'}
                                 </button>

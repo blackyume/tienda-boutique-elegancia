@@ -49,7 +49,7 @@ export const QuickAddCard = ({ product, onQuickView }) => {
                 <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0`}>
                     <button
                         onClick={handleOpenModal}
-                        className="bg-white/90 backdrop-blur-sm text-black px-8 py-3 rounded-full text-xs font-bold uppercase tracking-[0.2em] hover:bg-cielo-gold hover:text-white transition-all shadow-lg transform hover:scale-105"
+                        className="btn-oro bg-white/90 backdrop-blur-sm text-black px-8 py-3 rounded-full text-xs font-bold uppercase tracking-[0.2em] hover:bg-cielo-gold hover:text-white transition-all shadow-lg transform hover:scale-105"
                     >
                         Vista Rápida
                     </button>

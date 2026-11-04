@@ -77,7 +77,7 @@ export const CountdownBanner = () => {
 
                     <Link
                         to="/shop"
-                        className="mt-8 inline-flex items-center gap-2 px-6 py-3 bg-cielo-gold text-black text-[11px] font-bold uppercase tracking-widest rounded-sm hover:bg-white transition-colors"
+                        className="btn-oro mt-8 inline-flex items-center gap-2 px-6 py-3 bg-cielo-gold text-black text-[11px] font-bold uppercase tracking-widest rounded-sm hover:bg-white transition-colors"
                     >
                         Ver tienda <ArrowRight className="w-3.5 h-3.5" />
                     </Link>

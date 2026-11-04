@@ -16,7 +16,7 @@ export const Success = () => {
                     <CheckCircle className="w-12 h-12 text-green-500" />
                 </div>
 
-                <h1 className="text-4xl font-cinzel text-slate-900 dark:text-white mb-2">¡Gracias!</h1>
+                <h1 className="text-5xl font-serif text-slate-900 dark:text-noche-100 mb-2">¡Gracias!</h1>
                 <p className="text-slate-500 dark:text-slate-400 mb-8 font-light">Tu pedido fue recibido con éxito</p>
 
                 {orderId && (
@@ -38,7 +38,7 @@ export const Success = () => {
                 <div className="space-y-3">
                     <Button
                         onClick={() => navigate('/tracking')}
-                        className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold tracking-widest hover:bg-cielo-gold dark:hover:bg-cielo-gold dark:hover:text-black transition-colors"
+                        className="btn-oro w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold tracking-widest hover:bg-cielo-gold dark:hover:bg-cielo-gold dark:hover:text-black transition-colors"
                     >
                         <ShoppingBag className="w-4 h-4 inline mr-2" />
                         Ver Estado del Pedido

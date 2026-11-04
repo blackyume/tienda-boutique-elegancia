@@ -107,7 +107,7 @@ export const ReviewsSection = ({ productId }) => {
                 {user && hasBought && !hasReviewed && !showForm && (
                     <button
                         onClick={() => setShowForm(true)}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E8C65E] hover:bg-[#C19A2E] text-white transition-colors"
+                        className="btn-oro inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E8C65E] hover:bg-[#C19A2E] text-white transition-colors"
                     >
                         Dejar mi reseña
                     </button>
@@ -195,7 +195,7 @@ export const ReviewsSection = ({ productId }) => {
                         <button
                             type="submit"
                             disabled={submitting || uploading}
-                            className="inline-flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E8C65E] hover:bg-[#C19A2E] text-white disabled:opacity-50 transition-colors"
+                            className="btn-oro inline-flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E8C65E] hover:bg-[#C19A2E] text-white disabled:opacity-50 transition-colors"
                         >
                             {submitting ? 'Enviando…' : 'Enviar reseña'}
                         </button>

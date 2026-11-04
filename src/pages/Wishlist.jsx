@@ -23,14 +23,14 @@ export const Wishlist = () => {
                     <Heart className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                 </div>
                 <h1 className="text-3xl font-serif text-slate-900 dark:text-white mb-4">
-                    Tu Wishlist está vacía
+                    Todavía no tenés favoritos
                 </h1>
                 <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md">
                     Guardá tus prendas favoritas para no perderlas de vista.
                 </p>
                 <Button
                     onClick={() => navigate('/shop')}
-                    className="bg-[#E8C65E] hover:bg-[#B8932E] text-white px-8 py-3 font-bold tracking-widest uppercase"
+                    className="btn-oro bg-[#E8C65E] hover:bg-[#B8932E] text-white px-8 py-3 font-bold tracking-widest uppercase"
                 >
                     Explorar Colección
                 </Button>

@@ -47,3 +47,19 @@ describe('textoDelAviso', () => {
         expect(textoDelAviso(limpiarConsulta(base))).not.toContain('Prenda:');
     });
 });
+
+describe('arrepentimiento', () => {
+    it('el código entra en el límite de firestore.rules y lleva 8 caracteres', async () => {
+        const { codigoDeArrepentimiento } = await import('../src/utils/consultas');
+        expect(codigoDeArrepentimiento(1793760000000, 0.123456)).toMatch(/^ARR-[0-9A-Z]{8}$/);
+        expect(codigoDeArrepentimiento(1793760000000, 0).length).toBeLessThanOrEqual(20);
+    });
+
+    it('el correo le da el código y le aclara que no paga la devolución', async () => {
+        const { textoDelArrepentimiento } = await import('../src/utils/consultas');
+        const t = textoDelArrepentimiento({ nombre: 'Sofía', pedido: 'ORD-1', codigo: 'ARR-ABCD1234' });
+        expect(t).toContain('ARR-ABCD1234');
+        expect(t).toContain('ORD-1');
+        expect(t).toContain('No tiene costo');
+    });
+});

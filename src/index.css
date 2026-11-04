@@ -387,3 +387,36 @@ html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) {
     .animate-respirar, .animate-pagina-entra, .hilo-cargando::after { animation: none; }
 }
+
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Borde dorado metálico de los arcos: el mismo degradé del logo. El borde común
+   no acepta degradé con esquinas redondas, por eso va con máscara. */
+.arco-oro {
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: 9999px 9999px 0 0;
+  background: linear-gradient(180deg, #FBEFA8 0%, #E8C65E 28%, #FFF7CC 50%, #AE882C 78%, #8C6A22 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Todos los botones de la tienda son dorados (pedido del dueño, 4/11/2026). Va con
+   !important para ganarle a los colores que cada botón traía de antes. */
+.btn-oro {
+  background-image: linear-gradient(180deg, #F6E08F 0%, #E8C65E 48%, #CDA63F 100%) !important;
+  background-color: #E8C65E !important;
+  color: #11100D !important;
+  border-color: transparent !important;
+  transition: filter .25s ease, transform .25s ease;
+}
+.btn-oro:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-oro:disabled { opacity: .55; }

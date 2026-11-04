@@ -2,6 +2,7 @@ import React, { useState, useMemo, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { optimizeImage, resolveHeroImage } from '../utils/helpers';
+import { tituloDeProducto } from '../utils/nombres';
 import { ArrowRight } from 'lucide-react';
 import { lazyConReintento } from '../utils/lazyConReintento';
 
@@ -19,11 +20,17 @@ const CountdownBanner = lazyConReintento(() => import('../components/home/Countd
 const NewsletterInline = lazyConReintento(() => import('../components/home/NewsletterInline').then(m => ({ default: m.NewsletterInline })));
 const InstagramFeed = lazyConReintento(() => import('../components/home/InstagramFeed').then(m => ({ default: m.InstagramFeed })));
 const Atelier = lazyConReintento(() => import('../components/home/Atelier').then(m => ({ default: m.Atelier })));
+const Editorial = lazyConReintento(() => import('../components/home/Editorial').then(m => ({ default: m.Editorial })));
 
 import { QuickViewModal } from '../components/shop/QuickViewModal';
 import { Reveal } from '../components/ui/Reveal';
+import { Hilo } from '../components/ui/Ornamento';
 import { SectionHeader } from '../components/home/SectionHeader';
 import { SEO } from '../components/seo/SEO';
+
+// Con pocas prendas «Recién llegado» repite la Colección destacada: vuelve sola
+// cuando el catálogo crece.
+const PRENDAS_PARA_NOVEDADES = 20;
 
 export const Home = () => {
     const { inventory, categories, siteConfig } = useStore();
@@ -75,6 +82,8 @@ export const Home = () => {
                 <FeaturedCollection onQuickView={(p) => setQuickViewProduct(p)} />
             </Suspense>
 
+            <Hilo className="pt-4 md:pt-8" />
+
             {/* Categorías — caminos de compra arriba, junto al producto */}
             {validCategories.length > 0 && <section id="categories" className="py-14 md:py-20 px-6 bg-[#11100D] relative">
                 <Reveal className="max-w-[1400px] mx-auto">
@@ -82,19 +91,20 @@ export const Home = () => {
                         <SectionHeader align="left" eyebrow="Categorías" title="Por tipo de prenda" />
                         <Link
                             to="/shop"
-                            className="hidden md:inline-flex items-center gap-2 px-5 py-3 border border-white/20 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-white/5 rounded-sm shrink-0"
+                            className="btn-oro hidden md:inline-flex items-center gap-2 px-5 py-3 border border-white/20 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-white/5 rounded-sm shrink-0"
                         >
                             Ver todo <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                    {/* En el celular van en fila deslizable: en grilla eran 4 pantallas de arcos */}
+                    <div className="flex lg:grid lg:grid-cols-4 gap-3 md:gap-4 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scroll-pl-6 lg:scroll-pl-0 scrollbar-hide -mx-6 px-6 lg:mx-0 lg:px-0">
                         {validCategories.map((cat) => (
                             <Link
                                 key={cat.id}
                                 to={`/shop?category=${encodeURIComponent(cat.name)}`}
                                 aria-label={`Ver categoría ${cat.name}`}
-                                className="relative group cursor-pointer overflow-hidden rounded-sm aspect-[2/3] transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.12)]"
+                                className="relative group cursor-pointer overflow-hidden rounded-t-full aspect-[2/3] flex-none w-[44vw] sm:w-[30vw] lg:w-auto snap-start transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.12)]"
                             >
                                 <div className="absolute inset-0 bg-slate-800 animate-pulse" />
                                 <img
@@ -105,11 +115,14 @@ export const Home = () => {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-noche-950 via-noche-950/40 to-noche-950/10 opacity-70 group-hover:opacity-55 transition-opacity duration-700" />
 
+                                <span aria-hidden="true" className="arco-oro" />
+                                <span aria-hidden="true" className="absolute inset-1.5 md:inset-2 rounded-t-full border border-cielo-gold/25 group-hover:border-cielo-gold/60 transition-colors duration-700 pointer-events-none" />
+
                                 <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
                                     {/* Dos renglones reservados: sin esto, una categoría de nombre
                                         largo empuja el título hacia arriba y rompe la línea de la fila. */}
                                     <div className="flex items-end min-h-[2.75rem] md:min-h-[3.75rem] mb-2">
-                                        <h3 className="text-lg md:text-2xl font-serif text-white drop-shadow-lg leading-tight">{cat.name}</h3>
+                                        <h3 className="text-lg md:text-2xl font-serif text-white drop-shadow-lg leading-tight">{tituloDeProducto(cat.name)}</h3>
                                     </div>
                                     <div className="w-8 h-[1px] bg-white/40 mb-3 group-hover:w-20 transition-all duration-700 ease-out" />
                                     <p className="text-xs uppercase tracking-widest text-noche-300 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center gap-2 transform translate-y-3 group-hover:translate-y-0 delay-100">
@@ -123,7 +136,7 @@ export const Home = () => {
             </section>}
 
             {/* New Arrivals — más producto arriba */}
-            <section className="py-14 md:py-20 px-6 bg-[#11100D]">
+            {(inventory || []).filter(p => p.active !== false).length >= PRENDAS_PARA_NOVEDADES && <section className="py-14 md:py-20 px-6 bg-[#11100D]">
                 <div className="max-w-[1400px] mx-auto">
                     <Suspense fallback={<div className="h-[400px]" />}>
                         <NewArrivalsCarousel
@@ -132,7 +145,12 @@ export const Home = () => {
                         />
                     </Suspense>
                 </div>
-            </section>
+            </section>}
+
+            {/* Pausa de revista: la frase de la campaña y una prenda en el arco de la marca */}
+            <Suspense fallback={<div className="h-[600px] bg-noche-950" />}>
+                <Editorial />
+            </Suspense>
 
             {/* Urgencia: cuenta regresiva del próximo drop/promo (si hay una programada) */}
             <Suspense fallback={<div className="h-[200px] bg-[#11100D]" />}>

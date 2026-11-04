@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, MessageCircle } from 'lucide-react';
+import { Rombo } from '../components/ui/Ornamento';
 import { abrirConsulta } from '../utils/consultas';
 
 const FAQS = [
@@ -26,7 +27,7 @@ const FAQS = [
     },
     {
         q: '¿Puedo cambiar o devolver un producto?',
-        a: 'Por higiene y exclusividad no aceptamos cambios por gusto o talle fuera del plazo legal. Sí tenés derecho a arrepentirte dentro de los 10 días corridos de recibido el producto (sin uso, con etiquetas y empaque original), según la Resolución 424/2020. En caso de falla de fábrica o error en el envío, escribinos apenas lo recibas y lo resolvemos.',
+        a: 'Por higiene y exclusividad no aceptamos cambios por gusto o talle fuera del plazo legal. Sí tenés derecho a arrepentirte dentro de los 10 días corridos de recibido el producto (sin uso, con etiquetas y empaque original), según la Resolución 424/2020, y la devolución no tiene costo para vos. Si la prenda tiene una falla de fábrica tenés la garantía legal de 6 meses; ante una falla o un error en el envío, escribinos y lo resolvemos.',
     },
     {
         q: '¿Cómo sé qué talle elegir?',
@@ -63,8 +64,8 @@ export const FAQ = () => {
         <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans">
             <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-12">
-                    <span className="text-[#E8C65E] font-bold tracking-[0.25em] uppercase text-xs">Ayuda</span>
-                    <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mt-2 tracking-wide">Preguntas Frecuentes</h1>
+                    <span className="inline-flex items-center gap-3 text-[#E8C65E]/80 font-semibold tracking-[0.35em] uppercase text-2xs"><Rombo /> Ayuda <Rombo /></span>
+                    <h1 className="text-4xl md:text-5xl font-serif text-slate-900 dark:text-noche-100 mt-3">Preguntas Frecuentes</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-3 text-sm">Todo lo que necesitás saber antes de comprar.</p>
                 </div>
 
@@ -79,7 +80,7 @@ export const FAQ = () => {
                     <p className="text-slate-500 dark:text-slate-400 text-sm mb-5">Escribinos y te respondemos por correo.</p>
                     <button
                         onClick={() => abrirConsulta()}
-                        className="inline-flex items-center gap-2 bg-cielo-gold hover:bg-[#F3D985] text-[#11100D] font-bold text-sm px-6 py-3 rounded-xl transition-all"
+                        className="btn-oro inline-flex items-center gap-2 bg-cielo-gold hover:bg-[#F3D985] text-[#11100D] font-bold text-sm px-6 py-3 rounded-xl transition-all"
                     >
                         <MessageCircle className="w-4 h-4" /> Hacer una consulta
                     </button>

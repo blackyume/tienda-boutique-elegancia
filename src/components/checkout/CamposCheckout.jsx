@@ -59,7 +59,7 @@ export const BotonGoogle = ({ onClick }) => {
             type="button"
             onClick={entrar}
             disabled={cargando}
-            className="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-white text-slate-800 font-bold text-base border border-slate-200 shadow-md hover:shadow-lg hover:border-slate-300 active:scale-[0.99] transition-all disabled:opacity-70"
+            className="btn-oro w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl bg-white text-slate-800 font-bold text-base border border-slate-200 shadow-md hover:shadow-lg hover:border-slate-300 active:scale-[0.99] transition-all disabled:opacity-70"
         >
             <LogoGoogle />
             {cargando ? 'Abriendo Google…' : 'Continuar con Google'}

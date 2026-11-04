@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Loader } from 'lucide-react';
+import { Loader, Lock, Instagram } from 'lucide-react';
+import { Rombo } from '../components/ui/Ornamento';
 import { useStore } from '../context/StoreContext';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer } from '../components/ui/ToastContainer';
@@ -51,123 +52,34 @@ export const Maintenance = () => {
     }, [isAdmin, navigate]);
 
     return (
-        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 md:p-8 overflow-y-auto font-sans relative">
+        <div className="relative min-h-screen bg-noche-950 text-white flex flex-col items-center justify-center px-6 py-16 overflow-hidden font-sans">
             <ToastContainer />
 
-            {/* ========== PREMIUM BACKGROUND ========== */}
-            <div className="fixed inset-0 z-0 bg-black"></div>
-            <div
-                className="fixed inset-0 z-0 opacity-20 bg-cover bg-center"
-                style={{
-                    backgroundImage: "url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2029&auto=format&fit=crop')",
-                    maskImage: 'linear-gradient(to bottom, transparent 0%, transparent 35%, black 50%, black 100%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, transparent 35%, black 50%, black 100%)'
-                }}
-            ></div>
-            <div className="fixed bottom-0 left-0 right-0 h-1/3 z-0 bg-gradient-to-t from-[#E8C65E]/5 via-transparent to-transparent"></div>
+            {/* El arco de la marca, de fondo */}
+            <div aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[min(94vw,46rem)] h-[92vh] rounded-t-full border border-cielo-gold/25" />
+            <div aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[min(84vw,42rem)] h-[88vh] rounded-t-full border border-cielo-gold/10 bg-[radial-gradient(ellipse_at_50%_30%,rgba(232,198,94,0.07),transparent_65%)]" />
 
-            {/* ========== MAIN CONTENT ========== */}
-            <div className="relative z-10 max-w-xl w-full text-center flex flex-col items-center">
+            <div className="relative z-10 max-w-md w-full text-center flex flex-col items-center animate-fadeIn">
+                <img src="/assets/logo-main.png?v=5" alt="La Boutique de la Elegancia" className="w-[min(68vw,18rem)] h-auto mb-10" />
 
-                {/* Logo Section with Sparkles */}
-                <div className="mb-8 md:mb-12 relative">
-                    {/* Radial black fade for seamless blend */}
-                    <div className="absolute inset-0 -m-20 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,1)_0%,rgba(0,0,0,0.9)_50%,transparent_75%)] z-0"></div>
+                <span className="inline-flex items-center gap-4 text-2xs uppercase tracking-[0.4em] font-semibold text-cielo-gold/80">
+                    <Rombo /> Colección 2027 <Rombo />
+                </span>
 
-                    {/* BREATHING GOLDEN GLOW - Always on, pulses brighter */}
-                    <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#E8C65E] rounded-full blur-[120px] z-0"
-                        style={{
-                            animation: 'breathingGlow 3s ease-in-out infinite',
-                        }}
-                    ></div>
-                    <style>{`
-                        @keyframes breathingGlow {
-                            0%, 100% { opacity: 0.12; transform: translate(-50%, -50%) scale(1); }
-                            50% { opacity: 0.25; transform: translate(-50%, -50%) scale(1.1); }
-                        }
-                        @keyframes twinkle {
-                            0%, 100% { opacity: 0.6; transform: scale(1); }
-                            50% { opacity: 1; transform: scale(1.3); }
-                        }
-                    `}</style>
-
-                    {/* ========== MANY SPARKLE STARS - Very close to logo ========== */}
-                    {/* Top area */}
-                    <div className="absolute -top-1 right-6 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 2s ease-in-out infinite' }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute top-2 right-1 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 1.8s ease-in-out infinite 0.3s' }}>
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute -top-2 left-8 z-20 text-[#E8C65E]/90" style={{ animation: 'twinkle 2.2s ease-in-out infinite 0.5s' }}>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute top-0 left-2 z-20 text-white/60" style={{ animation: 'twinkle 2.5s ease-in-out infinite 0.2s' }}>
-                        <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-
-                    {/* Right side */}
-                    <div className="absolute top-1/4 -right-1 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 1.9s ease-in-out infinite 0.7s' }}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute top-1/2 right-0 z-20 text-[#E8C65E]/80" style={{ animation: 'twinkle 2.3s ease-in-out infinite 0.4s' }}>
-                        <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-
-                    {/* Left side */}
-                    <div className="absolute top-1/3 -left-1 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 2.1s ease-in-out infinite 0.6s' }}>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute top-1/2 left-1 z-20 text-white/50" style={{ animation: 'twinkle 2.6s ease-in-out infinite 0.9s' }}>
-                        <svg width="5" height="5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-
-                    {/* Bottom area */}
-                    <div className="absolute bottom-2 right-4 z-20 text-[#E8C65E]" style={{ animation: 'twinkle 2s ease-in-out infinite 0.8s' }}>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute -bottom-1 right-8 z-20 text-[#E8C65E]/70" style={{ animation: 'twinkle 1.7s ease-in-out infinite 0.1s' }}>
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute bottom-0 left-6 z-20 text-[#E8C65E]/80" style={{ animation: 'twinkle 2.4s ease-in-out infinite 0.35s' }}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-                    <div className="absolute bottom-4 left-0 z-20 text-white/40" style={{ animation: 'twinkle 2.8s ease-in-out infinite 0.55s' }}>
-                        <svg width="6" height="6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" /></svg>
-                    </div>
-
-                    <img
-                        src="/logo_custom.png"
-                        alt="La Boutique de la Elegancia"
-                        className="w-48 md:w-56 h-auto relative z-10 mx-auto object-contain mix-blend-screen"
-                    />
-                </div>
-
-                {/* Gold Divider */}
-                <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#E8C65E] to-transparent mb-6 opacity-50"></div>
-
-                {/* Main Heading */}
-                <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-white mb-3 tracking-[0.2em] uppercase">
-                    En Renovación
-                </h1>
-
-                {/* Professional Maintenance Description */}
-                <p className="text-gray-400 text-sm md:text-base font-light leading-relaxed mb-6 max-w-md mx-auto tracking-wide">
-                    Estamos trabajando para ofrecerte una experiencia de compra renovada y exclusiva.
-                    <span className="block mt-2 text-gray-500 text-xs">Nuestra tienda online está siendo optimizada para brindarte el mejor servicio.</span>
+                <h1 className="mt-5 font-serif text-5xl md:text-6xl text-noche-100">Muy pronto</h1>
+                <p className="mt-3 font-serif italic text-xl md:text-2xl text-cielo-gold">Elegancia que habla por vos.</p>
+                <p className="mt-5 text-sm text-noche-300/90 font-light leading-relaxed">
+                    Estamos preparando la tienda. Dejanos tu correo y te avisamos cuando abramos.
                 </p>
 
-                <span className="block text-[#E8C65E] font-medium tracking-[0.2em] text-xs md:text-sm mb-6 uppercase">Nueva Colección 2027 • Muy Pronto</span>
-
-                {/* Email Form */}
-                <div className="w-full max-w-sm mx-auto mb-10">
-                    <form onSubmit={handleSubmit} className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full p-1 pl-5 shadow-xl hover:border-[#E8C65E]/30 transition-colors duration-500">
+                <div className="w-full mt-7">
+                    <form onSubmit={handleSubmit} className="flex items-center bg-white/5 border border-cielo-gold/25 focus-within:border-cielo-gold/60 rounded-full p-1 pl-5 transition-colors">
                         <input
                             type="email"
                             required
-                            placeholder="Tu email..."
-                            className="bg-transparent border-none outline-none text-white text-sm w-full placeholder:text-gray-500 font-light tracking-wide"
+                            placeholder="Tu correo"
+                            aria-label="Tu correo"
+                            className="flex-1 min-w-0 bg-transparent border-none outline-none text-white text-base md:text-sm placeholder:text-noche-300/60 font-light"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             disabled={status === 'success' || status === 'loading'}
@@ -175,62 +87,36 @@ export const Maintenance = () => {
                         <button
                             type="submit"
                             disabled={status === 'success' || status === 'loading'}
-                            className="bg-[#E8C65E] hover:bg-[#C19A2E] text-black px-5 py-2.5 rounded-full font-semibold text-xs uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
+                            className="btn-oro px-5 py-2.5 rounded-full font-semibold text-xs uppercase tracking-widest"
                         >
-                            {status === 'loading' ? <Loader className="w-4 h-4 animate-spin" /> : (status === 'success' ? '¡Listo!' : 'Notificarme')}
+                            {status === 'loading' ? <Loader className="w-4 h-4 animate-spin" /> : (status === 'success' ? '¡Listo!' : 'Avisarme')}
                         </button>
                     </form>
                     {status === 'success' && (
-                        <p className="mt-4 text-[#E8C65E] text-xs font-medium uppercase tracking-widest animate-pulse">
-                            Te avisaremos.
-                        </p>
+                        <p className="mt-4 text-cielo-gold text-xs font-medium uppercase tracking-widest">Te avisamos.</p>
                     )}
                 </div>
 
-                {/* Social Icons */}
-                <div className="flex items-center justify-center gap-6 mt-4">
-                    <a href="https://www.instagram.com/laboutiquedelaeleganciaoficial/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#E8C65E] transition-colors duration-300" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                        </svg>
-                    </a>
-                </div>
+                <a href="https://www.instagram.com/laboutiquedelaeleganciaoficial/" target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 text-sm text-noche-300 hover:text-cielo-gold transition-colors">
+                    <Instagram className="w-4 h-4 text-cielo-gold" /> @laboutiquedelaeleganciaoficial
+                </a>
 
-                {/* ========== ADMIN LOGIN (Discrete Google Icon) ========== */}
-                <div className="mt-8 mb-6">
+                {/* Acceso del administrador: discreto a propósito */}
+                <div className="mt-7">
                     <button
                         onClick={handleAdminLogin}
                         disabled={loginLoading}
-                        className="p-2.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-[#E8C65E]/40 transition-all duration-300 group"
+                        aria-label="Acceso"
                         title="Acceso"
+                        className="p-2.5 rounded-full border border-white/10 hover:border-cielo-gold/40 transition-colors group"
                     >
-                        {loginLoading ? (
-                            <Loader className="w-5 h-5 animate-spin text-gray-400" />
-                        ) : (
-                            <svg className="w-5 h-5 text-gray-400 group-hover:text-[#E8C65E] transition-colors" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                            </svg>
-                        )}
+                        {loginLoading ? <Loader className="w-4 h-4 animate-spin text-noche-300" /> : <Lock className="w-4 h-4 text-noche-300/60 group-hover:text-cielo-gold transition-colors" />}
                     </button>
-                    {loginError && (
-                        <p className="mt-2 text-red-400 text-xs text-center">{loginError}</p>
-                    )}
-                    {user && !isAdmin && (
-                        <p className="mt-2 text-yellow-400/60 text-xs text-center">
-                            Sin acceso.
-                        </p>
-                    )}
+                    {loginError && <p className="mt-2 text-red-400 text-xs">{loginError}</p>}
+                    {user && !isAdmin && <p className="mt-2 text-noche-300/70 text-xs">Sin acceso.</p>}
                 </div>
 
-                {/* Footer */}
-                <p className="text-[10px] text-gray-600 uppercase tracking-[0.3em]">
-                    La Boutique de la Elegancia &copy; 2027
-                </p>
+                <p className="mt-6 text-[10px] text-noche-300/60 uppercase tracking-[0.3em]">La Boutique de la Elegancia &copy; 2027</p>
             </div>
         </div>
     );

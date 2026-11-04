@@ -95,7 +95,7 @@ const ICONOS_MENU = {
 
 export const Admin = () => {
 
-    const { isAdmin, user, login, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers, paymentConfig, expenses = [] } = useStore();
+    const { isAdmin, user, login, loginWithGoogle, logout, orders, updateOrderStatus, inventory, addProduct, updateProduct, deleteProduct, addToast, categories, addCategory, deleteCategory, siteImages, updateSiteImages, migrateData, uploadImage, isMaintenance, visitCount, toggleMaintenance, updateSystemVersion, cleanStorage, siteConfig, updateSiteConfig, wishlistEvents, aiConfig, abandonedCarts, activeSessions, reviews, visitStatsHourly, scheduledPromotions, deleteScheduledPromotion, newsletterSubscribers, paymentConfig, expenses = [] } = useStore();
     const confirm = useConfirm();
     const [adminTab, setAdminTab] = useState("dashboard");
     // Día elegido en el calendario del Inicio: abre Ventas filtrado en esa fecha.
@@ -516,6 +516,7 @@ export const Admin = () => {
                 </div>
                 <h1 className="text-3xl font-luxury font-bold mb-2">Acceso Restringido</h1>
                 <p className="text-slate-400 mb-8">Esta área es exclusiva para personal autorizado.</p>
+                <Button onClick={loginWithGoogle} className="!bg-[#E8C65E] !text-black px-8 py-3 rounded-full font-bold mb-3">Entrar con Google</Button>
                 <Button variant="secondary" onClick={() => window.location.href = '/'} className="!bg-white !text-black px-8 py-3 rounded-full font-bold hover:!bg-slate-200 transition-colors">
                     Volver a la Tienda
                 </Button>

@@ -63,7 +63,7 @@ export const Tracking = () => {
                                 className="w-full pl-10 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-slate-900 dark:focus:border-[#E8C65E] text-slate-900 dark:text-white transition-colors"
                             />
                         </div>
-                        <Button className="px-6">Buscar</Button>
+                        <Button className="btn-oro px-6">Buscar</Button>
                     </form>
                     {error && (
                         <div className="mt-4 flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm animate-fadeIn">

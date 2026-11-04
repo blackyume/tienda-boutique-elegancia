@@ -12,6 +12,8 @@ import { SEO } from '../components/seo/SEO';
 import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 import { TrustBadges } from '../components/ui/TrustBadges';
 import { abrirConsulta } from '../utils/consultas';
+import { Rombo } from '../components/ui/Ornamento';
+import { SectionHeader } from '../components/home/SectionHeader';
 import { ProductCard } from '../components/shop/ProductCard';
 import { ReviewsSection } from '../components/shop/ReviewsSection';
 import {
@@ -183,12 +185,12 @@ export const ProductDetail = () => {
                 reviewCount={reviewCount}
             />
 
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-24">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-2">
                 <Breadcrumbs
                     items={[
-                        { label: 'Shop', path: '/shop' },
-                        { label: product.category, path: `/shop?category=${encodeURIComponent(product.category)}` },
-                        { label: product.name }
+                        { label: 'Tienda', path: '/shop' },
+                        { label: tituloDeProducto(product.category), path: `/shop?category=${encodeURIComponent(product.category)}` },
+                        { label: tituloDeProducto(product.name) }
                     ]}
                 />
             </div>
@@ -197,7 +199,7 @@ export const ProductDetail = () => {
                 {/* Galería */}
                 <div>
                     <div
-                        className={`${marcoFoto} bg-slate-100 dark:bg-[#121212] overflow-hidden relative rounded-md cursor-zoom-in group sin-textura`}
+                        className={`${marcoFoto} bg-slate-100 dark:bg-[#121212] overflow-hidden relative cursor-zoom-in group sin-textura`}
                         onClick={() => setLightbox(true)}
                         onMouseEnter={fotos.alEntrar}
                         onMouseLeave={fotos.alSalir}
@@ -216,6 +218,7 @@ export const ProductDetail = () => {
                                 decoding="async"
                             />
                         ))}
+                        <span aria-hidden="true" className="absolute inset-2.5 border border-cielo-gold/30 pointer-events-none z-[1]" />
                         {fotos.rota && <div key={fotos.vuelta} className="barra-foto absolute bottom-0 inset-x-0 h-px bg-cielo-gold/80 pointer-events-none z-[1]" />}
                         <div className="absolute top-3 left-3 bg-black/50 text-white p-2 rounded-full backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                             <ZoomIn className="w-4 h-4" />
@@ -246,8 +249,8 @@ export const ProductDetail = () => {
                     llegar al fondo en pantallas chicas/medianas). */}
                 <div>
                     <div className="flex justify-between items-start mb-3">
-                        <span className="text-xs font-bold tracking-[0.2em] text-cielo-gold uppercase">
-                            {product.category}
+                        <span className="inline-flex items-center gap-3 text-2xs font-semibold tracking-[0.35em] text-cielo-gold/80 uppercase">
+                            <Rombo /> {product.category}
                         </span>
                         <button
                             onClick={handleShare}
@@ -258,12 +261,12 @@ export const ProductDetail = () => {
                         </button>
                     </div>
 
-                    <h1 className="text-3xl md:text-5xl font-luxury leading-tight mb-4">
+                    <h1 className="text-4xl md:text-5xl font-serif leading-[1.1] text-noche-100 mb-4">
                         {tituloDeProducto(product.name)}
                     </h1>
 
                     <div className="flex items-center gap-4 mb-3 flex-wrap">
-                        <p className="text-2xl font-semibold">{formatMoney(product.price)}</p>
+                        <p className="text-3xl font-light text-cielo-gold">{formatMoney(product.price)}</p>
                         {product.compareAtPrice > product.price && (
                             <span className="text-sm text-slate-400 line-through">
                                 {formatMoney(product.compareAtPrice)}
@@ -378,7 +381,7 @@ export const ProductDetail = () => {
                                                 onClick={() => setSelectedSize(s)}
                                                 disabled={!available}
                                                 aria-pressed={selected}
-                                                className={`h-11 border rounded-md flex items-center justify-center text-sm font-bold uppercase transition relative ${selected ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white' : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-500'} ${!available ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                                className={`h-11 border rounded-md flex items-center justify-center text-sm font-bold uppercase transition relative ${selected ? 'btn-oro' : 'border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-500'} ${!available ? 'opacity-40 cursor-not-allowed' : ''}`}
                                             >
                                                 {s}
                                                 {!available && (
@@ -434,7 +437,7 @@ export const ProductDetail = () => {
                             </div>
                             <div>
                                 <p className="text-xs font-bold uppercase tracking-wider text-orange-700 dark:text-orange-400">
-                                    ¡Alta demanda!
+                                    Últimas unidades
                                 </p>
                                 <p className="text-sm text-slate-700 dark:text-slate-300">
                                     Quedan pocas unidades disponibles.
@@ -448,7 +451,7 @@ export const ProductDetail = () => {
                         <Button
                             onClick={handleAddToCart}
                             disabled={totalStock === 0}
-                            className="w-full py-5 text-sm font-bold tracking-[0.2em] bg-slate-900 text-white dark:bg-white dark:text-slate-900 h-14 hover:bg-cielo-gold dark:hover:bg-cielo-gold hover:text-black transition-colors shadow-lg"
+                            className="btn-oro w-full py-5 text-sm font-bold tracking-[0.2em] bg-slate-900 text-white dark:bg-cielo-gold dark:text-[#11100D] h-14 rounded-none hover:bg-cielo-gold dark:hover:bg-[#F3D985] transition-colors"
                         >
                             {totalStock === 0 ? 'AGOTADO' : 'AGREGAR A LA BOLSA'}
                         </Button>
@@ -508,10 +511,7 @@ export const ProductDetail = () => {
             {relatedProducts.length > 0 && (
                 <div className="border-t border-slate-200 dark:border-slate-800 py-20 px-4">
                     <div className="max-w-7xl mx-auto">
-                        <div className="text-center mb-12">
-                            <h3 className="text-3xl font-luxury mb-3">Puede interesarte</h3>
-                            <div className="w-24 h-[1px] bg-cielo-gold mx-auto" />
-                        </div>
+                        <SectionHeader eyebrow="La Boutique" title="Puede interesarte" titleClassName="text-3xl md:text-4xl" className="mb-12" />
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10">
                             {relatedProducts.map((rp) => (
                                 <ProductCard key={rp.id} product={rp} />
@@ -522,16 +522,16 @@ export const ProductDetail = () => {
             )}
 
             {/* MOBILE STICKY CART BAR */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] backdrop-blur-xl">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-noche-900 border-t border-slate-200 dark:border-cielo-gold/25 shadow-[0_-8px_30px_rgba(0,0,0,0.15)] backdrop-blur-xl">
                 <div className="flex items-center gap-3 px-4 py-3 safe-bottom">
                     <div className="flex-shrink-0">
                         <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Total</p>
-                        <p className="text-lg font-black text-slate-900 dark:text-white leading-none">{formatMoney(product.price * quantity)}</p>
+                        <p className="text-lg font-light text-slate-900 dark:text-cielo-gold leading-none">{formatMoney(product.price * quantity)}</p>
                     </div>
                     <button
                         onClick={handleAddToCart}
                         disabled={totalStock === 0}
-                        className="flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] text-black transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="btn-oro flex-1 py-3.5 rounded-xl text-xs font-bold uppercase tracking-[0.2em] text-black transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{ background: totalStock === 0 ? '#94a3b8' : 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                     >
                         {totalStock === 0 ? 'Agotado' : 'Agregar al carrito'}

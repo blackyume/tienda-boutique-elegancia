@@ -74,7 +74,7 @@ export const PromoPopup = () => {
                         </div>
                     )}
 
-                    <Button onClick={handleClose} className="mt-8 bg-slate-900 text-white w-full py-4">
+                    <Button onClick={handleClose} className="btn-oro mt-8 bg-slate-900 text-white w-full py-4">
                         ENTENDIDO
                     </Button>
                 </div>

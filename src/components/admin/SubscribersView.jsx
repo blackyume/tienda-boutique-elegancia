@@ -30,7 +30,8 @@ export const SubscribersView = () => {
         return newsletterSubscribers.filter(s => (s.email || '').toLowerCase().includes(term));
     }, [newsletterSubscribers, q]);
 
-    const emails = useMemo(() => list.map(s => s.email).filter(Boolean), [list]);
+    const activos = useMemo(() => list.filter(s => !s.baja), [list]);
+    const emails = useMemo(() => activos.map(s => s.email).filter(Boolean), [activos]);
 
     const copyEmails = async () => {
         if (!emails.length) return;
@@ -45,9 +46,9 @@ export const SubscribersView = () => {
     };
 
     const exportCSV = () => {
-        if (!list.length) return;
+        if (!activos.length) return;
         const rows = [['Email', 'Origen', 'Fecha']];
-        list.forEach(s => rows.push([
+        activos.forEach(s => rows.push([
             s.email || '',
             SOURCE_LABEL[s.source] || s.source || '—',
             fmtDate(s.createdAt),
@@ -64,7 +65,7 @@ export const SubscribersView = () => {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        addToast?.(`${list.length} suscriptores exportados`, 'success');
+        addToast?.(`${activos.length} suscriptores exportados`, 'success');
     };
 
     const total = newsletterSubscribers.length;
@@ -92,7 +93,7 @@ export const SubscribersView = () => {
                     </button>
                     <button
                         onClick={exportCSV}
-                        disabled={!list.length}
+                        disabled={!activos.length}
                         className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold text-black disabled:opacity-40 transition-all"
                         style={{ background: 'linear-gradient(90deg, #BF953F, #FCF6BA 50%, #B38728)' }}
                     >
@@ -138,6 +139,7 @@ export const SubscribersView = () => {
                                             <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#E8C65E]/10 text-[#B38728] dark:text-[#E8C65E] border border-[#E8C65E]/20">
                                                 {SOURCE_LABEL[s.source] || s.source || '—'}
                                             </span>
+                                            {s.baja && <span className="ml-2 text-[11px] font-semibold text-rose-500">Se dio de baja</span>}
                                         </td>
                                         <td className="px-4 py-3 text-right text-slate-500 dark:text-slate-400 whitespace-nowrap">{fmtDate(s.createdAt)}</td>
                                     </tr>
@@ -152,7 +154,7 @@ export const SubscribersView = () => {
                             </tbody>
                         </table>
                     </div>
-                    <p className="text-xs text-slate-400">{list.length} de {total} mostrados</p>
+                    <p className="text-xs text-slate-400">{list.length} de {total} mostrados. Los que se dieron de baja no se copian ni se exportan.</p>
                 </>
             )}
         </div>

@@ -99,7 +99,7 @@ export const CapaPortadas = ({ visibles, activa, propias }) => (
 export const PuntosPortada = ({ slides, activa, onElegir }) => {
     if (slides.length < 2) return null;
     return (
-        <div className="absolute top-[calc(86svh-2.5rem)] md:top-auto md:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5 lg:left-auto lg:right-24 lg:translate-x-0">
+        <div className="absolute top-[calc(78svh-2.5rem)] md:top-auto md:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5 lg:left-auto lg:right-24 lg:translate-x-0">
             {slides.map((s, i) => (
                 <button
                     key={s.escritorio}

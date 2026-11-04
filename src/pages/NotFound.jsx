@@ -24,7 +24,7 @@ export const NotFound = () => {
                     La página que buscas no existe o ha sido movida a una colección privada.
                 </p>
                 <div className="animate-slideUp delay-200">
-                    <Button onClick={() => navigate('/')} className="bg-white text-black hover:bg-[#E8C65E] hover:text-white px-10 py-4 rounded-none font-bold tracking-[0.2em] transform transition-all duration-500 hover:scale-105">
+                    <Button onClick={() => navigate('/')} className="btn-oro bg-white text-black hover:bg-[#E8C65E] hover:text-white px-10 py-4 rounded-none font-bold tracking-[0.2em] transform transition-all duration-500 hover:scale-105">
                         VOLVER A LA BOUTIQUE
                     </Button>
                 </div>

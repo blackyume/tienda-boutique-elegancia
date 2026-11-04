@@ -10,6 +10,15 @@ import { tituloDeProducto } from '../../utils/nombres';
 export const Navbar = ({ onOpenCart }) => {
     const { cart, categories, user, logout, isAdmin, siteConfig, inventory } = useStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    // En el celular la franja no entra en un renglón: va una frase por vez.
+    const textoAnuncio = siteConfig.announcement?.text || 'Compra Segura · Envíos a todo el País · Nueva Colección 2027';
+    const frasesAnuncio = textoAnuncio.split(/\s*[|·•]\s*/).filter(Boolean);
+    const [fraseAnuncio, setFraseAnuncio] = useState(0);
+    useEffect(() => {
+        if (frasesAnuncio.length < 2) return undefined;
+        const id = setInterval(() => setFraseAnuncio((i) => i + 1), 4000);
+        return () => clearInterval(id);
+    }, [frasesAnuncio.length]);
 
     // Search State
     const [search, setSearch] = useState("");
@@ -121,8 +130,11 @@ export const Navbar = ({ onOpenCart }) => {
                         <div className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-white/40" />
                         <p className="relative flex items-center justify-center gap-3 text-[10px] md:text-[11px] font-extrabold tracking-[0.22em] uppercase text-[#211705]">
                             <span className="text-[#5c4410]/60 text-[8px]">◆</span>
-                            <span className="drop-shadow-[0_1px_0_rgba(255,255,255,0.25)]">
-                                {siteConfig.announcement.text || "Compra Segura · Envíos a todo el País · Nueva Colección 2027"}
+                            <span className="hidden md:inline drop-shadow-[0_1px_0_rgba(255,255,255,0.25)]">
+                                {textoAnuncio}
+                            </span>
+                            <span key={fraseAnuncio} className="md:hidden whitespace-nowrap animate-fadeIn drop-shadow-[0_1px_0_rgba(255,255,255,0.25)]">
+                                {frasesAnuncio[fraseAnuncio % frasesAnuncio.length]}
                             </span>
                             <span className="text-[#5c4410]/60 text-[8px]">◆</span>
                         </p>

@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { Mail, Instagram, MapPin, Check } from 'lucide-react';
+import { Rombo } from '../components/ui/Ornamento';
 import { useLocation } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { CORREO_DE_LA_TIENDA, enviarConsulta } from '../utils/consultas';
@@ -37,8 +38,8 @@ export const Contact = () => {
         <div className="bg-white dark:bg-[#11100D] min-h-screen pt-32 pb-20 px-6 font-sans">
             <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-12">
-                    <span className="text-[#E8C65E] font-bold tracking-[0.25em] uppercase text-xs">Estamos para ayudarte</span>
-                    <h1 className="text-4xl font-luxury font-bold text-slate-900 dark:text-white mt-2 tracking-wide">Contacto</h1>
+                    <span className="inline-flex items-center gap-3 text-[#E8C65E]/80 font-semibold tracking-[0.35em] uppercase text-2xs"><Rombo /> Estamos para ayudarte <Rombo /></span>
+                    <h1 className="text-4xl md:text-5xl font-serif text-slate-900 dark:text-noche-100 mt-3">Contacto</h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-3 text-sm">¿Tenés una consulta? Dejala acá y te respondemos por correo.</p>
                 </div>
 
@@ -52,15 +53,15 @@ export const Contact = () => {
                                 <p className="text-slate-500 dark:text-slate-400 text-xs break-all">{email}</p>
                             </div>
                         </a>
-                        <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-pink-500/50 transition-colors group">
-                            <span className="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center"><Instagram className="w-6 h-6 text-pink-500" /></span>
+                        <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-[#E8C65E]/50 transition-colors group">
+                            <span className="w-12 h-12 rounded-full bg-[#E8C65E]/10 flex items-center justify-center"><Instagram className="w-6 h-6 text-[#E8C65E]" /></span>
                             <div>
                                 <p className="font-bold text-slate-900 dark:text-white text-sm">Instagram</p>
                                 <p className="text-slate-500 dark:text-slate-400 text-xs">Mirá novedades y mandanos un DM</p>
                             </div>
                         </a>
                         <div className="flex items-center gap-4 p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03]">
-                            <span className="w-12 h-12 rounded-full bg-slate-500/10 flex items-center justify-center"><MapPin className="w-6 h-6 text-slate-400" /></span>
+                            <span className="w-12 h-12 rounded-full bg-[#E8C65E]/10 flex items-center justify-center"><MapPin className="w-6 h-6 text-[#E8C65E]" /></span>
                             <div>
                                 <p className="font-bold text-slate-900 dark:text-white text-sm">Ubicación</p>
                                 <p className="text-slate-500 dark:text-slate-400 text-xs">Tienda online · Envíos desde Rafaela, Santa Fe</p>
@@ -94,7 +95,7 @@ export const Contact = () => {
                                 <button
                                     type="submit"
                                     disabled={estado === 'enviando'}
-                                    className="w-full py-3.5 bg-cielo-gold hover:bg-[#F3D985] text-[#11100D] font-bold text-sm rounded-xl transition-colors disabled:opacity-60"
+                                    className="btn-oro w-full py-3.5 bg-cielo-gold hover:bg-[#F3D985] text-[#11100D] font-bold text-sm rounded-xl transition-colors disabled:opacity-60"
                                 >
                                     {estado === 'enviando' ? 'Enviando…' : 'Enviar consulta'}
                                 </button>
