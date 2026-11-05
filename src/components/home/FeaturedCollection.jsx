@@ -30,7 +30,7 @@ const HeroCard = ({ item, onQuickView }) => (
 
         {/* Nuevo badge */}
         <div className="absolute top-5 left-5 z-20">
-            <span className="inline-block px-3 py-1 text-[9px] uppercase tracking-[0.4em] font-bold border border-cielo-gold/60 text-cielo-gold bg-black/50 backdrop-blur-sm">
+            <span className="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.4em] font-bold border border-cielo-gold/60 text-cielo-gold bg-black/50 backdrop-blur-sm">
                 Destacado
             </span>
         </div>

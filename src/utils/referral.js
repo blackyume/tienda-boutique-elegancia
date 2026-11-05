@@ -9,6 +9,8 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 
 // Porcentaje de descuento por default para el referido
 export const REFERRAL_DISCOUNT_PERCENT = 10;
+// Apagado por pedido del dueño: el checkout y el perfil no ofrecen códigos.
+export const CODIGOS_DE_DESCUENTO_ACTIVOS = false;
 
 export const buildReferralCode = (uid) => {
     if (!uid) return '';

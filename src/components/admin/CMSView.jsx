@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { Button } from '../ui/Button';
 import { useConfirm } from '../ui/ConfirmDialog';
+import { NovedadEditor } from './NovedadEditor';
 import { Tag, Image as ImageIcon, Trash2, UploadCloud, Plus, X, Monitor, Megaphone, Layout, Share2, ToggleLeft, ToggleRight, Gift, Link as LinkIcon, Quote, Target, Clock } from 'lucide-react';
 
 const ImageUploader = ({ currentImage, onUpload, label, className = "" }) => {
@@ -530,6 +531,8 @@ export const CMSView = () => {
                         onSaveText={(t) => updateSection('announcement', 'text', t)}
                         onToggle={() => updateSection('announcement', 'enabled', !siteConfig.announcement?.enabled)}
                     />
+
+                    <NovedadEditor novedad={siteConfig.novedad} onGuardar={(n) => updateSection('root', 'novedad', n)} />
 
                     {/* POPUP */}
                     <section className="bg-white dark:bg-[#1a1a1a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm row-span-2">

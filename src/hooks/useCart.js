@@ -5,7 +5,7 @@ import { trackAddToCart, trackRemoveFromCart, trackAddToWishlist } from '../util
 // Lógica de carrito + wishlist extraída de StoreContext (verbatim).
 // Recibe el estado y devuelve las acciones; comportamiento idéntico.
 export const useCart = ({ cart, setCart, wishlist, setWishlist, inventory, addToast }) => {
-    const addToCart = (product, size, color, quantity = 1) => {
+    const addToCart = (product, size, color, quantity = 1, { aviso = true } = {}) => {
         if (!product) return false;
         const qty = Math.max(1, Number(quantity) || 1);
 
@@ -35,7 +35,7 @@ export const useCart = ({ cart, setCart, wishlist, setWishlist, inventory, addTo
             return [...prev, { ...snapshot, size, color, quantity: addQty, key }];
         });
         trackAddToCart(product, size, color, addQty);
-        addToast('Agregado a la bolsa', 'success');
+        if (aviso) addToast('Agregado a la bolsa', 'success');
         return true;
     };
 

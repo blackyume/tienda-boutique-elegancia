@@ -80,11 +80,11 @@ export const Hero = () => {
     // 1170 > 760) y se comía a la modelo.
     const esPortadaPropia = heroImage === PORTADA_PROPIA;
     const primera = slides[0];
-    const MEDIA_TELEFONO = '(max-width: 767px)';
-    const MEDIA_ESCRITORIO = '(min-width: 768px)';
+    const MEDIA_TELEFONO = '(max-width: 1023px)';
+    const MEDIA_ESCRITORIO = '(min-width: 1024px)';
 
     return (
-        <section className="relative md:min-h-screen flex flex-col md:flex-row md:items-center justify-start overflow-hidden bg-cielo-dark">
+        <section className="relative lg:min-h-screen flex flex-col lg:flex-row lg:items-center justify-start overflow-hidden bg-cielo-dark">
             {primera && (
                 <Helmet>
                     {esPortadaPropia ? (
@@ -103,18 +103,18 @@ export const Hero = () => {
                 1/11/2026). 78svh deja el eslogan y el botón en la primera pantalla sin
                 cortar a la modelo: a 86 quedaban a más de una pantalla de distancia.
                 En escritorio sigue a pantalla completa con el texto a la izquierda. */}
-            <div ref={layerRef} className="relative h-[78svh] md:h-auto md:absolute md:inset-x-0 md:bottom-0 md:top-[7.5rem] z-0 will-change-transform sin-textura">
+            <div ref={layerRef} className="relative h-[78svh] lg:h-auto lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-[7.5rem] z-0 will-change-transform sin-textura">
                 <CapaPortadas visibles={visibles} activa={activa} propias={esPortadaPropia} />
-                <div className="md:hidden absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#11100D] pointer-events-none" />
+                <div className="lg:hidden absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#11100D] pointer-events-none" />
             </div>
 
             {/* Los velos sólo tocan los bordes: arriba para el menú, abajo para el
                 pase a la sección siguiente. Las modelos van a plena luz (pedido del
                 dueño, 1/11/2026: «más premium»); antes un velo las apagaba enteras.
-                La capa de fotos arranca debajo del menú (md:top-[7.5rem]): en pantallas
+                La capa de fotos arranca debajo del menú (lg:top-[7.5rem]): en pantallas
                 anchas y bajas el logo le tapaba la cabeza a la modelo del medio. */}
             <div
-                className="hidden md:block absolute inset-0 z-[1] pointer-events-none"
+                className="hidden lg:block absolute inset-0 z-[1] pointer-events-none"
                 style={{
                     background: `linear-gradient(180deg,
                         rgba(17,16,13,0.60) 0%,
@@ -128,7 +128,7 @@ export const Hero = () => {
             {/* Velo lateral: la columna de texto arranca sobre fondo oscuro sí o sí
                 aunque la foto del CMS sea clara. Muere antes de la primera modelo. */}
             <div
-                className="hidden md:block absolute inset-0 z-[1] pointer-events-none"
+                className="hidden lg:block absolute inset-0 z-[1] pointer-events-none"
                 style={{
                     background: `linear-gradient(90deg,
                         rgba(17,16,13,0.70) 0%,
@@ -152,28 +152,28 @@ export const Hero = () => {
             {/* La columna de texto vive en el aire oscuro de la izquierda de la portada
                 (las modelos arrancan al 42% del ancho) y nunca pasa del 36% de la
                 pantalla: antes el titular de 7vw se montaba sobre la primera modelo.
-                md:pt-28 deja libre el menú fijo en pantallas bajas. */}
-            <div ref={contentRef} className="relative z-10 w-full md:w-auto px-6 md:pl-[5.5vw] md:pr-0 pt-3 md:pt-28 pb-10 md:pb-20 will-change-transform md:max-w-[36vw]">
+                lg:pt-28 deja libre el menú fijo en pantallas bajas. */}
+            <div ref={contentRef} className="relative z-10 w-full lg:w-auto px-6 lg:pl-[5.5vw] lg:pr-0 pt-3 lg:pt-28 pb-10 lg:pb-20 will-change-transform lg:max-w-[36vw]">
 
-                <span className="hidden md:block text-2xs uppercase tracking-[0.5em] font-medium text-cielo-gold/90 mb-7 animate-fadeIn">
+                <span className="hidden lg:block text-2xs uppercase tracking-[0.5em] font-medium text-cielo-gold/90 mb-7 animate-fadeIn">
                     Colección 2027
                 </span>
 
                 {/* El titular es el lema: «La Boutique» ya lo dice el logo justo arriba.
                     Sin lema en el CMS vuelven el título y el subtítulo. */}
-                <h1 className="font-serif leading-[1.04] text-noche-100 animate-slideUp text-[clamp(2.1rem,9.6vw,2.9rem)] md:text-[clamp(2.6rem,4.3vw,5.6rem)] text-balance">
+                <h1 className="font-serif leading-[1.04] text-noche-100 animate-slideUp text-[clamp(2.1rem,9.6vw,2.9rem)] lg:text-[clamp(2.6rem,4.3vw,5.6rem)] text-balance">
                     {lema || title}
                 </h1>
                 {!lema && <p className="font-serif italic font-light text-noche-100/90 mt-3 text-2xl">{subtitle}</p>}
 
-                <span className="hidden md:block h-px w-14 bg-cielo-gold/50 mt-9 animate-fadeIn opacity-0 [animation-delay:400ms]" />
+                <span className="hidden lg:block h-px w-14 bg-cielo-gold/50 mt-9 animate-fadeIn opacity-0 [animation-delay:400ms]" />
 
-                <div className="mt-5 md:mt-9 flex flex-col items-start gap-6 md:gap-9 animate-fadeIn opacity-0 [animation-delay:550ms]">
-                    <p className="order-2 md:order-1 text-sm md:text-[0.95rem] text-noche-300/90 max-w-sm font-light leading-relaxed">
+                <div className="mt-5 lg:mt-9 flex flex-col items-start gap-6 lg:gap-9 animate-fadeIn opacity-0 [animation-delay:550ms]">
+                    <p className="order-2 lg:order-1 text-sm lg:text-[0.95rem] text-noche-300/90 max-w-sm font-light leading-relaxed">
                         {lema ? resto : tagline}
                     </p>
 
-                    <div className="order-1 md:order-2 flex flex-wrap items-center gap-x-8 gap-y-5">
+                    <div className="order-1 lg:order-2 flex flex-wrap items-center gap-x-8 gap-y-5">
                         <Link
                             to="/shop"
                             onClick={primaryAction}

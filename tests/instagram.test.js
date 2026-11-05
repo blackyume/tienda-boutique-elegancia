@@ -64,9 +64,9 @@ describe('fotoDeProducto', () => {
 describe('imagenParaInstagram (servidor)', () => {
     it('pide a Cloudinary JPEG 4:5 y pisa transformaciones previas', () => {
         expect(imagenParaInstagram('https://res.cloudinary.com/dx/image/upload/v1/prod/a.webp'))
-            .toBe('https://res.cloudinary.com/dx/image/upload/c_fill,ar_4:5,g_auto,f_jpg,q_auto:good,w_1080/v1/prod/a.webp');
+            .toBe('https://res.cloudinary.com/dx/image/upload/c_pad,ar_4:5,b_rgb:11100D,f_jpg,q_auto:good,w_1080/v1/prod/a.webp');
         expect(imagenParaInstagram('https://res.cloudinary.com/dx/image/upload/f_auto,q_auto,w_600/v1/prod/a.webp'))
-            .toBe('https://res.cloudinary.com/dx/image/upload/c_fill,ar_4:5,g_auto,f_jpg,q_auto:good,w_1080/v1/prod/a.webp');
+            .toBe('https://res.cloudinary.com/dx/image/upload/c_pad,ar_4:5,b_rgb:11100D,f_jpg,q_auto:good,w_1080/v1/prod/a.webp');
     });
 
     it('deja igual las fotos que no son de Cloudinary', () => {

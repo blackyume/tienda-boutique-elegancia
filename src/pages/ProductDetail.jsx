@@ -38,6 +38,7 @@ export const ProductDetail = () => {
         toggleWishlist,
         addToast,
         setIsSizeGuideOpen,
+        setIsCartOpen,
         incrementProductView,
         siteConfig
     } = useStore();
@@ -148,7 +149,7 @@ export const ProductDetail = () => {
         if (!selectedColor && (product.colors?.length || 0) > 0) {
             return addToast('Seleccioná un color', 'error');
         }
-        addToCart(product, selectedSize, selectedColor, quantity);
+        if (addToCart(product, selectedSize, selectedColor, quantity, { aviso: false })) setIsCartOpen(true);
     };
 
     const handleShare = async () => {
@@ -233,13 +234,13 @@ export const ProductDetail = () => {
                     </div>
                     </div>
                     {images.length > 1 && (
-                        <div className="mt-3 grid grid-cols-4 md:grid-cols-5 gap-2 lg:mt-0 lg:order-first lg:flex lg:flex-col lg:w-20 lg:shrink-0 lg:p-0.5 lg:max-h-[calc(100svh-11.5rem)] lg:overflow-y-auto scrollbar-hide">
+                        <div className="mt-3 grid grid-cols-4 gap-2 md:flex md:justify-center lg:justify-start lg:mt-0 lg:order-first lg:flex lg:flex-col lg:w-20 lg:shrink-0 lg:p-0.5 lg:max-h-[calc(100svh-11.5rem)] lg:overflow-y-auto scrollbar-hide">
                             {images.map((img, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setActiveImage(i)}
                                     aria-label={`Imagen ${i + 1}`}
-                                    className={`aspect-[2/3] shrink-0 overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
+                                    className={`aspect-[2/3] md:w-20 lg:w-full shrink-0 overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
                                 >
                                     <img src={optimizeImage(img, 300)} alt="" className="w-full h-full object-cover" loading="lazy" />
                                 </button>
@@ -257,7 +258,7 @@ export const ProductDetail = () => {
                         </span>
                         <button
                             onClick={handleShare}
-                            className="text-slate-400 hover:text-cielo-gold transition-colors"
+                            className="p-2.5 -m-2.5 text-slate-400 hover:text-cielo-gold transition-colors"
                             aria-label="Compartir"
                         >
                             <Share2 className="w-5 h-5" />
@@ -424,7 +425,7 @@ export const ProductDetail = () => {
                             </div>
                             {selectedSize && selectedColor && variantStock > 0 && variantStock <= scarcityThreshold && (
                                 <p className="text-xs text-orange-500 mt-2">
-                                    Quedan {variantStock} unidades en {selectedSize} / {selectedColor}
+                                    {variantStock === 1 ? 'Queda 1 unidad' : `Quedan ${variantStock} unidades`} en {selectedSize} / {selectedColor}
                                 </p>
                             )}
                             {selectedSize && selectedColor && variantStock === 0 && (

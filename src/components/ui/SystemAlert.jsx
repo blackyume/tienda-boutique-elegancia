@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { DownloadCloud, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import { Rombo } from './Ornamento';
 
 export const SystemAlert = () => {
     const { systemConfig } = useStore();
@@ -26,20 +27,15 @@ export const SystemAlert = () => {
     };
 
     return (
-        <div className="fixed bottom-6 inset-x-0 z-50 flex justify-center px-4 animate-bounce-subtle">
-            <div className="bg-slate-900/95 dark:bg-white/95 backdrop-blur-md text-white dark:text-slate-900 px-6 py-4 rounded-2xl shadow-2xl border border-slate-700 dark:border-slate-200 flex items-center gap-6 max-w-lg w-full">
-                <div className="p-3 bg-blue-500/20 rounded-xl">
-                    <DownloadCloud className="w-6 h-6 text-blue-400 dark:text-blue-600" />
-                </div>
-                <div className="flex-1">
-                    <p className="font-bold text-sm">Nueva versión disponible</p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">Actualiza para ver los cambios recientes.</p>
-                </div>
+        <div className="fixed bottom-24 sm:bottom-6 inset-x-0 z-50 flex justify-center px-4 animate-fadeIn">
+            <div className="flex items-center gap-3 pl-4 pr-2 py-2 rounded-full bg-noche-900/95 backdrop-blur-xl border border-cielo-gold/30 shadow-[0_16px_48px_rgba(0,0,0,0.55)]">
+                <Rombo />
+                <span className="text-xs text-noche-100 font-medium">Actualizamos la tienda</span>
                 <button
                     onClick={handleReload}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold text-xs uppercase transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/30"
+                    className="btn-oro inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
                 >
-                    <RefreshCw className="w-4 h-4" /> Actualizar
+                    <RefreshCw className="w-3 h-3" /> Ver
                 </button>
             </div>
         </div>

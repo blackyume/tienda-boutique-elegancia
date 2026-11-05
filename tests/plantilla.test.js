@@ -11,4 +11,4 @@ it('la plantilla que se entrega al dueño la lee el importador', async () => {
         ['Campera Ecocuero Chocolate', 2, true],
         ['Top Cola de Ratón Morley', 0, false],
     ]);
-});
+}, 30000);

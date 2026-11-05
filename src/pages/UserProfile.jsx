@@ -4,7 +4,7 @@ import { Package, Truck, LogOut, User, Gift, Copy, Share2 } from 'lucide-react';
 import { formatMoney } from '../utils/helpers';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
-import { buildReferralCode, getReferralLink, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
+import { buildReferralCode, getReferralLink, REFERRAL_DISCOUNT_PERCENT, CODIGOS_DE_DESCUENTO_ACTIVOS } from '../utils/referral';
 import { getStatusLabel, getStatusClasses } from '../utils/orderStatus';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -77,7 +77,7 @@ export const UserProfile = () => {
                 </div>
 
                 {/* REFERRAL SECTION */}
-                <div className="bg-gradient-to-br from-[#E8C65E]/10 via-white to-sky-50 dark:from-[#E8C65E]/10 dark:via-slate-900/50 dark:to-sky-900/10 rounded-2xl border border-[#E8C65E]/30 p-6 md:p-8 mb-8 shadow-sm">
+                {CODIGOS_DE_DESCUENTO_ACTIVOS && <div className="bg-gradient-to-br from-[#E8C65E]/10 via-white to-sky-50 dark:from-[#E8C65E]/10 dark:via-slate-900/50 dark:to-sky-900/10 rounded-2xl border border-[#E8C65E]/30 p-6 md:p-8 mb-8 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-12 h-12 rounded-full bg-[#E8C65E] flex items-center justify-center text-white">
                             <Gift className="w-5 h-5" />
@@ -110,7 +110,7 @@ export const UserProfile = () => {
                         <Stat label="Ventas generadas" value={formatMoney(userData?.referralsRevenue || 0)} />
                         <Stat label="Descuentos dados" value={formatMoney(userData?.referralsEarnings || 0)} />
                     </div>
-                </div>
+                </div>}
 
                 {/* ORDERS SECTION */}
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">

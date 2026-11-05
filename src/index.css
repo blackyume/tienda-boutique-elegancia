@@ -169,9 +169,13 @@ body {
     button, a, [role="button"] {
         min-height: 44px;
     }
-    
+
+}
+
+/* Con letra más chica que 16 px, el iPhone y el iPad se acercan al escribir. */
+@media (max-width: 1023px), (pointer: coarse) {
     input, select, textarea {
-        font-size: 16px !important; /* Prevents iOS zoom on focus */
+        font-size: 16px !important;
     }
 }
 
@@ -421,7 +425,18 @@ html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 .btn-oro:hover:not(:disabled) { filter: brightness(1.08); }
 .btn-oro:disabled { opacity: .55; }
 
+/* Tablet vertical: la portada del teléfono va entera y el fondo se funde con la página. */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+  .portada-propia {
+    -webkit-mask-image: linear-gradient(90deg, transparent 17%, #000 31%, #000 69%, transparent 83%);
+    mask-image: linear-gradient(90deg, transparent 17%, #000 31%, #000 69%, transparent 83%);
+  }
+}
+
 /* Ficha en PC: la foto se achica para entrar entera en la pantalla, sin recortar a la modelo. */
+@media (min-width: 768px) {
+  .ficha-foto { width: min(100%, max(20rem, calc((100svh - 13rem) * var(--marco, .6667)))); margin-inline: auto; }
+}
 @media (min-width: 1024px) {
-  .ficha-foto { width: min(100%, max(20rem, calc((100svh - 11.5rem) * var(--marco, .6667)))); }
+  .ficha-foto { width: min(100%, max(20rem, calc((100svh - 11.5rem) * var(--marco, .6667)))); margin-inline: 0; }
 }

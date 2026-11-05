@@ -6,10 +6,12 @@ import { validarDatosCheckout, normalizarDatosCheckout, esRetiroEnSucursal, PROV
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { User, Lock, ChevronRight, ShieldCheck, ShoppingBag, Ticket, X, MessageCircle, CheckCircle2 } from 'lucide-react';
-import { formatMoney } from '../utils/helpers';
+import { formatMoney, optimizeImage } from '../utils/helpers';
 import { trackBeginCheckout } from '../utils/analytics';
 import { trackAbandonedCart, markAbandonedCartRecovered } from '../utils/abandonedCart';
-import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT } from '../utils/referral';
+import { findReferralOwner, REFERRAL_DISCOUNT_PERCENT, CODIGOS_DE_DESCUENTO_ACTIVOS } from '../utils/referral';
+import { tituloDeProducto } from '../utils/nombres';
+import { Rombo } from '../components/ui/Ornamento';
 import { BrandStrip } from '../components/ui/BrandBadges';
 import { MENSAJERIA_ACTIVA, canalDePedido } from '../utils/contacto';
 
@@ -402,8 +404,8 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                 {/* --- IZQUIERDA: FORMULARIO --- */}
                 <div className="lg:col-span-7 space-y-12 animate-slideUp">
                     <div className="flex items-center gap-4 mb-4">
-                        <button onClick={() => navigate('/')} className="text-xs font-bold uppercase text-slate-400 hover:text-cielo-gold flex items-center gap-1 transition-colors">
-                            <ChevronRight className="w-4 h-4 rotate-180" /> Volver
+                        <button onClick={() => navigate('/shop')} className="text-xs font-bold uppercase text-noche-300 hover:text-cielo-gold flex items-center gap-1 transition-colors">
+                            <ChevronRight className="w-4 h-4 rotate-180" /> Seguir comprando
                         </button>
                     </div>
 
@@ -419,7 +421,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                             </p>
                         </div>
                     ) : (
-                        <div className="p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/50 space-y-3">
+                        <div className="p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-cielo-gold/15 bg-white dark:bg-noche-850/50 space-y-3">
                             <BotonGoogle onClick={loginWithGoogle} />
                             <p className="text-center text-xs text-slate-500 dark:text-slate-400">
                                 Un toque y se cargan tu nombre y tu email. <strong className="text-slate-700 dark:text-slate-200">No es obligatorio:</strong> podés seguir y comprar sin cuenta.
@@ -430,10 +432,10 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
 
                     <form id="checkout-form" onSubmit={handleCheckout} noValidate className="space-y-10">
                         {/* Datos Personales */}
-                        <section className="bg-white dark:bg-slate-900/50 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-sm">
+                        <section className="bg-white dark:bg-noche-850/50 p-5 sm:p-8 rounded-3xl border border-slate-200 dark:border-cielo-gold/15 shadow-sm backdrop-blur-sm">
                             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-cielo-gold mb-8 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-cielo-gold/10 flex items-center justify-center text-cielo-gold text-lg font-serif">1</span>
-                                Tus Datos
+                                Tus datos
                             </h3>
                             <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
                                 <CampoCheckout label="Nombre" name="nombre" value={formData.nombre} onChange={handleInputChange} error={errores.nombre} autoComplete="given-name" />
@@ -447,7 +449,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                         </section>
 
                         {/* Envío */}
-                        <section className="bg-white dark:bg-slate-900/50 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-sm">
+                        <section className="bg-white dark:bg-noche-850/50 p-5 sm:p-8 rounded-3xl border border-slate-200 dark:border-cielo-gold/15 shadow-sm backdrop-blur-sm">
                             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-cielo-gold mb-8 flex items-center gap-3">
                                 <span className="w-8 h-8 rounded-full bg-cielo-gold/10 flex items-center justify-center text-cielo-gold text-lg font-serif">2</span>
                                 Envío
@@ -455,25 +457,25 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
 
                             <div className="space-y-4 mb-8">
                                 {Object.entries(shippingOptions).map(([key, option]) => (
-                                    <label key={key} className={`relative flex items-center justify-between gap-4 p-5 sm:p-6 border rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-md ${shippingMethod === key ? `bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900` : 'border-slate-200 dark:border-slate-700 hover:border-slate-400'}`}>
+                                    <label key={key} className={`relative flex items-center justify-between gap-4 p-4 sm:p-6 border rounded-2xl cursor-pointer transition-all duration-300 ${shippingMethod === key ? 'bg-cielo-gold/10 border-cielo-gold text-noche-100' : 'border-white/10 text-noche-100 hover:border-cielo-gold/40'}`}>
                                         <div className="flex items-center gap-4 sm:gap-5 min-w-0">
-                                            <div className={`w-5 h-5 shrink-0 rounded-full border-2 flex items-center justify-center ${shippingMethod === key ? 'border-cielo-gold' : 'border-slate-300'}`}>
+                                            <div className={`w-5 h-5 shrink-0 rounded-full border-2 flex items-center justify-center ${shippingMethod === key ? 'border-cielo-gold' : 'border-noche-300/50'}`}>
                                                 {shippingMethod === key && <div className="w-2.5 h-2.5 rounded-full bg-cielo-gold" />}
                                             </div>
                                             <input type="radio" name="metodoEnvio" checked={shippingMethod === key} onChange={() => setShippingMethod(key)} className="hidden" />
                                             <div className="min-w-0">
-                                                <span className="font-bold font-serif text-base sm:text-lg block tracking-wide leading-tight">{option.name}</span>
-                                                <span className={`text-[11px] uppercase tracking-widest font-bold ${shippingMethod === key ? 'text-white/60 dark:text-black/60' : 'text-slate-400'}`}>Llega en {option.time}</span>
+                                                <span className="font-serif text-base sm:text-lg block leading-tight">{option.name}</span>
+                                                <span className="block mt-1 text-xs text-noche-300">Llega en {option.time}</span>
                                             </div>
                                         </div>
-                                        <span className="font-bold text-lg shrink-0">{Number(option.cost) > 0 ? formatMoney(option.cost) : 'Gratis'}</span>
+                                        <span className={`font-semibold text-base sm:text-lg shrink-0 ${shippingMethod === key ? 'text-cielo-gold' : ''}`}>{Number(option.cost) > 0 ? formatMoney(option.cost) : 'Gratis'}</span>
                                     </label>
                                 ))}
                             </div>
                             {selectedShipping.note && (
                                 <div className="mb-8 p-4 rounded-2xl border border-cielo-gold/30 bg-cielo-gold/5 flex items-start gap-3">
-                                    <span className="text-xl">📦</span>
-                                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-snug">{selectedShipping.note}</p>
+                                    <Rombo className="bg-cielo-gold mt-1.5" />
+                                    <p className="text-sm text-noche-300 leading-snug">{selectedShipping.note}</p>
                                 </div>
                             )}
 
@@ -518,28 +520,28 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
 
                 {/* --- DERECHA: RESUMEN (STICKY) --- */}
                 <div className="lg:col-span-5">
-                    <div className="bg-white dark:bg-slate-900 p-8 lg:p-10 rounded-3xl sticky top-32 border border-slate-100 dark:border-white/10 shadow-2xl shadow-slate-200/50 dark:shadow-none animate-fadeIn">
-                        <h3 className="text-2xl font-cinzel text-slate-900 dark:text-white mb-8 pb-4 border-b border-slate-100 dark:border-white/10">Resumen de Compra</h3>
+                    <div className="bg-white dark:bg-noche-850/60 p-5 sm:p-8 lg:p-10 rounded-3xl lg:sticky lg:top-32 border border-slate-100 dark:border-cielo-gold/20 shadow-2xl shadow-slate-200/50 dark:shadow-none animate-fadeIn">
+                        <h3 className="text-3xl font-serif text-slate-900 dark:text-noche-100 mb-6 pb-4 border-b border-slate-100 dark:border-cielo-gold/15">Tu pedido</h3>
 
                         <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200">
                             {cart.map(i => (
                                 <div key={i.key} className="flex gap-4">
-                                    <div className="w-20 h-24 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 flex-shrink-0 relative group">
-                                        <img src={i.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                        <span className="absolute bottom-0 right-0 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] px-1.5 py-0.5 font-bold">x{i.quantity}</span>
+                                    <div className="w-16 h-24 bg-slate-100 dark:bg-noche-900 rounded-lg overflow-hidden flex-shrink-0 relative">
+                                        <img src={optimizeImage(i.image, 200)} alt="" className="w-full h-full object-cover" />
+                                        <span className="btn-oro absolute bottom-0 right-0 text-[10px] px-1.5 py-0.5 rounded-tl-md font-bold">x{i.quantity}</span>
                                     </div>
-                                    <div className="flex-1 py-1">
-                                        <p className="font-serif font-bold text-slate-900 dark:text-white text-lg leading-none mb-1">{i.name}</p>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{i.color} / {i.size}</p>
-                                        <p className=" font-bold text-slate-900 dark:text-white mt-2">{formatMoney(i.price * i.quantity)}</p>
+                                    <div className="flex-1 min-w-0 py-1">
+                                        <p className="font-serif text-slate-900 dark:text-noche-100 text-lg leading-tight mb-1">{tituloDeProducto(i.name)}</p>
+                                        <p className="text-xs text-noche-300">{i.color}{i.color && i.size ? ' · ' : ''}{i.size ? `Talle ${i.size}` : ''}</p>
+                                        <p className="font-semibold text-slate-900 dark:text-noche-100 mt-2">{formatMoney(i.price * i.quantity)}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="space-y-3 pt-6 border-t border-dashed border-slate-200 dark:border-white/10">
-                            <div className="flex justify-between text-slate-500 text-sm"><span>Subtotal</span><span>{formatMoney(cartTotal)}</span></div>
-                            <div className="flex justify-between text-slate-500 text-sm"><span>Envío</span><span>{Number(selectedShipping.cost) > 0 ? formatMoney(selectedShipping.cost) : 'Gratis'}</span></div>
+                        <div className="space-y-3 pt-6 border-t border-slate-200 dark:border-cielo-gold/15">
+                            <div className="flex justify-between text-noche-300 text-sm"><span>Subtotal</span><span>{formatMoney(cartTotal)}</span></div>
+                            <div className="flex justify-between text-noche-300 text-sm"><span>Envío</span><span>{Number(selectedShipping.cost) > 0 ? formatMoney(selectedShipping.cost) : 'Gratis'}</span></div>
                             {paymentConfig?.mpFee > 0 && (
                                 <div className="flex justify-between text-slate-500 text-xs italic">
                                     <span>Recargo Gestión de Pago ({paymentConfig.mpFee}%)</span>
@@ -573,7 +575,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                         </div>
 
                         {/* Coupon Input */}
-                        {!appliedCoupon && (
+                        {CODIGOS_DE_DESCUENTO_ACTIVOS && !appliedCoupon && (
                             <div className="pt-4">
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
@@ -605,7 +607,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                         )}
 
                         {/* Referral Input */}
-                        {!appliedReferral && (
+                        {CODIGOS_DE_DESCUENTO_ACTIVOS && !appliedReferral && (
                             <div className="pt-3">
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
@@ -645,7 +647,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                         <button
                             onClick={handleCheckout}
                             disabled={loading}
-                            className="btn-oro w-full bg-cielo-gold hover:bg-[#B8932E] text-black hover:text-white py-5 rounded-xl font-bold text-sm uppercase tracking-[0.2em] shadow-lg shadow-cielo-gold/20 transition-all transform hover:-translate-y-1 active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                            className="btn-oro w-full bg-cielo-gold hover:bg-[#B8932E] text-black hover:text-white py-4 sm:py-5 rounded-xl font-bold text-sm uppercase tracking-[0.2em] shadow-lg shadow-cielo-gold/20 transition-all transform hover:-translate-y-1 active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {loading ? <span className="animate-pulse">Procesando...</span> : <span>Pagar con Mercado Pago</span>}
                         </button>
@@ -681,7 +683,7 @@ Hubo un error con el pago automático. Quisiera coordinar por acá.`;
                             <ShieldCheck className="w-4 h-4" />
                         </div>
 
-                        <div className="mt-5 pt-5 border-t border-slate-100 dark:border-white/10">
+                        <div className="mt-5 pt-5 border-t border-slate-100 dark:border-cielo-gold/15">
                             <BrandStrip />
                         </div>
                     </div>

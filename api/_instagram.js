@@ -3,8 +3,8 @@
 /**
  * Instagram sólo acepta JPEG público con proporción entre 4:5 y 1.91:1.
  * Las fotos de la tienda viven en Cloudinary, que las convierte al vuelo:
- * se piden en JPEG, recortadas a 4:5 (el formato de feed que más lugar ocupa)
- * y centradas en lo importante. Cualquier otra URL se manda tal cual.
+ * se piden en JPEG, en 4:5 (el formato de feed que más lugar ocupa) y sin recortar:
+ * la modelo va entera, con bandas negras de la marca. Cualquier otra URL va tal cual.
  */
 const imagenParaInstagram = (url) => {
     const s = String(url || '');
@@ -13,7 +13,7 @@ const imagenParaInstagram = (url) => {
     // Si la URL ya trae transformaciones (letras seguidas de _ antes de la
     // versión o el nombre), se pisan por las de Instagram.
     const sinTransformaciones = despues.replace(/^(?:[a-z]{1,2}_[^/]+\/)+/, '');
-    return `${antes}/upload/c_fill,ar_4:5,g_auto,f_jpg,q_auto:good,w_1080/${sinTransformaciones}`;
+    return `${antes}/upload/c_pad,ar_4:5,b_rgb:11100D,f_jpg,q_auto:good,w_1080/${sinTransformaciones}`;
 };
 
 /** Huella corta de una llave, para saber de cuál salió la renovada sin guardarla entera. */

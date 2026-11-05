@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-const MEDIA_TELEFONO = '(max-width: 767px)';
-const MEDIA_ESCRITORIO = '(min-width: 768px)';
+const MEDIA_TELEFONO = '(max-width: 1023px)';
+const MEDIA_ESCRITORIO = '(min-width: 1024px)';
 const PASO_MS = 7000;
 
 // Carrusel de portadas con fundido cruzado.
@@ -82,7 +82,7 @@ export const CapaPortadas = ({ visibles, activa, propias }) => (
                             // hueco no se ve, y en una pantalla ancha y baja el cover le cortaba
                             // los pies o la cabeza a las modelos.
                             'absolute inset-0 w-full h-full object-cover object-center',
-                            propias && 'md:object-contain md:object-right-bottom',
+                            propias && 'portada-propia md:object-contain lg:object-right-bottom',
                             'transition-opacity duration-[1600ms] ease-in-out motion-reduce:transition-none',
                             esActiva ? 'opacity-100' : 'opacity-0',
                             esActiva
@@ -99,7 +99,7 @@ export const CapaPortadas = ({ visibles, activa, propias }) => (
 export const PuntosPortada = ({ slides, activa, onElegir }) => {
     if (slides.length < 2) return null;
     return (
-        <div className="absolute top-[calc(78svh-2.5rem)] md:top-auto md:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5 lg:left-auto lg:right-24 lg:translate-x-0">
+        <div className="absolute top-[calc(78svh-2.5rem)] lg:top-auto lg:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5 lg:left-auto lg:right-24 lg:translate-x-0">
             {slides.map((s, i) => (
                 <button
                     key={s.escritorio}

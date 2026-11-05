@@ -12,6 +12,7 @@ import { SystemAlert } from './components/ui/SystemAlert';
 import { SizeGuideModal } from './components/shop/SizeGuideModal';
 import { Home } from './pages/Home';
 import { Maintenance } from './pages/Maintenance';
+import { AvisoNovedades } from './components/ui/AvisoNovedades';
 import { PushOptIn } from './components/ui/PushOptIn';
 import { NewsletterPopup } from './components/layout/NewsletterPopup';
 import { ShopAssistant } from './components/shop/ShopAssistant';
@@ -126,6 +127,7 @@ const AppContent = () => {
       <UpdatePrompt />
       <BotonesContacto />
       <ChatConsultas />
+      <AvisoNovedades />
       <SystemAlert />
       <NewsletterPopup />
       {location.pathname !== '/admin' && location.pathname !== '/checkout' && <PushOptIn />}

@@ -26,7 +26,7 @@ export const CampoCheckout = ({
                 {opcional && <span className="text-[10px] font-semibold normal-case tracking-normal text-slate-400/80">(opcional)</span>}
             </label>
             {as === 'select' ? (
-                <select {...comunes} className={`${comunes.className} dark:bg-[#11100D] cursor-pointer`}>{children}</select>
+                <select {...comunes} className={`${comunes.className} [&>option]:bg-noche-900 cursor-pointer`}>{children}</select>
             ) : (
                 <input {...comunes} type={type} inputMode={inputMode} placeholder={placeholder} />
             )}

@@ -153,10 +153,10 @@ export const Navbar = ({ onOpenCart }) => {
                 `}>
                     {/* LEFT: hamburguesa (mobile) + navegación (desktop) */}
                     <div className="flex items-center gap-6 z-10">
-                        <button aria-label="Abrir menú" className="md:hidden p-2 text-white" onClick={() => setIsMobileMenuOpen(true)}>
+                        <button aria-label="Abrir menú" className="lg:hidden p-2 text-white" onClick={() => setIsMobileMenuOpen(true)}>
                             <Menu className="w-6 h-6" />
                         </button>
-                        <div className="hidden md:flex items-center gap-9 text-[11px] font-medium uppercase tracking-[0.24em]">
+                        <div className="hidden lg:flex items-center gap-9 text-[11px] font-medium uppercase tracking-[0.24em]">
                             <button
                                 onMouseEnter={() => setIsShopMenuOpen(true)}
                                 onMouseLeave={() => setIsShopMenuOpen(false)}
@@ -177,7 +177,7 @@ export const Navbar = ({ onOpenCart }) => {
                         <div
                             onMouseEnter={() => setIsShopMenuOpen(true)}
                             onMouseLeave={() => setIsShopMenuOpen(false)}
-                            className={`hidden md:block absolute top-full inset-x-0 pt-2 transition-all duration-300 ${isShopMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}
+                            className={`hidden lg:block absolute top-full inset-x-0 pt-2 transition-all duration-300 ${isShopMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}
                         >
                             <div className={`bg-noche-900 border-cielo-gold/15 shadow-[0_30px_60px_rgba(0,0,0,0.6)] ${scrolled ? 'border rounded-3xl' : 'border-y'}`}>
                                 <div className="max-w-6xl mx-auto px-10 py-9 grid grid-cols-[minmax(0,1fr)_auto] gap-14">
@@ -387,7 +387,7 @@ export const Navbar = ({ onOpenCart }) => {
                             onClick={() => handleCategoryClick('Todos')}
                             className="text-[11px] uppercase tracking-[0.3em] font-bold text-cielo-gold hover:text-white transition-colors"
                         >
-                            Ver todo el shop
+                            Ver toda la tienda
                         </button>
 
                         <div className="flex flex-col items-center gap-4">
@@ -397,7 +397,7 @@ export const Navbar = ({ onOpenCart }) => {
                                     onClick={() => handleCategoryClick(cat.name)}
                                     className="text-xl font-serif text-white hover:text-cielo-gold transition-colors duration-300 text-center leading-tight"
                                 >
-                                    {cat.name}
+                                    {tituloDeProducto(cat.name)}
                                 </button>
                             ))}
                         </div>
