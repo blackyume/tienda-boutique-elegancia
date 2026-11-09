@@ -366,7 +366,8 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
 
     const findProduct = (q) => {
         if (q == null) return null;
-        const s = String(q).trim().toLowerCase();
+        // El resumen le muestra los ids como "#abc123" y a veces la IA los devuelve con el #.
+        const s = String(q).trim().replace(/^#/, '').toLowerCase();
         return inventory.find(p => String(p.id).toLowerCase() === s)
             || inventory.find(p => (p.name || '').toLowerCase() === s)
             || inventory.find(p => (p.name || '').toLowerCase().includes(s));

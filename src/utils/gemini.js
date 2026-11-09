@@ -4,18 +4,24 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Modelos vigentes a septiembre 2026 (ai.google.dev/gemini-api/docs/models).
-// Se prueban en orden: flash alcanza para la tienda y es el más barato.
-// gemini-2.5-flash queda último como respaldo: Google lo apaga el 16/10/2026.
-// Los 2.0 ya están apagados (junio 2026) y 1.0-pro / gemini-pro hace rato:
-// cada uno que quedaba en la lista era un intento perdido antes de responder.
+// Modelos vigentes (ai.google.dev/gemini-api/docs/models), en el orden en que
+// se prueban. Medido el 9/11/2026 con el pedido real de Lau: 3.8 y 3.7 daban
+// 503 por saturación o no contestaban en 3 minutos; 3.5 y 3.6 tardaban 3-30 s;
+// 3.5-lite y 2.5 contestaban bien en 1-3 s. Por eso 2.5 va primero aunque
+// Google avisó que lo apaga: cuando lo haga devuelve 404 al instante y se pasa
+// al siguiente. Cada intento tiene tiempo máximo (TIEMPO_POR_MODELO_MS).
 export const DEFAULT_MODELS = [
+    'gemini-2.5-flash',
+    'gemini-3.5-flash',
+    'gemini-3.6-flash',
+    'gemini-3.5-flash-lite',
     'gemini-3.8-flash',
     'gemini-3.7-flash',
-    'gemini-3.5-flash',
-    'gemini-3.5-flash-lite',
-    'gemini-2.5-flash',
 ];
+
+// Un modelo saturado puede quedarse colgado sin contestar: pasado este tiempo
+// se corta y se prueba el siguiente.
+export const TIEMPO_POR_MODELO_MS = 40000;
 
 const parseKeys = (raw) => {
     if (!raw) return [];
@@ -36,7 +42,7 @@ export const generateWithGemini = async (prompt, { keys, models = DEFAULT_MODELS
         for (const modelName of models) {
             try {
                 const genAI = new GoogleGenerativeAI(key);
-                const model = genAI.getGenerativeModel({ model: modelName });
+                const model = genAI.getGenerativeModel({ model: modelName }, { timeout: TIEMPO_POR_MODELO_MS });
                 const result = await model.generateContent(prompt);
                 return result.response.text();
             } catch (err) {
@@ -93,6 +99,7 @@ export const explicarErrorIA = (e) => {
     if (/PERMISSION_DENIED|403/.test(m)) return `Google rechazó la llave (permiso denegado). Puede estar restringida a otro sitio o deshabilitada. Generá una nueva en aistudio.google.com/apikey. ${donde}`;
     if (/RESOURCE_EXHAUSTED|429|quota|rate limit/i.test(m)) return 'Gemini está saturado o se pasó el límite gratuito de hoy. Esperá un minuto y volvé a intentar; si sigue, mañana se renueva.';
     if (/not found|404|is not supported|deprecated/i.test(m)) return 'El modelo de Gemini que se intentó usar ya no existe. Avisale a quien te mantiene la tienda que actualice la lista de modelos.';
+    if (/503|UNAVAILABLE|high demand|overloaded|abort/i.test(m)) return 'Google tiene mucha demanda ahora y ningún modelo contestó a tiempo. Esperá un minuto y probá de nuevo: no es la llave ni tu internet.';
     if (/Failed to fetch|NetworkError|network|ECONN|timeout/i.test(m)) return 'No pude conectar con Google. Revisá tu internet y probá de nuevo.';
     return `Error: ${m}`;
 };

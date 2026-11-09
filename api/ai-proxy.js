@@ -12,7 +12,7 @@
 const { checkRateLimit, getClientIp } = require('./_rateLimit');
 
 // Vigentes a sep-2026; 2.5-flash de respaldo hasta que Google lo apague el 16/10/2026.
-const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.7-flash'];
 
 const STATIC_ALLOWED_ORIGINS = [
     'https://la-boutique-de-la-elegancia.web.app',
@@ -50,6 +50,7 @@ const tryGemini = async (prompt, keys) => {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+                        signal: AbortSignal.timeout(40000),
                     }
                 );
                 if (!res.ok) {
