@@ -19,7 +19,7 @@ export const Hilo = ({ className = '' }) => {
         return () => io.disconnect();
     }, []);
 
-    const trazo = `h-px flex-1 from-transparent to-cielo-gold/45 transition-transform duration-[1600ms] ease-out ${visible ? 'scale-x-100' : 'scale-x-0'}`;
+    const trazo = `h-px flex-1 from-transparent via-plata/30 to-cielo-gold/50 transition-transform duration-[1600ms] ease-out ${visible ? 'scale-x-100' : 'scale-x-0'}`;
     return (
         <div ref={ref} aria-hidden="true" className={`flex items-center gap-4 max-w-[1400px] mx-auto px-6 ${className}`}>
             <span className={`${trazo} bg-gradient-to-r origin-right`} />

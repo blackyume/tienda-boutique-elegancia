@@ -29,6 +29,11 @@ module.exports = {
                 // Tercer color de la marca (4/11/2026): corta el negro continuo. El oro
                 // sobre marfil es el oscuro: el de la casa no llega a AA en texto chico.
                 marfil: { DEFAULT: '#F3ECDE', 200: '#E9DFCB', tinta: '#1B1813', oro: '#7A5B1C' },
+                // Plata (18/11/2026, pedido del dueño: negro + plata + oro). Es platino
+                // CALIDO (H45 S6): una plata fria le pelearia el tono al negro y al oro,
+                // igual que el negro frio. Va en hilos, filos y reflejos; el oro sigue
+                // siendo el acento (botones, rombo, precio).
+                plata: { DEFAULT: '#D8D5CD', 400: '#ABA79D', 600: '#7C786F' },
                 noche: {
                     950: '#0A0908',  // fondo de pagina, el mas hondo
                     900: '#11100D',  // fondo base  (= cielo-dark)

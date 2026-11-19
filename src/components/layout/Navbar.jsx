@@ -147,7 +147,7 @@ export const Navbar = ({ onOpenCart }) => {
                 <div className={`
                     relative flex items-center justify-between px-8 transition-all duration-500
                     ${scrolled
-                        ? 'w-[90%] md:w-[85%] lg:w-[1100px] xl:w-[1180px] h-14 rounded-full bg-noche-900/90 backdrop-blur-xl border border-cielo-gold/15 shadow-[0_8px_30px_rgb(0,0,0,0.35)]'
+                        ? 'w-[90%] md:w-[85%] lg:w-[1100px] xl:w-[1180px] h-14 rounded-full panel-metales backdrop-blur-xl border'
                         : 'w-full h-20 px-10 lg:px-14 bg-gradient-to-b from-black/80 to-transparent border-none'
                     }
                 `}>
@@ -179,7 +179,7 @@ export const Navbar = ({ onOpenCart }) => {
                             onMouseLeave={() => setIsShopMenuOpen(false)}
                             className={`hidden lg:block absolute top-full inset-x-0 pt-2 transition-all duration-300 ${isShopMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none'}`}
                         >
-                            <div className={`bg-noche-900 border-cielo-gold/15 shadow-[0_30px_60px_rgba(0,0,0,0.6)] ${scrolled ? 'border rounded-3xl' : 'border-y'}`}>
+                            <div className={`panel-metales ${scrolled ? 'border rounded-3xl' : 'border-y'}`}>
                                 <div className="max-w-6xl mx-auto px-10 py-9 grid grid-cols-[minmax(0,1fr)_auto] gap-14">
                                     <div>
                                         <p className="text-2xs uppercase tracking-[0.4em] font-medium text-cielo-gold/90 mb-6">Categorías</p>
@@ -249,7 +249,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 />
                             </div>
                             {isSearchOpen && suggestions.length > 0 && (
-                                <div className="absolute top-full right-0 mt-2 w-80 bg-[#11100D]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-40">
+                                <div className="absolute top-full right-0 mt-2 w-80 panel-metales backdrop-blur-xl border rounded-2xl overflow-hidden z-40">
                                     <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-white/5">
                                         Sugerencias
                                     </div>
@@ -297,7 +297,7 @@ export const Navbar = ({ onOpenCart }) => {
                             {/* USER DROPDOWN - WITH INVISIBLE BRIDGE */}
                             {user && (
                                 <div className={`absolute top-full right-0 pt-4 w-60 transform transition-all duration-300 origin-top-right z-20 ${isUserMenuOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}`}>
-                                    <div className="bg-[#11100D]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                                    <div className="panel-metales backdrop-blur-xl border rounded-2xl p-1 overflow-hidden">
                                         <div className="px-5 py-4 border-b border-white/5 bg-white/5">
                                             <p className="text-xs font-bold text-white truncate font-cinzel">{user.email}</p>
                                             <div className="flex items-center gap-2 mt-1">
@@ -353,7 +353,7 @@ export const Navbar = ({ onOpenCart }) => {
                 contenido pasa el alto de un teléfono y antes, al estar centrado
                 y sin overflow, se comía el título y los links del pie quedaban
                 fuera de la pantalla sin manera de llegar. */}
-            <div className={`fixed inset-0 z-[60] bg-[#11100D]/95 backdrop-blur-2xl transition-opacity duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'}`}>
+            <div className={`fixed inset-0 z-[60] panel-metales backdrop-blur-2xl transition-opacity duration-500 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'}`}>
                 <button
                     onClick={() => setIsMobileMenuOpen(false)}
                     aria-label="Cerrar menú"
@@ -364,7 +364,10 @@ export const Navbar = ({ onOpenCart }) => {
 
                 <div className="h-full overflow-y-auto overscroll-contain">
                     <div className="min-h-full flex flex-col items-center justify-center gap-6 px-6 py-20">
-                        <h2 className="text-2xl font-cinzel text-cielo-gold">MENÚ</h2>
+                        <div className="flex flex-col items-center gap-3">
+                            <h2 className="text-2xl font-cinzel text-cielo-gold">MENÚ</h2>
+                            <div aria-hidden="true" className="hilo-metales w-40" />
+                        </div>
 
                         {/* BUSCADOR MOBILE */}
                         <form

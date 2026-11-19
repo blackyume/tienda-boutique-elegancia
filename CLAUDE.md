@@ -162,6 +162,8 @@ EmailJS, Gemini, Cloudinary también se configuran client-side desde Admin → I
 
 El material lo genera con IA la sesión **Productor**; esta sesión publica. Nada se publica sin el OK del dueño.
 
+**18/11/2026 — modelo nueva en Flow:** la «brasilera», sobre cortinas de satén dorado (las tiendas de fondo por prenda quedaron jubiladas), cada prenda con su outfit de siempre. **Rumbo nuevo (18/11, el dueño):** reemplaza TODAS las fotos de la tienda — las 2 de cada prenda (frente `image`, espalda `images[1]`; de ahí salen también categorías, Editorial, novedades y la tira de Instagram) y las 3 portadas `public/portada-estudio-b1..b3`. Expresiones naturales variadas porque es siempre la misma modelo. Al cambiar: guardar antes las URLs viejas de cada producto para poder volver, y mirar las fichas de categoría (4:5 `object-cover`) para que no corten cabeza ni pies. El Productor guarda el original de Flow en alta sin recortar, aparte de los recortes para redes.
+
 **Medidas, leídas del componente que las usa — no inferir de un archivo parecido:**
 
 | Pieza | Medida | De dónde sale |

@@ -7,13 +7,14 @@ import { MENSAJERIA_ACTIVA, whatsappDeConfig } from '../../utils/contacto';
 import { abrirConsulta, CORREO_DE_LA_TIENDA } from '../../utils/consultas';
 import { RegretModal } from './RegretModal';
 import { BrandStrip } from '../ui/BrandBadges';
+import SelloBlackYume from '../ui/SelloBlackYume';
 
 // Cuenta oficial de Instagram (default si no hay nada cargado en config).
 const OFFICIAL_IG = 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
 
 const FooterHeading = ({ children }) => (
-    <h4 className="font-cinzel text-2xs uppercase tracking-[0.35em] text-cielo-gold/80 mb-6 flex items-center gap-3">
-        <span className="h-px w-5 bg-cielo-gold/40" />
+    <h4 className="font-cinzel text-2xs uppercase tracking-[0.35em] text-plata mb-6 flex items-center gap-3">
+        <span className="h-px w-5 bg-gradient-to-r from-plata/40 to-cielo-gold/70" />
         {children}
     </h4>
 );
@@ -55,7 +56,8 @@ export const Footer = () => {
 
 
     return (
-        <footer className="bg-cielo-dark text-white border-t border-white/[0.05] mt-auto">
+        <footer className="bg-cielo-dark text-white mt-auto">
+            <div aria-hidden="true" className="hilo-metales" />
             <RegretModal isOpen={isRegretOpen} onClose={() => setIsRegretOpen(false)} />
 
             {/* Línea dorada superior */}
@@ -257,8 +259,10 @@ export const Footer = () => {
                 </div>
             </div>
 
-            {/* Línea dorada inferior */}
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-cielo-gold/20 to-transparent" />
+            <div className="pb-24 sm:pb-10 pt-2 px-6">
+                <SelloBlackYume />
+            </div>
+            <div aria-hidden="true" className="hilo-metales" />
         </footer>
     );
 };
