@@ -162,11 +162,11 @@ export const Navbar = ({ onOpenCart }) => {
                                 onMouseLeave={() => setIsShopMenuOpen(false)}
                                 onClick={() => setIsShopMenuOpen(v => !v)}
                                 aria-expanded={isShopMenuOpen}
-                                className={`flex items-center gap-1.5 py-4 uppercase tracking-[0.24em] font-medium transition-colors ${isShopMenuOpen ? 'text-cielo-gold' : 'text-white hover:text-cielo-gold'}`}
+                                className={`flex items-center gap-1.5 py-4 uppercase tracking-[0.24em] font-medium transition-colors ${isShopMenuOpen ? 'text-cielo-gold' : 'text-plata hover:text-cielo-gold'}`}
                             >
                                 Tienda <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isShopMenuOpen ? 'rotate-180' : ''}`} />
                             </button>
-                            <Link to="/shop?sort=newest" className="hidden lg:inline text-white hover:text-cielo-gold transition-colors">Novedades</Link>
+                            <Link to="/shop?sort=newest" className="hidden lg:inline text-plata hover:text-cielo-gold transition-colors">Novedades</Link>
                         </div>
 
                         {/* MENÚ DE LA TIENDA — panel a lo ancho de la barra (pedido del dueño,
@@ -186,7 +186,7 @@ export const Navbar = ({ onOpenCart }) => {
                                         <ul className="grid grid-cols-2 gap-x-10 gap-y-3">
                                             {categoriasMenu.map(cat => (
                                                 <li key={cat.id}>
-                                                    <button onClick={() => handleCategoryClick(cat.name)} className="group/cat flex items-center gap-3 font-serif text-lg lg:text-xl text-noche-100 hover:text-cielo-gold transition-colors text-left">
+                                                    <button onClick={() => handleCategoryClick(cat.name)} className="group/cat flex items-center gap-3 font-serif text-lg lg:text-xl metal-plata text-left">
                                                         <span className="h-px w-0 bg-cielo-gold transition-all duration-300 group-hover/cat:w-5" />
                                                         {tituloDeProducto(cat.name)}
                                                     </button>
@@ -231,11 +231,11 @@ export const Navbar = ({ onOpenCart }) => {
                     {/* ICONS (RIGHT) — con «Nuestra historia» delante, así la barra queda
                         pareja: dos textos a cada lado del logo. */}
                     <div className="flex items-center gap-4 pr-2">
-                        <Link to="/about" className="hidden lg:block mr-5 text-[11px] font-medium uppercase tracking-[0.24em] text-white hover:text-cielo-gold transition-colors">Nuestra historia</Link>
+                        <Link to="/about" className="hidden lg:block mr-5 text-[11px] font-medium uppercase tracking-[0.24em] text-plata hover:text-cielo-gold transition-colors">Nuestra historia</Link>
                         {/* SEARCH (EXPANDING + AUTOCOMPLETE) */}
                         <div className="hidden md:block relative">
                             <div className={`flex items-center transition-all duration-300 ease-out border border-transparent ${isSearchOpen ? 'w-56 bg-white/10 px-3 py-1.5 rounded-full border-white/10' : 'w-8 bg-transparent'}`}>
-                                <button onClick={toggleSearch} className="text-white hover:text-cielo-gold cursor-pointer transition-colors">
+                                <button onClick={toggleSearch} className="text-plata hover:text-cielo-gold cursor-pointer transition-colors">
                                     <Search className="w-4 h-4" />
                                 </button>
                                 <input
@@ -291,7 +291,7 @@ export const Navbar = ({ onOpenCart }) => {
 
                         {/* USER */}
                         <div className="relative group h-full flex items-center" onMouseEnter={() => setIsUserMenuOpen(true)} onMouseLeave={() => setIsUserMenuOpen(false)}>
-                            <button onClick={() => !user && setIsAuthModalOpen(true)} className="p-2 text-white hover:text-cielo-gold transition-colors rounded-full hover:bg-white/5 relative z-10">
+                            <button onClick={() => !user && setIsAuthModalOpen(true)} className="p-2 text-plata hover:text-cielo-gold transition-colors rounded-full hover:bg-white/5 relative z-10">
                                 <User className="w-5 h-5" />
                             </button>
                             {/* USER DROPDOWN - WITH INVISIBLE BRIDGE */}
@@ -331,12 +331,12 @@ export const Navbar = ({ onOpenCart }) => {
                         </div>
 
                         {/* WISHLIST (Desktop) */}
-                        <Link to="/wishlist" className="hidden md:block p-2 text-white hover:text-cielo-gold transition-colors rounded-full hover:bg-white/5 relative group">
+                        <Link to="/wishlist" className="hidden md:block p-2 text-plata hover:text-cielo-gold transition-colors rounded-full hover:bg-white/5 relative group">
                             <Heart className="w-5 h-5" />
                         </Link>
 
                         {/* CART (MODERN) */}
-                        <button onClick={onOpenCart} className="relative p-2 text-white hover:text-cielo-gold transition-colors magnetic-btn group">
+                        <button onClick={onOpenCart} className="relative p-2 text-plata hover:text-cielo-gold transition-colors magnetic-btn group">
                             <ShoppingBag className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             {cart.length > 0 && (
                                 <span className="absolute top-1 right-1 min-w-[14px] h-[14px] bg-cielo-gold text-black text-[9px] font-bold rounded-full flex items-center justify-center shadow-md border border-[#11100D] animate-bounce-slow leading-none pt-[1px]">
@@ -398,7 +398,7 @@ export const Navbar = ({ onOpenCart }) => {
                                 <button
                                     key={cat.id}
                                     onClick={() => handleCategoryClick(cat.name)}
-                                    className="text-xl font-serif text-white hover:text-cielo-gold transition-colors duration-300 text-center leading-tight"
+                                    className="text-xl font-serif metal-plata text-center leading-tight"
                                 >
                                     {tituloDeProducto(cat.name)}
                                 </button>

@@ -13,9 +13,9 @@ import SelloBlackYume from '../ui/SelloBlackYume';
 const OFFICIAL_IG = 'https://www.instagram.com/laboutiquedelaeleganciaoficial/';
 
 const FooterHeading = ({ children }) => (
-    <h4 className="font-cinzel text-2xs uppercase tracking-[0.35em] text-plata mb-6 flex items-center gap-3">
-        <span className="h-px w-5 bg-gradient-to-r from-plata/40 to-cielo-gold/70" />
-        {children}
+    <h4 className="font-cinzel text-2xs uppercase tracking-[0.35em] mb-6 flex items-center gap-3">
+        <span className="h-px w-5 bg-gradient-to-r from-plata/60 to-cielo-gold/80" />
+        <span className="metal-plata">{children}</span>
     </h4>
 );
 
@@ -44,7 +44,7 @@ const SocialBtn = ({ href, children }) => (
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-noche-300/80 hover:text-cielo-gold hover:border-cielo-gold/50 transition-all duration-300"
+        className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-plata-400 hover:text-cielo-gold hover:border-cielo-gold/50 transition-all duration-300"
     >
         {children}
     </a>
@@ -97,7 +97,7 @@ export const Footer = () => {
                                 { to: '/about', label: 'Nuestra historia' },
                             ].map(({ to, label }) => (
                                 <li key={label}>
-                                    <Link to={to} className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
+                                    <Link to={to} className="text-sm text-plata-400 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group">
                                         <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                         <span>{label}</span>
                                     </Link>
@@ -122,7 +122,7 @@ export const Footer = () => {
                                     {to ? (
                                         <Link
                                             to={to}
-                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-plata-400 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -130,7 +130,7 @@ export const Footer = () => {
                                     ) : (
                                         <button
                                             onClick={action}
-                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group text-left"
+                                            className="text-sm text-plata-400 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group text-left"
                                         >
                                             <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             {label}
@@ -156,7 +156,7 @@ export const Footer = () => {
                                     {to ? (
                                         <Link
                                             to={to}
-                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-plata-400 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>
@@ -166,7 +166,7 @@ export const Footer = () => {
                                             href={href}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-sm text-noche-300/80 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
+                                            className="text-sm text-plata-400 hover:text-cielo-gold transition-colors duration-200 flex items-center gap-2 group"
                                         >
                                             <span className="w-3 h-px shrink-0 origin-left bg-white/20 group-hover:scale-x-125 group-hover:bg-cielo-gold/60 transition-all duration-300" />
                                             <span>{label}</span>

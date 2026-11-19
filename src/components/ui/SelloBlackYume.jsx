@@ -12,9 +12,9 @@ const Emblema = () => (
                 <stop offset="1" stopColor="#9C7425" />
             </linearGradient>
             <linearGradient id="sello-plata" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#F7F6F2" />
-                <stop offset=".5" stopColor="#D8D5CD" />
-                <stop offset="1" stopColor="#8A867D" />
+                <stop offset="0" stopColor="#FFFFFF" />
+                <stop offset=".5" stopColor="#E4E6EA" />
+                <stop offset="1" stopColor="#8B9098" />
             </linearGradient>
             <mask id="sello-hueco">
                 <rect x="-50" y="-50" width="100" height="100" fill="white" />
@@ -43,7 +43,7 @@ const SelloBlackYume = () => (
             <p className="font-cinzel text-[9px] tracking-[0.42em] uppercase text-plata-400 mb-1.5">Powered by</p>
             <p className="font-cinzel font-bold text-[13px] sm:text-sm tracking-[0.16em] uppercase">
                 <span className="bg-gradient-to-r from-[#FBEBB0] via-[#E8C65E] to-[#B08A33] bg-clip-text text-transparent">BlackYume AI</span>{' '}
-                <span className="bg-gradient-to-r from-[#F7F6F2] via-[#D8D5CD] to-[#9A968D] bg-clip-text text-transparent">Neuronal Corp</span>
+                <span className="bg-gradient-to-r from-[#FFFFFF] via-[#E4E6EA] to-[#9EA3AB] bg-clip-text text-transparent">Neuronal Corp</span>
             </p>
             <p className="mt-1.5 text-[9px] tracking-[0.28em] uppercase text-plata-600">
                 Neural Network Division <span className="text-cielo-gold/70 tracking-normal">神経回路網</span>

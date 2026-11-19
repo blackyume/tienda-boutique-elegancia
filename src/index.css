@@ -69,8 +69,8 @@ body {
     background-color: #11100D;
     background-image: var(--grano-metal),
         radial-gradient(120% 55% at 50% 0%, rgba(232, 198, 94, .045) 0%, rgba(232, 198, 94, 0) 60%),
-        radial-gradient(70% 60% at 0% 100%, rgba(216, 213, 205, .075) 0%, rgba(216, 213, 205, 0) 70%),
-        linear-gradient(115deg, rgba(216, 213, 205, 0) 38%, rgba(216, 213, 205, .035) 50%, rgba(232, 198, 94, .028) 58%, rgba(232, 198, 94, 0) 70%),
+        radial-gradient(70% 60% at 0% 100%, rgba(228, 230, 234, .12) 0%, rgba(228, 230, 234, 0) 70%),
+        linear-gradient(115deg, rgba(228, 230, 234, 0) 38%, rgba(228, 230, 234, .06) 50%, rgba(232, 198, 94, .028) 58%, rgba(232, 198, 94, 0) 70%),
         linear-gradient(180deg, #0C0B09 0%, #11100D 40%, #171510 100%);
     background-size: 200px 200px, cover, cover, cover, cover;
     background-attachment: fixed;
@@ -259,7 +259,7 @@ img {
     background-image: linear-gradient(180deg, #26231D 0%, #171510 100%);
     border: 1px solid rgba(232, 198, 94, .10);
     box-shadow:
-        0 1px 0 rgba(216, 213, 205, .14) inset,
+        0 1px 0 rgba(228, 230, 234, .22) inset,
         0 -1px 0 rgba(0, 0, 0, .4) inset,
         0 8px 20px -10px rgba(0, 0, 0, .75);
 }
@@ -268,7 +268,7 @@ img {
     background-image: linear-gradient(180deg, #34302A 0%, #22201B 100%);
     border: 1px solid rgba(232, 198, 94, .14);
     box-shadow:
-        0 1px 0 rgba(216, 213, 205, .20) inset,
+        0 1px 0 rgba(228, 230, 234, .30) inset,
         0 -1px 0 rgba(0, 0, 0, .45) inset,
         0 18px 38px -14px rgba(0, 0, 0, .85);
 }
@@ -286,7 +286,7 @@ img {
    Hilo: plata en las puntas, oro en el medio. Remata el pie y los menús. */
 .hilo-metales {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(216, 213, 205, .28) 22%, rgba(232, 198, 94, .55) 50%, rgba(216, 213, 205, .28) 78%, transparent);
+    background: linear-gradient(90deg, transparent, rgba(228, 230, 234, .6) 22%, rgba(232, 198, 94, .85) 50%, rgba(228, 230, 234, .6) 78%, transparent);
 }
 
 /* Panel de menú: negro con un reflejo de plata arriba a la izquierda y uno de
@@ -295,16 +295,32 @@ img {
 .panel-metales {
     background-color: rgba(17, 16, 13, .96);
     background-image: var(--grano-metal),
-        radial-gradient(90% 70% at 0% 0%, rgba(216, 213, 205, .10) 0%, rgba(216, 213, 205, 0) 60%),
+        radial-gradient(90% 70% at 0% 0%, rgba(228, 230, 234, .16) 0%, rgba(228, 230, 234, 0) 60%),
         radial-gradient(80% 70% at 100% 100%, rgba(232, 198, 94, .06) 0%, rgba(232, 198, 94, 0) 60%);
     background-size: 200px 200px, cover, cover;
-    border-color: rgba(216, 213, 205, .22);
-    box-shadow: 0 1px 0 rgba(216, 213, 205, .14) inset, 0 30px 60px rgba(0, 0, 0, .6);
+    border-color: rgba(228, 230, 234, .38);
+    box-shadow: 0 1px 0 rgba(228, 230, 234, .25) inset, 0 30px 60px rgba(0, 0, 0, .6);
+}
+
+/* Texto de PLATA pulida (el dueño: «hacelo más fuerte, que se vea plateado»).
+   Un color liso no se lee como metal: el brillo lo da el degradé con un
+   reflejo blanco arriba y la sombra fría abajo. Al pasar el mouse pasa a oro. */
+.metal-plata {
+    background-image: linear-gradient(180deg, #FFFFFF 0%, #E9EBEE 38%, #A9AEB6 52%, #D9DCE1 70%, #F4F5F7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    transition: filter .3s ease;
+}
+.metal-plata:hover,
+.group\/cat:hover .metal-plata {
+    background-image: linear-gradient(180deg, #FFF6D6 0%, #F2D57E 38%, #B88A2E 54%, #E8C65E 72%, #FBEBB0 100%);
 }
 
 /* Filo de luz de un solo pixel: separa secciones sin dibujar una linea dura. */
 .filo-luz {
-    border-top: 1px solid rgba(216, 213, 205, .08);
+    border-top: 1px solid rgba(228, 230, 234, .14);
     box-shadow: 0 -12px 24px -20px rgba(0, 0, 0, .9);
 }
 

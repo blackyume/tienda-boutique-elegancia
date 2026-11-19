@@ -33,7 +33,7 @@ module.exports = {
                 // CALIDO (H45 S6): una plata fria le pelearia el tono al negro y al oro,
                 // igual que el negro frio. Va en hilos, filos y reflejos; el oro sigue
                 // siendo el acento (botones, rombo, precio).
-                plata: { DEFAULT: '#D8D5CD', 400: '#ABA79D', 600: '#7C786F' },
+                plata: { DEFAULT: '#E4E6EA', 400: '#B9BDC4', 600: '#8B9098' },
                 noche: {
                     950: '#0A0908',  // fondo de pagina, el mas hondo
                     900: '#11100D',  // fondo base  (= cielo-dark)
