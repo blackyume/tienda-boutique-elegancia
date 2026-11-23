@@ -34,6 +34,17 @@ describe('rotación de modelos del cerebro nuevo', () => {
         expect(llamadas.map(l => l.modelo)).toEqual(['b']);
     });
 
+    it('el descanso queda guardado sin la llave', async () => {
+        const guardado = {};
+        globalThis.localStorage = { getItem: (k) => guardado[k] ?? null, setItem: (k, v) => { guardado[k] = v; } };
+        comportamiento = { a: '503' };
+        const llamar = crearLlamador({ adminKeys: 'AQ.llave-secreta', system: 's', tools: [], models: ['a', 'b'] });
+        await llamar([]);
+        expect(guardado.lau_modelos_descansando).toMatch(/\|a"/);
+        expect(guardado.lau_modelos_descansando).not.toMatch(/llave-secreta/);
+        delete globalThis.localStorage;
+    });
+
     it('si el modelo no acepta "pensar", reintenta sin eso', async () => {
         comportamiento = { a: 'sin-pensar' };
         const llamar = crearLlamador({ adminKeys: 'k1', system: 's', tools: [], models: ['a'] });
