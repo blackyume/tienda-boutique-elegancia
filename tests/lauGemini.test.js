@@ -1,0 +1,48 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const llamadas = [];
+let comportamiento = {};
+vi.mock('@google/generative-ai', () => ({
+    GoogleGenerativeAI: class {
+        constructor(key) { this.key = key; }
+        getGenerativeModel(cfg) {
+            return {
+                generateContent: async () => {
+                    llamadas.push({ modelo: cfg.model, pensar: Boolean(cfg.generationConfig?.thinkingConfig) });
+                    const c = comportamiento[cfg.model];
+                    if (c === '503') throw new Error('[503 Service Unavailable] high demand');
+                    if (c === 'sin-pensar' && cfg.generationConfig?.thinkingConfig) throw new Error('thinkingConfig is not supported');
+                    return { response: { candidates: [{ content: { parts: [{ text: `hola desde ${cfg.model}` }] } }] } };
+                },
+            };
+        }
+    },
+}));
+
+const { crearLlamador, __reiniciar } = await import('../src/utils/lauGemini');
+
+describe('rotación de modelos del cerebro nuevo', () => {
+    beforeEach(() => { llamadas.length = 0; comportamiento = {}; __reiniciar(); });
+
+    it('pasa al siguiente si uno está saturado y lo deja descansar', async () => {
+        comportamiento = { a: '503' };
+        const llamar = crearLlamador({ adminKeys: 'k1', system: 's', tools: [], models: ['a', 'b'] });
+        const r = await llamar([]);
+        expect(r.modelo).toBe('b');
+        llamadas.length = 0;
+        await llamar([]);
+        expect(llamadas.map(l => l.modelo)).toEqual(['b']);
+    });
+
+    it('si el modelo no acepta "pensar", reintenta sin eso', async () => {
+        comportamiento = { a: 'sin-pensar' };
+        const llamar = crearLlamador({ adminKeys: 'k1', system: 's', tools: [], models: ['a'] });
+        const r = await llamar([]);
+        expect(r.modelo).toBe('a');
+        expect(llamadas.map(l => l.pensar)).toEqual([true, false]);
+    });
+
+    it('sin llaves avisa', () => {
+        expect(() => crearLlamador({ adminKeys: '', system: 's', tools: [] })).toThrow(/Sin API keys/);
+    });
+});

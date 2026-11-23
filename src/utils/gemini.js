@@ -4,17 +4,26 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Modelos vigentes (ai.google.dev/gemini-api/docs/models), en el orden en que
-// se prueban. Medido el 9/11/2026 con el pedido real de Lau: 3.8 y 3.7 daban
-// 503 por saturación o no contestaban en 3 minutos; 3.5 y 3.6 tardaban 3-30 s;
-// 3.5-lite y 2.5 contestaban bien en 1-3 s. Por eso 2.5 va primero aunque
-// Google avisó que lo apaga: cuando lo haga devuelve 404 al instante y se pasa
-// al siguiente. Cada intento tiene tiempo máximo (TIEMPO_POR_MODELO_MS).
+// Modelos vigentes, en el orden en que se prueban. Medido el 23/11/2026 con la
+// llave de la tienda y las herramientas reales de Lau (2 vueltas): 2.5-flash
+// contestó bien las dos veces (1-3 s, a veces 12-28 s) pero su cupo gratis diario
+// se agota; 3.5-flash-lite y 3.1-flash-lite eligieron bien la herramienta en
+// 2-3 s; flash-lite-latest es rápido pero a veces pregunta en vez de hacer;
+// flash-latest, 3-flash-preview, 3.5, 3.6 y 4-hydrogen daban 503 (mucha
+// demanda) casi siempre; 3.7 y 3.8 ya agotaban el cupo gratis (429). Los
+// 4-argon/carbon/neon, los "pro" y omni no tienen cupo en la cuenta gratis, y
+// 2.5-pro y 2.5-flash-lite ya no existen para cuentas nuevas (404): no van.
+// Cada intento tiene tiempo máximo (TIEMPO_POR_MODELO_MS).
 export const DEFAULT_MODELS = [
     'gemini-2.5-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+    'gemini-flash-lite-latest',
+    'gemini-flash-latest',
+    'gemini-3-flash-preview',
     'gemini-3.5-flash',
     'gemini-3.6-flash',
-    'gemini-3.5-flash-lite',
+    'gemini-4-hydrogen',
     'gemini-3.8-flash',
     'gemini-3.7-flash',
 ];

@@ -22,6 +22,11 @@ import { IlusWizard, IlusStockGrilla } from './guias/ilustracionesLau';
 import { IlusLau } from './guias/ilustraciones';
 import { IlusFichaCompleta } from './guias/ilustracionesPrecios';
 import { buscarProductos } from '../../utils/lauDirecto';
+import { SYSTEM as SISTEMA_VIEJO } from '../../utils/aiCopilot';
+import { declaraciones, correrAgente, historialParaGemini, sistemaCompleto, separarOpciones, esSensible, esLectura, instantanea, agregarRecuerdo, quitarRecuerdo } from '../../utils/lauCerebro';
+import { crearLlamador } from '../../utils/lauGemini';
+import { leerMemoria, guardarMemoria } from '../../utils/lauMemoria';
+import { revisarFoto } from '../../utils/lauFoto';
 
 const HISTORY_KEY = 'lau_copilot_v5';
 const VISTO_KEY = 'lau_visto_hasta'; // última vez que Lau estuvo abierta
@@ -236,6 +241,7 @@ const actionLabel = (a) => {
         case 'import_sales': return `Registrar venta de ${A.cliente}: ${A.prendas} prenda${A.prendas === 1 ? '' : 's'} por $${Number(A.total || 0).toLocaleString('es-AR')} (${A.canal}, ${A.fecha})`;
         case 'set_pricing': return `Configurar precios: ${A.detalle}`;
         case 'liquidar': return `Liquidar ${A.n} producto${A.n === 1 ? '' : 's'} (−${A.descuento}%, nunca bajo el costo): ${A.nombres}`;
+        case 'deshacer_todo': return `Volver ${A.n} producto${A.n === 1 ? '' : 's'} a como estaban antes del último cambio: ${A.nombres}`;
         case 'import_products': return `Cargar ${A.nuevos} producto${A.nuevos === 1 ? '' : 's'} nuevo${A.nuevos === 1 ? '' : 's'} (${A.conFoto} con foto) y actualizar ${A.cambios} desde ${A.archivo}`;
         default: return `${a.tool} ${JSON.stringify(A)}`;
     }
@@ -271,6 +277,11 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     const confirmResolver = useRef(null);
     // La última acción directa hecha, con su inversa, para el botón "Deshacer".
     const deshacerRef = useRef(null);
+    // Cerebro nuevo: memoria entre días y foto de los productos antes del último
+    // cambio grande, para "Deshacer todo".
+    const memoriaRef = useRef([]);
+    const deshacerTodoRef = useRef(null);
+    useEffect(() => { leerMemoria().then((l) => { memoriaRef.current = l; }); }, []);
     const [escuchando, setEscuchando] = useState(false);
     const recRef = useRef(null);
     const hayVoz = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
@@ -404,6 +415,24 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
     // --- EJECUTORES DE HERRAMIENTAS ---
     const exec = async (tool, A) => {
         switch (tool) {
+            case 'remember': {
+                const r = agregarRecuerdo(memoriaRef.current, A.fact);
+                if (r.error) return r.error;
+                await guardarMemoria(r.lista);
+                memoriaRef.current = r.lista;
+                return `Anotado en la memoria (recuerdo ${r.lista.length}).`;
+            }
+            case 'forget': {
+                const r = quitarRecuerdo(memoriaRef.current, A.number);
+                if (r.error) return r.error;
+                await guardarMemoria(r.lista);
+                memoriaRef.current = r.lista;
+                return `Borrado de la memoria: "${r.quitado}".`;
+            }
+            case 'review_photo': {
+                if (!A.imageUrl) return 'Falta la imageUrl de la foto.';
+                return await revisarFoto(String(A.imageUrl), aiConfig?.adminKeys);
+            }
             case 'query_inventory': {
                 let r = [...inventory];
                 if (A.search) r = r.filter(p => (p.name || '').toLowerCase().includes(String(A.search).toLowerCase()));
@@ -1025,6 +1054,88 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
         push({ role: 'system', text: 'Llegué al límite de pasos. Si quedó algo a medias, pedímelo de nuevo más puntual.' });
     };
 
+    // Cerebro nuevo (23/11/2026): Gemini con herramientas nativas, pensando antes
+    // de contestar, controlando lo que hizo y con memoria. Devuelve false si no
+    // llegó a hacer nada (para caer al cerebro viejo sin perder el pedido).
+    const agenteNativo = async (textoDelDueno, notaDeFotos, snapshotCtx) => {
+        const system = sistemaCompleto({ sistemaViejo: SISTEMA_VIEJO, snapshot: buildSnapshot(snapshotCtx), memoria: memoriaRef.current });
+        let llamar;
+        try { llamar = crearLlamador({ adminKeys: aiConfig?.adminKeys, system, tools: declaraciones() }); } catch { return false; }
+        const contents = historialParaGemini(messages);
+        contents.push({ role: 'user', parts: [{ text: [notaDeFotos, textoDelDueno].filter(Boolean).join('\n\n') }] });
+        let hizoAlgo = false;
+        let fotoAntes = null;
+        const ejecutar = async (pedidas) => {
+            hizoAlgo = true;
+            const lecturas = pedidas.filter(a => !esSensible(a.tool));
+            const escrituras = pedidas.filter(a => esSensible(a.tool));
+            const salida = [];
+            const correr = async (a) => {
+                try {
+                    setBusyMsg(esLectura(a.tool) ? 'Mirando…' : 'Haciendo el cambio…');
+                    salida.push({ name: a.tool, resultado: await exec(a.tool, a.args || {}) });
+                } catch (e) {
+                    salida.push({ name: a.tool, resultado: `ERROR: ${e?.message || 'falló'}` });
+                }
+            };
+            for (const a of lecturas) await correr(a);
+            if (escrituras.length) {
+                const ok = await askConfirm(escrituras);
+                if (!ok) {
+                    push({ role: 'system', text: 'Cancelado por vos' });
+                    escrituras.forEach(a => salida.push({ name: a.tool, resultado: 'CANCELADO por el dueño. No se hizo.' }));
+                } else {
+                    const foto = instantanea(escrituras, inventory, findProduct);
+                    for (const [id, f] of Object.entries(foto)) {
+                        fotoAntes = fotoAntes || {};
+                        if (!fotoAntes[id]) fotoAntes[id] = f;
+                    }
+                    push({ role: 'system', text: 'Confirmado ✓' });
+                    for (const a of escrituras) await correr(a);
+                }
+            }
+            return salida;
+        };
+        const avisar = (t) => { const { texto, opciones } = separarOpciones(t); if (texto || opciones) push({ role: 'ai', text: texto, options: opciones }); };
+        try {
+            setBusyMsg('Pensando…');
+            await correrAgente({ contents, llamar, ejecutar, avisar });
+        } catch (e) {
+            if (!hizoAlgo) return false;
+            throw e;
+        }
+        if (fotoAntes) {
+            deshacerTodoRef.current = fotoAntes;
+            const n = Object.keys(fotoAntes).length;
+            push({ role: 'system', text: n === 1 ? 'Guardé cómo estaba el producto antes del cambio.' : `Guardé cómo estaban los ${n} productos antes del cambio.`, options: ['Deshacer todo'] });
+        }
+        return true;
+    };
+
+    const deshacerTodo = async () => {
+        const foto = deshacerTodoRef.current;
+        push({ role: 'user', text: 'Deshacer todo' });
+        if (!foto) { push({ role: 'ai', text: 'No hay ningún cambio grande para deshacer.' }); return; }
+        const ids = Object.keys(foto);
+        const nombres = ids.map(id => foto[id].__nombre).filter(Boolean);
+        const ok = await askConfirm([{ tool: 'deshacer_todo', args: { n: ids.length, nombres: nombres.slice(0, 6).join(', ') + (nombres.length > 6 ? '…' : '') } }]);
+        if (!ok) { push({ role: 'system', text: 'Cancelado por vos.' }); return; }
+        setLoading(true);
+        let hechos = 0;
+        try {
+            for (const id of ids) {
+                const { __nombre, ...campos } = foto[id];
+                setBusyMsg(`Volviendo atrás ${__nombre || id}…`);
+                await updateProduct(id, campos);
+                hechos++;
+            }
+            deshacerTodoRef.current = null;
+            push({ role: 'ai', text: `↩️ Listo: ${hechos} producto${hechos === 1 ? '' : 's'} quedaron como estaban antes.` });
+        } catch (e) {
+            push({ role: 'system', text: `Volví atrás ${hechos} de ${ids.length}. ${explicarErrorIA(e)}` });
+        } finally { setLoading(false); setBusyMsg(''); }
+    };
+
     // Una planilla de productos (la plantilla) con las fotos adjuntas: es la
     // carga masiva, pero desde el chat. Misma lógica que Inventario → Importar.
     const importarProductos = async (archivo, buffer, fotos) => {
@@ -1306,6 +1417,7 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
             const efectivo = (p) => { const ef = precioEfectivo(p.price, comision); return `"${p.name}" está a $${Number(p.price || 0).toLocaleString('es-AR')} en la tienda. En efectivo o transferencia no pagás la comisión de MP (${comision}%): podés cobrarlo $${ef.toLocaleString('es-AR')} y ganás lo mismo. Más abajo de eso, ya sale de tu ganancia.`; };
             const directo = responderDirecto(text, { inventario: inventory, pedidos: orders, umbral: umbralStock, cotizar, categorias: (categories || []).map(c => c.name), efectivo });
             if (directo) { setInput(''); push({ role: 'user', text }); push({ role: 'ai', text: directo }); logAiAction?.('copilot', text, 'ok'); return; }
+            if (/^deshacer todo$/i.test(text)) { setInput(''); await deshacerTodo(); return; }
             if (/^deshacer$/i.test(text)) { setInput(''); await deshacer(); return; }
             if (accion) { setInput(''); await accionDirecta(text, accion); return; }
         }
@@ -1359,7 +1471,17 @@ export const AdminAssistantView = ({ orders, inventory, onClose }) => {
                 });
             }
             transcript.push({ role: 'user', content: text || 'Tengo estas prendas.' });
-            await agentLoop(transcript, { inventory, orders, categories, coupons, reviews, isMaintenance, siteConfig });
+            const ctx = { inventory, orders, categories, coupons, reviews, isMaintenance, siteConfig };
+            const notaFotos = transcript.filter(m => m.role === 'system').map(m => m.content).join('\n\n');
+            let resuelto = false;
+            try {
+                resuelto = await agenteNativo(text || 'Tengo estas prendas.', notaFotos, ctx);
+            } catch (e) {
+                // Ya hizo algo y después falló: se avisa, no se repite con el viejo.
+                push({ role: 'system', text: explicarErrorIA(e) });
+                resuelto = true;
+            }
+            if (!resuelto) await agentLoop(transcript, ctx);
             logAiAction?.('copilot', text || '(imagen)', 'ok');
         } catch (e) {
             push({ role: 'system', text: explicarErrorIA(e) });
