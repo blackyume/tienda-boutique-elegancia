@@ -351,6 +351,23 @@ const Lau = ({ abrir }) => (
             </Aviso>
         </Seccion>
 
+        <Seccion id="nuevo" titulo="Lo nuevo: piensa, controla y se acuerda">
+            <P>Desde el 23/11/2026 Lau <strong>piensa antes de hacer</strong>. Cuatro cosas nuevas:</P>
+            <Tabla
+                cabecera={['Qué', 'Cómo se usa']}
+                filas={[
+                    ['🧩 Pedidos largos', 'Varias cosas en un mensaje, y las hace todas en orden: “bajá 10% los jeans, ponelos en oferta y decime cuál tiene poco stock”. Los cambios los confirmás juntos, con un solo OK.'],
+                    ['✔️ Controla lo que hizo', 'Después de cambiar algo lo vuelve a mirar y te dice cómo quedó, con el número.'],
+                    ['🧠 Memoria', '“acordate que los precios los redondeo a la centena”: lo recuerda de un día para el otro. “olvidate del recuerdo 2” lo borra. Nunca guarda llaves ni contraseñas.'],
+                    ['👁️ Mira las fotos', '📎 + “mirá si esta foto está bien”: te avisa si está cortada, borrosa u oscura, y sugiere prenda y color. Lo que sugiere te lo pregunta; no lo carga solo.'],
+                ]}
+            />
+            <Aviso tipo="tip" titulo="Deshacer todo">
+                Cuando un cambio toca varios productos (subir los precios de una categoría, una oferta), Lau guarda cómo estaban antes y te deja el botón <K>Deshacer todo</K>: un toque y vuelven todos como estaban.
+            </Aviso>
+            <Aviso tipo="dato">Si un “cerebro” de Google está saturado, Lau cambia sola a otro. Si dice “se pasó el límite de hoy”, mañana se renueva; las cosas de todos los días (ventas, stock, precios, gastos) andan igual sin IA.</Aviso>
+        </Seccion>
+
         <Seccion id="frases" titulo="Frases que entiende">
             <Tabla
                 cabecera={['Decís', 'Hace']}
@@ -1322,8 +1339,8 @@ export const GUIAS = [
     {
         id: 'lau', titulo: 'Lau: la que hace todo por vos', icono: Bot, duracion: '6 min', para: 'Los dos',
         resumen: 'Le hablás y ella carga productos, lee tus planillas, te dice el stock y las ventas en vivo, calcula los precios y liquida lo que no se vende.',
-        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos', 'stock', 'tiempo real', 'en vivo', 'cuanto queda', 'que se vendio', 'precio', 'margen', 'comision', 'costo', 'packaging', 'liquidacion', 'sin llave', 'voz', 'microfono', 'dictar', 'deshacer', 'ocultar', 'llegaron', 'cambiar foto'],
-        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['en-vivo', 'Stock y ventas en vivo'], ['sin-llave', 'Sin la llave de IA'], ['precio', 'El precio sale solo'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
+        palabras: ['lau', 'asistente', 'chat', 'ia', 'inteligencia artificial', 'foto', 'publicar', 'descripcion', 'ventas por fuera', 'gastos', 'stock', 'tiempo real', 'en vivo', 'cuanto queda', 'que se vendio', 'precio', 'margen', 'comision', 'costo', 'packaging', 'liquidacion', 'sin llave', 'voz', 'microfono', 'dictar', 'deshacer', 'deshacer todo', 'ocultar', 'llegaron', 'cambiar foto', 'memoria', 'acordate', 'recordar', 'mirar foto'],
+        secciones: [['que-es', 'Qué es Lau'], ['cargar', 'Cargar un producto'], ['planillas', 'Tirale una planilla'], ['en-vivo', 'Stock y ventas en vivo'], ['nuevo', 'Lo nuevo: piensa y se acuerda'], ['sin-llave', 'Sin la llave de IA'], ['precio', 'El precio sale solo'], ['frases', 'Frases que entiende'], ['no-hace', 'Lo que no hace'], ['otras', 'Otras cosas'], ['no-responde', 'Si no responde']],
         Contenido: Lau,
     },
     {
