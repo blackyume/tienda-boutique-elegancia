@@ -25,7 +25,7 @@ import {
 } from '../utils/variants';
 import { trackViewItem } from '../utils/analytics';
 import { proporcionDelMarco, useMarcoFoto } from '../utils/marcoFoto';
-import { useRotacionFotos } from '../hooks/useRotacionFotos';
+import { claseFundido, useRotacionFotos } from '../hooks/useRotacionFotos';
 
 export const ProductDetail = () => {
     const { id } = useParams();
@@ -208,6 +208,7 @@ export const ProductDetail = () => {
                         onMouseLeave={fotos.alSalir}
                     >
                         {/* Todas apiladas y con fundido cruzado: frente y espalda rotan solas. */}
+                        <div className="absolute inset-0 z-0 transition-transform duration-700 group-hover:scale-105">
                         {images.map((src, i) => (
                             <img
                                 key={`${src}-${i}`}
@@ -215,12 +216,13 @@ export const ProductDetail = () => {
                                 alt={i === activeImage ? product.name : ''}
                                 aria-hidden={i !== activeImage}
                                 onLoad={i === 0 ? (e) => setMarcoFoto(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight) : undefined}
-                                className={`absolute inset-0 w-full h-full object-cover transition-[opacity,transform] duration-[1200ms] ease-in-out group-hover:scale-105 ${i === activeImage ? 'opacity-100' : 'opacity-0'}`}
+                                className={`${claseFundido(i, activeImage, fotos.anterior)} object-cover`}
                                 loading={i === 0 ? 'eager' : 'lazy'}
                                 fetchPriority={i === 0 ? 'high' : 'auto'}
                                 decoding="async"
                             />
                         ))}
+                        </div>
                         <span aria-hidden="true" className="absolute inset-2.5 border border-cielo-gold/30 pointer-events-none z-[1]" />
                         {fotos.rota && <div key={fotos.vuelta} className="barra-foto absolute bottom-0 inset-x-0 h-px bg-cielo-gold/80 pointer-events-none z-[1]" />}
                         <div className="absolute top-3 left-3 bg-black/50 text-white p-2 rounded-full backdrop-blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">

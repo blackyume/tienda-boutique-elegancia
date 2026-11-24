@@ -415,6 +415,29 @@ html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
 /* El hilo dorado bajo la foto de producto mientras rota sola (useRotacionFotos). */
 @keyframes barra-foto { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .barra-foto { transform-origin: left; animation: barra-foto 5.5s linear forwards; }
+/* Fundido entre fotos de la misma modelo (frente, espalda): la nueva entra
+   encima, desenfocada y apenas más grande, y se asienta; la anterior queda
+   entera debajo hasta el final. Pedido del dueño 23/11/2026: que no se note
+   el salto de una foto a otra. */
+.fundido {
+    position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;
+    opacity: 0; transform: scale(1.035); filter: blur(6px);
+    transition: opacity 0s linear 1.7s, transform 0s linear 1.7s, filter 0s linear 1.7s;
+}
+.fundido.es-anterior { z-index: 1; opacity: 1; transform: none; filter: none; transition: none; }
+.fundido.es-activa {
+    z-index: 2; opacity: 1; transform: none; filter: none;
+    transition: opacity 1.6s cubic-bezier(.4,0,.2,1), filter 1.6s cubic-bezier(.4,0,.2,1), transform 2.6s cubic-bezier(.22,.61,.36,1);
+}
+.fundido-hover {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; transform: scale(1.035); filter: blur(6px);
+    transition: opacity 1.1s cubic-bezier(.4,0,.2,1), filter 1.1s cubic-bezier(.4,0,.2,1), transform 1.8s cubic-bezier(.22,.61,.36,1);
+}
+.group:hover .fundido-hover { opacity: 1; transform: none; filter: none; }
+@media (prefers-reduced-motion: reduce) {
+    .fundido, .fundido.es-activa, .fundido-hover { transform: none; filter: none; transition: opacity .3s; }
+}
 @keyframes pagina-entra {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: none; }

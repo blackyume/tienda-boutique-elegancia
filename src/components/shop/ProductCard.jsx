@@ -90,7 +90,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                             alt=""
                             width={640}
                             sizes={SIZES_GRILLA}
-                            className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            className="fundido-hover absolute inset-0 w-full h-full object-cover"
                         />
                     )}
 

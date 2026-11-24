@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRotacionFotos } from '../../hooks/useRotacionFotos';
+import { claseFundido, useRotacionFotos } from '../../hooks/useRotacionFotos';
 import { tituloDeProducto } from '../../utils/nombres';
 import { useNavigate } from 'react-router-dom';
 import { X, Heart, Check, Ruler, Share2, ChevronDown, ArrowRight } from 'lucide-react';
@@ -133,7 +133,8 @@ export const QuickViewModal = ({ product, onClose }) => {
                                 title="Product Video"
                             ></iframe>
                         ) : (
-                            mediaList.map((m, i) => (
+                            <div className="absolute inset-0 z-0">
+                            {mediaList.map((m, i) => (
                                 <img
                                     key={`${m.url}-${i}`}
                                     src={m.url}
@@ -141,9 +142,10 @@ export const QuickViewModal = ({ product, onClose }) => {
                                     aria-hidden={i !== activeMediaIndex}
                                     loading={i === 0 ? 'eager' : 'lazy'}
                                     decoding="async"
-                                    className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-[1200ms] ease-in-out ${i === activeMediaIndex ? 'opacity-100' : 'opacity-0'}`}
+                                    className={`${claseFundido(i, activeMediaIndex, fotos.anterior)} object-contain`}
                                 />
-                            ))
+                            ))}
+                            </div>
                         )}
                         {fotos.rota && <div key={fotos.vuelta} className="barra-foto absolute bottom-0 inset-x-0 h-px bg-cielo-gold/70 pointer-events-none" />}
 

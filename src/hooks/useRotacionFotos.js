@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Las publicaciones traen frente y espalda: la foto principal pasa sola de una
 // a otra con un fundido lento (pedido del dueño, 1/11/2026). Apenas la clienta
@@ -6,14 +6,28 @@ import { useEffect, useState } from 'react';
 // mouse encima, con la pestaña oculta o si la persona pidió menos movimiento.
 export const PASO_FOTOS_MS = 5500;
 
+// Clase de cada foto apilada para el fundido (ver .fundido en index.css): la
+// nueva entra ENCIMA de la anterior, que se queda entera debajo hasta que la
+// otra termina de aparecer. Así no hay doble exposición ni bajón de luz.
+export const claseFundido = (i, indice, anterior) =>
+    `fundido${i === indice ? ' es-activa' : i === anterior ? ' es-anterior' : ''}`;
+
 export const useRotacionFotos = (cantidad, { clave, activa = true } = {}) => {
     const [indice, setIndice] = useState(0);
     const [manual, setManual] = useState(false);
     const [encima, setEncima] = useState(false);
     const [vuelta, setVuelta] = useState(0);
+    const [anterior, setAnterior] = useState(-1);
+    const ultimo = useRef(0);
+
+    useEffect(() => {
+        if (ultimo.current !== indice) setAnterior(ultimo.current);
+        ultimo.current = indice;
+    }, [indice]);
 
     useEffect(() => {
         setIndice(0);
+        setAnterior(-1);
         setManual(false);
     }, [clave]);
 
@@ -36,6 +50,7 @@ export const useRotacionFotos = (cantidad, { clave, activa = true } = {}) => {
 
     return {
         indice: Math.min(indice, Math.max(cantidad - 1, 0)),
+        anterior,
         elegir,
         rota,
         vuelta,
