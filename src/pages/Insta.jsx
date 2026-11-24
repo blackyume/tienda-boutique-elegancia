@@ -28,7 +28,7 @@ export const Insta = () => {
                 {prendas.map(p => (
                     <li key={p.id}>
                         <Link to={`/product/${p.id}?utm_source=instagram`} className="group block">
-                            <div className="aspect-[2/3] overflow-hidden bg-noche-850">
+                            <div className="aspect-[9/16] overflow-hidden bg-noche-850">
                                 <img src={optimizeImage(p.image, 500)} alt={tituloDeProducto(p.name)} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             </div>
                             <p className="font-serif text-base text-noche-100 mt-3 leading-snug group-hover:text-cielo-gold transition-colors">{tituloDeProducto(p.name)}</p>

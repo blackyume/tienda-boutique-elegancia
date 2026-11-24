@@ -202,7 +202,7 @@ export const Navbar = ({ onOpenCart }) => {
                                         <div className="flex gap-4">
                                             {fotosMenu.map(cat => (
                                                 <button key={cat.id} onClick={() => handleCategoryClick(cat.name)} className="group/foto w-32 lg:w-40 text-left">
-                                                    <div className="aspect-[2/3] overflow-hidden bg-noche-850">
+                                                    <div className="aspect-[9/16] overflow-hidden bg-noche-850">
                                                         <img src={optimizeImage(cat.image, 400)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-90 transition-opacity duration-500 group-hover/foto:opacity-100" />
                                                     </div>
                                                     <span className="block mt-3 font-serif italic text-sm text-noche-100 transition-colors group-hover/foto:text-cielo-gold">{tituloDeProducto(cat.name)}</span>

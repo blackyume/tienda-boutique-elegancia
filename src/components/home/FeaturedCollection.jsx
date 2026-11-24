@@ -12,7 +12,7 @@ const HeroCard = ({ item, onQuickView }) => (
         onClick={() => onQuickView?.(item)}
         role="button"
         aria-label={`Vista rápida de ${item.name}`}
-        className="group relative overflow-hidden cursor-pointer aspect-[2/3]"
+        className="group relative overflow-hidden cursor-pointer aspect-[9/16]"
         style={{ background: '#080808' }}
     >
         <img
@@ -92,7 +92,7 @@ const SmallCard = ({ item, onQuickView }) => (
         onClick={() => onQuickView?.(item)}
         role="button"
         aria-label={`Vista rápida de ${item.name}`}
-        className="group relative overflow-hidden cursor-pointer aspect-[2/3]"
+        className="group relative overflow-hidden cursor-pointer aspect-[9/16]"
         style={{ background: '#080808' }}
     >
         <img

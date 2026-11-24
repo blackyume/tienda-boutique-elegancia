@@ -21,6 +21,10 @@ describe('marcoParaRatio', () => {
         expect(marcoParaRatio(16 / 9)).toBe('aspect-[4/5]');
     });
 
+    it('la foto de fondo oro 768x1376 va entera en 9:16 (en 2:3 perdia los pies)', () => {
+        expect(marcoParaRatio(768 / 1376)).toBe('aspect-[9/16]');
+    });
+
     it('un ratio invalido no revienta', () => {
         expect(marcoParaRatio(0)).toBe('aspect-[2/3]');
     });

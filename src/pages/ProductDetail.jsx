@@ -240,7 +240,7 @@ export const ProductDetail = () => {
                                     key={i}
                                     onClick={() => setActiveImage(i)}
                                     aria-label={`Imagen ${i + 1}`}
-                                    className={`aspect-[2/3] md:w-20 lg:w-full shrink-0 overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
+                                    className={`aspect-[9/16] md:w-20 lg:w-full shrink-0 overflow-hidden rounded-md transition-all ${i === activeImage ? 'ring-2 ring-cielo-gold' : 'opacity-70 hover:opacity-100'}`}
                                 >
                                     <img src={optimizeImage(img, 300)} alt="" className="w-full h-full object-cover" loading="lazy" />
                                 </button>

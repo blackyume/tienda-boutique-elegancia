@@ -13,20 +13,21 @@ import { useCallback, useState } from 'react';
 const CARRILES = [
     { min: 0.90, clase: 'aspect-[4/5]' },  // cuadrada o casi
     { min: 0.72, clase: 'aspect-[3/4]' },  // vertical suave
-    { min: 0.00, clase: 'aspect-[2/3]' },  // modelo de cuerpo entero
+    { min: 0.62, clase: 'aspect-[2/3]' },  // modelo de cuerpo entero
+    { min: 0.00, clase: 'aspect-[9/16]' }, // fondo oro de Flow (768x1376): en 2:3 perdía los pies
 ];
 
-const PROPORCIONES = { 'aspect-[4/5]': 4 / 5, 'aspect-[3/4]': 3 / 4, 'aspect-[2/3]': 2 / 3 };
+const PROPORCIONES = { 'aspect-[4/5]': 4 / 5, 'aspect-[3/4]': 3 / 4, 'aspect-[2/3]': 2 / 3, 'aspect-[9/16]': 9 / 16 };
 
 // La misma proporción en número, para calcular el ancho desde el alto de la pantalla.
 export const proporcionDelMarco = (clase) => PROPORCIONES[clase] || 2 / 3;
 
 export const marcoParaRatio = (ratio) =>
-    (CARRILES.find((c) => ratio >= c.min) || CARRILES[CARRILES.length - 1]).clase;
+    ratio > 0 ? CARRILES.find((c) => ratio >= c.min).clase : 'aspect-[2/3]';
 
-// Arranca en 2:3 (desde el 1/11/2026 todo el catálogo es foto de modelo de
-// cuerpo entero) y se corrige solo cuando la foto informa su proporción.
-export const useMarcoFoto = (inicial = 'aspect-[2/3]') => {
+// Arranca en 9:16 (desde el 23/11/2026 todo el catálogo es la modelo sobre
+// fondo oro de Flow) y se corrige solo cuando la foto informa su proporción.
+export const useMarcoFoto = (inicial = 'aspect-[9/16]') => {
     const [marco, setMarco] = useState(inicial);
     const onNaturalSize = useCallback((w, h) => {
         if (w > 0 && h > 0) setMarco(marcoParaRatio(w / h));
