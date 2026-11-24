@@ -9,15 +9,13 @@
 
 import { PORTADA_PROPIA, resolveHeroImage } from './helpers';
 
-// Desde el 1/11/2026: collages del productor, tres modelos recortadas sobre un
-// mismo fondo de estudio (una sola en el teléfono), siempre de cuerpo entero y
-// con aire en los bordes, porque el zoom lento del hero come lo que toca el borde.
+// Desde el 23/11/2026: la brasilera de Flow sobre paneles art déco. Escritorio
+// 16:9 con la modelo en el tercio derecho (la izquierda en penumbra, ahí va el
+// texto); teléfono 9:16 con la cabeza al ~21 % para que el menú no la tape.
 // Al cambiar una portada, cambiar el NOMBRE del archivo: el service worker y la
 // CDN siguen sirviendo la vieja si el nombre es el mismo.
 export const PORTADAS_PROPIAS = [
-    { escritorio: '/portada-estudio-b1.webp', telefono: '/portada-estudio-b1-sm.webp', respaldo: '/portada-estudio-b1.jpg' },
-    { escritorio: '/portada-estudio-b2.webp', telefono: '/portada-estudio-b2-sm.webp', respaldo: '/portada-estudio-b2.jpg' },
-    { escritorio: '/portada-estudio-b3.webp', telefono: '/portada-estudio-b3-sm.webp', respaldo: '/portada-estudio-b3.jpg' },
+    { escritorio: '/portada-deco-1.webp', telefono: '/portada-deco-1-sm.webp', respaldo: '/portada-deco-1.jpg' },
 ];
 
 const normalizar = (slide) => {

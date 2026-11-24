@@ -46,7 +46,7 @@ describe('armarSlides', () => {
     });
 
     it('rota sólo con más de una', () => {
-        expect(rota(PORTADAS_PROPIAS)).toBe(true);
+        expect(rota([PORTADAS_PROPIAS[0], PORTADAS_PROPIAS[0]])).toBe(true);
         expect(rota([PORTADAS_PROPIAS[0]])).toBe(false);
         expect(rota(undefined)).toBe(false);
     });

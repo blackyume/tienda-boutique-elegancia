@@ -77,12 +77,11 @@ export const CapaPortadas = ({ visibles, activa, propias }) => (
                         loading={i === 0 ? 'eager' : 'lazy'}
                         decoding="async"
                         className={[
-                            // Las propias de escritorio van ENTERAS (contain), apoyadas a la
-                            // derecha: sus bordes son del mismo negro que la página, así que el
-                            // hueco no se ve, y en una pantalla ancha y baja el cover le cortaba
-                            // los pies o la cabeza a las modelos.
+                            // Las propias de escritorio van con todo su alto, apoyadas a la derecha
+                            // (la modelo está en el tercio derecho); lo que sobra se come de la
+                            // izquierda, que es cortina vacía, y ese borde se funde con la página.
                             'absolute inset-0 w-full h-full object-cover object-center',
-                            propias && 'portada-propia md:object-contain lg:object-right-bottom',
+                            propias && 'portada-propia md:object-contain lg:left-auto lg:w-auto lg:max-w-none',
                             'transition-opacity duration-[1600ms] ease-in-out motion-reduce:transition-none',
                             esActiva ? 'opacity-100' : 'opacity-0',
                             esActiva
