@@ -4,8 +4,9 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowRight } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { resolveHeroImage, PORTADA_PROPIA } from '../../utils/helpers';
-import { armarSlides } from '../../utils/portadas';
-import { usePortadas, CapaPortadas, PuntosPortada } from './PortadaCarrusel';
+import { armarSlides, DESFILE } from '../../utils/portadas';
+import { usePortadas, usePuedeVideo, CapaPortadas, PuntosPortada } from './PortadaCarrusel';
+import { Desfile } from './Desfile';
 
 export const Hero = () => {
     const { siteConfig } = useStore();
@@ -14,7 +15,8 @@ export const Hero = () => {
     const [effectsReady, setEffectsReady] = useState(false);
 
     const slides = useMemo(() => armarSlides(siteConfig), [siteConfig]);
-    const { activa, setActiva, visibles } = usePortadas(slides);
+    const { activa, fase, vueltas, setActiva, rotando, visibles } = usePortadas(slides);
+    const puedeVideo = usePuedeVideo();
 
     useEffect(() => {
         const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
@@ -79,6 +81,8 @@ export const Hero = () => {
     // Con un srcSet por ancho el teléfono elegía la apaisada (390px x DPR 3 =
     // 1170 > 760) y se comía a la modelo.
     const esPortadaPropia = heroImage === PORTADA_PROPIA;
+    // En escritorio, con movimiento permitido, la portada es el desfile por la puerta.
+    const desfile = esPortadaPropia && puedeVideo && DESFILE.modelos.length > 0;
     const primera = slides[0];
     const MEDIA_TELEFONO = '(max-width: 1023px)';
     const MEDIA_ESCRITORIO = '(min-width: 1024px)';
@@ -104,7 +108,9 @@ export const Hero = () => {
                 cortar a la modelo: a 86 quedaban a más de una pantalla de distancia.
                 En escritorio sigue a pantalla completa con el texto a la izquierda. */}
             <div ref={layerRef} className="relative h-[78svh] lg:h-auto lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-[7.5rem] z-0 will-change-transform sin-textura">
-                <CapaPortadas visibles={visibles} activa={activa} propias={esPortadaPropia} />
+                {desfile
+                    ? <Desfile />
+                    : <CapaPortadas visibles={visibles} activa={activa} fase={fase} vueltas={vueltas} propias={esPortadaPropia} />}
                 <div className="lg:hidden absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#11100D] pointer-events-none" />
             </div>
 
@@ -138,7 +144,7 @@ export const Hero = () => {
                 }}
             />
 
-            <PuntosPortada slides={slides} activa={activa} onElegir={setActiva} />
+            {!desfile && <PuntosPortada slides={slides} activa={activa} fase={fase} onElegir={setActiva} rotando={rotando} />}
 
             {effectsReady && (
                 <div
@@ -155,20 +161,28 @@ export const Hero = () => {
                 lg:pt-28 deja libre el menú fijo en pantallas bajas. */}
             <div ref={contentRef} className="relative z-10 w-full lg:w-auto px-6 lg:pl-[5.5vw] lg:pr-0 pt-3 lg:pt-28 pb-10 lg:pb-20 will-change-transform lg:max-w-[36vw]">
 
-                <span className="hidden lg:block text-2xs uppercase tracking-[0.5em] font-medium text-cielo-gold/90 mb-7 animate-fadeIn">
+                <span className="portada-antetitulo hidden lg:block text-2xs uppercase tracking-[0.5em] font-medium text-cielo-gold/90 mb-7">
                     Colección 2027
                 </span>
 
                 {/* El titular es el lema: «La Boutique» ya lo dice el logo justo arriba.
                     Sin lema en el CMS vuelven el título y el subtítulo. */}
-                <h1 className="font-serif leading-[1.04] text-noche-100 animate-slideUp text-[clamp(2.1rem,9.6vw,2.9rem)] lg:text-[clamp(2.6rem,4.3vw,5.6rem)] text-balance">
-                    {lema || title}
+                {/* Cada palabra sube desde atrás de una ranura, una detrás de otra. */}
+                <h1 aria-label={lema || title} className="font-serif leading-[1.04] text-noche-100 text-[clamp(2.1rem,9.6vw,2.9rem)] lg:text-[clamp(2.6rem,4.3vw,5.6rem)] text-balance">
+                    {(lema || title).split(/\s+/).map((palabra, i, todas) => (
+                        <React.Fragment key={i}>
+                            <span aria-hidden="true" className="titular-palabra">
+                                <span style={{ animationDelay: `${180 + i * 95}ms` }}>{palabra}</span>
+                            </span>
+                            {i < todas.length - 1 && ' '}
+                        </React.Fragment>
+                    ))}
                 </h1>
                 {!lema && <p className="font-serif italic font-light text-noche-100/90 mt-3 text-2xl">{subtitle}</p>}
 
-                <span className="hidden lg:block h-px w-14 bg-cielo-gold/50 mt-9 animate-fadeIn opacity-0 [animation-delay:400ms]" />
+                <span className="portada-regla hidden lg:block h-px w-14 bg-cielo-gold/50 mt-9" />
 
-                <div className="mt-5 lg:mt-9 flex flex-col items-start gap-6 lg:gap-9 animate-fadeIn opacity-0 [animation-delay:550ms]">
+                <div className="mt-5 lg:mt-9 flex flex-col items-start gap-6 lg:gap-9 animate-fadeIn opacity-0 [animation-delay:850ms]">
                     <p className="order-2 lg:order-1 text-sm lg:text-[0.95rem] text-noche-300/90 max-w-sm font-light leading-relaxed">
                         {lema ? resto : tagline}
                     </p>

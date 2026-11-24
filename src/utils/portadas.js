@@ -16,7 +16,19 @@ import { PORTADA_PROPIA, resolveHeroImage } from './helpers';
 // CDN siguen sirviendo la vieja si el nombre es el mismo.
 export const PORTADAS_PROPIAS = [
     { escritorio: '/portada-deco-1.webp', telefono: '/portada-deco-1-sm.webp', respaldo: '/portada-deco-1.jpg' },
+    { escritorio: '/portada-deco-2.webp', telefono: '/portada-deco-2-sm.webp', respaldo: '/portada-deco-2.jpg' },
+    { escritorio: '/portada-deco-3.webp', telefono: '/portada-deco-3-sm.webp', respaldo: '/portada-deco-3.jpg' },
 ];
+
+// El desfile de escritorio (Desfile.jsx): cada modelo con su pose (foto y, si hay,
+// video en el lugar), el video en que entra por la puerta y en el que sale.
+// Los cuadros de los extremos coinciden: escena vacía o la pose.
+export const DESFILE = {
+    modelos: [
+        { foto: '/portada-deco-1.webp', pose: '/desfile/gamulan-pose.mp4', entra: '/desfile/gamulan-entra.mp4', sale: '/desfile/gamulan-sale.mp4' },
+        { foto: '/desfile/chocolate-pose.webp', entra: '/desfile/chocolate-entra.mp4', sale: '/desfile/chocolate-sale.mp4' },
+    ],
+};
 
 const normalizar = (slide) => {
     if (typeof slide === 'string') {
